@@ -12,10 +12,12 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#EFF1F4">
 <meta name="theme-color" content="#0C0E12">
+<script>try{var __t=localStorage.getItem("tl-theme");if(__t==="light"||__t==="dark")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Spline+Sans:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap">
 <style>
 /* ============ TOKENS -- dark-first (matte sleeve black), light = grading-slab acrylic ============ */
 :root{
+  --show-sun:block; --show-moon:none;
   --bg:#0C0E12; --bg2:#11141A; --surface:#161A22; --surface2:#1C212B;
   --line:#262C38; --line2:#333B4A;
   --ink:#EEF0F4; --ink2:#A6ADBB; --ink3:#7E8798;
@@ -34,6 +36,7 @@
 }
 @media (prefers-color-scheme: light){
   :root:not([data-theme="dark"]){
+    --show-sun:none; --show-moon:block;
     --bg:#EFF1F4; --bg2:#F6F7FA; --surface:#FFFFFF; --surface2:#F1F3F6;
     --line:#DBDFE6; --line2:#C6CCD6;
     --ink:#15181E; --ink2:#4E5563; --ink3:#616B7A;
@@ -47,6 +50,7 @@
   }
 }
 :root[data-theme="light"]{
+  --show-sun:none; --show-moon:block;
   --bg:#EFF1F4; --bg2:#F6F7FA; --surface:#FFFFFF; --surface2:#F1F3F6;
   --line:#DBDFE6; --line2:#C6CCD6;
   --ink:#15181E; --ink2:#4E5563; --ink3:#616B7A;
@@ -129,6 +133,23 @@ button{font-family:inherit; color:inherit; cursor:pointer}
 }
 .mainnav button:hover{color:var(--ink); background:var(--surface)}
 .mainnav button[aria-current="true"]{color:var(--accent)}
+.brand-logo{height:50px; width:auto; display:none}
+html:not(.no-logo) .brand-logo.logo-d{display:var(--show-sun)}
+html:not(.no-logo) .brand-logo.logo-l{display:var(--show-moon)}
+html:not(.no-logo) .brand .brand-mark{display:none}
+html:not(.no-logo) .brand .brand-name{display:none}
+.foot-logo{height:62px; width:auto; display:none; margin-bottom:10px}
+html:not(.no-logo) .foot-logo.logo-d{display:var(--show-sun)}
+html:not(.no-logo) .foot-logo.logo-l{display:var(--show-moon)}
+html:not(.no-logo) .foot-brand{display:none}
+.theme-btn{
+  width:38px; height:38px; flex:0 0 auto; display:grid; place-items:center;
+  background:var(--surface); border:1px solid var(--line); border-radius:4px; color:var(--ink2);
+  transition:border-color .15s ease, color .15s ease;
+}
+.theme-btn:hover{border-color:var(--accent); color:var(--accent)}
+.theme-btn .ic-sun{display:var(--show-sun)}
+.theme-btn .ic-moon{display:var(--show-moon)}
 .cart-btn{
   display:flex; align-items:center; gap:8px;
   background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:8px 14px;
@@ -229,7 +250,7 @@ button{font-family:inherit; color:inherit; cursor:pointer}
 .dot.warn{background:var(--warn)} .dot.crit{background:var(--crit)}
 
 /* hero card */
-.stage{perspective:1100px; display:grid; place-items:center; min-height:420px}
+.stage{perspective:1100px; display:grid; place-items:center; min-height:420px; padding-bottom:56px}
 .holo{
   width:min(300px,72vw); aspect-ratio:5/7; border-radius:14px; position:relative;
   transform-style:preserve-3d; transition:transform .2s ease-out;
@@ -271,7 +292,7 @@ button{font-family:inherit; color:inherit; cursor:pointer}
   background-size:250% 250%; background-position:var(--shx,50%) var(--shy,50%);
 }
 .stage-caption{
-  position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
+  position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
   font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ink3);
   white-space:nowrap;
 }
@@ -859,6 +880,8 @@ footer::before{
 <header class="topbar">
   <div class="wrap">
     <button class="brand" data-go="home" aria-label="Top Loaded TCG home">
+      <img class="brand-logo logo-d" src="logo-dark.png" alt="" aria-hidden="true" onerror="document.documentElement.classList.add('no-logo')">
+      <img class="brand-logo logo-l" src="logo-light.png" alt="" aria-hidden="true" onerror="document.documentElement.classList.add('no-logo')">
       <span class="brand-mark" aria-hidden="true">TL</span>
       <span class="brand-name" id="brandName">Top Loaded<small>Trading Cards &middot; NKY</small></span>
     </button>
@@ -870,6 +893,10 @@ footer::before{
       <button data-go="buylist">Sell to Us</button>
       <button data-go="visit">Visit</button>
     </nav>
+    <button class="theme-btn" id="themeBtn" aria-label="Switch between light and dark mode" title="Light / dark mode">
+      <svg class="ic-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v3M12 18.5v3M21.5 12h-3M5.5 12h-3M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1M18.7 18.7l-2.1-2.1M7.4 7.4L5.3 5.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <svg class="ic-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+    </button>
     <button class="cart-btn" id="cartBtn" aria-haspopup="dialog">
       Cart <span class="cart-count" id="cartCount">0</span>
     </button>
@@ -1384,8 +1411,8 @@ footer::before{
           <dl class="kv">
             <dt>Site title</dt><dd><input id="setTitle" value="Top Loaded" style="width:180px"></dd>
             <dt>Logo</dt><dd><button class="btn btn-ghost" id="setLogo" type="button" style="padding:8px 14px">Upload logo</button></dd>
-            <dt>Weekday hours</dt><dd><input id="setHoursWk" value="Tue&ndash;Sat &middot; 11 AM &ndash; 8 PM" style="width:210px"></dd>
-            <dt>Sunday hours</dt><dd><input id="setHoursSun" value="Sun &middot; 11 AM &ndash; 6 PM" style="width:210px"></dd>
+            <dt>Weekday hours</dt><dd><input id="setHoursWk" value="Tue&ndash;Fri &middot; 11 AM &ndash; 6 PM" style="width:210px"></dd>
+            <dt>Weekend hours</dt><dd><input id="setHoursSun" value="Sat&ndash;Sun &middot; 10 AM &ndash; 4 PM" style="width:210px"></dd>
             <dt>Banner</dt><dd><input id="setBanner" placeholder="Holiday hours, big restock, show reminder&hellip;" style="width:100%"></dd>
             <dt>Show banner</dt><dd><button class="switch" role="switch" aria-checked="false" id="setBannerOn" aria-label="Show announcement banner"></button></dd>
           </dl>
@@ -1462,6 +1489,8 @@ footer::before{
   <div class="wrap">
     <div class="foot-grid">
       <div>
+        <img class="foot-logo logo-d" src="logo-dark.png" alt="Top Loaded Trading Cards" onerror="this.style.display='none'">
+        <img class="foot-logo logo-l" src="logo-light.png" alt="" aria-hidden="true" onerror="this.style.display='none'">
         <p class="foot-brand">Top Loaded</p>
         <ul style="margin-top:12px">
           <li>Buy &middot; Sell &middot; Trade</li>
@@ -1485,11 +1514,11 @@ footer::before{
         </ul>
       </div>
       <div>
-        <h4>Hours <span class="demo-tag">placeholder</span></h4>
+        <h4>Hours</h4>
         <ul>
           <li>Closed Mondays</li>
-          <li id="footHoursWk">Tue&ndash;Sat &middot; 11 AM &ndash; 8 PM</li>
-          <li id="footHoursSun">Sun &middot; 11 AM &ndash; 6 PM</li>
+          <li id="footHoursWk">Tue&ndash;Fri &middot; 11 AM &ndash; 6 PM</li>
+          <li id="footHoursSun">Sat&ndash;Sun &middot; 10 AM &ndash; 4 PM</li>
           <li style="margin-top:6px"><button class="linklike" data-go="show" id="footShowDate">Next card show &middot; Sat, Sep 5 &rarr;</button></li>
         </ul>
       </div>
@@ -2187,6 +2216,19 @@ footer::before{
   renderShop(); renderFeatured(); renderCart(); initLive();
   renderSched(); renderEvEditor(); renderAlerts(); renderCred();
   initLiveInventory();
+
+  /* ---------- theme toggle ---------- */
+  $("#themeBtn").addEventListener("click", function(){
+    var root = document.documentElement;
+    var cur = root.getAttribute("data-theme");
+    var effectiveDark;
+    if(cur === "dark") effectiveDark = true;
+    else if(cur === "light") effectiveDark = false;
+    else effectiveDark = !window.matchMedia("(prefers-color-scheme: light)").matches;
+    var next = effectiveDark ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("tl-theme", next); } catch(e){}
+  });
 
   /* ---------- scroll-in reveals ---------- */
   if(!reduceMotion && "IntersectionObserver" in window){
