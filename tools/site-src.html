@@ -11,13 +11,13 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="favicon.png">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#EFF1F4">
-<meta name="theme-color" content="#0C0E12">
-<script>try{var __t=localStorage.getItem("tl-theme");if(__t==="light"||__t==="dark")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
+<meta name="theme-color" content="#0C0A06">
+<script>(function(){var t="tl";try{var s=localStorage.getItem("tl-theme");if(s==="light"||s==="dark"||s==="tl")t=s}catch(e){}document.documentElement.setAttribute("data-theme",t)})()</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Spline+Sans:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap">
 <style>
 /* ============ TOKENS -- dark-first (matte sleeve black), light = grading-slab acrylic ============ */
 :root{
-  --show-sun:block; --show-moon:none;
+  --show-sun:none; --show-moon:none; --show-tl:block; --logo-dark:block; --logo-light:none;
   --bg:#0C0E12; --bg2:#11141A; --surface:#161A22; --surface2:#1C212B;
   --line:#262C38; --line2:#333B4A;
   --ink:#EEF0F4; --ink2:#A6ADBB; --ink3:#7E8798;
@@ -36,7 +36,7 @@
 }
 @media (prefers-color-scheme: light){
   :root:not([data-theme="dark"]){
-    --show-sun:none; --show-moon:block;
+    --show-sun:none; --show-moon:block; --show-tl:none; --logo-dark:none; --logo-light:block;
     --bg:#EFF1F4; --bg2:#F6F7FA; --surface:#FFFFFF; --surface2:#F1F3F6;
     --line:#DBDFE6; --line2:#C6CCD6;
     --ink:#15181E; --ink2:#4E5563; --ink3:#616B7A;
@@ -50,7 +50,7 @@
   }
 }
 :root[data-theme="light"]{
-  --show-sun:none; --show-moon:block;
+  --show-sun:none; --show-moon:block; --show-tl:none; --logo-dark:none; --logo-light:block;
   --bg:#EFF1F4; --bg2:#F6F7FA; --surface:#FFFFFF; --surface2:#F1F3F6;
   --line:#DBDFE6; --line2:#C6CCD6;
   --ink:#15181E; --ink2:#4E5563; --ink3:#616B7A;
@@ -61,6 +61,22 @@
   --foilA:#0B8AA0; --foilB:#6650DC; --foilC:#BE3D77; --foilD:#A8790C;
   --top-light:rgba(255,255,255,.9); --edge-shadow:0 1px 3px rgba(21,24,30,.08);
   --grain:.025;
+}
+/* Top Loaded house theme: graffiti yellow on warm black, from the shop logo.
+   Defines every token the light media block does, so it fully overrides it. */
+:root[data-theme="tl"]{
+  --show-sun:block; --show-moon:none; --show-tl:none; --logo-dark:block; --logo-light:none;
+  --bg:#0C0A06; --bg2:#131007; --surface:#191509; --surface2:#211B0D;
+  --line:#332B15; --line2:#4A3F1E;
+  --ink:#F7F2E4; --ink2:#C2B795; --ink3:#8E8465;
+  --accent:#FFD23F; --accent-ink:#171204; --accent-dim:#8A7524;
+  --good:#5BD98A; --warn:#E8B44D; --crit:#F26D6D;
+  --good-bg:rgba(91,217,138,.12); --warn-bg:rgba(232,180,77,.12); --crit-bg:rgba(242,109,109,.12);
+  --shadow:0 18px 50px rgba(0,0,0,.55);
+  --foilA:#FFE98A; --foilB:#FFD23F; --foilC:#FFFFFF; --foilD:#FFB03A;
+  --slab:#14100A; --slab-line:#332B15;
+  --top-light:rgba(255,255,255,.07); --edge-shadow:0 2px 8px rgba(0,0,0,.4);
+  --grain:.06;
 }
 
 /* ============ BASE ============ */
@@ -134,13 +150,13 @@ button{font-family:inherit; color:inherit; cursor:pointer}
 .mainnav button:hover{color:var(--ink); background:var(--surface)}
 .mainnav button[aria-current="true"]{color:var(--accent)}
 .brand-logo{height:50px; width:auto; display:none}
-html:not(.no-logo) .brand-logo.logo-d{display:var(--show-sun)}
-html:not(.no-logo) .brand-logo.logo-l{display:var(--show-moon)}
+html:not(.no-logo) .brand-logo.logo-d{display:var(--logo-dark)}
+html:not(.no-logo) .brand-logo.logo-l{display:var(--logo-light)}
 html:not(.no-logo) .brand .brand-mark{display:none}
 html:not(.no-logo) .brand .brand-name{display:none}
 .foot-logo{height:62px; width:auto; display:none; margin-bottom:10px}
-html:not(.no-logo) .foot-logo.logo-d{display:var(--show-sun)}
-html:not(.no-logo) .foot-logo.logo-l{display:var(--show-moon)}
+html:not(.no-logo) .foot-logo.logo-d{display:var(--logo-dark)}
+html:not(.no-logo) .foot-logo.logo-l{display:var(--logo-light)}
 html:not(.no-logo) .foot-brand{display:none}
 .theme-btn{
   width:38px; height:38px; flex:0 0 auto; display:grid; place-items:center;
@@ -150,6 +166,12 @@ html:not(.no-logo) .foot-brand{display:none}
 .theme-btn:hover{border-color:var(--accent); color:var(--accent)}
 .theme-btn .ic-sun{display:var(--show-sun)}
 .theme-btn .ic-moon{display:var(--show-moon)}
+.theme-btn .ic-tl{
+  display:var(--show-tl);
+  font-family:var(--disp); font-weight:800; font-size:.82rem; letter-spacing:.02em; line-height:1;
+  background:linear-gradient(120deg,var(--foilA),var(--foilB),var(--foilC),var(--foilD));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
 .cart-btn{
   display:flex; align-items:center; gap:8px;
   background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:8px 14px;
@@ -896,6 +918,7 @@ footer::before{
     <button class="theme-btn" id="themeBtn" aria-label="Switch between light and dark mode" title="Light / dark mode">
       <svg class="ic-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v3M12 18.5v3M21.5 12h-3M5.5 12h-3M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1M18.7 18.7l-2.1-2.1M7.4 7.4L5.3 5.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       <svg class="ic-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      <span class="ic-tl" aria-hidden="true">TL</span>
     </button>
     <button class="cart-btn" id="cartBtn" aria-haspopup="dialog">
       Cart <span class="cart-count" id="cartCount">0</span>
@@ -2220,14 +2243,11 @@ footer::before{
   /* ---------- theme toggle ---------- */
   $("#themeBtn").addEventListener("click", function(){
     var root = document.documentElement;
-    var cur = root.getAttribute("data-theme");
-    var effectiveDark;
-    if(cur === "dark") effectiveDark = true;
-    else if(cur === "light") effectiveDark = false;
-    else effectiveDark = !window.matchMedia("(prefers-color-scheme: light)").matches;
-    var next = effectiveDark ? "light" : "dark";
+    var cycle = { tl: "light", light: "dark", dark: "tl" };
+    var next = cycle[root.getAttribute("data-theme")] || "tl";
     root.setAttribute("data-theme", next);
     try { localStorage.setItem("tl-theme", next); } catch(e){}
+    toast(next === "tl" ? "Top Loaded theme" : (next === "light" ? "Light mode" : "Dark mode"));
   });
 
   /* ---------- scroll-in reveals ---------- */
