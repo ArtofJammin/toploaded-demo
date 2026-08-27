@@ -1,13 +1,24 @@
-<title>Top Loaded Flagship</title>
+<title>Top Loaded Trading Cards</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Top Loaded Trading Cards — Northern Kentucky's card shop for Pokemon, One Piece, Magic, and Gundam in Crescent Springs, KY. Buy, sell, and trade singles and sealed. Weekly play nights, live rip-and-ship breaks, and a monthly card show at the Hilton on Turfway Rd.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Top Loaded Trading Cards">
+<meta property="og:title" content="Top Loaded Trading Cards — Buy. Sell. Trade.">
+<meta property="og:description" content="Pokemon, One Piece, Magic, and Gundam singles and sealed in Crescent Springs, KY. We buy collections — cash on the spot or store credit +10%. Play nights weekly, card show monthly at the Hilton on Turfway Rd, Florence.">
+<meta property="og:image" content="https://artofjammin.github.io/toploaded-demo/og-image.png">
+<meta property="og:url" content="https://artofjammin.github.io/toploaded-demo/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#EFF1F4">
+<meta name="theme-color" content="#0C0E12">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Spline+Sans:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap">
 <style>
 /* ============ TOKENS -- dark-first (matte sleeve black), light = grading-slab acrylic ============ */
 :root{
   --bg:#0C0E12; --bg2:#11141A; --surface:#161A22; --surface2:#1C212B;
   --line:#262C38; --line2:#333B4A;
-  --ink:#EEF0F4; --ink2:#A6ADBB; --ink3:#737B8A;
+  --ink:#EEF0F4; --ink2:#A6ADBB; --ink3:#7E8798;
   --accent:#57D9C4; --accent-ink:#08110F; --accent-dim:#2E7A6E;
   --good:#5BD98A; --warn:#E8B44D; --crit:#F26D6D;
   --good-bg:rgba(91,217,138,.12); --warn-bg:rgba(232,180,77,.12); --crit-bg:rgba(242,109,109,.12);
@@ -15,6 +26,8 @@
   --slab:#12151B; --slab-line:#2A3140;
   --pk:#F5C542; --op:#E0563E; --mtg:#C08A3E;
   --shadow:0 18px 50px rgba(0,0,0,.5);
+  --top-light:rgba(255,255,255,.06); --edge-shadow:0 2px 8px rgba(0,0,0,.32);
+  --grain:.05;
   --disp:'Big Shoulders Display','Big Shoulders',Impact,'Arial Narrow',sans-serif;
   --body:'Spline Sans','Segoe UI',system-ui,sans-serif;
   --mono:'Spline Sans Mono','Cascadia Code',Consolas,monospace;
@@ -23,21 +36,27 @@
   :root:not([data-theme="dark"]){
     --bg:#EFF1F4; --bg2:#F6F7FA; --surface:#FFFFFF; --surface2:#F1F3F6;
     --line:#DBDFE6; --line2:#C6CCD6;
-    --ink:#15181E; --ink2:#4E5563; --ink3:#7A8290;
-    --accent:#0B8E7E; --accent-ink:#FFFFFF; --accent-dim:#7FB8AF;
+    --ink:#15181E; --ink2:#4E5563; --ink3:#616B7A;
+    --accent:#097366; --accent-ink:#FFFFFF; --accent-dim:#7FB8AF;
     --good:#1E9B54; --warn:#A9761B; --crit:#C6403E;
     --good-bg:rgba(30,155,84,.1); --warn-bg:rgba(169,118,27,.12); --crit-bg:rgba(198,64,62,.1);
     --shadow:0 16px 40px rgba(21,24,30,.14);
+    --foilA:#0B8AA0; --foilB:#6650DC; --foilC:#BE3D77; --foilD:#A8790C;
+    --top-light:rgba(255,255,255,.9); --edge-shadow:0 1px 3px rgba(21,24,30,.08);
+    --grain:.025;
   }
 }
 :root[data-theme="light"]{
   --bg:#EFF1F4; --bg2:#F6F7FA; --surface:#FFFFFF; --surface2:#F1F3F6;
   --line:#DBDFE6; --line2:#C6CCD6;
-  --ink:#15181E; --ink2:#4E5563; --ink3:#7A8290;
-  --accent:#0B8E7E; --accent-ink:#FFFFFF; --accent-dim:#7FB8AF;
+  --ink:#15181E; --ink2:#4E5563; --ink3:#616B7A;
+  --accent:#097366; --accent-ink:#FFFFFF; --accent-dim:#7FB8AF;
   --good:#1E9B54; --warn:#A9761B; --crit:#C6403E;
   --good-bg:rgba(30,155,84,.1); --warn-bg:rgba(169,118,27,.12); --crit-bg:rgba(198,64,62,.1);
   --shadow:0 16px 40px rgba(21,24,30,.14);
+  --foilA:#0B8AA0; --foilB:#6650DC; --foilC:#BE3D77; --foilD:#A8790C;
+  --top-light:rgba(255,255,255,.9); --edge-shadow:0 1px 3px rgba(21,24,30,.08);
+  --grain:.025;
 }
 
 /* ============ BASE ============ */
@@ -47,6 +66,12 @@ body{
   background:var(--bg); color:var(--ink);
   font-family:var(--body); font-size:16px; line-height:1.55;
   -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+body::after{
+  content:""; position:fixed; inset:0; z-index:1; pointer-events:none;
+  opacity:var(--grain); mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:160px 160px;
 }
 h1,h2,h3{margin:0; text-wrap:balance}
 p{margin:0}
@@ -60,7 +85,7 @@ button{font-family:inherit; color:inherit; cursor:pointer}
   color:var(--ink3);
 }
 .demo-tag{
-  font-family:var(--mono); font-size:.62rem; letter-spacing:.08em; text-transform:uppercase;
+  font-family:var(--mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase;
   color:var(--ink3); border:1px solid var(--line); border-radius:3px; padding:1px 5px;
   vertical-align:middle; white-space:nowrap;
 }
@@ -70,18 +95,17 @@ button{font-family:inherit; color:inherit; cursor:pointer}
 }
 .skip:focus{left:8px}
 
-/* ============ DEMO BADGE ============ */
-.tier-badge{
-  position:fixed; left:14px; bottom:14px; z-index:90;
-  font-family:var(--mono); font-size:.68rem; letter-spacing:.06em;
-  color:var(--ink3); background:var(--surface); border:1px solid var(--line);
-  padding:5px 10px; border-radius:4px; opacity:.85; pointer-events:none;
-}
-
 /* ============ HEADER ============ */
 .topbar{
   position:sticky; top:0; z-index:60; background:var(--bg);
   border-bottom:1px solid var(--line);
+}
+@supports ((backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px))){
+  .topbar{
+    background:color-mix(in srgb, var(--bg) 80%, transparent);
+    -webkit-backdrop-filter:blur(14px) saturate(1.15);
+    backdrop-filter:blur(14px) saturate(1.15);
+  }
 }
 .topbar .wrap{display:flex; align-items:center; gap:22px; height:64px}
 .brand{
@@ -119,27 +143,62 @@ button{font-family:inherit; color:inherit; cursor:pointer}
 /* ============ VIEWS ============ */
 .view{display:none}
 .view.active{display:block}
+@keyframes viewIn{from{opacity:0; transform:translateY(12px)}to{opacity:1; transform:none}}
+.view.active{animation:viewIn .32s cubic-bezier(.2,.7,.2,1) both}
 .view-head{padding:56px 0 28px}
 .view-head h1{
   font-family:var(--disp); font-weight:800; text-transform:uppercase; letter-spacing:.02em;
   font-size:clamp(2.4rem,5.5vw,3.6rem); line-height:.95;
 }
 .view-head .lede{color:var(--ink2); max-width:56ch; margin-top:14px}
+.view-head .eyebrow{display:inline-flex; align-items:center; gap:10px}
+.view-head .eyebrow::before{
+  content:""; width:26px; height:2px; flex:0 0 auto; border-radius:1px;
+  background:linear-gradient(90deg, var(--foilA), var(--foilB), var(--foilC), var(--foilD));
+}
 
 /* ============ HERO ============ */
 .hero{position:relative; overflow:hidden; background:var(--bg)}
+@keyframes aurora{
+  0%,100%{transform:translate3d(-2%,-1.5%,0) rotate(0deg)}
+  50%{transform:translate3d(2%,2%,0) rotate(3deg)}
+}
+.hero::before{
+  content:""; position:absolute; inset:-20% -10%; pointer-events:none;
+  background:
+    radial-gradient(42% 55% at 72% 38%, color-mix(in srgb, var(--foilB) 13%, transparent), transparent 70%),
+    radial-gradient(34% 46% at 84% 74%, color-mix(in srgb, var(--foilA) 11%, transparent), transparent 70%),
+    radial-gradient(30% 40% at 10% 84%, color-mix(in srgb, var(--foilC) 7%, transparent), transparent 70%);
+  animation:aurora 30s ease-in-out infinite;
+}
+.hero::after{
+  content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+  background:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size:56px 56px;
+  -webkit-mask-image:radial-gradient(70% 90% at 70% 40%, rgba(0,0,0,.5), transparent 75%);
+  mask-image:radial-gradient(70% 90% at 70% 40%, rgba(0,0,0,.5), transparent 75%);
+}
 .hero .wrap{
+  position:relative; z-index:1;
   display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);
   gap:40px; align-items:center; padding-top:64px; padding-bottom:72px; min-height:70vh;
 }
 .hero h1{
   font-family:var(--disp); font-weight:800; text-transform:uppercase;
-  font-size:clamp(4rem,11vw,8.2rem); line-height:.86; letter-spacing:.01em;
+  font-size:clamp(3.4rem,11vw,8.2rem); line-height:.86; letter-spacing:.01em;
 }
 .hero h1 span{display:block}
 .foil-text{
   background:linear-gradient(100deg,var(--foilA) 5%,var(--foilB) 35%,var(--foilC) 62%,var(--foilD) 92%);
   -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+@supports (-webkit-text-stroke: 1px black){
+  .hero h1 span:nth-child(2){
+    color:transparent;
+    -webkit-text-stroke:2px var(--ink);
+  }
 }
 .hero .sub{color:var(--ink2); max-width:44ch; margin-top:22px; font-size:1.06rem}
 .hero-ctas{display:flex; gap:12px; margin-top:28px; flex-wrap:wrap}
@@ -154,6 +213,13 @@ button{font-family:inherit; color:inherit; cursor:pointer}
   background:transparent; color:var(--ink); border:1px solid var(--line2);
 }
 .btn-ghost:hover{border-color:var(--accent); color:var(--accent); filter:none}
+.btn{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),
+             0 8px 20px -8px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.btn-ghost{box-shadow:none}
+.chip[aria-pressed="true"]{box-shadow:0 4px 12px -4px color-mix(in srgb, var(--accent) 45%, transparent)}
+.add:hover:not(:disabled){box-shadow:0 6px 16px -6px color-mix(in srgb, var(--accent) 50%, transparent)}
 .sync-pill{
   display:inline-flex; align-items:center; gap:8px; margin-top:30px;
   font-family:var(--mono); font-size:.72rem; letter-spacing:.06em; color:var(--ink3);
@@ -217,7 +283,29 @@ button{font-family:inherit; color:inherit; cursor:pointer}
 .reveal>*:nth-child(1){animation-delay:.05s}.reveal>*:nth-child(2){animation-delay:.14s}
 .reveal>*:nth-child(3){animation-delay:.23s}.reveal>*:nth-child(4){animation-delay:.32s}
 .reveal>*:nth-child(5){animation-delay:.41s}
-.holo{animation:cardIn .9s .3s cubic-bezier(.2,.7,.2,1) both}
+.holo{animation:cardIn .9s .3s cubic-bezier(.2,.7,.2,1) backwards}
+
+/* hero orchestration: foil glint, one-shot sheen pass, caption settle */
+@keyframes foilGlint{
+  0%{filter:brightness(.6) saturate(.7)}
+  55%{filter:brightness(1.35) saturate(1.25)}
+  100%{filter:brightness(1) saturate(1)}
+}
+.reveal .foil-text{animation:foilGlint 1.2s .55s ease-out both}
+@keyframes introSheen{
+  0%{transform:translateX(-160%) skewX(-16deg); opacity:0}
+  15%{opacity:1}
+  100%{transform:translateX(340%) skewX(-16deg); opacity:0}
+}
+.holo-frame::after{
+  content:""; position:absolute; top:-12%; bottom:-12%; left:0; width:38%;
+  background:linear-gradient(102deg, transparent, rgba(110,231,240,.16) 30%, rgba(255,255,255,.3) 50%, rgba(244,154,193,.15) 68%, transparent);
+  mix-blend-mode:screen; pointer-events:none; opacity:0;
+  transform:translateX(-160%) skewX(-16deg);
+  animation:introSheen 1.05s 1.2s cubic-bezier(.45,.1,.3,1) both;
+}
+@keyframes captionIn{from{opacity:0; transform:translate(-50%,8px)}to{opacity:1; transform:translate(-50%,0)}}
+.stage-caption{animation:captionIn .5s 1.9s ease both}
 
 /* ============ TICKER ============ */
 .ticker{
@@ -227,11 +315,24 @@ button{font-family:inherit; color:inherit; cursor:pointer}
 .ticker-track{display:inline-flex; gap:0; animation:tick 40s linear infinite; will-change:transform}
 .ticker:hover .ticker-track{animation-play-state:paused}
 .ticker span{
-  display:inline-block; padding:10px 26px;
+  display:inline-block; padding:10px 26px 10px 0;
   font-family:var(--mono); font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ink2);
 }
 .ticker b{color:var(--accent); font-weight:500}
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker{position:relative}
+.ticker::before{
+  content:"Buying desk"; position:absolute; left:0; top:0; bottom:0; z-index:2;
+  display:flex; align-items:center; padding:0 22px 0 24px;
+  background:linear-gradient(90deg, var(--bg2) 72%, transparent);
+  font-family:var(--mono); font-size:.64rem; letter-spacing:.22em; text-transform:uppercase; color:var(--accent);
+  pointer-events:none;
+}
+.ticker::after{
+  content:""; position:absolute; right:0; top:0; bottom:0; width:72px; z-index:1;
+  background:linear-gradient(270deg, var(--bg2), transparent); pointer-events:none;
+}
+.ticker span::before{content:"\2726"; color:var(--ink3); font-size:.6rem; padding-right:24px}
 
 /* ============ SECTIONS / CARDS ============ */
 .section{padding:64px 0}
@@ -253,6 +354,10 @@ button{font-family:inherit; color:inherit; cursor:pointer}
 .tri .num{
   font-family:var(--mono); font-size:.68rem; letter-spacing:.2em; color:var(--accent); display:block; margin-bottom:14px;
 }
+
+/* scroll-in reveals (class added by JS; no-JS and reduced-motion users see content immediately) */
+.sr{opacity:0; transform:translateY(18px); transition:opacity .55s cubic-bezier(.2,.7,.2,1), transform .55s cubic-bezier(.2,.7,.2,1); transition-delay:var(--srd,0s)}
+.sr.sr-in{opacity:1; transform:none}
 
 /* ============ SHOP ============ */
 .shop-tools{
@@ -286,7 +391,15 @@ label{font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-trans
 .thumb{
   position:relative; background:var(--slab); display:grid; place-items:center;
   padding:20px 0 16px; border-bottom:1px solid var(--line);
+  background:radial-gradient(120% 90% at 50% 18%, color-mix(in srgb, var(--accent) 8%, var(--slab)), var(--slab) 62%);
 }
+.prod{position:relative}
+.prod::after{
+  content:""; position:absolute; top:0; left:8%; right:8%; height:2px; pointer-events:none;
+  background:linear-gradient(90deg, transparent, var(--foilA) 30%, var(--foilC) 70%, transparent);
+  opacity:0; transition:opacity .18s ease;
+}
+.prod:hover::after{opacity:.9}
 .mini{
   width:150px; aspect-ratio:5/7; border-radius:8px; position:relative; overflow:hidden;
   border:1px solid var(--slab-line); background:#12151B;
@@ -300,7 +413,12 @@ label{font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-trans
   background:linear-gradient(115deg, transparent 25%, rgba(110,231,240,.4) 45%, rgba(244,154,193,.35) 55%, transparent 75%);
   background-size:300% 300%; background-position:80% 50%;
 }
-.prod:hover .holo-hover{opacity:1; background-position:20% 50%}
+@keyframes foilSweep{
+  0%{background-position:95% 50%; opacity:0}
+  35%{opacity:.95}
+  100%{background-position:12% 50%; opacity:.7}
+}
+.prod:hover .holo-hover,.prod:focus-within .holo-hover{animation:foilSweep .7s cubic-bezier(.3,.6,.2,1) both}
 .cond{
   position:absolute; top:10px; right:10px;
   font-family:var(--mono); font-size:.62rem; letter-spacing:.1em;
@@ -310,11 +428,12 @@ label{font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-trans
 .p-meta{padding:14px 16px 16px; display:flex; flex-direction:column; gap:4px; flex:1}
 .p-meta h3{font-size:.98rem; font-weight:600; line-height:1.3}
 .p-set{font-family:var(--mono); font-size:.7rem; letter-spacing:.04em; color:var(--ink3)}
-.p-row{display:flex; align-items:baseline; justify-content:space-between; margin-top:auto; padding-top:10px}
-.price{font-family:var(--mono); font-size:1.02rem; font-weight:500; font-variant-numeric:tabular-nums}
+.p-row{display:flex; align-items:baseline; justify-content:space-between; margin-top:auto; padding-top:10px; border-top:1px dashed var(--line)}
+.price{font-family:var(--mono); font-size:1.08rem; font-weight:500; font-variant-numeric:tabular-nums}
 .stock{font-family:var(--mono); font-size:.68rem; color:var(--ink3)}
 .stock.low{color:var(--warn)}
 .stock.out{color:var(--crit)}
+a.add{display:block; text-align:center; text-decoration:none; box-sizing:border-box; color:var(--ink)}
 .add{
   margin-top:12px; border:1px solid var(--line2); background:none; border-radius:4px; padding:9px 0;
   font-family:var(--mono); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink);
@@ -331,15 +450,17 @@ label{font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-trans
 .drawer{
   position:fixed; top:0; right:0; bottom:0; width:min(400px,92vw); z-index:100;
   background:var(--bg2); border-left:1px solid var(--line);
-  transform:translateX(102%); transition:transform .3s cubic-bezier(.2,.7,.2,1);
+  transform:translateX(102%); visibility:hidden;
+  transition:transform .3s cubic-bezier(.55,.06,.68,.19), visibility 0s .3s;
   display:flex; flex-direction:column;
 }
-.drawer.open{transform:none}
+.drawer.open{transform:none; visibility:visible; transition:transform .5s cubic-bezier(.22,1.18,.36,1), visibility 0s}
+html.cart-open, html.cart-open body{overflow:hidden}
 .drawer-head{display:flex; align-items:center; justify-content:space-between; padding:20px 22px; border-bottom:1px solid var(--line)}
 .drawer-head h2{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.4rem; letter-spacing:.04em}
 .drawer-close{background:none; border:1px solid var(--line); border-radius:4px; width:34px; height:34px; font-size:1rem; color:var(--ink2)}
 .drawer-close:hover{border-color:var(--accent); color:var(--accent)}
-.drawer-body{flex:1; overflow-y:auto; padding:14px 22px}
+.drawer-body{flex:1; overflow-y:auto; overflow-x:hidden; padding:14px 22px}
 .cart-line{display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--line)}
 .cart-line .ct{flex:1; min-width:0}
 .cart-line .ct b{font-weight:600; font-size:.9rem; display:block}
@@ -350,11 +471,29 @@ label{font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-trans
 .qty span{font-family:var(--mono); font-size:.85rem; min-width:18px; text-align:center; font-variant-numeric:tabular-nums}
 .cart-line .lp{font-family:var(--mono); font-size:.88rem; font-variant-numeric:tabular-nums}
 .cart-empty{color:var(--ink3); font-family:var(--mono); font-size:.8rem; text-align:center; padding:48px 0; letter-spacing:.08em}
+.cart-empty{
+  display:flex; flex-direction:column; align-items:center; gap:16px; padding:52px 0;
+}
+.cart-empty::before{
+  content:""; width:72px; aspect-ratio:5/7; border-radius:7px;
+  border:2px dashed var(--line2);
+  background:linear-gradient(160deg, var(--surface2), transparent 70%);
+}
+.grid .cart-empty{grid-column:1/-1}
 .drawer-foot{border-top:1px solid var(--line); padding:18px 22px 22px}
 .subtotal{display:flex; justify-content:space-between; font-family:var(--mono); margin-bottom:14px}
 .subtotal b{font-variant-numeric:tabular-nums; font-size:1.1rem}
 .drawer-foot .btn{width:100%}
 .drawer-note{font-family:var(--mono); font-size:.64rem; color:var(--ink3); text-align:center; margin-top:10px; letter-spacing:.06em}
+@keyframes lineIn{from{opacity:0; transform:translateX(18px)}to{opacity:1; transform:none}}
+.drawer.opening .cart-line{animation:lineIn .38s cubic-bezier(.2,.7,.2,1) both}
+.drawer.opening .cart-line:nth-child(1){animation-delay:.08s}
+.drawer.opening .cart-line:nth-child(2){animation-delay:.14s}
+.drawer.opening .cart-line:nth-child(3){animation-delay:.2s}
+.drawer.opening .cart-line:nth-child(4){animation-delay:.26s}
+.drawer.opening .cart-line:nth-child(n+5){animation-delay:.32s}
+@keyframes countPop{0%{transform:scale(1)}40%{transform:scale(1.4)}100%{transform:scale(1)}}
+.cart-count.pop{animation:countPop .35s cubic-bezier(.3,.7,.3,1)}
 
 /* ============ CARD SHOW ============ */
 .show-hero{
@@ -376,6 +515,8 @@ label{font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-trans
 .show-meta b{color:var(--ink); font-weight:500}
 .meter{height:8px; background:var(--surface2); border:1px solid var(--line); border-radius:99px; overflow:hidden; margin-top:8px}
 .meter i{display:block; height:100%; width:46%; background:var(--accent)}
+@keyframes meterFill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.view.active .meter i{transform-origin:left; animation:meterFill .9s .25s cubic-bezier(.2,.7,.2,1) both}
 .vendor-form{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:26px}
 .vendor-form h3, .form-card h3{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.5rem; letter-spacing:.03em; margin-bottom:6px}
 .form-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:16px}
@@ -435,6 +576,14 @@ label{font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-trans
 .spark{display:flex; align-items:flex-end; gap:3px; height:34px; margin-top:10px}
 .spark i{flex:1; background:var(--accent-dim); border-radius:2px 2px 0 0; min-height:3px}
 .spark i.today{background:var(--accent)}
+@keyframes sparkGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.view.active .spark i{transform-origin:bottom; animation:sparkGrow .6s cubic-bezier(.2,.7,.2,1) both}
+.view.active .spark i:nth-child(2){animation-delay:.05s}
+.view.active .spark i:nth-child(3){animation-delay:.1s}
+.view.active .spark i:nth-child(4){animation-delay:.15s}
+.view.active .spark i:nth-child(5){animation-delay:.2s}
+.view.active .spark i:nth-child(6){animation-delay:.25s}
+.view.active .spark i:nth-child(7){animation-delay:.3s}
 .admin-grid{display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr); gap:16px; margin-top:16px}
 .admin-card{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:22px}
 .admin-card h3{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.3rem; letter-spacing:.04em; margin-bottom:14px; display:flex; align-items:center; gap:10px}
@@ -445,7 +594,8 @@ label{font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-trans
 .pill.ok{background:var(--good-bg); color:var(--good)}
 .pill.warn{background:var(--warn-bg); color:var(--warn)}
 .pill.crit{background:var(--crit-bg); color:var(--crit)}
-.kv{display:grid; grid-template-columns:auto 1fr; gap:8px 18px; font-size:.88rem; align-items:center}
+.kv{display:grid; grid-template-columns:auto minmax(0,1fr); gap:8px 18px; font-size:.88rem; align-items:center}
+.kv dd select,.kv dd input{max-width:100%}
 .kv dt{font-family:var(--mono); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); margin:0}
 .kv dd{margin:0; color:var(--ink)}
 .toggle-row{display:flex; align-items:center; justify-content:space-between; gap:14px; padding:11px 0; border-bottom:1px solid var(--line)}
@@ -468,11 +618,11 @@ label{font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-trans
   max-height:180px; overflow-y:auto; margin-top:14px;
 }
 .log .ok{color:#5BD98A}
-.log .t{color:#737B8A}
+.log .t{color:#7E8798}
 .hook-row{display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--line); font-family:var(--mono); font-size:.76rem}
 .hook-row:last-child{border-bottom:0}
 .hook-row .hn{color:var(--ink2)}
-.table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:8px; margin-top:16px; background:var(--surface)}
+.table-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; border:1px solid var(--line); border-radius:8px; margin-top:16px; background:var(--surface)}
 table{border-collapse:collapse; width:100%; min-width:720px; font-size:.86rem}
 th{
   text-align:left; font-family:var(--mono); font-size:.66rem; letter-spacing:.14em; text-transform:uppercase;
@@ -523,6 +673,19 @@ td.num{font-family:var(--mono); font-variant-numeric:tabular-nums}
 .spot{border:1px solid var(--line2); background:none; border-radius:4px; padding:11px 0; font-family:var(--mono); font-size:.78rem; color:var(--ink); transition:background .15s ease,color .15s ease,border-color .15s ease}
 .spot:hover:not(:disabled){background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
 .spot:disabled{opacity:.35; cursor:not-allowed; text-decoration:line-through}
+
+/* live ambience */
+@keyframes chatIn{from{opacity:0; transform:translateY(6px)}to{opacity:1; transform:none}}
+.chat-body .chat-line{animation:chatIn .28s cubic-bezier(.2,.7,.2,1) both}
+@keyframes packFloat{
+  0%,100%{transform:translate(-50%,-50%) rotate(-4deg)}
+  50%{transform:translate(-50%,-52.5%) rotate(-2.5deg)}
+}
+.screen .pack{animation:packFloat 5.5s ease-in-out infinite}
+@keyframes ringPulse{0%{box-shadow:0 0 0 0 var(--crit)}70%,100%{box-shadow:0 0 0 7px transparent}}
+.live-pill i{animation:livepulse 1.6s infinite, ringPulse 1.6s ease-out infinite}
+@keyframes vTick{0%{transform:scale(1)}45%{transform:scale(1.12)}100%{transform:scale(1)}}
+.viewers.tick{animation:vTick .3s ease}
 @media (max-width:960px){ .live-grid{grid-template-columns:1fr} .spots{grid-template-columns:repeat(4,1fr)} }
 @media (max-width:480px){ .spots{grid-template-columns:repeat(3,1fr)} }
 
@@ -542,8 +705,14 @@ td.num{font-family:var(--mono); font-variant-numeric:tabular-nums}
 .ev-edit-row input{padding:7px 9px; font-size:.84rem}
 
 /* ============ FOOTER ============ */
-footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
-.foot-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:28px; padding:52px 0 40px}
+footer{
+  border-top:0; background:var(--bg2); margin-top:64px; position:relative;
+}
+footer::before{
+  content:""; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, var(--foilA), var(--foilB) 35%, var(--foilC) 65%, var(--foilD));
+}
+.foot-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:28px; padding:60px 0 44px}
 .foot-grid h4{
   font-family:var(--mono); font-size:.68rem; letter-spacing:.18em; text-transform:uppercase; color:var(--ink3);
   margin:0 0 14px; font-weight:500;
@@ -551,7 +720,7 @@ footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
 .foot-grid ul{list-style:none; margin:0; padding:0; display:grid; gap:8px; font-size:.9rem; color:var(--ink2)}
 .foot-grid a{color:var(--ink2); text-decoration:none}
 .foot-grid a:hover{color:var(--accent)}
-.foot-brand{font-family:var(--disp); font-weight:800; text-transform:uppercase; font-size:1.4rem; letter-spacing:.04em}
+.foot-brand{font-family:var(--disp); font-weight:800; text-transform:uppercase; font-size:2.1rem; letter-spacing:.04em}
 .foot-bottom{
   border-top:1px solid var(--line); padding:18px 0 26px;
   display:flex; gap:16px; align-items:center; flex-wrap:wrap;
@@ -563,16 +732,50 @@ footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
 
 /* ============ TOAST ============ */
 .toast{
-  position:fixed; bottom:22px; left:50%; transform:translate(-50%,16px); z-index:120;
+  position:fixed; bottom:22px; left:50%; transform:translate(-50%,14px) scale(.95); z-index:120;
   background:var(--ink); color:var(--bg); border-radius:6px; padding:11px 20px;
   font-family:var(--mono); font-size:.78rem; letter-spacing:.04em;
-  opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease;
+  opacity:0; pointer-events:none; transition:opacity .22s ease, transform .38s cubic-bezier(.24,1.2,.4,1);
   max-width:90vw; text-align:center;
 }
-.toast.on{opacity:1; transform:translate(-50%,0)}
+.toast.on{opacity:1; transform:translate(-50%,0) scale(1)}
+
+/* ============ FINISH LAYER ============ */
+.panel,.stat,.admin-card,.form-card,.vendor-form,.show-date-card,.chat,.prod{
+  background:linear-gradient(180deg, var(--surface2), var(--surface) 42%);
+  box-shadow:inset 0 1px 0 var(--top-light), var(--edge-shadow);
+}
+::selection{background:var(--accent); color:var(--accent-ink)}
+.chat-body,.log,.drawer-body,.table-wrap{scrollbar-width:thin; scrollbar-color:var(--line2) transparent}
+.meter i{background:linear-gradient(90deg, var(--accent), var(--foilA))}
+.toast{border-left:3px solid var(--accent)}
+
+/* press micro-states */
+.btn:active{transform:translateY(1px) scale(.985); filter:brightness(.95)}
+.chip,.add,.spot,.drawer-close,.qty button,.stock-edit button,.mainnav button{transition:transform .12s ease, background .15s ease, color .15s ease, border-color .15s ease}
+.chip:active,.add:active:not(:disabled),.spot:active:not(:disabled),.drawer-close:active,.qty button:active,.stock-edit button:active,.mainnav button:active{transform:scale(.94)}
+
+/* desktop rhythm */
+@media (min-width:961px){
+  .section{padding:84px 0}
+  .view-head{padding:76px 0 34px}
+}
 
 /* ============ RESPONSIVE ============ */
 @media (max-width:960px){
+  .topbar .wrap{height:auto; min-height:64px; padding-top:10px; padding-bottom:10px; row-gap:6px; flex-wrap:wrap}
+  .mainnav{
+    order:3; width:calc(100% + 48px); margin:0 -24px;
+    flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    padding:4px 20px 8px; scrollbar-width:none;
+  }
+  .mainnav::-webkit-scrollbar{display:none}
+  .mainnav button{
+    flex:0 0 auto; white-space:nowrap; min-height:40px;
+    border:1px solid var(--line); border-radius:99px; padding:9px 14px;
+  }
+  .mainnav button[aria-current="true"]{border-color:var(--accent)}
+  .cart-btn{margin-left:auto}
   .grid{grid-template-columns:repeat(3,1fr)}
   .stat-row{grid-template-columns:repeat(2,1fr)}
   .admin-grid{grid-template-columns:1fr}
@@ -590,24 +793,68 @@ footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
   .sched-time{grid-column:2}
   .sched-fee{grid-column:2}
   .topbar .wrap{height:auto; padding-top:10px; padding-bottom:10px; row-gap:6px; flex-wrap:wrap}
-  .mainnav{order:3; width:100%; margin-left:0}
+  .mainnav{
+    order:3; width:calc(100% + 48px); margin:0 -24px;
+    flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    padding:4px 20px 8px; scrollbar-width:none;
+  }
+  .mainnav::-webkit-scrollbar{display:none}
+  .mainnav button{
+    flex:0 0 auto; white-space:nowrap; min-height:40px;
+    border:1px solid var(--line); border-radius:99px; padding:9px 14px;
+  }
+  .mainnav button[aria-current="true"]{border-color:var(--accent)}
   .foot-grid{grid-template-columns:1fr}
   .stat-row{grid-template-columns:1fr 1fr}
+  select,input,textarea{font-size:16px}
+  .ev-edit-row input{font-size:16px}
+  .mini{width:min(150px, calc(100% - 20px))}
+  .section-head .demo-tag{white-space:normal}
+}
+@media (max-width:520px){
+  .kv{grid-template-columns:minmax(0,1fr); gap:4px 0}
+  .kv dt{margin-top:10px}
+  .kv dd input{width:100%}
+  .ev-edit-row{flex-wrap:wrap; row-gap:6px}
+  .ev-edit-row input[data-ev="name"]{flex:1 1 100%; order:-1}
 }
 @media (max-width:420px){
   .grid{grid-template-columns:1fr}
+  .hero-ctas{gap:10px}
+  .hero-ctas .btn{flex:1 1 100%}
+  .hero .wrap{padding-top:40px; padding-bottom:48px}
+}
+
+/* ============ TOUCH TARGETS ============ */
+@media (pointer:coarse){
+  .qty button{width:36px; height:36px}
+  .qty{gap:8px}
+  .stock-edit button{width:32px; height:32px}
+  .drawer-close{width:40px; height:40px}
+  .chip{padding:9px 16px}
+  .spot{padding:13px 0}
+  .cart-btn{min-height:40px}
+  .stage-caption{display:none}
 }
 
 /* ============ REDUCED MOTION ============ */
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important}
   .ticker-track{animation:none; transform:none}
-  .reveal>*,.holo{animation:none}
+  .reveal>*,.holo,.reveal .foil-text,.stage-caption,.holo-frame::after{animation:none}
+  .hero::before{animation:none}
+  .view.active{animation:none}
+  .sr{opacity:1; transform:none; transition:none}
+  .prod:hover .holo-hover,.prod:focus-within .holo-hover{animation:none; opacity:.55}
+  .drawer{transition:none}
+  .drawer.opening .cart-line,.cart-count.pop{animation:none}
+  .chat-body .chat-line,.screen .pack,.live-pill i,.viewers.tick{animation:none}
+  .view.active .meter i,.view.active .spark i{animation:none}
+  .btn:active,.chip:active,.add:active,.spot:active,.drawer-close:active,.qty button:active,.stock-edit button:active,.mainnav button:active{transform:none}
 }
 </style>
 
 <a class="skip" href="#main">Skip to content</a>
-<div class="tier-badge" aria-hidden="true">Tier 3 Demo &middot; $6,500 + $150/mo</div>
 
 <header class="topbar">
   <div class="wrap">
@@ -629,7 +876,7 @@ footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
   </div>
 </header>
 
-<div class="site-banner" id="siteBanner" hidden>
+<div class="site-banner" id="siteBanner" role="status" hidden>
   <span id="siteBannerText"></span>
   <button class="banner-link" id="siteBannerBtn" data-go="live" hidden>Watch &rarr;</button>
 </div>
@@ -641,9 +888,9 @@ footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
     <div class="hero">
       <div class="wrap">
         <div class="reveal">
-          <p class="eyebrow">Crescent Springs, KY &middot; South of Cincinnati</p>
+          <p class="eyebrow">Crescent Springs, KY &middot; Off I-71/75, just south of Cincinnati</p>
           <h1><span>Buy.</span><span>Sell.</span><span class="foil-text">Trade.</span></h1>
-          <p class="sub">Northern Kentucky's hobby shop for Pokemon, One Piece, and Magic: The Gathering &mdash; singles, sealed, and a play space that runs as late as we do.</p>
+          <p class="sub">Northern Kentucky's card shop for Pokemon, One Piece, Magic, and Gundam. Singles and sealed straight from the case, cash for your collection, and a seat at the table whenever the door's open.</p>
           <div class="hero-ctas">
             <button class="btn" data-go="shop">Shop live inventory</button>
             <button class="btn btn-ghost" data-go="buylist">Sell us your collection</button>
@@ -697,8 +944,91 @@ footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
           <h2>Fresh to the case</h2>
           <button class="linklike" data-go="shop">Browse all inventory &rarr;</button>
         </div>
-        <div class="freshness"><span class="dot"></span>Synced with Square &middot; 2 min ago <span class="demo-tag">demo data</span></div>
+        <div class="freshness" id="homeFresh"><span class="dot"></span>Synced with Square &middot; 2 min ago <span class="demo-tag">demo data</span></div>
         <div class="grid" id="featuredGrid"></div>
+      </div>
+    </div>
+
+    <div class="section" style="padding-top:0">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Why Top Loaded</h2>
+        </div>
+        <div class="tri">
+          <div class="panel">
+            <span class="num">01 / Local</span>
+            <h3>A real shop, not a warehouse</h3>
+            <p>Independent and Northern Kentucky&ndash;owned. The people pricing your buylist are the same ones ripping packs on stream and resetting tables after locals.</p>
+          </div>
+          <div class="panel">
+            <span class="num">02 / Official</span>
+            <h3>Bandai official store</h3>
+            <p>One Piece and Gundam events here run with official Bandai support &mdash; winner packs if you take it down, participation packs just for playing.</p>
+          </div>
+          <div class="panel">
+            <span class="num">03 / Fair</span>
+            <h3>Fair in both directions</h3>
+            <p>Singles priced against TCGplayer market, offers you're free to walk away from, and +10% on top whenever you take store credit instead of cash.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" style="padding-top:0">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Word around the tables</h2>
+          <span class="demo-tag">sample quotes &mdash; replace with real reviews before launch</span>
+        </div>
+        <div class="tri">
+          <div class="panel">
+            <p style="font-size:.96rem">&ldquo;Brought in two binders expecting a lowball. Got a fair number, took the credit bonus, and walked out with half a booster box.&rdquo;</p>
+            <p class="p-set" style="margin-top:12px">Sample review &middot; buylist customer</p>
+          </div>
+          <div class="panel">
+            <p style="font-size:.96rem">&ldquo;Locals run on time, prizing every week, and when nine of us showed up they just opened a second list. Nobody sat out.&rdquo;</p>
+            <p class="p-set" style="margin-top:12px">Sample review &middot; One Piece regular</p>
+          </div>
+          <div class="panel">
+            <p style="font-size:.96rem">&ldquo;Claimed a break spot on a Tuesday, hits were in my mailbox by the weekend. Sleeved, top loaded, tracked.&rdquo;</p>
+            <p class="p-set" style="margin-top:12px">Sample review &middot; live break buyer</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" style="padding-top:0">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Good to know</h2>
+          <span class="demo-tag">confirm policy details before launch</span>
+        </div>
+        <div style="display:grid; gap:10px; max-width:820px">
+          <details class="panel" style="padding:16px 20px">
+            <summary style="cursor:pointer; font-weight:600">How do online orders ship?</summary>
+            <p style="color:var(--ink2); margin-top:10px; font-size:.94rem">Singles ship sleeved in a top loader (we are who we say we are) inside a bubble mailer, with tracking. Sealed product ships boxed. Or skip shipping entirely &mdash; choose in-store pickup and it's waiting at the counter.</p>
+          </details>
+          <details class="panel" style="padding:16px 20px">
+            <summary style="cursor:pointer; font-weight:600">How do you grade card condition?</summary>
+            <p style="color:var(--ink2); margin-top:10px; font-size:.94rem">Every single in the case and on the site carries a condition label &mdash; NM (near mint) or LP (lightly played) &mdash; checked by hand before it's listed. If something arrives not as described, email <a href="mailto:toploadedtcg@gmail.com">toploadedtcg@gmail.com</a> and we'll make it right.</p>
+          </details>
+          <details class="panel" style="padding:16px 20px">
+            <summary style="cursor:pointer; font-weight:600">Can you hold a card for me?</summary>
+            <p style="color:var(--ink2); margin-top:10px; font-size:.94rem">Usually, yes &mdash; call <a href="tel:+15132222573">(513) 222-2573</a> during open hours and we can set an in-stock item aside for a short hold while you head over.</p>
+          </details>
+          <details class="panel" style="padding:16px 20px">
+            <summary style="cursor:pointer; font-weight:600">How does selling a collection work?</summary>
+            <p style="color:var(--ink2); margin-top:10px; font-size:.94rem">Walk in any day we're open &mdash; no appointment needed &mdash; or start a quote from the Sell to Us page. We sort it, price it against current market, and make an offer with zero obligation. Estate-sized lot? We travel across the Tri-State.</p>
+          </details>
+          <details class="panel" style="padding:16px 20px">
+            <summary style="cursor:pointer; font-weight:600">What's the store credit bonus?</summary>
+            <p style="color:var(--ink2); margin-top:10px; font-size:.94rem">Take any buylist or trade offer as store credit instead of cash and we add 10% on top. Credit is tracked on your account at the register &mdash; just give your name or phone number at the counter.</p>
+          </details>
+          <details class="panel" style="padding:16px 20px">
+            <summary style="cursor:pointer; font-weight:600">When and where is the card show?</summary>
+            <p style="color:var(--ink2); margin-top:10px; font-size:.94rem">The first Saturday or Sunday of every month, 10 AM to 4 PM at the Hilton Cincinnati Airport, 7373 Turfway Rd, Florence, KY. Admission is free; vendors set up from 8 AM.</p>
+          </details>
+        </div>
       </div>
     </div>
   </section>
@@ -709,16 +1039,21 @@ footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
       <div class="view-head">
         <p class="eyebrow">Live inventory &middot; Singles &amp; sealed</p>
         <h1>The case, online</h1>
-        <p class="lede">What you see here is what's in the shop. Stock counts come straight from our Square register &mdash; if it sells at the counter, it disappears here too.</p>
+        <p class="lede">Every card here is a live listing from our store &mdash; synced nightly from our TCGplayer seller account. Buy online and we ship it, or call the shop and we'll hold it at the counter.</p>
       </div>
       <div class="shop-tools" role="group" aria-label="Filters">
-        <div class="chip-row" id="gameChips">
+        <div class="field" style="flex:1 1 230px; min-width:190px;">
+          <label for="shopSearch">Search the case</label>
+          <input id="shopSearch" type="search" placeholder="Card name, set, rarity&hellip;" autocomplete="off">
+        </div>
+        <div class="chip-row" id="gameChips" role="group" aria-label="Filter by game">
           <button class="chip" data-game="all" aria-pressed="true">All games</button>
           <button class="chip" data-game="pk" aria-pressed="false">Pokemon</button>
           <button class="chip" data-game="op" aria-pressed="false">One Piece</button>
           <button class="chip" data-game="mtg" aria-pressed="false">Magic</button>
+          <button class="chip" data-game="other" aria-pressed="false" id="otherChip" hidden>More games</button>
         </div>
-        <div class="chip-row" id="typeChips">
+        <div class="chip-row" id="typeChips" role="group" aria-label="Filter by product type">
           <button class="chip" data-type="all" aria-pressed="true">Everything</button>
           <button class="chip" data-type="single" aria-pressed="false">Singles</button>
           <button class="chip" data-type="sealed" aria-pressed="false">Sealed</button>
@@ -732,7 +1067,7 @@ footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
           </select>
         </div>
       </div>
-      <div class="freshness"><span class="dot"></span>Synced with Square &middot; 2 min ago &middot; <span id="shopCount"></span> items <span class="demo-tag">demo data</span></div>
+      <div class="freshness" id="shopFresh"><span class="dot"></span>Synced with Square &middot; 2 min ago &middot; <span id="shopCount"></span> items <span class="demo-tag">demo data</span></div>
       <div class="grid" id="shopGrid"></div>
     </div>
   </section>
@@ -743,7 +1078,7 @@ footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
       <div class="view-head">
         <p class="eyebrow">First Saturday or Sunday &middot; Hilton on Turfway Road &middot; Florence, KY</p>
         <h1>The Top Loaded Card Show</h1>
-        <p class="lede">Once a month we take over the Hilton ballroom on Turfway Road with vendors from across the Tri-State. Buy, sell, trade, and rip packs with a few hundred of your closest friends.</p>
+        <p class="lede">Once a month we take over the Hilton ballroom on Turfway Road with vendor tables from across the Tri-State. Buy, sell, trade, and rip packs &mdash; admission is free and the doors are open 10 to 4.</p>
       </div>
       <div class="show-hero">
         <div class="show-date-card">
@@ -770,7 +1105,7 @@ footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
             <div class="field"><label for="vGame">Mostly selling</label>
               <select id="vGame"><option>Pokemon</option><option>One Piece</option><option>Magic: The Gathering</option><option>Sports cards</option><option>Mixed / other</option></select>
             </div>
-            <div class="field full"><button class="btn" type="submit">Request a table</button></div>
+            <div class="field full"><button class="btn" type="submit">Reserve my table</button></div>
           </div>
         </form>
       </div>
@@ -820,6 +1155,7 @@ footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
           <div class="panel"><span class="k">Cash</span><p>Straight cash offer, paid on the spot once we've looked everything over.</p></div>
           <div class="panel"><span class="k">+10%</span><p>Take store credit instead and we add ten percent to the offer.</p></div>
           <div class="panel"><span class="k">Big?</span><p>Estate or store-closing sized lot? We travel for large collections across the Tri-State &mdash; call (513) 222-2573.</p></div>
+          <div class="panel"><span class="k">How</span><p>No appointment needed &mdash; walk in with it, or start a quote here. We sort, price against current market, and the offer is yours to take or leave.</p></div>
         </div>
         <form class="form-card" id="buyForm">
           <h3>Start a quote</h3>
@@ -833,7 +1169,7 @@ footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
             <div class="field full"><label for="bDesc">Describe the collection</label>
               <textarea id="bDesc" rows="4" placeholder="e.g. two binders of modern Pokemon hits, a Base Set Blastoise, and about 4,000 bulk commons"></textarea>
             </div>
-            <div class="field full"><button class="btn" type="submit">Request a quote</button></div>
+            <div class="field full"><button class="btn" type="submit">Get my offer</button><p class="drawer-note" style="text-align:left; margin-top:8px">No obligation &mdash; we reply with a real number, and you decide.</p></div>
           </div>
         </form>
       </div>
@@ -1129,7 +1465,15 @@ footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
         <p class="foot-brand">Top Loaded</p>
         <ul style="margin-top:12px">
           <li>Buy &middot; Sell &middot; Trade</li>
-          <li>Northern Kentucky's hobby shop for all things Pokemon, One Piece, and more.</li>
+          <li>Northern Kentucky's card shop for Pokemon, One Piece, Magic, and Gundam. Bandai official tournament store.</li>
+        </ul>
+        <h4 style="margin-top:20px">Site</h4>
+        <ul>
+          <li><button class="linklike" data-go="shop">Shop the case</button></li>
+          <li><button class="linklike" data-go="live">Live breaks</button></li>
+          <li><button class="linklike" data-go="show">Card show</button></li>
+          <li><button class="linklike" data-go="events">Play nights</button></li>
+          <li><button class="linklike" data-go="buylist">Sell your collection</button></li>
         </ul>
       </div>
       <div>
@@ -1323,36 +1667,130 @@ footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
     '</svg>';
   }
   function prodCard(it){
-    var mini = '<div class="mini">' + cardArt(it) + '<span class="holo-hover"></span></div>';
-    var cond = it.cond ? '<span class="cond">' + it.cond + "</span>" : "";
+    var art = (it.tcg && it.img)
+      ? '<img class="card-img" loading="lazy" src="' + it.img + '" alt="' + esc(it.name) + '" onerror="this.style.display=\'none\'">'
+      : cardArt(it);
+    var mini = '<div class="mini">' + art + '<span class="holo-hover"></span></div>';
+    var cond = it.cond ? '<span class="cond">' + esc(it.cond) + "</span>" : "";
+    var action = it.tcg
+      ? '<a class="add" href="' + it.url + '" target="_blank" rel="noopener noreferrer">Buy on TCGplayer</a>'
+      : '<button class="add" data-add="' + it.id + '"' + (it.stock <= 0 ? " disabled" : "") + ">" +
+        (it.stock <= 0 ? "Sold out" : "Add to cart") + "</button>";
     return '<article class="prod">' +
       '<div class="thumb">' + mini + cond + "</div>" +
-      '<div class="p-meta"><h3>' + it.name + "</h3>" +
-      '<p class="p-set">' + GAMES[it.game] + " \u00b7 " + it.set + "</p>" +
+      '<div class="p-meta"><h3>' + esc(it.name) + "</h3>" +
+      '<p class="p-set">' + esc(it.lineName || GAMES[it.game] || "TCG") + " \u00b7 " + esc(it.set) + "</p>" +
       '<div class="p-row"><span class="price">' + money(it.price) + "</span>" + stockLabel(it) + "</div>" +
-      '<button class="add" data-add="' + it.id + '"' + (it.stock <= 0 ? " disabled" : "") + ">" +
-      (it.stock <= 0 ? "Sold out" : "Add to cart") + "</button></div></article>";
+      action + "</div></article>";
   }
 
-  var filterGame = "all", filterType = "all", sortMode = "feat";
-  function renderShop(){
-    var list = ITEMS.filter(function(it){
-      return !it.live && (filterGame === "all" || it.game === filterGame) && (filterType === "all" || it.type === filterType);
+  var filterGame = "all", filterType = "all", sortMode = "feat", searchQ = "", pageCount = 1;
+  var SHOP_PAGE = 24;
+  function activeList(){
+    var src = LIVE ? LIVE.items : ITEMS;
+    return src.filter(function(it){
+      if(it.live) return false;
+      if(filterGame !== "all" && it.game !== filterGame) return false;
+      if(filterType !== "all" && it.type !== filterType) return false;
+      if(searchQ){
+        var hay = (it.name + " " + it.set + " " + (it.lineName || "")).toLowerCase();
+        var terms = searchQ.split(/\s+/);
+        for(var t = 0; t < terms.length; t++){
+          if(terms[t] && hay.indexOf(terms[t]) === -1) return false;
+        }
+      }
+      return true;
     });
+  }
+  function renderShop(){
+    var list = activeList();
     if(sortMode === "asc") list = list.slice().sort(function(a,b){ return a.price - b.price; });
     if(sortMode === "desc") list = list.slice().sort(function(a,b){ return b.price - a.price; });
-    $("#shopGrid").innerHTML = list.map(prodCard).join("") || '<p class="cart-empty">Nothing matches those filters.</p>';
     $("#shopCount").textContent = list.length;
+    var shown = list.slice(0, SHOP_PAGE * pageCount);
+    var more = list.length > shown.length
+      ? '<button class="add" id="loadMore" type="button" style="grid-column:1/-1; padding:13px 0;">Show 24 more \u00b7 ' + (list.length - shown.length) + ' left</button>'
+      : "";
+    $("#shopGrid").innerHTML = (shown.map(prodCard).join("") ||
+      '<p class="cart-empty">Nothing matches &mdash; clear a filter, or call (513) 222-2573. The case moves fast.</p>') + more;
   }
   function renderFeatured(){
     var feat = [ITEMS[1], ITEMS[9], ITEMS[16], ITEMS[6]];
     $("#featuredGrid").innerHTML = feat.map(prodCard).join("");
   }
 
+  /* ---------- live TCGplayer inventory ---------- */
+  var LIVE = null;
+  var COND_ABBR = {"Near Mint":"NM","Lightly Played":"LP","Moderately Played":"MP","Heavily Played":"HP","Damaged":"DMG","Unopened":"SEALED"};
+  function liveType(name){
+    return /booster box|elite trainer|booster bundle|collection box|booster display|booster pack|premium collection|box set|blister|tin\b/i.test(name) ? "sealed" : "single";
+  }
+  function liveToItem(p){
+    var ls = p.listings || [];
+    var best = ls[0];
+    var qty = 0;
+    for(var i = 0; i < ls.length; i++){
+      qty += ls[i].qty;
+      if(ls[i].price < best.price) best = ls[i];
+    }
+    var cond = COND_ABBR[best.cond] || best.cond || null;
+    if(cond && best.printing && /reverse/i.test(best.printing)) cond += " \u00b7 RH";
+    else if(cond && best.printing === "Foil") cond += " \u00b7 Foil";
+    return {
+      id: "tcg-" + p.id, name: p.name,
+      set: p.set + (p.rarity ? " \u00b7 " + p.rarity : ""),
+      lineName: p.line,
+      game: (p.game === "pk" || p.game === "op" || p.game === "mtg") ? p.game : "other",
+      type: liveType(p.name + " " + (p.set || "")),
+      cond: cond, price: best.price, stock: qty, tcg: true,
+      img: "https://tcgplayer-cdn.tcgplayer.com/product/" + p.id + "_in_400x400.jpg",
+      url: "https://www.tcgplayer.com/product/" + p.id + "?seller=5c356cdf"
+    };
+  }
+  function initLiveInventory(){
+    if(!window.fetch) return;
+    fetch("inventory.json", {cache: "no-store"}).then(function(r){
+      if(!r.ok) throw new Error("no inventory");
+      return r.json();
+    }).then(function(d){
+      if(!d || !d.items || !d.items.length) return;
+      var items = [];
+      for(var i = 0; i < d.items.length; i++) items.push(liveToItem(d.items[i]));
+      LIVE = { items: items, generated: d.generated };
+      pageCount = 1;
+      var gen = (d.generated || "").slice(0, 10);
+      $("#shopFresh").innerHTML = '<span class="dot"></span>Live inventory \u00b7 <span id="shopCount">' + d.products +
+        '</span> results \u00b7 ' + d.units + ' cards in stock \u00b7 synced ' + gen + ' from our TCGplayer store';
+      $("#homeFresh").innerHTML = '<span class="dot"></span>The priciest pulls in the case right now \u00b7 live from our TCGplayer store';
+      var oc = $("#otherChip"); if(oc) oc.hidden = false;
+      var top = items.slice().sort(function(a,b){ return b.price - a.price; }).slice(0, 4);
+      $("#featuredGrid").innerHTML = top.map(prodCard).join("");
+      renderShop();
+    }).catch(function(){ /* offline or demo host: embedded demo data stays */ });
+  }
+  document.addEventListener("click", function(e){
+    var lm = e.target.closest("#loadMore");
+    if(lm){ pageCount++; renderShop(); }
+  });
+  (function(){
+    var deb = null;
+    var si = $("#shopSearch");
+    if(!si) return;
+    si.addEventListener("input", function(){
+      clearTimeout(deb);
+      deb = setTimeout(function(){
+        searchQ = si.value.trim().toLowerCase();
+        pageCount = 1;
+        renderShop();
+      }, 160);
+    });
+  })();
+
   $$("#gameChips .chip").forEach(function(ch){
     ch.addEventListener("click", function(){
       filterGame = ch.dataset.game;
       $$("#gameChips .chip").forEach(function(c){ c.setAttribute("aria-pressed", String(c === ch)); });
+      pageCount = 1;
       renderShop();
     });
   });
@@ -1360,28 +1798,42 @@ footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
     ch.addEventListener("click", function(){
       filterType = ch.dataset.type;
       $$("#typeChips .chip").forEach(function(c){ c.setAttribute("aria-pressed", String(c === ch)); });
+      pageCount = 1;
       renderShop();
     });
   });
-  $("#sortSel").addEventListener("change", function(e){ sortMode = e.target.value; renderShop(); });
+  $("#sortSel").addEventListener("change", function(e){ sortMode = e.target.value; pageCount = 1; renderShop(); });
 
   /* ---------- cart ---------- */
   var cart = {}; // id -> qty
+  var lastCartQty = 0;
   var drawer = $("#drawer"), overlay = $("#overlay");
   function cartQty(){ return Object.keys(cart).reduce(function(n,k){ return n + cart[k]; }, 0); }
   function openCart(){
     drawer.classList.add("open"); overlay.classList.add("open");
     drawer.setAttribute("aria-hidden","false");
+    if(!reduceMotion){
+      drawer.classList.add("opening");
+      setTimeout(function(){ drawer.classList.remove("opening"); }, 700);
+    }
+    document.documentElement.classList.add("cart-open");
     $("#drawerClose").focus();
   }
   function closeCart(){
     drawer.classList.remove("open"); overlay.classList.remove("open");
     drawer.setAttribute("aria-hidden","true");
+    document.documentElement.classList.remove("cart-open");
     $("#cartBtn").focus();
   }
   function renderCart(){
     var ids = Object.keys(cart);
-    $("#cartCount").textContent = cartQty();
+    var qNow = cartQty();
+    if(!reduceMotion && qNow > lastCartQty){
+      var cc = $("#cartCount");
+      cc.classList.remove("pop"); void cc.offsetWidth; cc.classList.add("pop");
+    }
+    lastCartQty = qNow;
+    $("#cartCount").textContent = qNow;
     if(!ids.length){
       $("#cartBody").innerHTML = '<p class="cart-empty">Cart is empty &mdash; go pull some hits.</p>';
       $("#cartTotal").textContent = money(0);
@@ -1540,7 +1992,7 @@ footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
     ["toploaded_shop", "Gundam locals Saturday 1 PM — breaks soon after"],
     ["jess_rips", "chase card is still in there I can feel it"],
     ["cincy_cards", "W shop"],
-    ["packrat_pete", "see everyone at the Turfway show Sep 12"]
+    ["packrat_pete", "see everyone at the Turfway show, first weekend of the month"]
   ];
   var chatIdx = 0;
   function pushChat(user, msg, sys){
@@ -1565,7 +2017,9 @@ footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
     var v = 214;
     setInterval(function(){
       v = Math.max(180, v + Math.round(Math.random() * 14 - 7));
-      $("#viewerCount").textContent = v + " watching";
+      var vc = $("#viewerCount");
+      vc.textContent = v + " watching";
+      if(!reduceMotion){ vc.classList.remove("tick"); void vc.offsetWidth; vc.classList.add("tick"); }
     }, 5000);
     $("#chatForm").addEventListener("submit", function(e){
       e.preventDefault();
@@ -1732,5 +2186,22 @@ footer{border-top:1px solid var(--line); background:var(--bg2); margin-top:40px}
   /* ---------- init ---------- */
   renderShop(); renderFeatured(); renderCart(); initLive();
   renderSched(); renderEvEditor(); renderAlerts(); renderCred();
+  initLiveInventory();
+
+  /* ---------- scroll-in reveals ---------- */
+  if(!reduceMotion && "IntersectionObserver" in window){
+    var srTargets = $$("#view-home .tri .panel, #view-show .gal, #view-show .show-date-card, #view-show .vendor-form, #view-events .tri .panel, #view-live .tri .panel, #view-buylist .buy-points .panel, #view-buylist .form-card, .section-head");
+    srTargets.forEach(function(el){
+      var idx = Array.prototype.indexOf.call(el.parentNode.children, el);
+      el.classList.add("sr");
+      el.style.setProperty("--srd", (Math.min(idx, 5) * 70) + "ms");
+    });
+    var srIO = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("sr-in"); srIO.unobserve(en.target); }
+      });
+    }, {rootMargin:"0px 0px -10% 0px", threshold:.05});
+    srTargets.forEach(function(el){ srIO.observe(el); });
+  }
 })();
 </script>

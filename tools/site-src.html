@@ -1,0 +1,2207 @@
+<title>Top Loaded Trading Cards</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Top Loaded Trading Cards — Northern Kentucky's card shop for Pokemon, One Piece, Magic, and Gundam in Crescent Springs, KY. Buy, sell, and trade singles and sealed. Weekly play nights, live rip-and-ship breaks, and a monthly card show at the Hilton on Turfway Rd.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Top Loaded Trading Cards">
+<meta property="og:title" content="Top Loaded Trading Cards — Buy. Sell. Trade.">
+<meta property="og:description" content="Pokemon, One Piece, Magic, and Gundam singles and sealed in Crescent Springs, KY. We buy collections — cash on the spot or store credit +10%. Play nights weekly, card show monthly at the Hilton on Turfway Rd, Florence.">
+<meta property="og:image" content="https://artofjammin.github.io/toploaded-demo/og-image.png">
+<meta property="og:url" content="https://artofjammin.github.io/toploaded-demo/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#EFF1F4">
+<meta name="theme-color" content="#0C0E12">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Spline+Sans:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap">
+<style>
+/* ============ TOKENS -- dark-first (matte sleeve black), light = grading-slab acrylic ============ */
+:root{
+  --bg:#0C0E12; --bg2:#11141A; --surface:#161A22; --surface2:#1C212B;
+  --line:#262C38; --line2:#333B4A;
+  --ink:#EEF0F4; --ink2:#A6ADBB; --ink3:#7E8798;
+  --accent:#57D9C4; --accent-ink:#08110F; --accent-dim:#2E7A6E;
+  --good:#5BD98A; --warn:#E8B44D; --crit:#F26D6D;
+  --good-bg:rgba(91,217,138,.12); --warn-bg:rgba(232,180,77,.12); --crit-bg:rgba(242,109,109,.12);
+  --foilA:#6EE7F0; --foilB:#9D8CFF; --foilC:#F49AC1; --foilD:#F5D06F;
+  --slab:#12151B; --slab-line:#2A3140;
+  --pk:#F5C542; --op:#E0563E; --mtg:#C08A3E;
+  --shadow:0 18px 50px rgba(0,0,0,.5);
+  --top-light:rgba(255,255,255,.06); --edge-shadow:0 2px 8px rgba(0,0,0,.32);
+  --grain:.05;
+  --disp:'Big Shoulders Display','Big Shoulders',Impact,'Arial Narrow',sans-serif;
+  --body:'Spline Sans','Segoe UI',system-ui,sans-serif;
+  --mono:'Spline Sans Mono','Cascadia Code',Consolas,monospace;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#EFF1F4; --bg2:#F6F7FA; --surface:#FFFFFF; --surface2:#F1F3F6;
+    --line:#DBDFE6; --line2:#C6CCD6;
+    --ink:#15181E; --ink2:#4E5563; --ink3:#616B7A;
+    --accent:#097366; --accent-ink:#FFFFFF; --accent-dim:#7FB8AF;
+    --good:#1E9B54; --warn:#A9761B; --crit:#C6403E;
+    --good-bg:rgba(30,155,84,.1); --warn-bg:rgba(169,118,27,.12); --crit-bg:rgba(198,64,62,.1);
+    --shadow:0 16px 40px rgba(21,24,30,.14);
+    --foilA:#0B8AA0; --foilB:#6650DC; --foilC:#BE3D77; --foilD:#A8790C;
+    --top-light:rgba(255,255,255,.9); --edge-shadow:0 1px 3px rgba(21,24,30,.08);
+    --grain:.025;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#EFF1F4; --bg2:#F6F7FA; --surface:#FFFFFF; --surface2:#F1F3F6;
+  --line:#DBDFE6; --line2:#C6CCD6;
+  --ink:#15181E; --ink2:#4E5563; --ink3:#616B7A;
+  --accent:#097366; --accent-ink:#FFFFFF; --accent-dim:#7FB8AF;
+  --good:#1E9B54; --warn:#A9761B; --crit:#C6403E;
+  --good-bg:rgba(30,155,84,.1); --warn-bg:rgba(169,118,27,.12); --crit-bg:rgba(198,64,62,.1);
+  --shadow:0 16px 40px rgba(21,24,30,.14);
+  --foilA:#0B8AA0; --foilB:#6650DC; --foilC:#BE3D77; --foilD:#A8790C;
+  --top-light:rgba(255,255,255,.9); --edge-shadow:0 1px 3px rgba(21,24,30,.08);
+  --grain:.025;
+}
+
+/* ============ BASE ============ */
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:var(--body); font-size:16px; line-height:1.55;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+body::after{
+  content:""; position:fixed; inset:0; z-index:1; pointer-events:none;
+  opacity:var(--grain); mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:160px 160px;
+}
+h1,h2,h3{margin:0; text-wrap:balance}
+p{margin:0}
+a{color:var(--accent)}
+button{font-family:inherit; color:inherit; cursor:pointer}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
+.wrap{max-width:1160px; margin:0 auto; padding:0 24px}
+.mono{font-family:var(--mono)}
+.eyebrow{
+  font-family:var(--mono); font-size:.72rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--ink3);
+}
+.demo-tag{
+  font-family:var(--mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--ink3); border:1px solid var(--line); border-radius:3px; padding:1px 5px;
+  vertical-align:middle; white-space:nowrap;
+}
+.skip{
+  position:absolute; left:-999px; top:8px; z-index:200; background:var(--accent); color:var(--accent-ink);
+  padding:8px 14px; border-radius:4px; font-weight:600; text-decoration:none;
+}
+.skip:focus{left:8px}
+
+/* ============ HEADER ============ */
+.topbar{
+  position:sticky; top:0; z-index:60; background:var(--bg);
+  border-bottom:1px solid var(--line);
+}
+@supports ((backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px))){
+  .topbar{
+    background:color-mix(in srgb, var(--bg) 80%, transparent);
+    -webkit-backdrop-filter:blur(14px) saturate(1.15);
+    backdrop-filter:blur(14px) saturate(1.15);
+  }
+}
+.topbar .wrap{display:flex; align-items:center; gap:22px; height:64px}
+.brand{
+  display:flex; align-items:center; gap:11px; background:none; border:0; padding:0;
+}
+.brand-mark{
+  width:34px; height:34px; flex:0 0 auto; border-radius:5px;
+  background:linear-gradient(135deg,var(--foilA),var(--foilB) 45%,var(--foilC) 75%,var(--foilD));
+  display:grid; place-items:center;
+  font-family:var(--disp); font-weight:800; font-size:1.05rem; color:#0C0E12; letter-spacing:.02em;
+}
+.brand-name{
+  font-family:var(--disp); font-weight:800; font-size:1.3rem; letter-spacing:.05em; text-transform:uppercase;
+  line-height:1;
+}
+.brand-name small{display:block; font-family:var(--mono); font-weight:400; font-size:.58rem; letter-spacing:.3em; color:var(--ink3); margin-top:3px}
+.mainnav{display:flex; gap:4px; margin-left:auto; flex-wrap:wrap}
+.mainnav button{
+  background:none; border:0; padding:8px 12px; border-radius:4px;
+  font-family:var(--mono); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink2);
+}
+.mainnav button:hover{color:var(--ink); background:var(--surface)}
+.mainnav button[aria-current="true"]{color:var(--accent)}
+.cart-btn{
+  display:flex; align-items:center; gap:8px;
+  background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:8px 14px;
+  font-family:var(--mono); font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink);
+}
+.cart-btn:hover{border-color:var(--accent)}
+.cart-count{
+  min-width:20px; height:20px; padding:0 5px; border-radius:10px; display:grid; place-items:center;
+  background:var(--accent); color:var(--accent-ink); font-weight:600; font-size:.72rem;
+}
+
+/* ============ VIEWS ============ */
+.view{display:none}
+.view.active{display:block}
+@keyframes viewIn{from{opacity:0; transform:translateY(12px)}to{opacity:1; transform:none}}
+.view.active{animation:viewIn .32s cubic-bezier(.2,.7,.2,1) both}
+.view-head{padding:56px 0 28px}
+.view-head h1{
+  font-family:var(--disp); font-weight:800; text-transform:uppercase; letter-spacing:.02em;
+  font-size:clamp(2.4rem,5.5vw,3.6rem); line-height:.95;
+}
+.view-head .lede{color:var(--ink2); max-width:56ch; margin-top:14px}
+.view-head .eyebrow{display:inline-flex; align-items:center; gap:10px}
+.view-head .eyebrow::before{
+  content:""; width:26px; height:2px; flex:0 0 auto; border-radius:1px;
+  background:linear-gradient(90deg, var(--foilA), var(--foilB), var(--foilC), var(--foilD));
+}
+
+/* ============ HERO ============ */
+.hero{position:relative; overflow:hidden; background:var(--bg)}
+@keyframes aurora{
+  0%,100%{transform:translate3d(-2%,-1.5%,0) rotate(0deg)}
+  50%{transform:translate3d(2%,2%,0) rotate(3deg)}
+}
+.hero::before{
+  content:""; position:absolute; inset:-20% -10%; pointer-events:none;
+  background:
+    radial-gradient(42% 55% at 72% 38%, color-mix(in srgb, var(--foilB) 13%, transparent), transparent 70%),
+    radial-gradient(34% 46% at 84% 74%, color-mix(in srgb, var(--foilA) 11%, transparent), transparent 70%),
+    radial-gradient(30% 40% at 10% 84%, color-mix(in srgb, var(--foilC) 7%, transparent), transparent 70%);
+  animation:aurora 30s ease-in-out infinite;
+}
+.hero::after{
+  content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+  background:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size:56px 56px;
+  -webkit-mask-image:radial-gradient(70% 90% at 70% 40%, rgba(0,0,0,.5), transparent 75%);
+  mask-image:radial-gradient(70% 90% at 70% 40%, rgba(0,0,0,.5), transparent 75%);
+}
+.hero .wrap{
+  position:relative; z-index:1;
+  display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);
+  gap:40px; align-items:center; padding-top:64px; padding-bottom:72px; min-height:70vh;
+}
+.hero h1{
+  font-family:var(--disp); font-weight:800; text-transform:uppercase;
+  font-size:clamp(3.4rem,11vw,8.2rem); line-height:.86; letter-spacing:.01em;
+}
+.hero h1 span{display:block}
+.foil-text{
+  background:linear-gradient(100deg,var(--foilA) 5%,var(--foilB) 35%,var(--foilC) 62%,var(--foilD) 92%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+@supports (-webkit-text-stroke: 1px black){
+  .hero h1 span:nth-child(2){
+    color:transparent;
+    -webkit-text-stroke:2px var(--ink);
+  }
+}
+.hero .sub{color:var(--ink2); max-width:44ch; margin-top:22px; font-size:1.06rem}
+.hero-ctas{display:flex; gap:12px; margin-top:28px; flex-wrap:wrap}
+.btn{
+  border:0; border-radius:4px; padding:13px 22px;
+  background:var(--accent); color:var(--accent-ink);
+  font-family:var(--mono); font-size:.82rem; font-weight:500; letter-spacing:.1em; text-transform:uppercase;
+  transition:transform .15s ease, filter .15s ease;
+}
+.btn:hover{filter:brightness(1.08); transform:translateY(-1px)}
+.btn-ghost{
+  background:transparent; color:var(--ink); border:1px solid var(--line2);
+}
+.btn-ghost:hover{border-color:var(--accent); color:var(--accent); filter:none}
+.btn{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),
+             0 8px 20px -8px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.btn-ghost{box-shadow:none}
+.chip[aria-pressed="true"]{box-shadow:0 4px 12px -4px color-mix(in srgb, var(--accent) 45%, transparent)}
+.add:hover:not(:disabled){box-shadow:0 6px 16px -6px color-mix(in srgb, var(--accent) 50%, transparent)}
+.sync-pill{
+  display:inline-flex; align-items:center; gap:8px; margin-top:30px;
+  font-family:var(--mono); font-size:.72rem; letter-spacing:.06em; color:var(--ink3);
+  border:1px solid var(--line); border-radius:99px; padding:6px 14px; background:var(--bg2);
+}
+.dot{width:7px; height:7px; border-radius:50%; background:var(--good); flex:0 0 auto}
+.dot.warn{background:var(--warn)} .dot.crit{background:var(--crit)}
+
+/* hero card */
+.stage{perspective:1100px; display:grid; place-items:center; min-height:420px}
+.holo{
+  width:min(300px,72vw); aspect-ratio:5/7; border-radius:14px; position:relative;
+  transform-style:preserve-3d; transition:transform .2s ease-out;
+  box-shadow:var(--shadow);
+}
+.holo-frame{
+  position:absolute; inset:0; border-radius:14px; overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 50% 30%, #232A38 0%, #12151B 60%, #0B0D11 100%);
+  border:1px solid var(--slab-line);
+  display:flex; flex-direction:column;
+}
+.holo-top{
+  font-family:var(--disp); font-weight:800; text-transform:uppercase; letter-spacing:.14em;
+  font-size:1.05rem; text-align:center; padding:18px 0 10px; color:#EEF0F4;
+}
+.holo-art{
+  flex:1; margin:0 18px; border-radius:8px; position:relative; overflow:hidden;
+  border:1px solid #2A3140;
+  background:
+    repeating-conic-gradient(from 0deg at 50% 58%,
+      rgba(110,231,240,.16) 0deg 9deg, rgba(157,140,255,.13) 9deg 18deg,
+      rgba(244,154,193,.12) 18deg 27deg, rgba(245,208,111,.14) 27deg 36deg),
+    radial-gradient(75% 60% at 50% 58%, #1B2130 0%, #101319 70%);
+}
+.holo-art::after{
+  content:"TL"; position:absolute; inset:0; display:grid; place-items:center;
+  font-family:var(--disp); font-weight:800; font-size:4.6rem; letter-spacing:.02em;
+  background:linear-gradient(120deg,var(--foilA),var(--foilB) 45%,var(--foilC) 70%,var(--foilD));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.holo-bottom{
+  font-family:var(--mono); font-size:.58rem; letter-spacing:.22em; text-transform:uppercase;
+  text-align:center; padding:14px 0 16px; color:#737B8A;
+}
+.holo .sheen{
+  position:absolute; inset:0; border-radius:14px; pointer-events:none; mix-blend-mode:screen; opacity:.55;
+  background:linear-gradient(115deg, transparent 30%, rgba(110,231,240,.28) 44%, rgba(244,154,193,.25) 52%, rgba(245,208,111,.22) 58%, transparent 72%);
+  background-size:250% 250%; background-position:var(--shx,50%) var(--shy,50%);
+}
+.stage-caption{
+  position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
+  font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ink3);
+  white-space:nowrap;
+}
+
+/* orchestrated load reveal */
+@keyframes rise{from{opacity:0; transform:translateY(26px)}to{opacity:1; transform:none}}
+@keyframes cardIn{from{opacity:0; transform:rotateY(-22deg) rotateX(6deg) scale(.94)}to{opacity:1; transform:none}}
+.reveal>*{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+.reveal>*:nth-child(1){animation-delay:.05s}.reveal>*:nth-child(2){animation-delay:.14s}
+.reveal>*:nth-child(3){animation-delay:.23s}.reveal>*:nth-child(4){animation-delay:.32s}
+.reveal>*:nth-child(5){animation-delay:.41s}
+.holo{animation:cardIn .9s .3s cubic-bezier(.2,.7,.2,1) backwards}
+
+/* hero orchestration: foil glint, one-shot sheen pass, caption settle */
+@keyframes foilGlint{
+  0%{filter:brightness(.6) saturate(.7)}
+  55%{filter:brightness(1.35) saturate(1.25)}
+  100%{filter:brightness(1) saturate(1)}
+}
+.reveal .foil-text{animation:foilGlint 1.2s .55s ease-out both}
+@keyframes introSheen{
+  0%{transform:translateX(-160%) skewX(-16deg); opacity:0}
+  15%{opacity:1}
+  100%{transform:translateX(340%) skewX(-16deg); opacity:0}
+}
+.holo-frame::after{
+  content:""; position:absolute; top:-12%; bottom:-12%; left:0; width:38%;
+  background:linear-gradient(102deg, transparent, rgba(110,231,240,.16) 30%, rgba(255,255,255,.3) 50%, rgba(244,154,193,.15) 68%, transparent);
+  mix-blend-mode:screen; pointer-events:none; opacity:0;
+  transform:translateX(-160%) skewX(-16deg);
+  animation:introSheen 1.05s 1.2s cubic-bezier(.45,.1,.3,1) both;
+}
+@keyframes captionIn{from{opacity:0; transform:translate(-50%,8px)}to{opacity:1; transform:translate(-50%,0)}}
+.stage-caption{animation:captionIn .5s 1.9s ease both}
+
+/* ============ TICKER ============ */
+.ticker{
+  border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+  background:var(--bg2); overflow:hidden; white-space:nowrap;
+}
+.ticker-track{display:inline-flex; gap:0; animation:tick 40s linear infinite; will-change:transform}
+.ticker:hover .ticker-track{animation-play-state:paused}
+.ticker span{
+  display:inline-block; padding:10px 26px 10px 0;
+  font-family:var(--mono); font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ink2);
+}
+.ticker b{color:var(--accent); font-weight:500}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker{position:relative}
+.ticker::before{
+  content:"Buying desk"; position:absolute; left:0; top:0; bottom:0; z-index:2;
+  display:flex; align-items:center; padding:0 22px 0 24px;
+  background:linear-gradient(90deg, var(--bg2) 72%, transparent);
+  font-family:var(--mono); font-size:.64rem; letter-spacing:.22em; text-transform:uppercase; color:var(--accent);
+  pointer-events:none;
+}
+.ticker::after{
+  content:""; position:absolute; right:0; top:0; bottom:0; width:72px; z-index:1;
+  background:linear-gradient(270deg, var(--bg2), transparent); pointer-events:none;
+}
+.ticker span::before{content:"\2726"; color:var(--ink3); font-size:.6rem; padding-right:24px}
+
+/* ============ SECTIONS / CARDS ============ */
+.section{padding:64px 0}
+.section-head{display:flex; align-items:baseline; justify-content:space-between; gap:16px; margin-bottom:26px; flex-wrap:wrap}
+.section-head h2{
+  font-family:var(--disp); font-weight:800; text-transform:uppercase; letter-spacing:.02em;
+  font-size:clamp(1.8rem,3.4vw,2.5rem); line-height:1;
+}
+.linklike{
+  background:none; border:0; padding:0; color:var(--accent);
+  font-family:var(--mono); font-size:.76rem; letter-spacing:.12em; text-transform:uppercase;
+}
+.linklike:hover{text-decoration:underline}
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:8px}
+.tri{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
+.tri .panel{padding:26px 24px}
+.tri h3{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.5rem; letter-spacing:.03em}
+.tri p{color:var(--ink2); margin-top:10px; font-size:.94rem}
+.tri .num{
+  font-family:var(--mono); font-size:.68rem; letter-spacing:.2em; color:var(--accent); display:block; margin-bottom:14px;
+}
+
+/* scroll-in reveals (class added by JS; no-JS and reduced-motion users see content immediately) */
+.sr{opacity:0; transform:translateY(18px); transition:opacity .55s cubic-bezier(.2,.7,.2,1), transform .55s cubic-bezier(.2,.7,.2,1); transition-delay:var(--srd,0s)}
+.sr.sr-in{opacity:1; transform:none}
+
+/* ============ SHOP ============ */
+.shop-tools{
+  display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center; margin-bottom:8px;
+}
+.chip-row{display:flex; gap:6px; flex-wrap:wrap}
+.chip{
+  background:var(--surface); border:1px solid var(--line); border-radius:99px; padding:6px 14px;
+  font-family:var(--mono); font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink2);
+}
+.chip:hover{border-color:var(--line2); color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.sort-wrap{margin-left:auto; display:flex; align-items:center; gap:8px}
+select,input,textarea{
+  background:var(--surface); border:1px solid var(--line); border-radius:4px; color:var(--ink);
+  font-family:var(--body); font-size:.9rem; padding:9px 12px;
+}
+select:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+label{font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3)}
+.freshness{
+  display:flex; align-items:center; gap:8px; margin:14px 0 22px;
+  font-family:var(--mono); font-size:.72rem; letter-spacing:.06em; color:var(--ink3);
+}
+.grid{display:grid; grid-template-columns:repeat(4,1fr); gap:16px}
+.prod{
+  background:var(--surface); border:1px solid var(--line); border-radius:8px; overflow:hidden;
+  display:flex; flex-direction:column;
+  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.prod:hover{transform:translateY(-3px); border-color:var(--line2); box-shadow:var(--shadow)}
+.thumb{
+  position:relative; background:var(--slab); display:grid; place-items:center;
+  padding:20px 0 16px; border-bottom:1px solid var(--line);
+  background:radial-gradient(120% 90% at 50% 18%, color-mix(in srgb, var(--accent) 8%, var(--slab)), var(--slab) 62%);
+}
+.prod{position:relative}
+.prod::after{
+  content:""; position:absolute; top:0; left:8%; right:8%; height:2px; pointer-events:none;
+  background:linear-gradient(90deg, transparent, var(--foilA) 30%, var(--foilC) 70%, transparent);
+  opacity:0; transition:opacity .18s ease;
+}
+.prod:hover::after{opacity:.9}
+.mini{
+  width:150px; aspect-ratio:5/7; border-radius:8px; position:relative; overflow:hidden;
+  border:1px solid var(--slab-line); background:#12151B;
+  transition:transform .25s ease;
+}
+.prod:hover .mini{transform:translateY(-4px) rotate(-2deg)}
+.mini svg{display:block; width:100%; height:100%}
+.mini img.card-img{display:block; width:100%; height:100%; object-fit:cover}
+.mini .holo-hover{
+  position:absolute; inset:0; mix-blend-mode:screen; opacity:0; transition:opacity .25s ease, background-position .5s ease;
+  background:linear-gradient(115deg, transparent 25%, rgba(110,231,240,.4) 45%, rgba(244,154,193,.35) 55%, transparent 75%);
+  background-size:300% 300%; background-position:80% 50%;
+}
+@keyframes foilSweep{
+  0%{background-position:95% 50%; opacity:0}
+  35%{opacity:.95}
+  100%{background-position:12% 50%; opacity:.7}
+}
+.prod:hover .holo-hover,.prod:focus-within .holo-hover{animation:foilSweep .7s cubic-bezier(.3,.6,.2,1) both}
+.cond{
+  position:absolute; top:10px; right:10px;
+  font-family:var(--mono); font-size:.62rem; letter-spacing:.1em;
+  background:rgba(12,14,18,.75); color:#EEF0F4; border:1px solid #2A3140;
+  padding:2px 7px; border-radius:3px;
+}
+.p-meta{padding:14px 16px 16px; display:flex; flex-direction:column; gap:4px; flex:1}
+.p-meta h3{font-size:.98rem; font-weight:600; line-height:1.3}
+.p-set{font-family:var(--mono); font-size:.7rem; letter-spacing:.04em; color:var(--ink3)}
+.p-row{display:flex; align-items:baseline; justify-content:space-between; margin-top:auto; padding-top:10px; border-top:1px dashed var(--line)}
+.price{font-family:var(--mono); font-size:1.08rem; font-weight:500; font-variant-numeric:tabular-nums}
+.stock{font-family:var(--mono); font-size:.68rem; color:var(--ink3)}
+.stock.low{color:var(--warn)}
+.stock.out{color:var(--crit)}
+a.add{display:block; text-align:center; text-decoration:none; box-sizing:border-box; color:var(--ink)}
+.add{
+  margin-top:12px; border:1px solid var(--line2); background:none; border-radius:4px; padding:9px 0;
+  font-family:var(--mono); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink);
+  transition:background .15s ease,color .15s ease,border-color .15s ease;
+}
+.add:hover:not(:disabled){background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.add:disabled{opacity:.4; cursor:not-allowed}
+
+/* ============ CART DRAWER ============ */
+.overlay{
+  position:fixed; inset:0; background:rgba(6,8,11,.6); z-index:95; opacity:0; pointer-events:none; transition:opacity .25s ease;
+}
+.overlay.open{opacity:1; pointer-events:auto}
+.drawer{
+  position:fixed; top:0; right:0; bottom:0; width:min(400px,92vw); z-index:100;
+  background:var(--bg2); border-left:1px solid var(--line);
+  transform:translateX(102%); visibility:hidden;
+  transition:transform .3s cubic-bezier(.55,.06,.68,.19), visibility 0s .3s;
+  display:flex; flex-direction:column;
+}
+.drawer.open{transform:none; visibility:visible; transition:transform .5s cubic-bezier(.22,1.18,.36,1), visibility 0s}
+html.cart-open, html.cart-open body{overflow:hidden}
+.drawer-head{display:flex; align-items:center; justify-content:space-between; padding:20px 22px; border-bottom:1px solid var(--line)}
+.drawer-head h2{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.4rem; letter-spacing:.04em}
+.drawer-close{background:none; border:1px solid var(--line); border-radius:4px; width:34px; height:34px; font-size:1rem; color:var(--ink2)}
+.drawer-close:hover{border-color:var(--accent); color:var(--accent)}
+.drawer-body{flex:1; overflow-y:auto; overflow-x:hidden; padding:14px 22px}
+.cart-line{display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--line)}
+.cart-line .ct{flex:1; min-width:0}
+.cart-line .ct b{font-weight:600; font-size:.9rem; display:block}
+.cart-line .ct span{font-family:var(--mono); font-size:.68rem; color:var(--ink3)}
+.qty{display:flex; align-items:center; gap:6px}
+.qty button{width:26px; height:26px; border:1px solid var(--line); background:none; border-radius:3px; color:var(--ink2); font-family:var(--mono)}
+.qty button:hover{border-color:var(--accent); color:var(--accent)}
+.qty span{font-family:var(--mono); font-size:.85rem; min-width:18px; text-align:center; font-variant-numeric:tabular-nums}
+.cart-line .lp{font-family:var(--mono); font-size:.88rem; font-variant-numeric:tabular-nums}
+.cart-empty{color:var(--ink3); font-family:var(--mono); font-size:.8rem; text-align:center; padding:48px 0; letter-spacing:.08em}
+.cart-empty{
+  display:flex; flex-direction:column; align-items:center; gap:16px; padding:52px 0;
+}
+.cart-empty::before{
+  content:""; width:72px; aspect-ratio:5/7; border-radius:7px;
+  border:2px dashed var(--line2);
+  background:linear-gradient(160deg, var(--surface2), transparent 70%);
+}
+.grid .cart-empty{grid-column:1/-1}
+.drawer-foot{border-top:1px solid var(--line); padding:18px 22px 22px}
+.subtotal{display:flex; justify-content:space-between; font-family:var(--mono); margin-bottom:14px}
+.subtotal b{font-variant-numeric:tabular-nums; font-size:1.1rem}
+.drawer-foot .btn{width:100%}
+.drawer-note{font-family:var(--mono); font-size:.64rem; color:var(--ink3); text-align:center; margin-top:10px; letter-spacing:.06em}
+@keyframes lineIn{from{opacity:0; transform:translateX(18px)}to{opacity:1; transform:none}}
+.drawer.opening .cart-line{animation:lineIn .38s cubic-bezier(.2,.7,.2,1) both}
+.drawer.opening .cart-line:nth-child(1){animation-delay:.08s}
+.drawer.opening .cart-line:nth-child(2){animation-delay:.14s}
+.drawer.opening .cart-line:nth-child(3){animation-delay:.2s}
+.drawer.opening .cart-line:nth-child(4){animation-delay:.26s}
+.drawer.opening .cart-line:nth-child(n+5){animation-delay:.32s}
+@keyframes countPop{0%{transform:scale(1)}40%{transform:scale(1.4)}100%{transform:scale(1)}}
+.cart-count.pop{animation:countPop .35s cubic-bezier(.3,.7,.3,1)}
+
+/* ============ CARD SHOW ============ */
+.show-hero{
+  display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:32px; align-items:stretch;
+}
+.show-date-card{
+  background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:30px;
+  position:relative; overflow:hidden;
+}
+.show-date-card::before{
+  content:""; position:absolute; inset:0 auto 0 0; width:5px;
+  background:linear-gradient(180deg,var(--foilA),var(--foilB),var(--foilC),var(--foilD));
+}
+.show-date{
+  font-family:var(--disp); font-weight:800; text-transform:uppercase;
+  font-size:clamp(2.6rem,6vw,4.2rem); line-height:.92; letter-spacing:.01em;
+}
+.show-meta{display:grid; gap:8px; margin-top:18px; font-family:var(--mono); font-size:.8rem; color:var(--ink2)}
+.show-meta b{color:var(--ink); font-weight:500}
+.meter{height:8px; background:var(--surface2); border:1px solid var(--line); border-radius:99px; overflow:hidden; margin-top:8px}
+.meter i{display:block; height:100%; width:46%; background:var(--accent)}
+@keyframes meterFill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.view.active .meter i{transform-origin:left; animation:meterFill .9s .25s cubic-bezier(.2,.7,.2,1) both}
+.vendor-form{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:26px}
+.vendor-form h3, .form-card h3{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.5rem; letter-spacing:.03em; margin-bottom:6px}
+.form-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:16px}
+.field{display:flex; flex-direction:column; gap:6px}
+.field.full{grid-column:1/-1}
+.gallery{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:26px}
+.gal{
+  aspect-ratio:4/3; border-radius:8px; border:1px solid var(--line); position:relative; overflow:hidden;
+  background:var(--slab); display:flex; align-items:flex-end;
+}
+.gal::before{content:""; position:absolute; inset:0; opacity:.9}
+.gal.g1::before{background:repeating-linear-gradient(45deg,#1D2432 0 14px,#171C27 14px 28px)}
+.gal.g2::before{background:radial-gradient(60% 80% at 30% 30%,#2A3346 0%,#151A23 70%)}
+.gal.g3::before{background:repeating-linear-gradient(-30deg,#20283A 0 10px,#181E2B 10px 20px)}
+.gal.g4::before{background:radial-gradient(70% 70% at 70% 30%,#33283E 0%,#161A23 70%)}
+.gal.g5::before{background:repeating-linear-gradient(90deg,#1C2635 0 18px,#161C27 18px 36px)}
+.gal.g6::before{background:radial-gradient(80% 60% at 50% 60%,#243645 0%,#141A22 75%)}
+.gal span{
+  position:relative; margin:10px; font-family:var(--mono); font-size:.62rem; letter-spacing:.14em; text-transform:uppercase;
+  color:#A6ADBB; background:rgba(12,14,18,.72); border:1px solid #2A3140; padding:3px 8px; border-radius:3px;
+}
+
+/* ============ EVENTS ============ */
+.sched{display:grid; gap:0; border:1px solid var(--line); border-radius:8px; overflow:hidden}
+.sched-row{
+  display:grid; grid-template-columns:120px 1fr auto auto; gap:18px; align-items:center;
+  padding:16px 22px; background:var(--surface); border-bottom:1px solid var(--line);
+}
+.sched-row:last-child{border-bottom:0}
+.sched-day{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.25rem; letter-spacing:.05em}
+.sched-name{font-weight:600}
+.sched-name small{display:block; font-weight:400; color:var(--ink3); font-size:.8rem}
+.sched-time,.sched-fee{font-family:var(--mono); font-size:.78rem; color:var(--ink2); font-variant-numeric:tabular-nums}
+.fee-free{color:var(--good)}
+
+/* ============ BUYLIST ============ */
+.buy-grid{display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:32px; align-items:start}
+.form-card{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:26px}
+.buy-points{display:grid; gap:14px}
+.buy-points .panel{padding:18px 20px; display:flex; gap:14px; align-items:baseline}
+.buy-points .k{font-family:var(--disp); font-weight:800; font-size:1.6rem; color:var(--accent); min-width:64px; text-transform:uppercase; line-height:1}
+.buy-points p{color:var(--ink2); font-size:.92rem}
+
+/* ============ ADMIN ============ */
+.admin-bar{
+  background:var(--bg2); border-bottom:1px solid var(--line); padding:12px 0;
+}
+.admin-bar .wrap{display:flex; align-items:center; gap:16px; flex-wrap:wrap}
+.admin-bar .eyebrow{color:var(--accent)}
+.stat-row{display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
+.stat{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:18px 20px}
+.stat .lab{font-family:var(--mono); font-size:.66rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ink3)}
+.stat .val{font-family:var(--disp); font-weight:800; font-size:2.1rem; line-height:1.1; margin-top:6px; font-variant-numeric:tabular-nums}
+.stat .sub{font-family:var(--mono); font-size:.68rem; color:var(--ink3); margin-top:4px}
+.stat .sub.up{color:var(--good)}
+.stat .sub.down{color:var(--warn)}
+.spark{display:flex; align-items:flex-end; gap:3px; height:34px; margin-top:10px}
+.spark i{flex:1; background:var(--accent-dim); border-radius:2px 2px 0 0; min-height:3px}
+.spark i.today{background:var(--accent)}
+@keyframes sparkGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.view.active .spark i{transform-origin:bottom; animation:sparkGrow .6s cubic-bezier(.2,.7,.2,1) both}
+.view.active .spark i:nth-child(2){animation-delay:.05s}
+.view.active .spark i:nth-child(3){animation-delay:.1s}
+.view.active .spark i:nth-child(4){animation-delay:.15s}
+.view.active .spark i:nth-child(5){animation-delay:.2s}
+.view.active .spark i:nth-child(6){animation-delay:.25s}
+.view.active .spark i:nth-child(7){animation-delay:.3s}
+.admin-grid{display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr); gap:16px; margin-top:16px}
+.admin-card{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:22px}
+.admin-card h3{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.3rem; letter-spacing:.04em; margin-bottom:14px; display:flex; align-items:center; gap:10px}
+.pill{
+  display:inline-flex; align-items:center; gap:6px; border-radius:99px; padding:3px 10px;
+  font-family:var(--mono); font-size:.66rem; letter-spacing:.08em; text-transform:uppercase;
+}
+.pill.ok{background:var(--good-bg); color:var(--good)}
+.pill.warn{background:var(--warn-bg); color:var(--warn)}
+.pill.crit{background:var(--crit-bg); color:var(--crit)}
+.kv{display:grid; grid-template-columns:auto minmax(0,1fr); gap:8px 18px; font-size:.88rem; align-items:center}
+.kv dd select,.kv dd input{max-width:100%}
+.kv dt{font-family:var(--mono); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); margin:0}
+.kv dd{margin:0; color:var(--ink)}
+.toggle-row{display:flex; align-items:center; justify-content:space-between; gap:14px; padding:11px 0; border-bottom:1px solid var(--line)}
+.toggle-row:last-child{border-bottom:0}
+.toggle-row .tl b{font-weight:600; font-size:.9rem; display:block}
+.toggle-row .tl span{font-size:.78rem; color:var(--ink3)}
+.switch{
+  width:42px; height:24px; border-radius:99px; border:1px solid var(--line2); background:var(--surface2);
+  position:relative; flex:0 0 auto; transition:background .2s ease,border-color .2s ease; padding:0;
+}
+.switch::after{
+  content:""; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%;
+  background:var(--ink3); transition:transform .2s ease, background .2s ease;
+}
+.switch[aria-checked="true"]{background:var(--accent); border-color:var(--accent)}
+.switch[aria-checked="true"]::after{transform:translateX(18px); background:var(--accent-ink)}
+.log{
+  background:var(--slab); border:1px solid var(--slab-line); border-radius:6px; padding:14px 16px;
+  font-family:var(--mono); font-size:.72rem; line-height:1.8; color:#A6ADBB;
+  max-height:180px; overflow-y:auto; margin-top:14px;
+}
+.log .ok{color:#5BD98A}
+.log .t{color:#7E8798}
+.hook-row{display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--line); font-family:var(--mono); font-size:.76rem}
+.hook-row:last-child{border-bottom:0}
+.hook-row .hn{color:var(--ink2)}
+.table-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; border:1px solid var(--line); border-radius:8px; margin-top:16px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; min-width:720px; font-size:.86rem}
+th{
+  text-align:left; font-family:var(--mono); font-size:.66rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--ink3); font-weight:500; padding:12px 16px; border-bottom:1px solid var(--line); background:var(--surface2);
+}
+td{padding:11px 16px; border-bottom:1px solid var(--line); vertical-align:middle}
+tr:last-child td{border-bottom:0}
+td.num{font-family:var(--mono); font-variant-numeric:tabular-nums}
+.stock-edit{display:inline-flex; align-items:center; gap:8px}
+.stock-edit button{width:24px; height:24px; border:1px solid var(--line); background:none; border-radius:3px; color:var(--ink2); font-family:var(--mono); line-height:1}
+.stock-edit button:hover{border-color:var(--accent); color:var(--accent)}
+.stock-edit span{font-family:var(--mono); min-width:20px; text-align:center; font-variant-numeric:tabular-nums}
+.stock-edit span.low{color:var(--warn)} .stock-edit span.zero{color:var(--crit)}
+.teaser{
+  margin-top:16px; border:1px dashed var(--line2); border-radius:8px; padding:20px 22px;
+  display:flex; align-items:center; gap:20px; flex-wrap:wrap; background:var(--bg2);
+}
+.teaser .tt b{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.15rem; letter-spacing:.04em; display:block}
+.teaser .tt span{font-size:.85rem; color:var(--ink2)}
+.teaser .tt code{font-family:var(--mono); font-size:.78rem; color:var(--accent); background:none}
+
+/* ============ LIVE ============ */
+.live-dot{display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--crit); margin-left:7px; vertical-align:2px; animation:livepulse 1.6s ease-in-out infinite}
+@keyframes livepulse{0%,100%{opacity:1}50%{opacity:.3}}
+.live-grid{display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,.9fr); gap:16px; align-items:stretch}
+.player{background:var(--slab); border:1px solid var(--slab-line); border-radius:8px; overflow:hidden; display:flex; flex-direction:column}
+.screen{position:relative; aspect-ratio:16/9; overflow:hidden; background:radial-gradient(70% 90% at 50% 65%, #1B2130 0%, #0B0D11 80%)}
+.screen .glow{position:absolute; inset:-30%; background:conic-gradient(from 0deg, rgba(110,231,240,.08), rgba(157,140,255,.1), rgba(244,154,193,.08), rgba(245,208,111,.09), rgba(110,231,240,.08)); animation:spinbg 24s linear infinite}
+@keyframes spinbg{to{transform:rotate(360deg)}}
+.screen .pack{position:absolute; left:50%; top:54%; width:118px; aspect-ratio:5/7; transform:translate(-50%,-50%) rotate(-4deg); border-radius:10px; background:linear-gradient(150deg,#232A38,#12151B); border:1px solid #2A3140; display:grid; place-items:center}
+.screen .pack b{font-family:var(--disp); font-weight:800; font-size:2.1rem; background:linear-gradient(120deg,var(--foilA),var(--foilB),var(--foilC),var(--foilD)); -webkit-background-clip:text; background-clip:text; color:transparent}
+.screen .rip{position:absolute; left:50%; top:16%; transform:translateX(-50%); font-family:var(--mono); font-size:.66rem; letter-spacing:.2em; text-transform:uppercase; color:#A6ADBB; white-space:nowrap}
+.live-pill{position:absolute; top:14px; left:14px; display:inline-flex; align-items:center; gap:7px; background:rgba(12,14,18,.82); border:1px solid #2A3140; border-radius:99px; padding:5px 12px; font-family:var(--mono); font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; color:#EEF0F4}
+.live-pill i{width:8px; height:8px; border-radius:50%; background:var(--crit); animation:livepulse 1.6s infinite}
+.viewers{position:absolute; top:14px; right:14px; background:rgba(12,14,18,.82); border:1px solid #2A3140; border-radius:99px; padding:5px 12px; font-family:var(--mono); font-size:.68rem; color:#A6ADBB}
+.player-bar{display:flex; align-items:center; gap:6px 14px; padding:14px 16px; border-top:1px solid var(--slab-line); flex-wrap:wrap}
+.player-bar b{font-weight:600; font-size:.92rem}
+.player-bar span{font-family:var(--mono); font-size:.68rem; color:var(--ink3)}
+.chat{background:var(--surface); border:1px solid var(--line); border-radius:8px; display:flex; flex-direction:column; min-height:0}
+.chat-head{padding:14px 16px; border-bottom:1px solid var(--line); font-family:var(--disp); font-weight:700; text-transform:uppercase; letter-spacing:.04em; display:flex; justify-content:space-between; align-items:center; gap:10px}
+.chat-body{flex:1; overflow-y:auto; padding:12px 16px; display:flex; flex-direction:column; gap:9px; max-height:330px; min-height:220px}
+.chat-line{font-size:.84rem; line-height:1.4}
+.chat-line b{font-family:var(--mono); font-size:.72rem; color:var(--accent); font-weight:500; margin-right:6px}
+.chat-line.sys{color:var(--ink3); font-family:var(--mono); font-size:.68rem}
+.chat-form{display:flex; gap:8px; padding:12px; border-top:1px solid var(--line)}
+.chat-form input{flex:1; min-width:0}
+.spots{display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-top:16px}
+.spot{border:1px solid var(--line2); background:none; border-radius:4px; padding:11px 0; font-family:var(--mono); font-size:.78rem; color:var(--ink); transition:background .15s ease,color .15s ease,border-color .15s ease}
+.spot:hover:not(:disabled){background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.spot:disabled{opacity:.35; cursor:not-allowed; text-decoration:line-through}
+
+/* live ambience */
+@keyframes chatIn{from{opacity:0; transform:translateY(6px)}to{opacity:1; transform:none}}
+.chat-body .chat-line{animation:chatIn .28s cubic-bezier(.2,.7,.2,1) both}
+@keyframes packFloat{
+  0%,100%{transform:translate(-50%,-50%) rotate(-4deg)}
+  50%{transform:translate(-50%,-52.5%) rotate(-2.5deg)}
+}
+.screen .pack{animation:packFloat 5.5s ease-in-out infinite}
+@keyframes ringPulse{0%{box-shadow:0 0 0 0 var(--crit)}70%,100%{box-shadow:0 0 0 7px transparent}}
+.live-pill i{animation:livepulse 1.6s infinite, ringPulse 1.6s ease-out infinite}
+@keyframes vTick{0%{transform:scale(1)}45%{transform:scale(1.12)}100%{transform:scale(1)}}
+.viewers.tick{animation:vTick .3s ease}
+@media (max-width:960px){ .live-grid{grid-template-columns:1fr} .spots{grid-template-columns:repeat(4,1fr)} }
+@media (max-width:480px){ .spots{grid-template-columns:repeat(3,1fr)} }
+
+/* ============ SITE BANNER ============ */
+.site-banner{
+  display:flex; gap:14px; align-items:center; justify-content:center; flex-wrap:wrap;
+  padding:9px 16px; background:var(--accent); color:var(--accent-ink);
+  font-family:var(--mono); font-size:.76rem; letter-spacing:.06em; text-align:center;
+}
+.site-banner[hidden]{display:none}
+.banner-link{
+  background:none; border:0; padding:0; color:var(--accent-ink); font:inherit;
+  text-decoration:underline; letter-spacing:inherit;
+}
+.ev-edit-row{display:flex; gap:8px; align-items:center; padding:7px 0; border-bottom:1px solid var(--line)}
+.ev-edit-row:last-child{border-bottom:0}
+.ev-edit-row input{padding:7px 9px; font-size:.84rem}
+
+/* ============ FOOTER ============ */
+footer{
+  border-top:0; background:var(--bg2); margin-top:64px; position:relative;
+}
+footer::before{
+  content:""; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, var(--foilA), var(--foilB) 35%, var(--foilC) 65%, var(--foilD));
+}
+.foot-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:28px; padding:60px 0 44px}
+.foot-grid h4{
+  font-family:var(--mono); font-size:.68rem; letter-spacing:.18em; text-transform:uppercase; color:var(--ink3);
+  margin:0 0 14px; font-weight:500;
+}
+.foot-grid ul{list-style:none; margin:0; padding:0; display:grid; gap:8px; font-size:.9rem; color:var(--ink2)}
+.foot-grid a{color:var(--ink2); text-decoration:none}
+.foot-grid a:hover{color:var(--accent)}
+.foot-brand{font-family:var(--disp); font-weight:800; text-transform:uppercase; font-size:2.1rem; letter-spacing:.04em}
+.foot-bottom{
+  border-top:1px solid var(--line); padding:18px 0 26px;
+  display:flex; gap:16px; align-items:center; flex-wrap:wrap;
+  font-family:var(--mono); font-size:.68rem; letter-spacing:.06em; color:var(--ink3);
+}
+.foot-bottom .adminlink{color:var(--ink3); background:none; border:0; padding:0; font:inherit; text-decoration:underline; letter-spacing:inherit}
+.foot-bottom .adminlink:hover{color:var(--accent)}
+.foot-bottom .spacer{flex:1}
+
+/* ============ TOAST ============ */
+.toast{
+  position:fixed; bottom:22px; left:50%; transform:translate(-50%,14px) scale(.95); z-index:120;
+  background:var(--ink); color:var(--bg); border-radius:6px; padding:11px 20px;
+  font-family:var(--mono); font-size:.78rem; letter-spacing:.04em;
+  opacity:0; pointer-events:none; transition:opacity .22s ease, transform .38s cubic-bezier(.24,1.2,.4,1);
+  max-width:90vw; text-align:center;
+}
+.toast.on{opacity:1; transform:translate(-50%,0) scale(1)}
+
+/* ============ FINISH LAYER ============ */
+.panel,.stat,.admin-card,.form-card,.vendor-form,.show-date-card,.chat,.prod{
+  background:linear-gradient(180deg, var(--surface2), var(--surface) 42%);
+  box-shadow:inset 0 1px 0 var(--top-light), var(--edge-shadow);
+}
+::selection{background:var(--accent); color:var(--accent-ink)}
+.chat-body,.log,.drawer-body,.table-wrap{scrollbar-width:thin; scrollbar-color:var(--line2) transparent}
+.meter i{background:linear-gradient(90deg, var(--accent), var(--foilA))}
+.toast{border-left:3px solid var(--accent)}
+
+/* press micro-states */
+.btn:active{transform:translateY(1px) scale(.985); filter:brightness(.95)}
+.chip,.add,.spot,.drawer-close,.qty button,.stock-edit button,.mainnav button{transition:transform .12s ease, background .15s ease, color .15s ease, border-color .15s ease}
+.chip:active,.add:active:not(:disabled),.spot:active:not(:disabled),.drawer-close:active,.qty button:active,.stock-edit button:active,.mainnav button:active{transform:scale(.94)}
+
+/* desktop rhythm */
+@media (min-width:961px){
+  .section{padding:84px 0}
+  .view-head{padding:76px 0 34px}
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:960px){
+  .topbar .wrap{height:auto; min-height:64px; padding-top:10px; padding-bottom:10px; row-gap:6px; flex-wrap:wrap}
+  .mainnav{
+    order:3; width:calc(100% + 48px); margin:0 -24px;
+    flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    padding:4px 20px 8px; scrollbar-width:none;
+  }
+  .mainnav::-webkit-scrollbar{display:none}
+  .mainnav button{
+    flex:0 0 auto; white-space:nowrap; min-height:40px;
+    border:1px solid var(--line); border-radius:99px; padding:9px 14px;
+  }
+  .mainnav button[aria-current="true"]{border-color:var(--accent)}
+  .cart-btn{margin-left:auto}
+  .grid{grid-template-columns:repeat(3,1fr)}
+  .stat-row{grid-template-columns:repeat(2,1fr)}
+  .admin-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:repeat(2,1fr)}
+  .hero .wrap{grid-template-columns:1fr; min-height:0; padding-top:48px}
+  .stage{min-height:0; margin-top:8px}
+  .show-hero,.buy-grid{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .tri{grid-template-columns:1fr}
+  .gallery{grid-template-columns:repeat(2,1fr)}
+  .form-grid{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:72px 1fr; row-gap:4px}
+  .sched-time{grid-column:2}
+  .sched-fee{grid-column:2}
+  .topbar .wrap{height:auto; padding-top:10px; padding-bottom:10px; row-gap:6px; flex-wrap:wrap}
+  .mainnav{
+    order:3; width:calc(100% + 48px); margin:0 -24px;
+    flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    padding:4px 20px 8px; scrollbar-width:none;
+  }
+  .mainnav::-webkit-scrollbar{display:none}
+  .mainnav button{
+    flex:0 0 auto; white-space:nowrap; min-height:40px;
+    border:1px solid var(--line); border-radius:99px; padding:9px 14px;
+  }
+  .mainnav button[aria-current="true"]{border-color:var(--accent)}
+  .foot-grid{grid-template-columns:1fr}
+  .stat-row{grid-template-columns:1fr 1fr}
+  select,input,textarea{font-size:16px}
+  .ev-edit-row input{font-size:16px}
+  .mini{width:min(150px, calc(100% - 20px))}
+  .section-head .demo-tag{white-space:normal}
+}
+@media (max-width:520px){
+  .kv{grid-template-columns:minmax(0,1fr); gap:4px 0}
+  .kv dt{margin-top:10px}
+  .kv dd input{width:100%}
+  .ev-edit-row{flex-wrap:wrap; row-gap:6px}
+  .ev-edit-row input[data-ev="name"]{flex:1 1 100%; order:-1}
+}
+@media (max-width:420px){
+  .grid{grid-template-columns:1fr}
+  .hero-ctas{gap:10px}
+  .hero-ctas .btn{flex:1 1 100%}
+  .hero .wrap{padding-top:40px; padding-bottom:48px}
+}
+
+/* ============ TOUCH TARGETS ============ */
+@media (pointer:coarse){
+  .qty button{width:36px; height:36px}
+  .qty{gap:8px}
+  .stock-edit button{width:32px; height:32px}
+  .drawer-close{width:40px; height:40px}
+  .chip{padding:9px 16px}
+  .spot{padding:13px 0}
+  .cart-btn{min-height:40px}
+  .stage-caption{display:none}
+}
+
+/* ============ REDUCED MOTION ============ */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important}
+  .ticker-track{animation:none; transform:none}
+  .reveal>*,.holo,.reveal .foil-text,.stage-caption,.holo-frame::after{animation:none}
+  .hero::before{animation:none}
+  .view.active{animation:none}
+  .sr{opacity:1; transform:none; transition:none}
+  .prod:hover .holo-hover,.prod:focus-within .holo-hover{animation:none; opacity:.55}
+  .drawer{transition:none}
+  .drawer.opening .cart-line,.cart-count.pop{animation:none}
+  .chat-body .chat-line,.screen .pack,.live-pill i,.viewers.tick{animation:none}
+  .view.active .meter i,.view.active .spark i{animation:none}
+  .btn:active,.chip:active,.add:active,.spot:active,.drawer-close:active,.qty button:active,.stock-edit button:active,.mainnav button:active{transform:none}
+}
+</style>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <button class="brand" data-go="home" aria-label="Top Loaded TCG home">
+      <span class="brand-mark" aria-hidden="true">TL</span>
+      <span class="brand-name" id="brandName">Top Loaded<small>Trading Cards &middot; NKY</small></span>
+    </button>
+    <nav class="mainnav" aria-label="Main">
+      <button data-go="shop">Shop</button>
+      <button data-go="live">Live<span class="live-dot" aria-hidden="true"></span></button>
+      <button data-go="show">Card Show</button>
+      <button data-go="events">Play Nights</button>
+      <button data-go="buylist">Sell to Us</button>
+      <button data-go="visit">Visit</button>
+    </nav>
+    <button class="cart-btn" id="cartBtn" aria-haspopup="dialog">
+      Cart <span class="cart-count" id="cartCount">0</span>
+    </button>
+  </div>
+</header>
+
+<div class="site-banner" id="siteBanner" role="status" hidden>
+  <span id="siteBannerText"></span>
+  <button class="banner-link" id="siteBannerBtn" data-go="live" hidden>Watch &rarr;</button>
+</div>
+
+<main id="main">
+
+  <!-- ================= HOME ================= -->
+  <section class="view active" id="view-home" aria-label="Home">
+    <div class="hero">
+      <div class="wrap">
+        <div class="reveal">
+          <p class="eyebrow">Crescent Springs, KY &middot; Off I-71/75, just south of Cincinnati</p>
+          <h1><span>Buy.</span><span>Sell.</span><span class="foil-text">Trade.</span></h1>
+          <p class="sub">Northern Kentucky's card shop for Pokemon, One Piece, Magic, and Gundam. Singles and sealed straight from the case, cash for your collection, and a seat at the table whenever the door's open.</p>
+          <div class="hero-ctas">
+            <button class="btn" data-go="shop">Shop live inventory</button>
+            <button class="btn btn-ghost" data-go="buylist">Sell us your collection</button>
+            <button class="btn btn-ghost" data-go="live"><span class="live-dot" style="margin:0 8px 0 0; vertical-align:1px"></span>Watch the break</button>
+          </div>
+          <span class="sync-pill"><span class="dot"></span>Inventory synced with Square &middot; 2 min ago</span>
+        </div>
+        <div class="stage" id="stage">
+          <div class="holo" id="holo" aria-hidden="true">
+            <div class="holo-frame">
+              <div class="holo-top">Top Loaded</div>
+              <div class="holo-art"></div>
+              <div class="holo-bottom">Crescent Springs &middot; KY &middot; Buy Sell Trade</div>
+            </div>
+            <div class="sheen" id="sheen"></div>
+          </div>
+          <span class="stage-caption">Holofoil &middot; move your cursor</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker-track" id="tickerTrack"></div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="tri">
+          <div class="panel">
+            <span class="num">01 / BUY</span>
+            <h3>Singles &amp; sealed, priced live</h3>
+            <p>Every card on this site is the same card in the glass case &mdash; one Square inventory, updated the moment something sells in store or online.</p>
+          </div>
+          <div class="panel">
+            <span class="num">02 / SELL</span>
+            <h3>We buy collections</h3>
+            <p>Cash on the spot or a store-credit bonus. Bulk, binders, graded, sealed &mdash; bring it in or start a quote from your couch.</p>
+          </div>
+          <div class="panel">
+            <span class="num">03 / TRADE</span>
+            <h3>The play space is always on</h3>
+            <p>Locals every week, a monthly show at the Hilton on Turfway, and open tables whenever the door is open.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" style="padding-top:0">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Fresh to the case</h2>
+          <button class="linklike" data-go="shop">Browse all inventory &rarr;</button>
+        </div>
+        <div class="freshness" id="homeFresh"><span class="dot"></span>Synced with Square &middot; 2 min ago <span class="demo-tag">demo data</span></div>
+        <div class="grid" id="featuredGrid"></div>
+      </div>
+    </div>
+
+    <div class="section" style="padding-top:0">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Why Top Loaded</h2>
+        </div>
+        <div class="tri">
+          <div class="panel">
+            <span class="num">01 / Local</span>
+            <h3>A real shop, not a warehouse</h3>
+            <p>Independent and Northern Kentucky&ndash;owned. The people pricing your buylist are the same ones ripping packs on stream and resetting tables after locals.</p>
+          </div>
+          <div class="panel">
+            <span class="num">02 / Official</span>
+            <h3>Bandai official store</h3>
+            <p>One Piece and Gundam events here run with official Bandai support &mdash; winner packs if you take it down, participation packs just for playing.</p>
+          </div>
+          <div class="panel">
+            <span class="num">03 / Fair</span>
+            <h3>Fair in both directions</h3>
+            <p>Singles priced against TCGplayer market, offers you're free to walk away from, and +10% on top whenever you take store credit instead of cash.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" style="padding-top:0">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Word around the tables</h2>
+          <span class="demo-tag">sample quotes &mdash; replace with real reviews before launch</span>
+        </div>
+        <div class="tri">
+          <div class="panel">
+            <p style="font-size:.96rem">&ldquo;Brought in two binders expecting a lowball. Got a fair number, took the credit bonus, and walked out with half a booster box.&rdquo;</p>
+            <p class="p-set" style="margin-top:12px">Sample review &middot; buylist customer</p>
+          </div>
+          <div class="panel">
+            <p style="font-size:.96rem">&ldquo;Locals run on time, prizing every week, and when nine of us showed up they just opened a second list. Nobody sat out.&rdquo;</p>
+            <p class="p-set" style="margin-top:12px">Sample review &middot; One Piece regular</p>
+          </div>
+          <div class="panel">
+            <p style="font-size:.96rem">&ldquo;Claimed a break spot on a Tuesday, hits were in my mailbox by the weekend. Sleeved, top loaded, tracked.&rdquo;</p>
+            <p class="p-set" style="margin-top:12px">Sample review &middot; live break buyer</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" style="padding-top:0">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Good to know</h2>
+          <span class="demo-tag">confirm policy details before launch</span>
+        </div>
+        <div style="display:grid; gap:10px; max-width:820px">
+          <details class="panel" style="padding:16px 20px">
+            <summary style="cursor:pointer; font-weight:600">How do online orders ship?</summary>
+            <p style="color:var(--ink2); margin-top:10px; font-size:.94rem">Singles ship sleeved in a top loader (we are who we say we are) inside a bubble mailer, with tracking. Sealed product ships boxed. Or skip shipping entirely &mdash; choose in-store pickup and it's waiting at the counter.</p>
+          </details>
+          <details class="panel" style="padding:16px 20px">
+            <summary style="cursor:pointer; font-weight:600">How do you grade card condition?</summary>
+            <p style="color:var(--ink2); margin-top:10px; font-size:.94rem">Every single in the case and on the site carries a condition label &mdash; NM (near mint) or LP (lightly played) &mdash; checked by hand before it's listed. If something arrives not as described, email <a href="mailto:toploadedtcg@gmail.com">toploadedtcg@gmail.com</a> and we'll make it right.</p>
+          </details>
+          <details class="panel" style="padding:16px 20px">
+            <summary style="cursor:pointer; font-weight:600">Can you hold a card for me?</summary>
+            <p style="color:var(--ink2); margin-top:10px; font-size:.94rem">Usually, yes &mdash; call <a href="tel:+15132222573">(513) 222-2573</a> during open hours and we can set an in-stock item aside for a short hold while you head over.</p>
+          </details>
+          <details class="panel" style="padding:16px 20px">
+            <summary style="cursor:pointer; font-weight:600">How does selling a collection work?</summary>
+            <p style="color:var(--ink2); margin-top:10px; font-size:.94rem">Walk in any day we're open &mdash; no appointment needed &mdash; or start a quote from the Sell to Us page. We sort it, price it against current market, and make an offer with zero obligation. Estate-sized lot? We travel across the Tri-State.</p>
+          </details>
+          <details class="panel" style="padding:16px 20px">
+            <summary style="cursor:pointer; font-weight:600">What's the store credit bonus?</summary>
+            <p style="color:var(--ink2); margin-top:10px; font-size:.94rem">Take any buylist or trade offer as store credit instead of cash and we add 10% on top. Credit is tracked on your account at the register &mdash; just give your name or phone number at the counter.</p>
+          </details>
+          <details class="panel" style="padding:16px 20px">
+            <summary style="cursor:pointer; font-weight:600">When and where is the card show?</summary>
+            <p style="color:var(--ink2); margin-top:10px; font-size:.94rem">The first Saturday or Sunday of every month, 10 AM to 4 PM at the Hilton Cincinnati Airport, 7373 Turfway Rd, Florence, KY. Admission is free; vendors set up from 8 AM.</p>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SHOP ================= -->
+  <section class="view" id="view-shop" aria-label="Shop">
+    <div class="wrap">
+      <div class="view-head">
+        <p class="eyebrow">Live inventory &middot; Singles &amp; sealed</p>
+        <h1>The case, online</h1>
+        <p class="lede">Every card here is a live listing from our store &mdash; synced nightly from our TCGplayer seller account. Buy online and we ship it, or call the shop and we'll hold it at the counter.</p>
+      </div>
+      <div class="shop-tools" role="group" aria-label="Filters">
+        <div class="field" style="flex:1 1 230px; min-width:190px;">
+          <label for="shopSearch">Search the case</label>
+          <input id="shopSearch" type="search" placeholder="Card name, set, rarity&hellip;" autocomplete="off">
+        </div>
+        <div class="chip-row" id="gameChips" role="group" aria-label="Filter by game">
+          <button class="chip" data-game="all" aria-pressed="true">All games</button>
+          <button class="chip" data-game="pk" aria-pressed="false">Pokemon</button>
+          <button class="chip" data-game="op" aria-pressed="false">One Piece</button>
+          <button class="chip" data-game="mtg" aria-pressed="false">Magic</button>
+          <button class="chip" data-game="other" aria-pressed="false" id="otherChip" hidden>More games</button>
+        </div>
+        <div class="chip-row" id="typeChips" role="group" aria-label="Filter by product type">
+          <button class="chip" data-type="all" aria-pressed="true">Everything</button>
+          <button class="chip" data-type="single" aria-pressed="false">Singles</button>
+          <button class="chip" data-type="sealed" aria-pressed="false">Sealed</button>
+        </div>
+        <div class="sort-wrap">
+          <label for="sortSel">Sort</label>
+          <select id="sortSel">
+            <option value="feat">Featured</option>
+            <option value="asc">Price: low to high</option>
+            <option value="desc">Price: high to low</option>
+          </select>
+        </div>
+      </div>
+      <div class="freshness" id="shopFresh"><span class="dot"></span>Synced with Square &middot; 2 min ago &middot; <span id="shopCount"></span> items <span class="demo-tag">demo data</span></div>
+      <div class="grid" id="shopGrid"></div>
+    </div>
+  </section>
+
+  <!-- ================= CARD SHOW ================= -->
+  <section class="view" id="view-show" aria-label="Card show">
+    <div class="wrap">
+      <div class="view-head">
+        <p class="eyebrow">First Saturday or Sunday &middot; Hilton on Turfway Road &middot; Florence, KY</p>
+        <h1>The Top Loaded Card Show</h1>
+        <p class="lede">Once a month we take over the Hilton ballroom on Turfway Road with vendor tables from across the Tri-State. Buy, sell, trade, and rip packs &mdash; admission is free and the doors are open 10 to 4.</p>
+      </div>
+      <div class="show-hero">
+        <div class="show-date-card">
+          <p class="eyebrow">Next show</p>
+          <p class="show-date" id="showDateBig">Sat<br>Sep 5</p>
+          <div class="show-meta">
+            <span><b id="showHours">10 AM &ndash; 4 PM</b> &middot; vendor setup from 8 AM</span>
+            <span><b>Hilton Cincinnati Airport</b> &middot; 7373 Turfway Rd, Florence, KY</span>
+            <span><b>First Saturday or Sunday</b> of every month &middot; free admission</span>
+            <span style="margin-top:8px">Vendor tables booked &middot; <b id="tablesLabel">11 of 24</b></span>
+          </div>
+          <div class="meter" role="img" aria-label="11 of 24 vendor tables booked"><i></i></div>
+        </div>
+        <form class="vendor-form" id="vendorForm">
+          <p class="eyebrow">Vendors</p>
+          <h3>Book a table</h3>
+          <p style="color:var(--ink2); font-size:.92rem">8-foot tables, setup from 8 AM. We'll confirm by email within a day. <span class="demo-tag">demo form</span></p>
+          <div class="form-grid">
+            <div class="field"><label for="vName">Name</label><input id="vName" required autocomplete="off"></div>
+            <div class="field"><label for="vEmail">Email</label><input id="vEmail" type="email" required autocomplete="off"></div>
+            <div class="field"><label for="vTables">Tables</label>
+              <select id="vTables"><option>1 table &mdash; $60</option><option>2 tables &mdash; $110</option><option>3 tables &mdash; $150</option></select>
+            </div>
+            <div class="field"><label for="vGame">Mostly selling</label>
+              <select id="vGame"><option>Pokemon</option><option>One Piece</option><option>Magic: The Gathering</option><option>Sports cards</option><option>Mixed / other</option></select>
+            </div>
+            <div class="field full"><button class="btn" type="submit">Reserve my table</button></div>
+          </div>
+        </form>
+      </div>
+      <div class="section" style="padding-bottom:0">
+        <div class="section-head"><h2>From past shows</h2><span class="demo-tag">photo placeholders</span></div>
+        <div class="gallery">
+          <div class="gal g1"><span>July &middot; trade night floor</span></div>
+          <div class="gal g2"><span>Vendor row</span></div>
+          <div class="gal g3"><span>Pack wars finals</span></div>
+          <div class="gal g4"><span>June &middot; ballroom</span></div>
+          <div class="gal g5"><span>Grading meetup</span></div>
+          <div class="gal g6"><span>Door prize wall</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EVENTS ================= -->
+  <section class="view" id="view-events" aria-label="Play nights">
+    <div class="wrap">
+      <div class="view-head">
+        <p class="eyebrow">In-store play space &middot; Crescent Springs</p>
+        <h1>Play nights</h1>
+        <p class="lede">Play runs on our 8-top &mdash; one big table of eight &mdash; and when more of you show up we split into a second list so everyone plays. Weekly events below. <span class="demo-tag">fees TBD</span></p>
+      </div>
+      <div class="sched" id="schedList"></div>
+      <div class="section" style="padding-bottom:0">
+        <div class="tri">
+          <div class="panel"><span class="num">Official</span><h3>Bandai official store</h3><p>We're a Bandai official tournament store &mdash; One Piece and Gundam events here run with official Bandai support and prizing.</p></div>
+          <div class="panel"><span class="num">Prizing</span><h3>Winner &amp; participation packs</h3><p>Bandai games: winner packs if you take the event, participation packs just for playing. Pokemon league prizing runs on its own promo structure.</p></div>
+          <div class="panel"><span class="num">Seating</span><h3>The 8-top &amp; second list</h3><p>Events seat eight at the big table. More than eight and we split into two lists, so nobody sits out.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= BUYLIST ================= -->
+  <section class="view" id="view-buylist" aria-label="Sell to us">
+    <div class="wrap">
+      <div class="view-head">
+        <p class="eyebrow">Buylist &middot; Cash or credit</p>
+        <h1>We buy collections</h1>
+        <p class="lede">Binders, bulk, graded slabs, sealed product, whole closets. Walk in any day we're open, or start a quote here and we'll get back to you with a number.</p>
+      </div>
+      <div class="buy-grid">
+        <div class="buy-points">
+          <div class="panel"><span class="k">Cash</span><p>Straight cash offer, paid on the spot once we've looked everything over.</p></div>
+          <div class="panel"><span class="k">+10%</span><p>Take store credit instead and we add ten percent to the offer.</p></div>
+          <div class="panel"><span class="k">Big?</span><p>Estate or store-closing sized lot? We travel for large collections across the Tri-State &mdash; call (513) 222-2573.</p></div>
+          <div class="panel"><span class="k">How</span><p>No appointment needed &mdash; walk in with it, or start a quote here. We sort, price against current market, and the offer is yours to take or leave.</p></div>
+        </div>
+        <form class="form-card" id="buyForm">
+          <h3>Start a quote</h3>
+          <p style="color:var(--ink2); font-size:.92rem">Tell us roughly what you've got &mdash; photos help but aren't required. <span class="demo-tag">demo form</span></p>
+          <div class="form-grid">
+            <div class="field"><label for="bName">Name</label><input id="bName" required autocomplete="off"></div>
+            <div class="field"><label for="bContact">Email or phone</label><input id="bContact" required autocomplete="off"></div>
+            <div class="field full"><label for="bGames">What's in it?</label>
+              <select id="bGames"><option>Pokemon</option><option>One Piece</option><option>Magic: The Gathering</option><option>A mix of games</option><option>Sports cards / other</option></select>
+            </div>
+            <div class="field full"><label for="bDesc">Describe the collection</label>
+              <textarea id="bDesc" rows="4" placeholder="e.g. two binders of modern Pokemon hits, a Base Set Blastoise, and about 4,000 bulk commons"></textarea>
+            </div>
+            <div class="field full"><button class="btn" type="submit">Get my offer</button><p class="drawer-note" style="text-align:left; margin-top:8px">No obligation &mdash; we reply with a real number, and you decide.</p></div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LIVE ================= -->
+  <section class="view" id="view-live" aria-label="Live breaks">
+    <div class="wrap">
+      <div class="view-head">
+        <p class="eyebrow">Rip &amp; ship &middot; Streaming from the shop floor</p>
+        <h1>Live breaks</h1>
+        <p class="lede">Whatnot-style rip &amp; ship: claim a spot, watch every pack opened on camera, and your hits go out the next morning &mdash; sleeved, top loaded, and tracked. <span class="demo-tag">simulated stream</span></p>
+      </div>
+      <div class="live-grid">
+        <div class="player">
+          <div class="screen">
+            <div class="glow" aria-hidden="true"></div>
+            <span class="rip">Now ripping &middot; pack 7 of 36</span>
+            <div class="pack" aria-hidden="true"><b>TL</b></div>
+            <span class="live-pill"><i></i><span id="livePillText">Live</span></span>
+            <span class="viewers" id="viewerCount">214 watching</span>
+          </div>
+          <div class="player-bar">
+            <b>Prismatic Evolutions booster box break</b>
+            <span>On the live site this frame embeds the real stream &mdash; Whatnot, YouTube, or Twitch</span>
+          </div>
+        </div>
+        <div class="chat" aria-label="Stream chat">
+          <div class="chat-head">Chat <span class="demo-tag">simulated</span></div>
+          <div class="chat-body" id="chatBody"></div>
+          <form class="chat-form" id="chatForm">
+            <input id="chatInput" placeholder="Say something&hellip;" aria-label="Chat message" autocomplete="off">
+            <button class="btn" type="submit">Send</button>
+          </form>
+        </div>
+      </div>
+      <div class="section" style="padding-bottom:0">
+        <div class="section-head"><h2>Claim a spot in this break</h2><span class="demo-tag">$24.99 per spot &middot; sample terms</span></div>
+        <p class="lede" style="max-width:64ch">One spot = three packs ripped live under your name. Hits ship free the next morning; bulk converts to store credit if you'd rather skip shipping. Claimed spots land straight in your cart.</p>
+        <div class="spots" id="spotGrid"></div>
+      </div>
+      <div class="section" style="padding-bottom:0">
+        <div class="section-head"><h2>Stream schedule</h2><span class="demo-tag">sample times</span></div>
+        <div class="tri">
+          <div class="panel"><span class="num">Tue &middot; 7 PM</span><h3>Pokemon rip night</h3><p>Sealed singles chases &mdash; ETBs, bundles, and a booster box to close the night.</p></div>
+          <div class="panel"><span class="num">Thu &middot; 8 PM</span><h3>One Piece box breaks</h3><p>Full box rips with leader giveaways between breaks.</p></div>
+          <div class="panel"><span class="num">Sun &middot; 6 PM</span><h3>Mailbag &amp; trades</h3><p>We open what you sent in, price collections live, and take trade offers on air.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= STAFF ================= -->
+  <section class="view" id="view-staff" aria-label="Staff desk">
+    <div class="admin-bar">
+      <div class="wrap">
+        <span class="eyebrow">Staff desk</span>
+        <span class="pill ok"><span class="dot"></span>Register &middot; Crescent Springs</span>
+        <span class="demo-tag">All staff data is simulated for this demo</span>
+        <span style="flex:1"></span>
+        <button class="linklike" data-go="home">&larr; Back to storefront</button>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="view-head" style="padding-top:36px; padding-bottom:20px">
+        <h1>Staff desk</h1>
+        <p class="lede">Store credit and pricing tools for the counter.</p>
+      </div>
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3>Store credit</h3>
+          <div class="field" style="margin-bottom:12px"><label for="credSearch">Find customer</label><input id="credSearch" placeholder="Name or phone" autocomplete="off"></div>
+          <div class="table-wrap" style="margin-top:0">
+            <table style="min-width:0">
+              <thead><tr><th>Customer</th><th>Phone</th><th>Credit</th></tr></thead>
+              <tbody id="credBody"></tbody>
+            </table>
+          </div>
+          <div class="form-grid" style="margin-top:16px">
+            <div class="field"><label for="credWho">Customer</label><select id="credWho"></select></div>
+            <div class="field"><label for="credAmt">Cash value of trade ($)</label><input id="credAmt" type="number" min="0" step="0.01" placeholder="50.00"></div>
+            <div class="field full"><button class="btn" id="credAdd" type="button">Add as store credit (+10%)</button></div>
+          </div>
+          <p class="drawer-note" style="text-align:left; margin-top:10px">Trade-ins taken in credit get the 10% bonus applied automatically.</p>
+        </div>
+        <div class="admin-card">
+          <h3>Pricing desk</h3>
+          <dl class="kv">
+            <dt>Market price</dt><dd><input id="pdMarket" type="number" min="0" step="0.01" placeholder="100.00" style="width:130px"></dd>
+            <dt>Buy rate</dt><dd><select id="pdRate"><option value="0.55">55% &mdash; bulk / slow movers</option><option value="0.6" selected>60% &mdash; standard singles</option><option value="0.7">70% &mdash; hot / case cards</option><option value="0.8">80% &mdash; graded slabs</option></select> <span class="demo-tag">sample rates</span></dd>
+            <dt>Cash offer</dt><dd class="mono" id="pdCash">&mdash;</dd>
+            <dt>Credit offer (+10%)</dt><dd class="mono" id="pdCredit" style="color:var(--accent)">&mdash;</dd>
+          </dl>
+          <h3 style="margin-top:22px">Sell pricing rules</h3>
+          <div class="toggle-row"><div class="tl"><b>Singles</b><span>TCGplayer market, rounded up to .99</span></div><span class="pill ok"><span class="dot"></span>Auto</span></div>
+          <div class="toggle-row"><div class="tl"><b>Sealed</b><span>MAP or market, whichever is higher</span></div><span class="pill ok"><span class="dot"></span>Auto</span></div>
+          <div class="toggle-row"><div class="tl"><b>Graded slabs</b><span>Priced by hand at the counter</span></div><span class="pill warn"><span class="dot warn"></span>Manual</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ADMIN ================= -->
+  <section class="view" id="view-admin" aria-label="Admin">
+    <div class="admin-bar">
+      <div class="wrap">
+        <span class="eyebrow">Back of house</span>
+        <span class="pill ok"><span class="dot"></span>Connected to Square</span>
+        <span class="demo-tag">All admin data is simulated for this demo</span>
+        <span style="flex:1"></span>
+        <button class="linklike" data-go="home">&larr; Back to storefront</button>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="view-head" style="padding-top:36px; padding-bottom:20px">
+        <h1>Today at Top Loaded</h1>
+        <p class="lede">Wednesday, Aug 27 &middot; register and website, one inventory.</p>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat">
+          <span class="lab">Today's sales</span>
+          <span class="val">$1,284</span>
+          <span class="sub up">+18% vs last Wed &middot; via Square</span>
+          <div class="spark" aria-hidden="true">
+            <i style="height:36%"></i><i style="height:52%"></i><i style="height:44%"></i><i style="height:68%"></i><i style="height:58%"></i><i style="height:80%"></i><i class="today" style="height:92%"></i>
+          </div>
+        </div>
+        <div class="stat">
+          <span class="lab">Orders today</span>
+          <span class="val">23</span>
+          <span class="sub">18 in-store &middot; 5 online pickup</span>
+        </div>
+        <div class="stat">
+          <span class="lab">Low-stock alerts</span>
+          <span class="val" id="lowStockVal">0</span>
+          <span class="sub down">Items at 1 or fewer &middot; reorder soon</span>
+        </div>
+        <div class="stat">
+          <span class="lab">Show tables booked</span>
+          <span class="val">11<span style="font-size:1.2rem; color:var(--ink3)">/24</span></span>
+          <span class="sub" id="statShowDate">Sat, Sep 5 &middot; Hilton, Turfway Rd</span>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3>Square integration <span class="pill ok"><span class="dot"></span>Healthy</span></h3>
+          <dl class="kv">
+            <dt>Merchant</dt><dd>Top Loaded Trading Cards <span class="mono" style="color:var(--ink3); font-size:.72rem">&middot; MLQ3&hellip;8KF</span></dd>
+            <dt>Location</dt>
+            <dd>
+              <select id="locSel" aria-label="Square location">
+                <option>Top Loaded TCG &mdash; Crescent Springs (2514 Hazelwood Dr)</option>
+                <option>Card Show Booth &mdash; Mobile (Square Terminal)</option>
+              </select>
+            </dd>
+            <dt>Catalog</dt><dd class="mono" style="font-size:.82rem">214 items mapped &middot; last sync <span id="lastSync">1:47 PM</span></dd>
+            <dt>Auto-sync</dt>
+            <dd>
+              <select id="syncInterval" aria-label="Auto-sync interval">
+                <option>Every 5 minutes</option>
+                <option selected>Every 15 minutes</option>
+                <option>Every 30 minutes</option>
+                <option>Hourly</option>
+              </select>
+            </dd>
+          </dl>
+          <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap">
+            <button class="btn" id="syncNow">Sync now</button>
+            <button class="btn btn-ghost" id="viewSquare">Open Square dashboard</button>
+          </div>
+          <div class="log" id="syncLog" aria-live="polite" aria-label="Sync log">
+            <div><span class="t">1:47 PM</span> &middot; <span class="ok">OK</span> Pulled catalog delta &middot; 3 price changes, 1 new item</div>
+            <div><span class="t">1:47 PM</span> &middot; <span class="ok">OK</span> Pushed 2 stock edits to Square (Crescent Springs)</div>
+            <div><span class="t">1:32 PM</span> &middot; <span class="ok">OK</span> Auto-sync complete &middot; 214 items &middot; 0 conflicts</div>
+            <div><span class="t">1:17 PM</span> &middot; <span class="ok">OK</span> Webhook inventory.count.updated &middot; Charizard ex 3 &rarr; 2</div>
+            <div><span class="t">1:02 PM</span> &middot; <span class="ok">OK</span> Auto-sync complete &middot; 214 items &middot; 0 conflicts</div>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <h3>Sync behavior</h3>
+          <div class="toggle-row">
+            <div class="tl"><b>Push stock changes to Square</b><span>Edits here update the register instantly</span></div>
+            <button class="switch" role="switch" aria-checked="true" aria-label="Push stock changes to Square"></button>
+          </div>
+          <div class="toggle-row">
+            <div class="tl"><b>Pull Square sales into site stock</b><span>Counter sales reduce online counts in seconds</span></div>
+            <button class="switch" role="switch" aria-checked="true" aria-label="Pull Square sales into site stock"></button>
+          </div>
+          <div class="toggle-row">
+            <div class="tl"><b>Auto-hide sold-out items</b><span>Zero stock hides the listing until restocked</span></div>
+            <button class="switch" role="switch" aria-checked="true" aria-label="Auto-hide sold-out items"></button>
+          </div>
+          <div class="toggle-row">
+            <div class="tl"><b>Card show mode</b><span>Route weekend sales to the booth location</span></div>
+            <button class="switch" role="switch" aria-checked="false" aria-label="Card show mode"></button>
+          </div>
+          <h3 style="margin-top:22px">Webhooks</h3>
+          <div class="hook-row"><span class="hn">inventory.count.updated</span><span class="pill ok"><span class="dot"></span>2m ago</span></div>
+          <div class="hook-row"><span class="hn">order.created</span><span class="pill ok"><span class="dot"></span>11m ago</span></div>
+          <div class="hook-row"><span class="hn">catalog.version.updated</span><span class="pill ok"><span class="dot"></span>1h ago</span></div>
+          <div class="hook-row"><span class="hn">payment.updated</span><span class="pill warn"><span class="dot warn"></span>Retrying &middot; 1 of 3</span></div>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3>Site settings</h3>
+          <dl class="kv">
+            <dt>Site title</dt><dd><input id="setTitle" value="Top Loaded" style="width:180px"></dd>
+            <dt>Logo</dt><dd><button class="btn btn-ghost" id="setLogo" type="button" style="padding:8px 14px">Upload logo</button></dd>
+            <dt>Weekday hours</dt><dd><input id="setHoursWk" value="Tue&ndash;Sat &middot; 11 AM &ndash; 8 PM" style="width:210px"></dd>
+            <dt>Sunday hours</dt><dd><input id="setHoursSun" value="Sun &middot; 11 AM &ndash; 6 PM" style="width:210px"></dd>
+            <dt>Banner</dt><dd><input id="setBanner" placeholder="Holiday hours, big restock, show reminder&hellip;" style="width:100%"></dd>
+            <dt>Show banner</dt><dd><button class="switch" role="switch" aria-checked="false" id="setBannerOn" aria-label="Show announcement banner"></button></dd>
+          </dl>
+          <div style="margin-top:16px"><button class="btn" id="setApply" type="button">Apply to site</button></div>
+        </div>
+        <div class="admin-card">
+          <h3>Live rips <span class="pill crit" id="liveStatusPill"><span class="dot crit"></span>Offline</span></h3>
+          <p style="color:var(--ink2); font-size:.9rem">Going live puts a banner across the storefront, lights up the Live tab, and opens break-spot claims.</p>
+          <div style="margin-top:14px"><button class="btn" id="goLiveBtn" type="button">Start live rip</button></div>
+          <h3 style="margin-top:24px">Card show</h3>
+          <dl class="kv">
+            <dt>Next show</dt><dd><input id="setShowDate" value="Sat, Sep 5" style="width:140px"></dd>
+            <dt>Hours</dt><dd><input id="setShowHours" value="10 AM &ndash; 4 PM" style="width:140px"></dd>
+            <dt>Cadence</dt><dd>First Saturday or Sunday &middot; setup from 8 AM</dd>
+          </dl>
+          <div style="margin-top:14px"><button class="btn btn-ghost" id="setShowApply" type="button">Update show info</button></div>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3>Play nights editor</h3>
+          <p style="color:var(--ink2); font-size:.9rem">Edit the weekly schedule and publish &mdash; the Play Nights page updates instantly.</p>
+          <div id="evEditor" style="margin-top:10px"></div>
+          <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap">
+            <button class="btn" id="evApply" type="button">Publish schedule</button>
+            <button class="btn btn-ghost" id="evAdd" type="button">Add night</button>
+          </div>
+        </div>
+        <div class="admin-card">
+          <h3>Channel sync alerts <span class="pill warn"><span class="dot warn"></span><span id="alertCount">2</span> open</span></h3>
+          <p style="color:var(--ink2); font-size:.9rem">When something sells on one channel, the other gets flagged until it's reconciled &mdash; Square (register &amp; this site) on one side, TCGplayer on the other.</p>
+          <div id="alertList" style="margin-top:12px"></div>
+          <h3 style="margin-top:22px">TCGplayer nightly import</h3>
+          <div class="toggle-row">
+            <div class="tl"><b>Pull TCGplayer inventory every morning</b><span>6:00 AM &middot; listings, prices &amp; quantities reconciled into Square</span></div>
+            <button class="switch" role="switch" aria-checked="true" aria-label="Nightly TCGplayer import"></button>
+          </div>
+          <div class="log" id="tcgLog">
+            <div><span class="t">6:00 AM</span> &middot; <span class="ok">OK</span> Nightly import &middot; 1,204 TCGplayer listings &middot; 17 price changes &middot; 2 conflicts flagged</div>
+            <div><span class="t">Yesterday</span> &middot; <span class="ok">OK</span> Nightly import &middot; 1,198 listings &middot; 9 price changes &middot; 0 conflicts</div>
+          </div>
+          <div style="margin-top:12px"><button class="btn btn-ghost" id="tcgRun" type="button">Run import now</button></div>
+        </div>
+      </div>
+
+      <div class="section-head" style="margin-top:40px">
+        <h2>Inventory</h2>
+        <span class="demo-tag">edits push to Square (simulated)</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Item</th><th>Game</th><th>Type</th><th>Cond</th><th>Price</th><th>Stock</th><th>Square</th></tr>
+          </thead>
+          <tbody id="invBody"></tbody>
+        </table>
+      </div>
+
+      <div class="teaser">
+        <div class="tt" style="flex:1; min-width:240px">
+          <b>TCGplayer price sync</b>
+          <span>Link your <code>Top Loaded TCG</code> seller account to reprice singles against market automatically. Preview: Ragavan market <code>$54.12</code> &rarr; your price <code>$58.00 (+7%)</code>.</span>
+        </div>
+        <button class="btn btn-ghost" id="tcgTease">Preview repricing</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer id="visit-anchor">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <p class="foot-brand">Top Loaded</p>
+        <ul style="margin-top:12px">
+          <li>Buy &middot; Sell &middot; Trade</li>
+          <li>Northern Kentucky's card shop for Pokemon, One Piece, Magic, and Gundam. Bandai official tournament store.</li>
+        </ul>
+        <h4 style="margin-top:20px">Site</h4>
+        <ul>
+          <li><button class="linklike" data-go="shop">Shop the case</button></li>
+          <li><button class="linklike" data-go="live">Live breaks</button></li>
+          <li><button class="linklike" data-go="show">Card show</button></li>
+          <li><button class="linklike" data-go="events">Play nights</button></li>
+          <li><button class="linklike" data-go="buylist">Sell your collection</button></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Visit</h4>
+        <ul>
+          <li>2514 Hazelwood Dr<br>Crescent Springs, KY 41017</li>
+          <li><a href="tel:+15132222573">(513) 222-2573</a></li>
+          <li><a href="mailto:toploadedtcg@gmail.com">toploadedtcg@gmail.com</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Hours <span class="demo-tag">placeholder</span></h4>
+        <ul>
+          <li>Closed Mondays</li>
+          <li id="footHoursWk">Tue&ndash;Sat &middot; 11 AM &ndash; 8 PM</li>
+          <li id="footHoursSun">Sun &middot; 11 AM &ndash; 6 PM</li>
+          <li style="margin-top:6px"><button class="linklike" data-go="show" id="footShowDate">Next card show &middot; Sat, Sep 5 &rarr;</button></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Find us</h4>
+        <ul>
+          <li><a href="https://www.facebook.com/toploadedtradingcards" rel="noopener">Facebook &middot; toploadedtradingcards</a></li>
+          <li><a href="https://www.instagram.com/toploadedtcg" rel="noopener">Instagram &middot; @toploadedtcg</a></li>
+          <li><a href="https://www.tcgplayer.com/sellers/Top-Loaded-TCG/5c356cdf" rel="noopener">TCGplayer seller &middot; Top Loaded TCG</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; 2026 Top Loaded Trading Cards</span>
+      <span>Demo site &mdash; inventory, orders &amp; integrations simulated</span>
+      <span class="spacer"></span>
+      <button class="adminlink" data-go="staff">Staff</button>
+      <button class="adminlink" data-go="admin">Admin</button>
+    </div>
+  </div>
+</footer>
+
+<!-- ================= CART ================= -->
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Shopping cart" aria-hidden="true">
+  <div class="drawer-head">
+    <h2>Your cart</h2>
+    <button class="drawer-close" id="drawerClose" aria-label="Close cart">&times;</button>
+  </div>
+  <div class="drawer-body" id="cartBody"></div>
+  <div class="drawer-foot">
+    <div class="subtotal"><span>Subtotal</span><b id="cartTotal">$0.00</b></div>
+    <button class="btn" id="checkoutBtn">Checkout &middot; demo only</button>
+    <p class="drawer-note">Pickup in store or ship &middot; payments run through Square (simulated here)</p>
+  </div>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script id="cardArtData"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- data ---------- */
+  var GAMES = {pk:"Pokemon", op:"One Piece", mtg:"Magic"};
+  var ITEMS = [
+    {id:"pk1", name:"Charizard ex", set:"Scarlet & Violet\u2014151 \u00b7 199/165", game:"pk", type:"single", cond:"NM", price:109.99, stock:2},
+    {id:"pk2", name:"Pikachu with Grey Felt Hat", set:"SVP Promo \u00b7 085", game:"pk", type:"single", cond:"NM", price:329.00, stock:1},
+    {id:"pk3", name:"Tatsugiri ex", set:"Surging Sparks \u00b7 226/191", game:"pk", type:"single", cond:"NM", price:34.50, stock:3},
+    {id:"pk4", name:"Iono (Special Art)", set:"Paldea Evolved \u00b7 254/193", game:"pk", type:"single", cond:"LP", price:82.00, stock:1},
+    {id:"pk5", name:"Roaring Moon ex", set:"Paradox Rift \u00b7 251/182", game:"pk", type:"single", cond:"NM", price:24.00, stock:4},
+    {id:"pk6", name:"151 Booster Bundle", set:"Scarlet & Violet\u2014151 \u00b7 sealed", game:"pk", type:"sealed", cond:null, price:69.99, stock:8},
+    {id:"pk7", name:"Prismatic Evolutions ETB", set:"Elite Trainer Box \u00b7 sealed", game:"pk", type:"sealed", cond:null, price:99.99, stock:4},
+    {id:"pk8", name:"Surging Sparks Booster Box", set:"36 packs \u00b7 sealed", game:"pk", type:"sealed", cond:null, price:159.99, stock:3},
+    {id:"op1", name:"Shanks (Leader)", set:"OP-09 Emperors in the New World", game:"op", type:"single", cond:"NM", price:59.99, stock:2},
+    {id:"op2", name:"Monkey D. Luffy (Secret)", set:"OP-05 Awakening of the New Era", game:"op", type:"single", cond:"NM", price:119.00, stock:1},
+    {id:"op3", name:"Boa Hancock (SR)", set:"OP-07 500 Years in the Future", game:"op", type:"single", cond:"NM", price:18.50, stock:5},
+    {id:"op4", name:"Trafalgar Law (Leader)", set:"OP-01 Romance Dawn", game:"op", type:"single", cond:"LP", price:74.00, stock:1},
+    {id:"op5", name:"OP-11 Booster Box", set:"A Fist of Divine Speed \u00b7 sealed", game:"op", type:"sealed", cond:null, price:89.99, stock:6},
+    {id:"op6", name:"EB-01 Memorial Collection", set:"Extra Booster display \u00b7 sealed", game:"op", type:"sealed", cond:null, price:124.99, stock:2},
+    {id:"m1", name:"Ragavan, Nimble Pilferer", set:"Modern Horizons 2 \u00b7 138", game:"mtg", type:"single", cond:"NM", price:58.00, stock:2},
+    {id:"m2", name:"Sheoldred, the Apocalypse", set:"Dominaria United \u00b7 107", game:"mtg", type:"single", cond:"NM", price:69.00, stock:3},
+    {id:"m3", name:"The One Ring", set:"Tales of Middle-earth \u00b7 246", game:"mtg", type:"single", cond:"LP", price:54.00, stock:1},
+    {id:"m4", name:"Orcish Bowmasters", set:"Tales of Middle-earth \u00b7 103", game:"mtg", type:"single", cond:"NM", price:32.00, stock:4},
+    {id:"m5", name:"Bloomburrow Play Booster Box", set:"36 packs \u00b7 sealed", game:"mtg", type:"sealed", cond:null, price:129.99, stock:5},
+    {id:"m6", name:"MH3 Collector Booster", set:"Modern Horizons 3 \u00b7 single pack", game:"mtg", type:"sealed", cond:null, price:59.99, stock:7}
+  ];
+
+  var $ = function(s, c){ return (c||document).querySelector(s); };
+  var $$ = function(s, c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
+  var money = function(n){ return "$" + n.toFixed(2); };
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- toast ---------- */
+  var toastEl = $("#toast"), toastTimer = null;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add("on");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove("on"); }, 2600);
+  }
+
+  /* ---------- view switching ---------- */
+  var views = {home:"#view-home", shop:"#view-shop", live:"#view-live", show:"#view-show", events:"#view-events", buylist:"#view-buylist", staff:"#view-staff", admin:"#view-admin"};
+  var current = "home";
+  function go(name){
+    if(name === "visit"){ $("#visit-anchor").scrollIntoView({behavior: reduceMotion ? "auto" : "smooth"}); return; }
+    if(!views[name]) return;
+    current = name;
+    Object.keys(views).forEach(function(k){ $(views[k]).classList.toggle("active", k === name); });
+    $$(".mainnav button").forEach(function(b){ b.setAttribute("aria-current", String(b.dataset.go === name)); });
+    if(name === "admin"){ renderAdmin(); }
+    window.scrollTo({top:0, behavior:"auto"});
+  }
+  document.addEventListener("click", function(e){
+    var t = e.target.closest("[data-go]");
+    if(t){ go(t.dataset.go); }
+  });
+
+  /* ---------- ticker ---------- */
+  var buys = [
+    ["Charizard ex \u00b7 151", "$85"], ["Umbreon VMAX Alt", "$450"], ["Shanks OP-09 Leader", "$42"],
+    ["The One Ring", "$40"], ["Prismatic ETBs", "$70"], ["Luffy OP-05 Alt", "$88"],
+    ["Ragavan MH2", "$41"], ["Base Set holos", "ask"], ["Sealed booster boxes", "top rates"]
+  ];
+  var half = buys.map(function(b){ return "<span>Buying now \u00b7 <b>" + b[0] + "</b> up to <b>" + b[1] + "</b></span>"; }).join("");
+  $("#tickerTrack").innerHTML = half + half;
+
+  /* ---------- hero tilt ---------- */
+  var stage = $("#stage"), holo = $("#holo"), sheen = $("#sheen");
+  if(!reduceMotion && window.matchMedia("(pointer:fine)").matches){
+    stage.addEventListener("pointermove", function(e){
+      var r = stage.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width - 0.5;
+      var y = (e.clientY - r.top) / r.height - 0.5;
+      holo.style.transform = "rotateY(" + (x * 18) + "deg) rotateX(" + (y * -14) + "deg)";
+      sheen.style.setProperty("--shx", (50 + x * 90) + "%");
+      sheen.style.setProperty("--shy", (50 + y * 90) + "%");
+    });
+    stage.addEventListener("pointerleave", function(){
+      holo.style.transform = "";
+      sheen.style.setProperty("--shx", "50%");
+      sheen.style.setProperty("--shy", "50%");
+    });
+  }
+
+  /* ---------- product rendering ---------- */
+  function stockLabel(it){
+    if(it.stock <= 0) return '<span class="stock out">Sold out</span>';
+    if(it.stock <= 1) return '<span class="stock low">Last one</span>';
+    if(it.stock <= 2) return '<span class="stock low">' + it.stock + ' left</span>';
+    return '<span class="stock">' + it.stock + ' in stock</span>';
+  }
+  function esc(s){
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+  var ART = {
+    pk:{a:"#3A6EA8", b:"#16202F", label:"POKEMON",
+        em:'<path d="M125 92 L96 158 h22 l-14 60 l50 -76 h-25 l21 -50 z" fill="#F5C542"/>'},
+    op:{a:"#8E3227", b:"#231314", label:"ONE PIECE",
+        em:'<path d="M95 166 a30 28 0 0 1 60 0 z" fill="#E8C97A"/><rect x="97" y="152" width="56" height="11" fill="#D94A3D"/><ellipse cx="125" cy="168" rx="56" ry="12" fill="#E8C97A"/>'},
+    mtg:{a:"#57432A", b:"#1E1911", label:"MAGIC",
+        em:'<path d="M125 98 L172 132 L154 190 L96 190 L78 132 Z" fill="none" stroke="#C08A3E" stroke-width="5"/><path d="M125 120 L152 140 L142 172 L108 172 L98 140 Z" fill="#C08A3E" opacity=".85"/>'}
+  };
+  function boxArt(){
+    return '<g><rect x="75" y="80" width="100" height="120" rx="5" fill="rgba(255,255,255,.92)"/>' +
+      '<rect x="75" y="80" width="100" height="26" rx="5" fill="rgba(0,0,0,.45)"/>' +
+      '<path d="M75 200 L125 222 L175 200 Z" fill="rgba(255,255,255,.55)"/>' +
+      '<path d="M125 106 v94" stroke="rgba(0,0,0,.25)" stroke-width="2"/>' +
+      '<path d="M90 130 h70 M90 150 h70 M90 170 h44" stroke="rgba(0,0,0,.28)" stroke-width="5" stroke-linecap="round"/></g>';
+  }
+  var IMG_KEY = {pk1:"pk-charizard151", pk2:"pk-pikachuhat", pk3:"pk-tatsugiri", pk4:"pk-iono", pk5:"pk-roaringmoon", op1:"op-shanks-op09", op2:"op-luffy-op05", op3:"op-boa-op07", op4:"op-law-op01", m1:"mtg-ragavan", m2:"mtg-sheoldred", m3:"mtg-onering", m4:"mtg-bowmasters"};
+  function cardArt(it){
+    var key = IMG_KEY[it.id];
+    if(key && window.CARD_IMG && window.CARD_IMG[key]){
+      return '<img class="card-img" src="' + window.CARD_IMG[key] + '" alt="' + esc(it.name) + '">';
+    }
+    var a = ART[it.game];
+    var gid = "cg-" + it.id;
+    var name = it.name.length > 24 ? it.name.slice(0, 23) + "…" : it.name;
+    var set = it.set.length > 32 ? it.set.slice(0, 31) + "…" : it.set;
+    return '<svg viewBox="0 0 250 350" role="img" aria-label="' + esc(it.name) + ' card art placeholder" preserveAspectRatio="xMidYMid slice">' +
+      '<defs><radialGradient id="' + gid + '" cx="50%" cy="40%" r="80%">' +
+        '<stop offset="0%" stop-color="' + a.a + '"/><stop offset="100%" stop-color="' + a.b + '"/></radialGradient></defs>' +
+      '<rect width="250" height="350" fill="#12151B"/>' +
+      '<rect x="8" y="8" width="234" height="334" rx="9" fill="none" stroke="#2A3140" stroke-width="2"/>' +
+      '<text x="20" y="31" font-family="Spline Sans Mono, monospace" font-size="11" letter-spacing="2.4" fill="rgba(255,255,255,.55)">' + a.label + '</text>' +
+      '<rect x="16" y="42" width="218" height="216" rx="6" fill="url(#' + gid + ')"/>' +
+      '<g opacity=".16"><path d="M16 226 L234 130" stroke="#fff" stroke-width="24"/><path d="M16 258 L234 176" stroke="#fff" stroke-width="9"/></g>' +
+      (it.type === "sealed" ? boxArt() : a.em) +
+      '<rect x="16" y="42" width="218" height="216" rx="6" fill="none" stroke="rgba(0,0,0,.4)"/>' +
+      '<text x="20" y="292" font-family="Spline Sans, sans-serif" font-weight="600" font-size="16" fill="#EEF0F4">' + esc(name) + '</text>' +
+      '<text x="20" y="318" font-family="Spline Sans Mono, monospace" font-size="10.5" letter-spacing="1" fill="rgba(255,255,255,.5)">' + esc(set) + '</text>' +
+    '</svg>';
+  }
+  function prodCard(it){
+    var art = (it.tcg && it.img)
+      ? '<img class="card-img" loading="lazy" src="' + it.img + '" alt="' + esc(it.name) + '" onerror="this.style.display=\'none\'">'
+      : cardArt(it);
+    var mini = '<div class="mini">' + art + '<span class="holo-hover"></span></div>';
+    var cond = it.cond ? '<span class="cond">' + esc(it.cond) + "</span>" : "";
+    var action = it.tcg
+      ? '<a class="add" href="' + it.url + '" target="_blank" rel="noopener noreferrer">Buy on TCGplayer</a>'
+      : '<button class="add" data-add="' + it.id + '"' + (it.stock <= 0 ? " disabled" : "") + ">" +
+        (it.stock <= 0 ? "Sold out" : "Add to cart") + "</button>";
+    return '<article class="prod">' +
+      '<div class="thumb">' + mini + cond + "</div>" +
+      '<div class="p-meta"><h3>' + esc(it.name) + "</h3>" +
+      '<p class="p-set">' + esc(it.lineName || GAMES[it.game] || "TCG") + " \u00b7 " + esc(it.set) + "</p>" +
+      '<div class="p-row"><span class="price">' + money(it.price) + "</span>" + stockLabel(it) + "</div>" +
+      action + "</div></article>";
+  }
+
+  var filterGame = "all", filterType = "all", sortMode = "feat", searchQ = "", pageCount = 1;
+  var SHOP_PAGE = 24;
+  function activeList(){
+    var src = LIVE ? LIVE.items : ITEMS;
+    return src.filter(function(it){
+      if(it.live) return false;
+      if(filterGame !== "all" && it.game !== filterGame) return false;
+      if(filterType !== "all" && it.type !== filterType) return false;
+      if(searchQ){
+        var hay = (it.name + " " + it.set + " " + (it.lineName || "")).toLowerCase();
+        var terms = searchQ.split(/\s+/);
+        for(var t = 0; t < terms.length; t++){
+          if(terms[t] && hay.indexOf(terms[t]) === -1) return false;
+        }
+      }
+      return true;
+    });
+  }
+  function renderShop(){
+    var list = activeList();
+    if(sortMode === "asc") list = list.slice().sort(function(a,b){ return a.price - b.price; });
+    if(sortMode === "desc") list = list.slice().sort(function(a,b){ return b.price - a.price; });
+    $("#shopCount").textContent = list.length;
+    var shown = list.slice(0, SHOP_PAGE * pageCount);
+    var more = list.length > shown.length
+      ? '<button class="add" id="loadMore" type="button" style="grid-column:1/-1; padding:13px 0;">Show 24 more \u00b7 ' + (list.length - shown.length) + ' left</button>'
+      : "";
+    $("#shopGrid").innerHTML = (shown.map(prodCard).join("") ||
+      '<p class="cart-empty">Nothing matches &mdash; clear a filter, or call (513) 222-2573. The case moves fast.</p>') + more;
+  }
+  function renderFeatured(){
+    var feat = [ITEMS[1], ITEMS[9], ITEMS[16], ITEMS[6]];
+    $("#featuredGrid").innerHTML = feat.map(prodCard).join("");
+  }
+
+  /* ---------- live TCGplayer inventory ---------- */
+  var LIVE = null;
+  var COND_ABBR = {"Near Mint":"NM","Lightly Played":"LP","Moderately Played":"MP","Heavily Played":"HP","Damaged":"DMG","Unopened":"SEALED"};
+  function liveType(name){
+    return /booster box|elite trainer|booster bundle|collection box|booster display|booster pack|premium collection|box set|blister|tin\b/i.test(name) ? "sealed" : "single";
+  }
+  function liveToItem(p){
+    var ls = p.listings || [];
+    var best = ls[0];
+    var qty = 0;
+    for(var i = 0; i < ls.length; i++){
+      qty += ls[i].qty;
+      if(ls[i].price < best.price) best = ls[i];
+    }
+    var cond = COND_ABBR[best.cond] || best.cond || null;
+    if(cond && best.printing && /reverse/i.test(best.printing)) cond += " \u00b7 RH";
+    else if(cond && best.printing === "Foil") cond += " \u00b7 Foil";
+    return {
+      id: "tcg-" + p.id, name: p.name,
+      set: p.set + (p.rarity ? " \u00b7 " + p.rarity : ""),
+      lineName: p.line,
+      game: (p.game === "pk" || p.game === "op" || p.game === "mtg") ? p.game : "other",
+      type: liveType(p.name + " " + (p.set || "")),
+      cond: cond, price: best.price, stock: qty, tcg: true,
+      img: "https://tcgplayer-cdn.tcgplayer.com/product/" + p.id + "_in_400x400.jpg",
+      url: "https://www.tcgplayer.com/product/" + p.id + "?seller=5c356cdf"
+    };
+  }
+  function initLiveInventory(){
+    if(!window.fetch) return;
+    fetch("inventory.json", {cache: "no-store"}).then(function(r){
+      if(!r.ok) throw new Error("no inventory");
+      return r.json();
+    }).then(function(d){
+      if(!d || !d.items || !d.items.length) return;
+      var items = [];
+      for(var i = 0; i < d.items.length; i++) items.push(liveToItem(d.items[i]));
+      LIVE = { items: items, generated: d.generated };
+      pageCount = 1;
+      var gen = (d.generated || "").slice(0, 10);
+      $("#shopFresh").innerHTML = '<span class="dot"></span>Live inventory \u00b7 <span id="shopCount">' + d.products +
+        '</span> results \u00b7 ' + d.units + ' cards in stock \u00b7 synced ' + gen + ' from our TCGplayer store';
+      $("#homeFresh").innerHTML = '<span class="dot"></span>The priciest pulls in the case right now \u00b7 live from our TCGplayer store';
+      var oc = $("#otherChip"); if(oc) oc.hidden = false;
+      var top = items.slice().sort(function(a,b){ return b.price - a.price; }).slice(0, 4);
+      $("#featuredGrid").innerHTML = top.map(prodCard).join("");
+      renderShop();
+    }).catch(function(){ /* offline or demo host: embedded demo data stays */ });
+  }
+  document.addEventListener("click", function(e){
+    var lm = e.target.closest("#loadMore");
+    if(lm){ pageCount++; renderShop(); }
+  });
+  (function(){
+    var deb = null;
+    var si = $("#shopSearch");
+    if(!si) return;
+    si.addEventListener("input", function(){
+      clearTimeout(deb);
+      deb = setTimeout(function(){
+        searchQ = si.value.trim().toLowerCase();
+        pageCount = 1;
+        renderShop();
+      }, 160);
+    });
+  })();
+
+  $$("#gameChips .chip").forEach(function(ch){
+    ch.addEventListener("click", function(){
+      filterGame = ch.dataset.game;
+      $$("#gameChips .chip").forEach(function(c){ c.setAttribute("aria-pressed", String(c === ch)); });
+      pageCount = 1;
+      renderShop();
+    });
+  });
+  $$("#typeChips .chip").forEach(function(ch){
+    ch.addEventListener("click", function(){
+      filterType = ch.dataset.type;
+      $$("#typeChips .chip").forEach(function(c){ c.setAttribute("aria-pressed", String(c === ch)); });
+      pageCount = 1;
+      renderShop();
+    });
+  });
+  $("#sortSel").addEventListener("change", function(e){ sortMode = e.target.value; pageCount = 1; renderShop(); });
+
+  /* ---------- cart ---------- */
+  var cart = {}; // id -> qty
+  var lastCartQty = 0;
+  var drawer = $("#drawer"), overlay = $("#overlay");
+  function cartQty(){ return Object.keys(cart).reduce(function(n,k){ return n + cart[k]; }, 0); }
+  function openCart(){
+    drawer.classList.add("open"); overlay.classList.add("open");
+    drawer.setAttribute("aria-hidden","false");
+    if(!reduceMotion){
+      drawer.classList.add("opening");
+      setTimeout(function(){ drawer.classList.remove("opening"); }, 700);
+    }
+    document.documentElement.classList.add("cart-open");
+    $("#drawerClose").focus();
+  }
+  function closeCart(){
+    drawer.classList.remove("open"); overlay.classList.remove("open");
+    drawer.setAttribute("aria-hidden","true");
+    document.documentElement.classList.remove("cart-open");
+    $("#cartBtn").focus();
+  }
+  function renderCart(){
+    var ids = Object.keys(cart);
+    var qNow = cartQty();
+    if(!reduceMotion && qNow > lastCartQty){
+      var cc = $("#cartCount");
+      cc.classList.remove("pop"); void cc.offsetWidth; cc.classList.add("pop");
+    }
+    lastCartQty = qNow;
+    $("#cartCount").textContent = qNow;
+    if(!ids.length){
+      $("#cartBody").innerHTML = '<p class="cart-empty">Cart is empty &mdash; go pull some hits.</p>';
+      $("#cartTotal").textContent = money(0);
+      return;
+    }
+    var total = 0;
+    $("#cartBody").innerHTML = ids.map(function(id){
+      var it = ITEMS.find(function(x){ return x.id === id; });
+      var q = cart[id];
+      total += it.price * q;
+      return '<div class="cart-line">' +
+        '<div class="ct"><b>' + it.name + "</b><span>" + (it.live ? "Live break \u00b7 rip & ship" : GAMES[it.game] + (it.cond ? " \u00b7 " + it.cond : " \u00b7 sealed")) + "</span></div>" +
+        '<div class="qty"><button data-dec="' + id + '" aria-label="Remove one">&minus;</button><span>' + q + '</span><button data-inc="' + id + '" aria-label="Add one">+</button></div>' +
+        '<span class="lp">' + money(it.price * q) + "</span></div>";
+    }).join("");
+    $("#cartTotal").textContent = money(total);
+  }
+  document.addEventListener("click", function(e){
+    var add = e.target.closest("[data-add]");
+    if(add){
+      var it = ITEMS.find(function(x){ return x.id === add.dataset.add; });
+      var have = cart[it.id] || 0;
+      if(have >= it.stock){ toast("That's all our stock of " + it.name); return; }
+      cart[it.id] = have + 1;
+      renderCart();
+      toast("Added " + it.name + " to cart");
+      return;
+    }
+    var inc = e.target.closest("[data-inc]");
+    if(inc){
+      var it2 = ITEMS.find(function(x){ return x.id === inc.dataset.inc; });
+      if((cart[it2.id]||0) >= it2.stock){ toast("That's all our stock of " + it2.name); return; }
+      cart[it2.id]++; renderCart(); return;
+    }
+    var dec = e.target.closest("[data-dec]");
+    if(dec){
+      var id = dec.dataset.dec;
+      cart[id]--;
+      if(cart[id] <= 0) delete cart[id];
+      renderCart(); return;
+    }
+  });
+  $("#cartBtn").addEventListener("click", function(){ renderCart(); openCart(); });
+  $("#drawerClose").addEventListener("click", closeCart);
+  overlay.addEventListener("click", closeCart);
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape" && drawer.classList.contains("open")) closeCart(); });
+  $("#checkoutBtn").addEventListener("click", function(){
+    if(!cartQty()){ toast("Cart is empty"); return; }
+    toast("Demo checkout \u2014 on the live site this hands off to Square");
+  });
+
+  /* ---------- forms ---------- */
+  $("#vendorForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    toast("Table request received (demo) \u2014 we'd email you within a day");
+    e.target.reset();
+  });
+  $("#buyForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    toast("Quote request sent (demo) \u2014 we'd reply with a number soon");
+    e.target.reset();
+  });
+
+  /* ---------- admin ---------- */
+  function nowTime(){
+    var d = new Date(), h = d.getHours(), m = d.getMinutes();
+    var ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12;
+    return h + ":" + (m < 10 ? "0" : "") + m + " " + ap;
+  }
+  function renderAdmin(){
+    var low = ITEMS.filter(function(it){ return !it.live && it.stock <= 1; }).length;
+    $("#lowStockVal").textContent = low;
+    $("#invBody").innerHTML = ITEMS.filter(function(it){ return !it.live; }).map(function(it){
+      var cls = it.stock <= 0 ? "zero" : (it.stock <= 1 ? "low" : "");
+      return "<tr>" +
+        "<td>" + it.name + "</td>" +
+        "<td>" + GAMES[it.game] + "</td>" +
+        "<td>" + (it.type === "single" ? "Single" : "Sealed") + "</td>" +
+        "<td>" + (it.cond || "\u2014") + "</td>" +
+        '<td class="num">' + money(it.price) + "</td>" +
+        '<td><span class="stock-edit">' +
+          '<button data-stk="-1" data-id="' + it.id + '" aria-label="Decrease stock">&minus;</button>' +
+          '<span class="' + cls + '">' + it.stock + "</span>" +
+          '<button data-stk="1" data-id="' + it.id + '" aria-label="Increase stock">+</button>' +
+        "</span></td>" +
+        '<td><span class="pill ok"><span class="dot"></span>Synced</span></td>' +
+      "</tr>";
+    }).join("");
+  }
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("[data-stk]");
+    if(!b) return;
+    var it = ITEMS.find(function(x){ return x.id === b.dataset.id; });
+    it.stock = Math.max(0, it.stock + parseInt(b.dataset.stk, 10));
+    renderAdmin(); renderShop(); renderFeatured();
+    var log = $("#syncLog");
+    log.insertAdjacentHTML("afterbegin",
+      '<div><span class="t">' + nowTime() + '</span> \u00b7 <span class="ok">OK</span> Pushed stock edit to Square \u00b7 ' + it.name + " \u2192 " + it.stock + "</div>");
+    ALERTS.unshift({msg:"Stock changed here: " + it.name + " \u2192 " + it.stock + " \u2014 TCGplayer listing needs the same change", ch:"TCGplayer"});
+    renderAlerts();
+    toast("Stock updated \u2014 pushed to Square, TCGplayer flagged (demo)");
+  });
+  $("#syncNow").addEventListener("click", function(){
+    var btn = this, log = $("#syncLog");
+    btn.disabled = true; btn.textContent = "Syncing\u2026";
+    setTimeout(function(){
+      btn.disabled = false; btn.textContent = "Sync now";
+      $("#lastSync").textContent = nowTime();
+      log.insertAdjacentHTML("afterbegin",
+        '<div><span class="t">' + nowTime() + '</span> \u00b7 <span class="ok">OK</span> Manual sync complete \u00b7 214 items \u00b7 0 conflicts</div>');
+      toast("Catalog synced with Square \u2014 214 items, 0 conflicts (demo)");
+    }, 900);
+  });
+  $("#viewSquare").addEventListener("click", function(){ toast("On the live site this opens squareup.com/dashboard"); });
+  $("#tcgTease").addEventListener("click", function(){ toast("TCGplayer repricing ships with the live build (demo preview)"); });
+  $$(".switch").forEach(function(sw){
+    sw.addEventListener("click", function(){
+      var on = sw.getAttribute("aria-checked") === "true";
+      sw.setAttribute("aria-checked", String(!on));
+      toast(sw.getAttribute("aria-label") + (!on ? " \u2014 on" : " \u2014 off") + " (demo)");
+    });
+  });
+  $("#locSel").addEventListener("change", function(e){ toast("Location switched \u2014 " + e.target.value.split(" \u2014 ")[0] + " (demo)"); });
+  $("#syncInterval").addEventListener("change", function(e){ toast("Auto-sync set to " + e.target.value.toLowerCase() + " (demo)"); });
+
+  /* ---------- live breaks ---------- */
+  var SPOT_PRICE = 24.99;
+  var takenSpots = {2:true, 5:true, 9:true};
+  function renderSpots(){
+    var html = "";
+    for(var i = 1; i <= 12; i++){
+      html += '<button class="spot" data-spot="' + i + '"' + (takenSpots[i] ? " disabled" : "") + ">" +
+        (takenSpots[i] ? "Taken" : "#" + i) + "</button>";
+    }
+    $("#spotGrid").innerHTML = html;
+  }
+  document.addEventListener("click", function(e){
+    var s = e.target.closest("[data-spot]");
+    if(!s || s.disabled) return;
+    var n = s.dataset.spot;
+    takenSpots[n] = true;
+    var id = "live-spot-" + n;
+    ITEMS.push({id:id, name:"Break spot #" + n + " · Prismatic box", set:"Rip & ship · ships next day", game:"pk", type:"sealed", cond:null, price:SPOT_PRICE, stock:1, live:true});
+    cart[id] = 1;
+    renderSpots(); renderCart();
+    pushChat(null, "you claimed spot #" + n, true);
+    toast("Spot #" + n + " claimed — added to cart (demo)");
+  });
+
+  var CHAT_FEED = [
+    ["mike_pulls", "LETS GO that alt art was insane"],
+    ["nky_collector", "how many spots left?"],
+    ["sarah_tcg", "shipping was crazy fast last week btw"],
+    ["breakz_bill", "my spot is up next, no whammies"],
+    ["gundam_greg", "any gundam breaks coming?"],
+    ["toploaded_shop", "Gundam locals Saturday 1 PM — breaks soon after"],
+    ["jess_rips", "chase card is still in there I can feel it"],
+    ["cincy_cards", "W shop"],
+    ["packrat_pete", "see everyone at the Turfway show, first weekend of the month"]
+  ];
+  var chatIdx = 0;
+  function pushChat(user, msg, sys){
+    var body = $("#chatBody");
+    var div = document.createElement("div");
+    div.className = "chat-line" + (sys ? " sys" : "");
+    if(sys){ div.textContent = msg; }
+    else { div.innerHTML = "<b>" + esc(user) + "</b>" + esc(msg); }
+    body.appendChild(div);
+    while(body.children.length > 40) body.removeChild(body.firstChild);
+    body.scrollTop = body.scrollHeight;
+  }
+  function initLive(){
+    renderSpots();
+    pushChat(null, "Welcome to the break — chat is simulated for this demo", true);
+    CHAT_FEED.slice(0, 4).forEach(function(c){ pushChat(c[0], c[1]); });
+    chatIdx = 4;
+    setInterval(function(){
+      var c = CHAT_FEED[chatIdx++ % CHAT_FEED.length];
+      pushChat(c[0], c[1]);
+    }, 4200);
+    var v = 214;
+    setInterval(function(){
+      v = Math.max(180, v + Math.round(Math.random() * 14 - 7));
+      var vc = $("#viewerCount");
+      vc.textContent = v + " watching";
+      if(!reduceMotion){ vc.classList.remove("tick"); void vc.offsetWidth; vc.classList.add("tick"); }
+    }, 5000);
+    $("#chatForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      var inp = $("#chatInput");
+      if(!inp.value.trim()) return;
+      pushChat("you", inp.value.trim());
+      inp.value = "";
+    });
+  }
+
+  /* ---------- play nights: data-driven schedule + admin editor ---------- */
+  var EVENTS = [
+    {day:"Mon", name:"Shop closed", small:"Back Tuesday at open", time:"—", fee:"—"},
+    {day:"Wed", name:"One Piece Locals", small:"Bandai official · winner & participation packs", time:"5:00 PM", fee:"TBD"},
+    {day:"Sat", name:"One Piece Locals", small:"Bandai official · winner & participation packs", time:"11:00 AM", fee:"TBD"},
+    {day:"Sat", name:"Gundam Card Game", small:"Bandai official · winner & participation packs", time:"1:00 PM", fee:"TBD"},
+    {day:"Sun", name:"Pokemon League", small:"All ages · league promo prizing", time:"11:00 AM", fee:"TBD"}
+  ];
+  function renderSched(){
+    $("#schedList").innerHTML = EVENTS.map(function(ev){
+      return '<div class="sched-row"><span class="sched-day">' + esc(ev.day) + '</span>' +
+        '<span class="sched-name">' + esc(ev.name) + '<small>' + esc(ev.small) + '</small></span>' +
+        '<span class="sched-time">' + esc(ev.time) + '</span><span class="sched-fee">' + esc(ev.fee) + '</span></div>';
+    }).join("");
+  }
+  function renderEvEditor(){
+    $("#evEditor").innerHTML = EVENTS.map(function(ev, i){
+      return '<div class="ev-edit-row">' +
+        '<input data-ev="day" data-i="' + i + '" value="' + esc(ev.day) + '" style="width:52px" aria-label="Day">' +
+        '<input data-ev="name" data-i="' + i + '" value="' + esc(ev.name) + '" style="flex:1; min-width:110px" aria-label="Event name">' +
+        '<input data-ev="time" data-i="' + i + '" value="' + esc(ev.time) + '" style="width:82px" aria-label="Start time">' +
+        '<input data-ev="fee" data-i="' + i + '" value="' + esc(ev.fee) + '" style="width:56px" aria-label="Entry fee">' +
+      '</div>';
+    }).join("");
+  }
+  $("#evApply").addEventListener("click", function(){
+    $$("#evEditor [data-ev]").forEach(function(inp){
+      EVENTS[parseInt(inp.dataset.i, 10)][inp.dataset.ev] = inp.value;
+    });
+    renderSched();
+    toast("Schedule published — Play Nights page updated");
+  });
+  $("#evAdd").addEventListener("click", function(){
+    EVENTS.push({day:"Fri", name:"New event", small:"Set details, then publish", time:"6:00 PM", fee:"TBD"});
+    renderEvEditor();
+  });
+
+  /* ---------- site settings / banner / live toggle ---------- */
+  var isLive = false;
+  function updateBanner(){
+    var el = $("#siteBanner"), txt = $("#siteBannerText"), btn = $("#siteBannerBtn");
+    var custom = $("#setBanner").value.trim();
+    var customOn = $("#setBannerOn").getAttribute("aria-checked") === "true";
+    if(isLive){
+      txt.textContent = "LIVE NOW — rip & ship break in progress";
+      btn.hidden = false; el.hidden = false;
+    } else if(customOn && custom){
+      txt.textContent = custom; btn.hidden = true; el.hidden = false;
+    } else {
+      el.hidden = true;
+    }
+  }
+  $("#setApply").addEventListener("click", function(){
+    var t = $("#setTitle").value.trim() || "Top Loaded";
+    $("#brandName").firstChild.nodeValue = t;
+    $("#footHoursWk").textContent = $("#setHoursWk").value;
+    $("#footHoursSun").textContent = $("#setHoursSun").value;
+    updateBanner();
+    toast("Site settings applied (demo — saved for this session)");
+  });
+  $("#setLogo").addEventListener("click", function(){
+    toast("Logo upload ships with the live build — accepts PNG/SVG, swaps the header mark");
+  });
+  $("#goLiveBtn").addEventListener("click", function(){
+    isLive = !isLive;
+    this.textContent = isLive ? "End live rip" : "Start live rip";
+    var pill = $("#liveStatusPill");
+    pill.className = "pill " + (isLive ? "ok" : "crit");
+    pill.innerHTML = '<span class="dot' + (isLive ? "" : " crit") + '"></span>' + (isLive ? "On air" : "Offline");
+    $("#livePillText").textContent = isLive ? "Live" : "Offline";
+    updateBanner();
+    toast(isLive ? "You're live — storefront banner is up" : "Stream ended — banner cleared");
+  });
+  $("#setShowApply").addEventListener("click", function(){
+    var d = $("#setShowDate").value.trim(), h = $("#setShowHours").value.trim();
+    $("#showDateBig").innerHTML = esc(d).replace(/,\s*/, "<br>");
+    $("#showHours").textContent = h;
+    $("#footShowDate").innerHTML = "Next card show · " + esc(d) + " →";
+    $("#statShowDate").textContent = d + " · Hilton, Turfway Rd";
+    toast("Card show info updated across the site");
+  });
+
+  /* ---------- channel sync alerts ---------- */
+  var ALERTS = [
+    {msg:"Sold in-store (Square): Charizard ex — update the TCGplayer listing", ch:"TCGplayer"},
+    {msg:"Sold on TCGplayer: The One Ring — pull it from the case & Square", ch:"Square"}
+  ];
+  function renderAlerts(){
+    $("#alertList").innerHTML = ALERTS.length ? ALERTS.map(function(a, i){
+      return '<div class="toggle-row"><div class="tl"><b>' + esc(a.msg) + '</b><span>Reconcile on ' + esc(a.ch) + '</span></div>' +
+        '<button class="btn btn-ghost" data-ack="' + i + '" type="button" style="padding:7px 12px">Done</button></div>';
+    }).join("") : '<p class="drawer-note" style="text-align:left">All channels reconciled — nothing waiting.</p>';
+    $("#alertCount").textContent = ALERTS.length;
+  }
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("[data-ack]");
+    if(!b) return;
+    ALERTS.splice(parseInt(b.dataset.ack, 10), 1);
+    renderAlerts();
+    toast("Alert cleared — channels reconciled");
+  });
+  $("#tcgRun").addEventListener("click", function(){
+    var btn = this;
+    btn.disabled = true; btn.textContent = "Importing…";
+    setTimeout(function(){
+      btn.disabled = false; btn.textContent = "Run import now";
+      $("#tcgLog").insertAdjacentHTML("afterbegin",
+        '<div><span class="t">' + nowTime() + '</span> · <span class="ok">OK</span> Manual import · 1,204 listings · 3 price changes · 0 conflicts</div>');
+      toast("TCGplayer import complete — 3 price changes pulled (demo)");
+    }, 1100);
+  });
+
+  /* ---------- staff desk: store credit + pricing ---------- */
+  var CUSTOMERS = [
+    {n:"Alex R.",    p:"(859) 555-0142", c:86.50},
+    {n:"Dana K.",    p:"(513) 555-0177", c:212.00},
+    {n:"Marcus T.",  p:"(859) 555-0103", c:14.25},
+    {n:"Priya S.",   p:"(513) 555-0164", c:0.00}
+  ];
+  function renderCred(){
+    var q = ($("#credSearch").value || "").toLowerCase();
+    var rows = CUSTOMERS.filter(function(cu){
+      return !q || cu.n.toLowerCase().indexOf(q) > -1 || cu.p.indexOf(q) > -1;
+    });
+    $("#credBody").innerHTML = rows.length ? rows.map(function(cu){
+      return "<tr><td>" + esc(cu.n) + '</td><td class="num">' + esc(cu.p) + '</td><td class="num">' + money(cu.c) + "</td></tr>";
+    }).join("") : '<tr><td colspan="3" style="color:var(--ink3)">No matches — new customers get an account at checkout.</td></tr>';
+    $("#credWho").innerHTML = CUSTOMERS.map(function(cu, i){
+      return '<option value="' + i + '">' + esc(cu.n) + "</option>";
+    }).join("");
+  }
+  $("#credSearch").addEventListener("input", renderCred);
+  $("#credAdd").addEventListener("click", function(){
+    var amt = parseFloat($("#credAmt").value);
+    if(!(amt > 0)){ toast("Enter the cash value of the trade first"); return; }
+    var cu = CUSTOMERS[parseInt($("#credWho").value, 10)];
+    var credited = amt * 1.10;
+    cu.c += credited;
+    $("#credAmt").value = "";
+    renderCred();
+    toast(money(amt) + " trade → " + money(credited) + " credit for " + cu.n + " (+10% bonus)");
+  });
+  function recalcPricing(){
+    var m = parseFloat($("#pdMarket").value);
+    var r = parseFloat($("#pdRate").value);
+    if(!(m > 0)){ $("#pdCash").textContent = "—"; $("#pdCredit").textContent = "—"; return; }
+    var cash = m * r;
+    $("#pdCash").textContent = money(cash);
+    $("#pdCredit").textContent = money(cash * 1.10);
+  }
+  $("#pdMarket").addEventListener("input", recalcPricing);
+  $("#pdRate").addEventListener("change", recalcPricing);
+
+  /* ---------- init ---------- */
+  renderShop(); renderFeatured(); renderCart(); initLive();
+  renderSched(); renderEvEditor(); renderAlerts(); renderCred();
+  initLiveInventory();
+
+  /* ---------- scroll-in reveals ---------- */
+  if(!reduceMotion && "IntersectionObserver" in window){
+    var srTargets = $$("#view-home .tri .panel, #view-show .gal, #view-show .show-date-card, #view-show .vendor-form, #view-events .tri .panel, #view-live .tri .panel, #view-buylist .buy-points .panel, #view-buylist .form-card, .section-head");
+    srTargets.forEach(function(el){
+      var idx = Array.prototype.indexOf.call(el.parentNode.children, el);
+      el.classList.add("sr");
+      el.style.setProperty("--srd", (Math.min(idx, 5) * 70) + "ms");
+    });
+    var srIO = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("sr-in"); srIO.unobserve(en.target); }
+      });
+    }, {rootMargin:"0px 0px -10% 0px", threshold:.05});
+    srTargets.forEach(function(el){ srIO.observe(el); });
+  }
+})();
+</script>
