@@ -103,7 +103,9 @@ button{font-family:inherit; color:inherit; cursor:pointer}
 .eyebrow{
   font-family:var(--mono); font-size:.72rem; letter-spacing:.18em; text-transform:uppercase;
   color:var(--ink3);
+  margin-bottom:20px;
 }
+.admin-bar .eyebrow{margin-bottom:0}
 .demo-tag{
   font-family:var(--mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase;
   color:var(--ink3); border:1px solid var(--line); border-radius:3px; padding:1px 5px;
@@ -595,6 +597,17 @@ html.cart-open, html.cart-open body{overflow:hidden}
 .sched-time,.sched-fee{font-family:var(--mono); font-size:.78rem; color:var(--ink2); font-variant-numeric:tabular-nums}
 .fee-free{color:var(--good)}
 
+/* ============ EVENT SIGNUPS ============ */
+.signup-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+.signup-card{padding:26px 24px; display:flex; flex-direction:column; gap:12px}
+.signup-card h3{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.5rem; letter-spacing:.03em}
+.signup-card p{color:var(--ink2); font-size:.94rem}
+.signup-card .btn{align-self:flex-start; text-decoration:none}
+.signup-card .eyebrow{margin-bottom:4px}
+.signup-note{font-family:var(--mono); font-size:.7rem; letter-spacing:.04em; color:var(--ink3); margin-top:auto}
+.signup-note a{color:var(--accent)}
+@media (max-width:880px){ .signup-grid{grid-template-columns:1fr} }
+
 /* ============ BUYLIST ============ */
 .buy-grid{display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:32px; align-items:start}
 .form-card{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:26px}
@@ -755,7 +768,8 @@ footer::before{
   content:""; position:absolute; top:0; left:0; right:0; height:3px;
   background:linear-gradient(90deg, var(--foilA), var(--foilB) 35%, var(--foilC) 65%, var(--foilD));
 }
-.foot-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:28px; padding:60px 0 44px}
+.foot-grid{display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr 1.15fr; gap:28px; padding:60px 0 44px}
+.foot-about{max-width:34ch}
 .foot-grid h4{
   font-family:var(--mono); font-size:.68rem; letter-spacing:.18em; text-transform:uppercase; color:var(--ink3);
   margin:0 0 14px; font-weight:500;
@@ -1189,6 +1203,28 @@ footer::before{
           <div class="panel"><span class="num">Seating</span><h3>The 8-top &amp; second list</h3><p>Events seat eight at the big table. More than eight and we split into two lists, so nobody sits out.</p></div>
         </div>
       </div>
+      <div class="section" style="padding-bottom:0">
+        <div class="section-head"><h2>Sign up for next week's events</h2></div>
+        <div class="signup-grid">
+          <div class="panel signup-card">
+            <p class="eyebrow">One Piece &amp; Gundam &middot; Wed 5 PM &middot; Sat 11 AM &amp; 1 PM</p>
+            <h3>Sign up on Bandai TCG+</h3>
+            <p>Our Bandai events run through the official TCG+ app. Grab your seat there and check in at the counter &mdash; winner and participation packs come straight from Bandai.</p>
+            <a class="btn" href="https://www.bandai-tcg-plus.com/" target="_blank" rel="noopener noreferrer">Open Bandai TCG+ &rarr;</a>
+            <p class="signup-note">Search "Top Loaded" in the app for this week's events. <span class="demo-tag">direct store link coming</span></p>
+          </div>
+          <form class="panel signup-card" id="pkSignup">
+            <p class="eyebrow">Pokemon League &middot; Sundays 11 AM</p>
+            <h3>Save your seat</h3>
+            <div class="form-grid" style="margin-top:2px">
+              <div class="field"><label for="pkName">Name</label><input id="pkName" required autocomplete="off" placeholder="Trainer name"></div>
+              <div class="field"><label for="pkCount">Seats</label><select id="pkCount"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+              <div class="field full"><button class="btn" type="submit">Email my signup</button></div>
+            </div>
+            <p class="signup-note">Opens your email app with the signup filled out &mdash; or call <a href="tel:+15132222573">(513) 222-2573</a> and we'll pencil you in.</p>
+          </form>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -1511,15 +1547,18 @@ footer::before{
 <footer id="visit-anchor">
   <div class="wrap">
     <div class="foot-grid">
-      <div>
+      <div class="foot-about">
         <img class="foot-logo logo-d" src="logo-dark.png" alt="Top Loaded Trading Cards" onerror="this.style.display='none'">
         <img class="foot-logo logo-l" src="logo-light.png" alt="" aria-hidden="true" onerror="this.style.display='none'">
         <p class="foot-brand">Top Loaded</p>
         <ul style="margin-top:12px">
           <li>Buy &middot; Sell &middot; Trade</li>
           <li>Northern Kentucky's card shop for Pokemon, One Piece, Magic, and Gundam. Bandai official tournament store.</li>
+          <li style="margin-top:8px"><button class="linklike" data-go="show" id="footShowDate">Next card show &middot; Sat, Sep 5 &rarr;</button></li>
         </ul>
-        <h4 style="margin-top:20px">Site</h4>
+      </div>
+      <div>
+        <h4>Site</h4>
         <ul>
           <li><button class="linklike" data-go="shop">Shop the case</button></li>
           <li><button class="linklike" data-go="live">Live breaks</button></li>
@@ -1542,7 +1581,6 @@ footer::before{
           <li>Closed Mondays</li>
           <li id="footHoursWk">Tue&ndash;Fri &middot; 11 AM &ndash; 6 PM</li>
           <li id="footHoursSun">Sat&ndash;Sun &middot; 10 AM &ndash; 4 PM</li>
-          <li style="margin-top:6px"><button class="linklike" data-go="show" id="footShowDate">Next card show &middot; Sat, Sep 5 &rarr;</button></li>
         </ul>
       </div>
       <div>
@@ -1556,7 +1594,7 @@ footer::before{
     </div>
     <div class="foot-bottom">
       <span>&copy; 2026 Top Loaded Trading Cards</span>
-      <span>Demo site &mdash; inventory, orders &amp; integrations simulated</span>
+      <span>Live inventory synced from our TCGplayer store &middot; online checkout &amp; admin tools simulated for demo</span>
       <span class="spacer"></span>
       <button class="adminlink" data-go="staff">Staff</button>
       <button class="adminlink" data-go="admin">Admin</button>
@@ -1942,6 +1980,16 @@ footer::before{
     e.preventDefault();
     toast("Table request received (demo) \u2014 we'd email you within a day");
     e.target.reset();
+  });
+  $("#pkSignup").addEventListener("submit", function(e){
+    e.preventDefault();
+    var name = $("#pkName").value.trim();
+    if(!name){ toast("Add your name first"); return; }
+    var seats = $("#pkCount").value;
+    var subject = "Pokemon League signup — Sunday 11 AM";
+    var body = "Name: " + name + "\nSeats: " + seats + "\n\nSee you Sunday at 11!";
+    window.location.href = "mailto:toploadedtcg@gmail.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+    toast("Opening your email app — hit send and you're in");
   });
   $("#buyForm").addEventListener("submit", function(e){
     e.preventDefault();
