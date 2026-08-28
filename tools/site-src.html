@@ -597,6 +597,27 @@ html.cart-open, html.cart-open body{overflow:hidden}
 .sched-time,.sched-fee{font-family:var(--mono); font-size:.78rem; color:var(--ink2); font-variant-numeric:tabular-nums}
 .fee-free{color:var(--good)}
 
+/* ============ VISIT ============ */
+.visit-layout{display:grid; grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr); gap:16px; align-items:stretch}
+.visit-info{padding:26px 24px; display:flex; flex-direction:column; gap:14px}
+.visit-info h3{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.5rem; letter-spacing:.03em}
+.visit-info a{color:var(--accent)}
+.visit-actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:auto; padding-top:8px}
+.visit-actions .btn{text-decoration:none}
+.map-wrap{position:relative; border:1px solid var(--line); border-radius:8px; overflow:hidden; min-height:400px; background:var(--slab)}
+.map-fallback{position:absolute; inset:0; display:grid; place-items:center; padding:24px; text-align:center; font-family:var(--mono); font-size:.74rem; letter-spacing:.06em; color:var(--ink3); max-width:44ch; margin:0 auto}
+.map-wrap iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
+@media (max-width:880px){ .visit-layout{grid-template-columns:1fr} .map-wrap{min-height:300px} }
+
+/* ============ LOGIN GATE ============ */
+.login-modal{
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:120;
+  width:min(360px,92vw); background:var(--surface); border:1px solid var(--line); border-radius:8px;
+  padding:26px 24px; box-shadow:var(--shadow);
+}
+.login-modal[hidden]{display:none}
+.login-modal h3{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.5rem; letter-spacing:.03em}
+
 /* ============ EVENT SIGNUPS ============ */
 .signup-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
 .signup-card{padding:26px 24px; display:flex; flex-direction:column; gap:12px}
@@ -1309,6 +1330,36 @@ footer::before{
     </div>
   </section>
 
+  <!-- ================= VISIT ================= -->
+  <section class="view" id="view-visit" aria-label="Visit the shop">
+    <div class="wrap">
+      <div class="view-head">
+        <p class="eyebrow">Crescent Springs &middot; Northern Kentucky</p>
+        <h1>Come find the shop</h1>
+        <p class="lede">Just off the Dixie Highway corridor, minutes from I-71/75. Free parking out front, play space in the back.</p>
+      </div>
+      <div class="visit-layout">
+        <div class="panel visit-info">
+          <h3>Top Loaded Trading Cards</h3>
+          <dl class="kv" style="margin-top:6px">
+            <dt>Address</dt><dd>2514 Hazelwood Dr<br>Crescent Springs, KY 41017</dd>
+            <dt>Phone</dt><dd><a href="tel:+15132222573">(513) 222-2573</a></dd>
+            <dt>Email</dt><dd><a href="mailto:toploadedtcg@gmail.com">toploadedtcg@gmail.com</a></dd>
+            <dt>Hours</dt><dd>Closed Mondays<br><span id="visitHoursWk">Tue&ndash;Fri &middot; 11 AM &ndash; 6 PM</span><br><span id="visitHoursWe">Sat&ndash;Sun &middot; 10 AM &ndash; 4 PM</span></dd>
+          </dl>
+          <div class="visit-actions">
+            <a class="btn" href="https://www.google.com/maps/search/?api=1&amp;query=Top+Loaded+Trading+Cards+2514+Hazelwood+Dr+Crescent+Springs+KY+41017" target="_blank" rel="noopener noreferrer">Google Maps &rarr;</a>
+            <a class="btn btn-ghost" href="https://maps.apple.com/place?place-id=I96E3F1088FE2244C" target="_blank" rel="noopener noreferrer">Apple Maps &rarr;</a>
+          </div>
+        </div>
+        <div class="map-wrap">
+          <div class="map-fallback"><span>Map loads on the live site &mdash; use the Google or Apple Maps buttons for directions.</span></div>
+          <iframe title="Map to Top Loaded Trading Cards, 2514 Hazelwood Dr, Crescent Springs KY" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=2514%20Hazelwood%20Dr%2C%20Crescent%20Springs%2C%20KY%2041017&amp;z=15&amp;output=embed"></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ================= STAFF ================= -->
   <section class="view" id="view-staff" aria-label="Staff desk">
     <div class="admin-bar">
@@ -1317,6 +1368,7 @@ footer::before{
         <span class="pill ok"><span class="dot"></span>Register &middot; Crescent Springs</span>
         <span class="demo-tag">All staff data is simulated for this demo</span>
         <span style="flex:1"></span>
+        <button class="linklike logoutBtn" type="button">Log out</button>
         <button class="linklike" data-go="home">&larr; Back to storefront</button>
       </div>
     </div>
@@ -1367,6 +1419,7 @@ footer::before{
         <span class="pill ok"><span class="dot"></span>Connected to Square</span>
         <span class="demo-tag">All admin data is simulated for this demo</span>
         <span style="flex:1"></span>
+        <button class="linklike logoutBtn" type="button">Log out</button>
         <button class="linklike" data-go="home">&larr; Back to storefront</button>
       </div>
     </div>
@@ -1619,6 +1672,20 @@ footer::before{
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<div class="overlay" id="loginOverlay"></div>
+<div class="login-modal" id="loginModal" role="dialog" aria-modal="true" aria-label="Staff login" hidden>
+  <p class="eyebrow" style="margin-bottom:10px">Back of house</p>
+  <h3>Staff login</h3>
+  <form id="loginForm">
+    <div class="field" style="margin-top:12px"><label for="loginPin">Passcode</label><input id="loginPin" type="password" autocomplete="current-password"></div>
+    <div style="display:flex; gap:10px; margin-top:16px">
+      <button class="btn" type="submit">Log in</button>
+      <button class="btn btn-ghost" type="button" id="loginCancel">Cancel</button>
+    </div>
+  </form>
+  <p class="drawer-note" style="text-align:left; margin-top:14px">Demo gate &mdash; real staff accounts ship with the live build.</p>
+</div>
+
 <script id="cardArtData"></script>
 <script>
 (function(){
@@ -1664,11 +1731,17 @@ footer::before{
   }
 
   /* ---------- view switching ---------- */
-  var views = {home:"#view-home", shop:"#view-shop", live:"#view-live", show:"#view-show", events:"#view-events", buylist:"#view-buylist", staff:"#view-staff", admin:"#view-admin"};
+  var views = {home:"#view-home", shop:"#view-shop", live:"#view-live", show:"#view-show", events:"#view-events", buylist:"#view-buylist", visit:"#view-visit", staff:"#view-staff", admin:"#view-admin"};
   var current = "home";
+  var pendingView = null;
+  function isAuthed(){ try { return sessionStorage.getItem("tl-staff") === "1"; } catch(e){ return false; } }
   function go(name){
-    if(name === "visit"){ $("#visit-anchor").scrollIntoView({behavior: reduceMotion ? "auto" : "smooth"}); return; }
     if(!views[name]) return;
+    if((name === "admin" || name === "staff") && !isAuthed()){
+      pendingView = name;
+      openLogin();
+      return;
+    }
     current = name;
     Object.keys(views).forEach(function(k){ $(views[k]).classList.toggle("active", k === name); });
     $$(".mainnav button").forEach(function(b){ b.setAttribute("aria-current", String(b.dataset.go === name)); });
@@ -1969,7 +2042,11 @@ footer::before{
   $("#cartBtn").addEventListener("click", function(){ renderCart(); openCart(); });
   $("#drawerClose").addEventListener("click", closeCart);
   overlay.addEventListener("click", closeCart);
-  document.addEventListener("keydown", function(e){ if(e.key === "Escape" && drawer.classList.contains("open")) closeCart(); });
+  document.addEventListener("keydown", function(e){
+    if(e.key !== "Escape") return;
+    if(drawer.classList.contains("open")) closeCart();
+    if(!$("#loginModal").hidden) closeLogin();
+  });
   $("#checkoutBtn").addEventListener("click", function(){
     if(!cartQty()){ toast("Cart is empty"); return; }
     toast("Demo checkout \u2014 on the live site this hands off to Square");
@@ -2187,6 +2264,8 @@ footer::before{
     $("#brandName").firstChild.nodeValue = t;
     $("#footHoursWk").textContent = $("#setHoursWk").value;
     $("#footHoursSun").textContent = $("#setHoursSun").value;
+    $("#visitHoursWk").textContent = $("#setHoursWk").value;
+    $("#visitHoursWe").textContent = $("#setHoursSun").value;
     updateBanner();
     toast("Site settings applied (demo — saved for this session)");
   });
@@ -2287,6 +2366,55 @@ footer::before{
   renderShop(); renderFeatured(); renderCart(); initLive();
   renderSched(); renderEvEditor(); renderAlerts(); renderCred();
   initLiveInventory();
+
+  /* ---------- staff/admin login gate ---------- */
+  var AUTH_HASH = "213d2c9854a9b82d6e119914ced2e04b627c8c98d94d89ef1b7953a40d5806c1";
+  function openLogin(){
+    $("#loginModal").hidden = false;
+    $("#loginOverlay").classList.add("open");
+    $("#loginPin").value = "";
+    $("#loginPin").focus();
+  }
+  function closeLogin(){
+    $("#loginModal").hidden = true;
+    $("#loginOverlay").classList.remove("open");
+    pendingView = null;
+  }
+  function sha256hex(str){
+    if(!(window.crypto && crypto.subtle && window.TextEncoder)) return Promise.resolve(null);
+    return crypto.subtle.digest("SHA-256", new TextEncoder().encode(str)).then(function(buf){
+      var a = new Uint8Array(buf), s = "";
+      for(var i = 0; i < a.length; i++){ s += (a[i] < 16 ? "0" : "") + a[i].toString(16); }
+      return s;
+    });
+  }
+  $("#loginForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    var pin = $("#loginPin").value;
+    sha256hex(pin).then(function(h){
+      var ok = h ? (h === AUTH_HASH) : (pin === atob("dG9wbG9hZGVk"));
+      if(ok){
+        try { sessionStorage.setItem("tl-staff", "1"); } catch(e2){}
+        var t = pendingView || "admin";
+        closeLogin();
+        go(t);
+        toast("Logged in — back of house unlocked");
+      } else {
+        toast("Wrong passcode — ask a manager");
+        $("#loginPin").value = "";
+        $("#loginPin").focus();
+      }
+    });
+  });
+  $("#loginCancel").addEventListener("click", closeLogin);
+  $("#loginOverlay").addEventListener("click", closeLogin);
+  document.addEventListener("click", function(e){
+    if(e.target.closest(".logoutBtn")){
+      try { sessionStorage.removeItem("tl-staff"); } catch(e2){}
+      toast("Logged out");
+      go("home");
+    }
+  });
 
   /* ---------- theme toggle ---------- */
   $("#themeBtn").addEventListener("click", function(){
