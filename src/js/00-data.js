@@ -25,6 +25,13 @@
 
   var $ = function(s, c){ return (c||document).querySelector(s); };
   var $$ = function(s, c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
-  var money = function(n){ return "$" + n.toFixed(2); };
-  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  TL.$ = $; TL.$$ = $$; TL.money = money; TL.reduceMotion = reduceMotion; TL.GAMES = GAMES; TL.ITEMS = ITEMS;
+  var money = function(n){
+    n = Number(n) || 0;
+    var neg = n < 0, s = Math.abs(n).toFixed(2), i = s.indexOf(".");
+    return (neg ? "-$" : "$") + s.slice(0, i).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + s.slice(i);
+  };
+  var fmtInt = function(n){ return String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ","); };
+  var motionMQ = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var reduceMotion = motionMQ.matches;
+  if(motionMQ.addEventListener) motionMQ.addEventListener("change", function(e){ reduceMotion = e.matches; TL.reduceMotion = e.matches; TL.emit("motion:change", {reduce: e.matches}); });
+  TL.$ = $; TL.$$ = $$; TL.money = money; TL.fmtInt = fmtInt; TL.reduceMotion = reduceMotion; TL.GAMES = GAMES; TL.ITEMS = ITEMS;

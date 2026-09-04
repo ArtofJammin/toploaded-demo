@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <title>Top Loaded Trading Cards</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,7 +19,12 @@
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#EFF1F4">
 <meta name="theme-color" content="#0C0A06">
 <script>(function(){var t="tl";try{var s=localStorage.getItem("tl-theme");if(s==="light"||s==="dark"||s==="tl")t=s}catch(e){}document.documentElement.setAttribute("data-theme",t)})()</script>
+<link rel="canonical" href="https://artofjammin.github.io/toploaded-demo/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://tcgplayer-cdn.tcgplayer.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Spline+Sans:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Store","name":"Top Loaded Trading Cards","url":"https://artofjammin.github.io/toploaded-demo/","telephone":"+15132222573","email":"toploadedtcg@gmail.com","image":"https://artofjammin.github.io/toploaded-demo/og-image.png","address":{"@type":"PostalAddress","streetAddress":"2514 Hazelwood Dr","addressLocality":"Crescent Springs","addressRegion":"KY","postalCode":"41017","addressCountry":"US"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":"Tuesday","opens":"11:00","closes":"18:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Wednesday","opens":"11:00","closes":"18:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Thursday","opens":"11:00","closes":"18:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Friday","opens":"11:00","closes":"18:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"10:00","closes":"16:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Sunday","opens":"10:00","closes":"16:00"}],"sameAs":["https://www.facebook.com/toploadedtradingcards","https://www.instagram.com/toploadedtcg","https://www.tcgplayer.com/sellers/Top-Loaded-TCG/5c356cdf"],"priceRange":"$"}</script>
 <style>
 /* ============ TOKENS -- dark-first (matte sleeve black), light = grading-slab acrylic ============ */
 :root{
@@ -44,7 +52,7 @@
     --line:#DBDFE6; --line2:#C6CCD6;
     --ink:#15181E; --ink2:#4E5563; --ink3:#616B7A;
     --accent:#097366; --accent-ink:#FFFFFF; --accent-dim:#7FB8AF;
-    --good:#1E9B54; --warn:#A9761B; --crit:#C6403E;
+    --good:#15773F; --warn:#865B0E; --crit:#B8302E;
     --good-bg:rgba(30,155,84,.1); --warn-bg:rgba(169,118,27,.12); --crit-bg:rgba(198,64,62,.1);
     --shadow:0 16px 40px rgba(21,24,30,.14);
     --foilA:#0B8AA0; --foilB:#6650DC; --foilC:#BE3D77; --foilD:#A8790C;
@@ -58,7 +66,7 @@
   --line:#DBDFE6; --line2:#C6CCD6;
   --ink:#15181E; --ink2:#4E5563; --ink3:#616B7A;
   --accent:#097366; --accent-ink:#FFFFFF; --accent-dim:#7FB8AF;
-  --good:#1E9B54; --warn:#A9761B; --crit:#C6403E;
+  --good:#15773F; --warn:#865B0E; --crit:#B8302E;
   --good-bg:rgba(30,155,84,.1); --warn-bg:rgba(169,118,27,.12); --crit-bg:rgba(198,64,62,.1);
   --shadow:0 16px 40px rgba(21,24,30,.14);
   --foilA:#0B8AA0; --foilB:#6650DC; --foilC:#BE3D77; --foilD:#A8790C;
@@ -944,7 +952,8 @@ footer::before{
   .btn:active,.chip:active,.add:active,.spot:active,.drawer-close:active,.qty button:active,.stock-edit button:active,.mainnav button:active{transform:none}
 }
 </style>
-
+</head>
+<body>
 <a class="skip" href="#main">Skip to content</a>
 
 <header class="topbar">
@@ -960,6 +969,7 @@ footer::before{
       <button data-go="live">Live<span class="live-dot" aria-hidden="true"></span></button>
       <button data-go="show">Card Show</button>
       <button data-go="events">Play Nights</button>
+      <button data-go="rip">Rip a Pack</button>
       <button data-go="buylist">Sell to Us</button>
       <button data-go="visit">Visit</button>
     </nav>
@@ -1607,6 +1617,18 @@ footer::before{
     </div>
   </section>
 
+  <!-- ================= PACK RIP (virtual pack opening) ================= -->
+  <section class="view" id="view-rip" aria-label="Rip a pack">
+    <div class="wrap">
+      <div class="view-head">
+        <p class="eyebrow">Virtual pack opening &middot; real cards from the case</p>
+        <h1>Rip a pack</h1>
+        <p class="lede">Pick a game and a set, tear the pack, and see what you pull &mdash; every card is a real single from our inventory, with real prices.</p>
+      </div>
+      <div id="ripApp"></div>
+    </div>
+  </section>
+
 </main>
 
 <!-- ================= FOOTER ================= -->
@@ -1762,6 +1784,28 @@ footer::before{
   };
   TL.clamp = function(n, lo, hi){ return Math.min(hi, Math.max(lo, n)); };
   TL.pad2 = function(n){ return (n < 10 ? "0" : "") + n; };
+  /* Focus trap for modals/drawers: keeps Tab inside `el`, restores focus on release.
+       var release = TL.trapFocus(el, {initial: firstInput}); … release(); */
+  TL.trapFocus = function(el, opts){
+    opts = opts || {};
+    var prev = document.activeElement;
+    var sel = 'a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+    function items(){ return Array.prototype.filter.call(el.querySelectorAll(sel), function(n){ return n.offsetParent !== null || n === document.activeElement; }); }
+    function onKey(e){
+      if(e.key !== "Tab") return;
+      var f = items(); if(!f.length){ e.preventDefault(); return; }
+      var first = f[0], last = f[f.length - 1];
+      if(e.shiftKey && (document.activeElement === first || !el.contains(document.activeElement))){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+    }
+    document.addEventListener("keydown", onKey, true);
+    var init = opts.initial || items()[0];
+    if(init) try { init.focus(); } catch(e){}
+    return function release(){
+      document.removeEventListener("keydown", onKey, true);
+      if(prev && prev.focus && opts.restore !== false) try { prev.focus(); } catch(e){}
+    };
+  };
   /* no-op defaults; feature modules replace these */
   TL.confetti = function(){};
   TL.flyTo = function(){};
@@ -1797,9 +1841,16 @@ footer::before{
 
   var $ = function(s, c){ return (c||document).querySelector(s); };
   var $$ = function(s, c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
-  var money = function(n){ return "$" + n.toFixed(2); };
-  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  TL.$ = $; TL.$$ = $$; TL.money = money; TL.reduceMotion = reduceMotion; TL.GAMES = GAMES; TL.ITEMS = ITEMS;
+  var money = function(n){
+    n = Number(n) || 0;
+    var neg = n < 0, s = Math.abs(n).toFixed(2), i = s.indexOf(".");
+    return (neg ? "-$" : "$") + s.slice(0, i).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + s.slice(i);
+  };
+  var fmtInt = function(n){ return String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ","); };
+  var motionMQ = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var reduceMotion = motionMQ.matches;
+  if(motionMQ.addEventListener) motionMQ.addEventListener("change", function(e){ reduceMotion = e.matches; TL.reduceMotion = e.matches; TL.emit("motion:change", {reduce: e.matches}); });
+  TL.$ = $; TL.$$ = $$; TL.money = money; TL.fmtInt = fmtInt; TL.reduceMotion = reduceMotion; TL.GAMES = GAMES; TL.ITEMS = ITEMS;
 
   /* ---------- api client ----------
      Discovers the API base URL, first match wins:
@@ -2765,6 +2816,7 @@ footer::before{
       return null;
     });
   }
+  var releaseLoginTrap = null;
   TL.auth = {
     role: function(){ return TL.api.role || null; },
     can: function(view){
@@ -2781,13 +2833,15 @@ footer::before{
       m.hidden = false;
       $("#loginOverlay").classList.add("open");
       $("#loginPin").value = "";
-      $("#loginPin").focus();
+      if(releaseLoginTrap) releaseLoginTrap();
+      releaseLoginTrap = TL.trapFocus(m, {initial: $("#loginPin")});
     },
     closeLogin: function(){
       var m = $("#loginModal"); if(!m) return;
       m.hidden = true;
       $("#loginOverlay").classList.remove("open");
       pendingView = null;
+      if(releaseLoginTrap){ releaseLoginTrap(); releaseLoginTrap = null; }
     },
     login: function(pin){
       pin = String(pin || "");
@@ -2853,15 +2907,34 @@ footer::before{
   });
   document.documentElement.setAttribute("data-role", TL.auth.role() || "");
 
-  /* ---------- theme toggle ---------- */
-  $("#themeBtn").addEventListener("click", function(){
-    var root = document.documentElement;
-    var cycle = { tl: "light", light: "dark", dark: "tl" };
-    var next = cycle[root.getAttribute("data-theme")] || "tl";
-    root.setAttribute("data-theme", next);
+  /* ---------- theme toggle ----------
+     Cycles tl → light → dark. Emits 'theme:change' {theme} and keeps the button label
+     and the browser theme-color in step. TL.theme() returns the current theme. */
+  var THEME_NAMES = {tl: "Top Loaded theme", light: "Light mode", dark: "Dark mode"};
+  var THEME_COLORS = {tl: "#0C0A06", light: "#EFF1F4", dark: "#0C0E12"};
+  function applyThemeMeta(t){
+    var btn = $("#themeBtn"), cycle = {tl: "light", light: "dark", dark: "tl"};
+    if(btn){
+      btn.setAttribute("aria-label", "Theme: " + THEME_NAMES[t] + ". Switch to " + THEME_NAMES[cycle[t]].toLowerCase());
+      btn.title = THEME_NAMES[t] + " \u2192 " + THEME_NAMES[cycle[t]];
+    }
+    $$('meta[name="theme-color"]').forEach(function(m){ if(!m.media) m.setAttribute("content", THEME_COLORS[t] || THEME_COLORS.tl); });
+  }
+  TL.theme = function(){ return document.documentElement.getAttribute("data-theme") || "tl"; };
+  TL.setTheme = function(next){
+    if(!THEME_NAMES[next]) return;
+    document.documentElement.setAttribute("data-theme", next);
     try { localStorage.setItem("tl-theme", next); } catch(e){}
-    toast(next === "tl" ? "Top Loaded theme" : (next === "light" ? "Light mode" : "Dark mode"));
+    applyThemeMeta(next);
+    TL.emit("theme:change", {theme: next});
+  };
+  $("#themeBtn").addEventListener("click", function(){
+    var cycle = {tl: "light", light: "dark", dark: "tl"};
+    var next = cycle[TL.theme()] || "tl";
+    TL.setTheme(next);
+    toast(THEME_NAMES[next]);
   });
+  applyThemeMeta(TL.theme());
 
   /* ---------- scroll-in reveals ---------- */
   if(!reduceMotion && "IntersectionObserver" in window){
@@ -2891,3 +2964,5 @@ footer::before{
   });
 })();
 </script>
+</body>
+</html>

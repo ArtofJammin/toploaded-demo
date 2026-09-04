@@ -4,3 +4,4 @@ api/.wrangler/
 tools/.dev-kv.json
 tools/update-inventory.log
 .DS_Store
+tools/artifact.html

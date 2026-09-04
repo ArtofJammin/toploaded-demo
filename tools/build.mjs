@@ -29,6 +29,21 @@ function listSorted(dir, ext) {
 }
 const read = f => readFileSync(f, 'utf8');
 
+function jsonLd(cfg) {
+  const days = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' };
+  const hours = Object.entries(cfg.hours || {}).filter(([, v]) => v).map(([d, v]) => ({
+    '@type': 'OpeningHoursSpecification', dayOfWeek: days[d], opens: v[0], closes: v[1] }));
+  return {
+    '@context': 'https://schema.org', '@type': 'Store', name: 'Top Loaded Trading Cards',
+    url: 'https://artofjammin.github.io/toploaded-demo/', telephone: cfg.phoneRaw, email: cfg.email,
+    image: 'https://artofjammin.github.io/toploaded-demo/og-image.png',
+    address: { '@type': 'PostalAddress', streetAddress: cfg.address.line1, addressLocality: cfg.address.city, addressRegion: cfg.address.state, postalCode: cfg.address.zip, addressCountry: 'US' },
+    openingHoursSpecification: hours,
+    sameAs: [cfg.links.facebook, cfg.links.instagram, cfg.links.tcgplayer].filter(Boolean),
+    priceRange: '$',
+  };
+}
+
 export function buildHtml() {
   const head = read(join(src, 'head.html'));
   const css = listSorted(join(src, 'css'), '.css').map(read).join('\n');
@@ -36,13 +51,19 @@ export function buildHtml() {
   const js = listSorted(join(src, 'js'), '.js').map(read).join('\n');
   // config.default.json is the single source of truth for site settings; the worker
   // imports the same file. Inlined so the page renders correct hours/events offline.
-  const cfg = JSON.stringify(JSON.parse(read(join(repo, 'config.default.json'))));
-  return head +
-    '<style>\n' + css + '</style>\n\n' +
-    html + '\n' +
+  const cfgObj = JSON.parse(read(join(repo, 'config.default.json')));
+  const cfg = JSON.stringify(cfgObj);
+  const ld = '<script type="application/ld+json">' + JSON.stringify(jsonLd(cfgObj)).replace(/</g, '\\u003c') + '</script>\n';
+  const body = html + '\n' +
     '<script id="siteConfig">window.TL_DEFAULT_CONFIG=' + cfg.replace(/</g, '\\u003c') + ';</script>\n' +
     '<script id="cardArtData"></script>\n' +
     '<script>\n(function(){\n  "use strict";\n\n' + js + '})();\n</script>\n';
+  return {
+    // The web build is a complete standards-mode document.
+    page: '<!DOCTYPE html>\n<html lang="en">\n<head>\n' + head + ld + '<style>\n' + css + '</style>\n</head>\n<body>\n' + body + '</body>\n</html>\n',
+    // The artifact build stays bare: the artifact host wraps it in its own skeleton.
+    bare: head + '<style>\n' + css + '</style>\n\n' + body,
+  };
 }
 
 const ART_KEYS = ['pk-charizard151', 'pk-pikachuhat', 'pk-tatsugiri', 'pk-iono', 'pk-roaringmoon',
@@ -58,15 +79,15 @@ function dataUri(key) {
 }
 
 export function build() {
-  const html = buildHtml();
+  const { page, bare } = buildHtml();
   const marker = '<script id="cardArtData"></script>';
-  if (!html.includes(marker)) throw new Error('cardArtData marker missing');
-  writeFileSync(join(repo, 'index.html'), html);
+  if (!page.includes(marker)) throw new Error('cardArtData marker missing');
+  writeFileSync(join(repo, 'index.html'), page);
   const kb = Math.round(statSync(join(repo, 'index.html')).size / 1024);
   console.log(`Built index.html (lean): ${kb} KB`);
   const pairs = ART_KEYS.map(k => JSON.stringify(k) + ':' + JSON.stringify(dataUri(k)));
   const block = '<script id="cardArtData">window.CARD_IMG={' + pairs.join(',') + '};</script>';
-  writeFileSync(join(tools, 'artifact.html'), html.replace(marker, block));
+  writeFileSync(join(tools, 'artifact.html'), bare.replace(marker, block));
   const mb = (statSync(join(tools, 'artifact.html')).size / 1048576).toFixed(2);
   console.log(`Built tools/artifact.html (fat): ${mb} MB`);
 }

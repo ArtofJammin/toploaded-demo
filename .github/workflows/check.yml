@@ -1,0 +1,19 @@
+# CI: the committed index.html must match the build, and the checks/tests must pass.
+name: Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node tools/check.mjs
+      - name: index.html is up to date with src/
+        run: git diff --exit-code -- index.html || (echo "::error::Run 'node tools/build.mjs' and commit index.html" && exit 1)

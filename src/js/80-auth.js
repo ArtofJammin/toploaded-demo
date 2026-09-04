@@ -28,6 +28,7 @@
       return null;
     });
   }
+  var releaseLoginTrap = null;
   TL.auth = {
     role: function(){ return TL.api.role || null; },
     can: function(view){
@@ -44,13 +45,15 @@
       m.hidden = false;
       $("#loginOverlay").classList.add("open");
       $("#loginPin").value = "";
-      $("#loginPin").focus();
+      if(releaseLoginTrap) releaseLoginTrap();
+      releaseLoginTrap = TL.trapFocus(m, {initial: $("#loginPin")});
     },
     closeLogin: function(){
       var m = $("#loginModal"); if(!m) return;
       m.hidden = true;
       $("#loginOverlay").classList.remove("open");
       pendingView = null;
+      if(releaseLoginTrap){ releaseLoginTrap(); releaseLoginTrap = null; }
     },
     login: function(pin){
       pin = String(pin || "");

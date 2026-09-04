@@ -19,7 +19,7 @@ build();
 const html = readFileSync(join(repo, 'index.html'), 'utf8');
 
 // 1. JS syntax (the last <script> is the app IIFE)
-const scripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+const scripts = [...html.matchAll(/<script(\s[^>]*)?>([\s\S]*?)<\/script>/g)].filter(m => !/type="(application\/ld\+json|application\/json)"/.test(m[1] || '')).map(m => m[2]);
 const app = scripts[scripts.length - 1];
 try { new vm.Script(app, { filename: 'index.html(app)' }); console.log('ok    app script parses (' + Math.round(app.length / 1024) + ' KB)'); }
 catch (e) { fail('app script syntax error: ' + e.message); }

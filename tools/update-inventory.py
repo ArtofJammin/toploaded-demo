@@ -6,6 +6,7 @@ calls (captured from the seller page). Run nightly; output is committed to
 the repo so GitHub Pages redeploys with fresh stock.
 """
 import json
+import os
 import re
 import sys
 import time
@@ -16,8 +17,9 @@ SELLER_NAME = "Top Loaded TCG"
 API = "https://mp-search-api.tcgplayer.com/v1/search/request?q=&isList=false&mpfev=5489"
 PAGE_SIZE = 50
 MAX_FROM = 10000  # ES window cap
-OUT = "inventory.json"
-SUMMARY_OUT = "inventory-summary.json"
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+OUT = os.path.join(REPO, "inventory.json")
+SUMMARY_OUT = os.path.join(REPO, "inventory-summary.json")
 
 GAME_KEYS = {
     "pokemon": "pk",
@@ -105,7 +107,7 @@ def page_body(offset):
         },
         "context": {"cart": {}, "shippingCountry": "US", "userProfile": {}},
         "settings": {"useFuzzySearch": True, "didYouMean": {}},
-        "sort": {},
+        "sort": {"field": "product-sorting-name", "order": "asc"},
     }).encode()
 
 
@@ -132,6 +134,9 @@ def fetch_page(offset, retries=3):
 
 def main():
     items = []
+    seen = set()
+    dupes = 0
+    unmapped = {}
     offset = 0
     total = None
     while total is None or (offset < total and offset < MAX_FROM):
@@ -145,9 +150,20 @@ def main():
                         if l.get("sellerName") == SELLER_NAME]
             if not listings:
                 continue
+            pid = p.get("productId")
+            try:
+                pid = int(pid)
+            except (TypeError, ValueError):
+                pass
+            if pid in seen:
+                dupes += 1
+                continue
+            seen.add(pid)
             line = (p.get("productLineName") or "").strip()
+            if line.lower() not in GAME_KEYS:
+                unmapped[line] = unmapped.get(line, 0) + 1
             items.append({
-                "id": p.get("productId"),
+                "id": pid,
                 "name": p.get("productName"),
                 "set": p.get("setName"),
                 "line": line,
@@ -174,8 +190,15 @@ def main():
         "units": sum(l["qty"] for i in items for l in i["listings"]),
         "items": items,
     }
-    if not items:
-        print("no items returned - refusing to overwrite %s" % OUT)
+    if dupes:
+        print("skipped %d duplicate products across pages" % dupes)
+    if unmapped:
+        print("product lines mapped to 'other': %s" % ", ".join(
+            "%s (%d)" % kv for kv in sorted(unmapped.items(), key=lambda kv: -kv[1])))
+    if total and total >= MAX_FROM:
+        print("WARNING: seller has %d products but the search window caps at %d" % (total, MAX_FROM))
+    if not items or (total and len(items) < total * 0.5):
+        print("only %d of %d products returned - refusing to overwrite %s" % (len(items), total or 0, OUT))
         return 2
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(out, f, separators=(",", ":"), ensure_ascii=False)

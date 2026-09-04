@@ -55,6 +55,28 @@
   };
   TL.clamp = function(n, lo, hi){ return Math.min(hi, Math.max(lo, n)); };
   TL.pad2 = function(n){ return (n < 10 ? "0" : "") + n; };
+  /* Focus trap for modals/drawers: keeps Tab inside `el`, restores focus on release.
+       var release = TL.trapFocus(el, {initial: firstInput}); … release(); */
+  TL.trapFocus = function(el, opts){
+    opts = opts || {};
+    var prev = document.activeElement;
+    var sel = 'a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+    function items(){ return Array.prototype.filter.call(el.querySelectorAll(sel), function(n){ return n.offsetParent !== null || n === document.activeElement; }); }
+    function onKey(e){
+      if(e.key !== "Tab") return;
+      var f = items(); if(!f.length){ e.preventDefault(); return; }
+      var first = f[0], last = f[f.length - 1];
+      if(e.shiftKey && (document.activeElement === first || !el.contains(document.activeElement))){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+    }
+    document.addEventListener("keydown", onKey, true);
+    var init = opts.initial || items()[0];
+    if(init) try { init.focus(); } catch(e){}
+    return function release(){
+      document.removeEventListener("keydown", onKey, true);
+      if(prev && prev.focus && opts.restore !== false) try { prev.focus(); } catch(e){}
+    };
+  };
   /* no-op defaults; feature modules replace these */
   TL.confetti = function(){};
   TL.flyTo = function(){};
