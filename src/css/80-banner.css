@@ -1,0 +1,14 @@
+/* ============ SITE BANNER ============ */
+.site-banner{
+  display:flex; gap:14px; align-items:center; justify-content:center; flex-wrap:wrap;
+  padding:9px 16px; background:var(--accent); color:var(--accent-ink);
+  font-family:var(--mono); font-size:.76rem; letter-spacing:.06em; text-align:center;
+}
+.site-banner[hidden]{display:none}
+.banner-link{
+  background:none; border:0; padding:0; color:var(--accent-ink); font:inherit;
+  text-decoration:underline; letter-spacing:inherit;
+}
+.ev-edit-row{display:flex; gap:8px; align-items:center; padding:7px 0; border-bottom:1px solid var(--line)}
+.ev-edit-row:last-child{border-bottom:0}
+.ev-edit-row input{padding:7px 9px; font-size:.84rem}

@@ -1,0 +1,63 @@
+/* ============ TOKENS -- dark-first (matte sleeve black), light = grading-slab acrylic ============ */
+:root{
+  --show-sun:none; --show-moon:none; --show-tl:block; --logo-dark:block; --logo-light:none;
+  --bg:#0C0E12; --bg2:#11141A; --surface:#161A22; --surface2:#1C212B;
+  --line:#262C38; --line2:#333B4A;
+  --ink:#EEF0F4; --ink2:#A6ADBB; --ink3:#7E8798;
+  --accent:#57D9C4; --accent-ink:#08110F; --accent-dim:#2E7A6E;
+  --good:#5BD98A; --warn:#E8B44D; --crit:#F26D6D;
+  --good-bg:rgba(91,217,138,.12); --warn-bg:rgba(232,180,77,.12); --crit-bg:rgba(242,109,109,.12);
+  --foilA:#6EE7F0; --foilB:#9D8CFF; --foilC:#F49AC1; --foilD:#F5D06F;
+  --slab:#12151B; --slab-line:#2A3140;
+  --pk:#F5C542; --op:#E0563E; --mtg:#C08A3E;
+  --shadow:0 18px 50px rgba(0,0,0,.5);
+  --top-light:rgba(255,255,255,.06); --edge-shadow:0 2px 8px rgba(0,0,0,.32);
+  --grain:.05;
+  --disp:'Big Shoulders Display','Big Shoulders',Impact,'Arial Narrow',sans-serif;
+  --body:'Spline Sans','Segoe UI',system-ui,sans-serif;
+  --mono:'Spline Sans Mono','Cascadia Code',Consolas,monospace;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --show-sun:none; --show-moon:block; --show-tl:none; --logo-dark:none; --logo-light:block;
+    --bg:#EFF1F4; --bg2:#F6F7FA; --surface:#FFFFFF; --surface2:#F1F3F6;
+    --line:#DBDFE6; --line2:#C6CCD6;
+    --ink:#15181E; --ink2:#4E5563; --ink3:#616B7A;
+    --accent:#097366; --accent-ink:#FFFFFF; --accent-dim:#7FB8AF;
+    --good:#1E9B54; --warn:#A9761B; --crit:#C6403E;
+    --good-bg:rgba(30,155,84,.1); --warn-bg:rgba(169,118,27,.12); --crit-bg:rgba(198,64,62,.1);
+    --shadow:0 16px 40px rgba(21,24,30,.14);
+    --foilA:#0B8AA0; --foilB:#6650DC; --foilC:#BE3D77; --foilD:#A8790C;
+    --top-light:rgba(255,255,255,.9); --edge-shadow:0 1px 3px rgba(21,24,30,.08);
+    --grain:.025;
+  }
+}
+:root[data-theme="light"]{
+  --show-sun:none; --show-moon:block; --show-tl:none; --logo-dark:none; --logo-light:block;
+  --bg:#EFF1F4; --bg2:#F6F7FA; --surface:#FFFFFF; --surface2:#F1F3F6;
+  --line:#DBDFE6; --line2:#C6CCD6;
+  --ink:#15181E; --ink2:#4E5563; --ink3:#616B7A;
+  --accent:#097366; --accent-ink:#FFFFFF; --accent-dim:#7FB8AF;
+  --good:#1E9B54; --warn:#A9761B; --crit:#C6403E;
+  --good-bg:rgba(30,155,84,.1); --warn-bg:rgba(169,118,27,.12); --crit-bg:rgba(198,64,62,.1);
+  --shadow:0 16px 40px rgba(21,24,30,.14);
+  --foilA:#0B8AA0; --foilB:#6650DC; --foilC:#BE3D77; --foilD:#A8790C;
+  --top-light:rgba(255,255,255,.9); --edge-shadow:0 1px 3px rgba(21,24,30,.08);
+  --grain:.025;
+}
+/* Top Loaded house theme: graffiti yellow on warm black, from the shop logo.
+   Defines every token the light media block does, so it fully overrides it. */
+:root[data-theme="tl"]{
+  --show-sun:block; --show-moon:none; --show-tl:none; --logo-dark:block; --logo-light:none;
+  --bg:#0C0A06; --bg2:#131007; --surface:#191509; --surface2:#211B0D;
+  --line:#332B15; --line2:#4A3F1E;
+  --ink:#F7F2E4; --ink2:#C2B795; --ink3:#8E8465;
+  --accent:#FFD23F; --accent-ink:#171204; --accent-dim:#8A7524;
+  --good:#5BD98A; --warn:#E8B44D; --crit:#F26D6D;
+  --good-bg:rgba(91,217,138,.12); --warn-bg:rgba(232,180,77,.12); --crit-bg:rgba(242,109,109,.12);
+  --shadow:0 18px 50px rgba(0,0,0,.55);
+  --foilA:#FFE98A; --foilB:#FFD23F; --foilC:#FFFFFF; --foilD:#FFB03A;
+  --slab:#14100A; --slab-line:#332B15;
+  --top-light:rgba(255,255,255,.07); --edge-shadow:0 2px 8px rgba(0,0,0,.4);
+  --grain:.06;
+}

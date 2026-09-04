@@ -1,0 +1,15 @@
+/* ============ REDUCED MOTION ============ */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important}
+  .ticker-track{animation:none; transform:none}
+  .reveal>*,.holo,.reveal .foil-text,.stage-caption,.holo-frame::after{animation:none}
+  .hero::before{animation:none}
+  .view.active{animation:none}
+  .sr{opacity:1; transform:none; transition:none}
+  .prod:hover .holo-hover,.prod:focus-within .holo-hover{animation:none; opacity:.55}
+  .drawer{transition:none}
+  .drawer.opening .cart-line,.cart-count.pop{animation:none}
+  .chat-body .chat-line,.screen .pack,.live-pill i,.viewers.tick{animation:none}
+  .view.active .meter i,.view.active .spark i{animation:none}
+  .btn:active,.chip:active,.add:active,.spot:active,.drawer-close:active,.qty button:active,.stock-edit button:active,.mainnav button:active{transform:none}
+}

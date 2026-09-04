@@ -1,0 +1,44 @@
+/* ============ LIVE ============ */
+.live-dot{display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--crit); margin-left:7px; vertical-align:2px; animation:livepulse 1.6s ease-in-out infinite}
+@keyframes livepulse{0%,100%{opacity:1}50%{opacity:.3}}
+.live-grid{display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,.9fr); gap:16px; align-items:stretch}
+.player{background:var(--slab); border:1px solid var(--slab-line); border-radius:8px; overflow:hidden; display:flex; flex-direction:column}
+.screen{position:relative; aspect-ratio:16/9; overflow:hidden; background:radial-gradient(70% 90% at 50% 65%, #1B2130 0%, #0B0D11 80%)}
+.screen .glow{position:absolute; inset:-30%; background:conic-gradient(from 0deg, rgba(110,231,240,.08), rgba(157,140,255,.1), rgba(244,154,193,.08), rgba(245,208,111,.09), rgba(110,231,240,.08)); animation:spinbg 24s linear infinite}
+@keyframes spinbg{to{transform:rotate(360deg)}}
+.screen .pack{position:absolute; left:50%; top:54%; width:118px; aspect-ratio:5/7; transform:translate(-50%,-50%) rotate(-4deg); border-radius:10px; background:linear-gradient(150deg,#232A38,#12151B); border:1px solid #2A3140; display:grid; place-items:center}
+.screen .pack b{font-family:var(--disp); font-weight:800; font-size:2.1rem; background:linear-gradient(120deg,var(--foilA),var(--foilB),var(--foilC),var(--foilD)); -webkit-background-clip:text; background-clip:text; color:transparent}
+.screen .rip{position:absolute; left:50%; top:16%; transform:translateX(-50%); font-family:var(--mono); font-size:.66rem; letter-spacing:.2em; text-transform:uppercase; color:#A6ADBB; white-space:nowrap}
+.live-pill{position:absolute; top:14px; left:14px; display:inline-flex; align-items:center; gap:7px; background:rgba(12,14,18,.82); border:1px solid #2A3140; border-radius:99px; padding:5px 12px; font-family:var(--mono); font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; color:#EEF0F4}
+.live-pill i{width:8px; height:8px; border-radius:50%; background:var(--crit); animation:livepulse 1.6s infinite}
+.viewers{position:absolute; top:14px; right:14px; background:rgba(12,14,18,.82); border:1px solid #2A3140; border-radius:99px; padding:5px 12px; font-family:var(--mono); font-size:.68rem; color:#A6ADBB}
+.player-bar{display:flex; align-items:center; gap:6px 14px; padding:14px 16px; border-top:1px solid var(--slab-line); flex-wrap:wrap}
+.player-bar b{font-weight:600; font-size:.92rem}
+.player-bar span{font-family:var(--mono); font-size:.68rem; color:var(--ink3)}
+.chat{background:var(--surface); border:1px solid var(--line); border-radius:8px; display:flex; flex-direction:column; min-height:0}
+.chat-head{padding:14px 16px; border-bottom:1px solid var(--line); font-family:var(--disp); font-weight:700; text-transform:uppercase; letter-spacing:.04em; display:flex; justify-content:space-between; align-items:center; gap:10px}
+.chat-body{flex:1; overflow-y:auto; padding:12px 16px; display:flex; flex-direction:column; gap:9px; max-height:330px; min-height:220px}
+.chat-line{font-size:.84rem; line-height:1.4}
+.chat-line b{font-family:var(--mono); font-size:.72rem; color:var(--accent); font-weight:500; margin-right:6px}
+.chat-line.sys{color:var(--ink3); font-family:var(--mono); font-size:.68rem}
+.chat-form{display:flex; gap:8px; padding:12px; border-top:1px solid var(--line)}
+.chat-form input{flex:1; min-width:0}
+.spots{display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-top:16px}
+.spot{border:1px solid var(--line2); background:none; border-radius:4px; padding:11px 0; font-family:var(--mono); font-size:.78rem; color:var(--ink); transition:background .15s ease,color .15s ease,border-color .15s ease}
+.spot:hover:not(:disabled){background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.spot:disabled{opacity:.35; cursor:not-allowed; text-decoration:line-through}
+
+/* live ambience */
+@keyframes chatIn{from{opacity:0; transform:translateY(6px)}to{opacity:1; transform:none}}
+.chat-body .chat-line{animation:chatIn .28s cubic-bezier(.2,.7,.2,1) both}
+@keyframes packFloat{
+  0%,100%{transform:translate(-50%,-50%) rotate(-4deg)}
+  50%{transform:translate(-50%,-52.5%) rotate(-2.5deg)}
+}
+.screen .pack{animation:packFloat 5.5s ease-in-out infinite}
+@keyframes ringPulse{0%{box-shadow:0 0 0 0 var(--crit)}70%,100%{box-shadow:0 0 0 7px transparent}}
+.live-pill i{animation:livepulse 1.6s infinite, ringPulse 1.6s ease-out infinite}
+@keyframes vTick{0%{transform:scale(1)}45%{transform:scale(1.12)}100%{transform:scale(1)}}
+.viewers.tick{animation:vTick .3s ease}
+@media (max-width:960px){ .live-grid{grid-template-columns:1fr} .spots{grid-template-columns:repeat(4,1fr)} }
+@media (max-width:480px){ .spots{grid-template-columns:repeat(3,1fr)} }

@@ -1,0 +1,67 @@
+/* ============ HEADER ============ */
+.topbar{
+  position:sticky; top:0; z-index:60; background:var(--bg);
+  border-bottom:1px solid var(--line);
+}
+@supports ((backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px))){
+  .topbar{
+    background:color-mix(in srgb, var(--bg) 80%, transparent);
+    -webkit-backdrop-filter:blur(14px) saturate(1.15);
+    backdrop-filter:blur(14px) saturate(1.15);
+  }
+}
+.topbar .wrap{display:flex; align-items:center; gap:22px; height:64px}
+.brand{
+  display:flex; align-items:center; gap:11px; background:none; border:0; padding:0;
+}
+.brand-mark{
+  width:34px; height:34px; flex:0 0 auto; border-radius:5px;
+  background:linear-gradient(135deg,var(--foilA),var(--foilB) 45%,var(--foilC) 75%,var(--foilD));
+  display:grid; place-items:center;
+  font-family:var(--disp); font-weight:800; font-size:1.05rem; color:#0C0E12; letter-spacing:.02em;
+}
+.brand-name{
+  font-family:var(--disp); font-weight:800; font-size:1.3rem; letter-spacing:.05em; text-transform:uppercase;
+  line-height:1;
+}
+.brand-name small{display:block; font-family:var(--mono); font-weight:400; font-size:.58rem; letter-spacing:.3em; color:var(--ink3); margin-top:3px}
+.mainnav{display:flex; gap:4px; margin-left:auto; flex-wrap:wrap}
+.mainnav button{
+  background:none; border:0; padding:8px 12px; border-radius:4px;
+  font-family:var(--mono); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink2);
+}
+.mainnav button:hover{color:var(--ink); background:var(--surface)}
+.mainnav button[aria-current="true"]{color:var(--accent)}
+.brand-logo{height:50px; width:auto; display:none}
+html:not(.no-logo) .brand-logo.logo-d{display:var(--logo-dark)}
+html:not(.no-logo) .brand-logo.logo-l{display:var(--logo-light)}
+html:not(.no-logo) .brand .brand-mark{display:none}
+html:not(.no-logo) .brand .brand-name{display:none}
+.foot-logo{height:62px; width:auto; display:none; margin-bottom:10px}
+html:not(.no-logo) .foot-logo.logo-d{display:var(--logo-dark)}
+html:not(.no-logo) .foot-logo.logo-l{display:var(--logo-light)}
+html:not(.no-logo) .foot-brand{display:none}
+.theme-btn{
+  width:38px; height:38px; flex:0 0 auto; display:grid; place-items:center;
+  background:var(--surface); border:1px solid var(--line); border-radius:4px; color:var(--ink2);
+  transition:border-color .15s ease, color .15s ease;
+}
+.theme-btn:hover{border-color:var(--accent); color:var(--accent)}
+.theme-btn .ic-sun{display:var(--show-sun)}
+.theme-btn .ic-moon{display:var(--show-moon)}
+.theme-btn .ic-tl{
+  display:var(--show-tl);
+  font-family:var(--disp); font-weight:800; font-size:.82rem; letter-spacing:.02em; line-height:1;
+  background:linear-gradient(120deg,var(--foilA),var(--foilB),var(--foilC),var(--foilD));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.cart-btn{
+  display:flex; align-items:center; gap:8px;
+  background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:8px 14px;
+  font-family:var(--mono); font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink);
+}
+.cart-btn:hover{border-color:var(--accent)}
+.cart-count{
+  min-width:20px; height:20px; padding:0 5px; border-radius:10px; display:grid; place-items:center;
+  background:var(--accent); color:var(--accent-ink); font-weight:600; font-size:.72rem;
+}

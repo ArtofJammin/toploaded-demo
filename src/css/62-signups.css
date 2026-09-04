@@ -1,0 +1,10 @@
+/* ============ EVENT SIGNUPS ============ */
+.signup-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+.signup-card{padding:26px 24px; display:flex; flex-direction:column; gap:12px}
+.signup-card h3{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.5rem; letter-spacing:.03em}
+.signup-card p{color:var(--ink2); font-size:.94rem}
+.signup-card .btn{align-self:flex-start; text-decoration:none}
+.signup-card .eyebrow{margin-bottom:4px}
+.signup-note{font-family:var(--mono); font-size:.7rem; letter-spacing:.04em; color:var(--ink3); margin-top:auto}
+.signup-note a{color:var(--accent)}
+@media (max-width:880px){ .signup-grid{grid-template-columns:1fr} }

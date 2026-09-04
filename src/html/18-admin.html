@@ -1,0 +1,182 @@
+  <!-- ================= ADMIN ================= -->
+  <section class="view" id="view-admin" aria-label="Admin">
+    <div class="admin-bar">
+      <div class="wrap">
+        <span class="eyebrow">Back of house</span>
+        <span class="pill ok"><span class="dot"></span>Connected to Square</span>
+        <span class="demo-tag">All admin data is simulated for this demo</span>
+        <span style="flex:1"></span>
+        <button class="linklike logoutBtn" type="button">Log out</button>
+        <button class="linklike" data-go="home">&larr; Back to storefront</button>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="view-head" style="padding-top:36px; padding-bottom:20px">
+        <h1>Today at Top Loaded</h1>
+        <p class="lede">Wednesday, Aug 27 &middot; register and website, one inventory.</p>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat">
+          <span class="lab">Today's sales</span>
+          <span class="val">$1,284</span>
+          <span class="sub up">+18% vs last Wed &middot; via Square</span>
+          <div class="spark" aria-hidden="true">
+            <i style="height:36%"></i><i style="height:52%"></i><i style="height:44%"></i><i style="height:68%"></i><i style="height:58%"></i><i style="height:80%"></i><i class="today" style="height:92%"></i>
+          </div>
+        </div>
+        <div class="stat">
+          <span class="lab">Orders today</span>
+          <span class="val">23</span>
+          <span class="sub">18 in-store &middot; 5 online pickup</span>
+        </div>
+        <div class="stat">
+          <span class="lab">Low-stock alerts</span>
+          <span class="val" id="lowStockVal">0</span>
+          <span class="sub down">Items at 1 or fewer &middot; reorder soon</span>
+        </div>
+        <div class="stat">
+          <span class="lab">Show tables booked</span>
+          <span class="val">11<span style="font-size:1.2rem; color:var(--ink3)">/24</span></span>
+          <span class="sub" id="statShowDate">Sat, Sep 5 &middot; Hilton, Turfway Rd</span>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3>Square integration <span class="pill ok"><span class="dot"></span>Healthy</span></h3>
+          <dl class="kv">
+            <dt>Merchant</dt><dd>Top Loaded Trading Cards <span class="mono" style="color:var(--ink3); font-size:.72rem">&middot; MLQ3&hellip;8KF</span></dd>
+            <dt>Location</dt>
+            <dd>
+              <select id="locSel" aria-label="Square location">
+                <option>Top Loaded TCG &mdash; Crescent Springs (2514 Hazelwood Dr)</option>
+                <option>Card Show Booth &mdash; Mobile (Square Terminal)</option>
+              </select>
+            </dd>
+            <dt>Catalog</dt><dd class="mono" style="font-size:.82rem">214 items mapped &middot; last sync <span id="lastSync">1:47 PM</span></dd>
+            <dt>Auto-sync</dt>
+            <dd>
+              <select id="syncInterval" aria-label="Auto-sync interval">
+                <option>Every 5 minutes</option>
+                <option selected>Every 15 minutes</option>
+                <option>Every 30 minutes</option>
+                <option>Hourly</option>
+              </select>
+            </dd>
+          </dl>
+          <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap">
+            <button class="btn" id="syncNow">Sync now</button>
+            <button class="btn btn-ghost" id="viewSquare">Open Square dashboard</button>
+          </div>
+          <div class="log" id="syncLog" aria-live="polite" aria-label="Sync log">
+            <div><span class="t">1:47 PM</span> &middot; <span class="ok">OK</span> Pulled catalog delta &middot; 3 price changes, 1 new item</div>
+            <div><span class="t">1:47 PM</span> &middot; <span class="ok">OK</span> Pushed 2 stock edits to Square (Crescent Springs)</div>
+            <div><span class="t">1:32 PM</span> &middot; <span class="ok">OK</span> Auto-sync complete &middot; 214 items &middot; 0 conflicts</div>
+            <div><span class="t">1:17 PM</span> &middot; <span class="ok">OK</span> Webhook inventory.count.updated &middot; Charizard ex 3 &rarr; 2</div>
+            <div><span class="t">1:02 PM</span> &middot; <span class="ok">OK</span> Auto-sync complete &middot; 214 items &middot; 0 conflicts</div>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <h3>Sync behavior</h3>
+          <div class="toggle-row">
+            <div class="tl"><b>Push stock changes to Square</b><span>Edits here update the register instantly</span></div>
+            <button class="switch" role="switch" aria-checked="true" aria-label="Push stock changes to Square"></button>
+          </div>
+          <div class="toggle-row">
+            <div class="tl"><b>Pull Square sales into site stock</b><span>Counter sales reduce online counts in seconds</span></div>
+            <button class="switch" role="switch" aria-checked="true" aria-label="Pull Square sales into site stock"></button>
+          </div>
+          <div class="toggle-row">
+            <div class="tl"><b>Auto-hide sold-out items</b><span>Zero stock hides the listing until restocked</span></div>
+            <button class="switch" role="switch" aria-checked="true" aria-label="Auto-hide sold-out items"></button>
+          </div>
+          <div class="toggle-row">
+            <div class="tl"><b>Card show mode</b><span>Route weekend sales to the booth location</span></div>
+            <button class="switch" role="switch" aria-checked="false" aria-label="Card show mode"></button>
+          </div>
+          <h3 style="margin-top:22px">Webhooks</h3>
+          <div class="hook-row"><span class="hn">inventory.count.updated</span><span class="pill ok"><span class="dot"></span>2m ago</span></div>
+          <div class="hook-row"><span class="hn">order.created</span><span class="pill ok"><span class="dot"></span>11m ago</span></div>
+          <div class="hook-row"><span class="hn">catalog.version.updated</span><span class="pill ok"><span class="dot"></span>1h ago</span></div>
+          <div class="hook-row"><span class="hn">payment.updated</span><span class="pill warn"><span class="dot warn"></span>Retrying &middot; 1 of 3</span></div>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3>Site settings</h3>
+          <dl class="kv">
+            <dt>Site title</dt><dd><input id="setTitle" value="Top Loaded" style="width:180px"></dd>
+            <dt>Logo</dt><dd><button class="btn btn-ghost" id="setLogo" type="button" style="padding:8px 14px">Upload logo</button></dd>
+            <dt>Weekday hours</dt><dd><input id="setHoursWk" value="Tue&ndash;Fri &middot; 11 AM &ndash; 6 PM" style="width:210px"></dd>
+            <dt>Weekend hours</dt><dd><input id="setHoursSun" value="Sat&ndash;Sun &middot; 10 AM &ndash; 4 PM" style="width:210px"></dd>
+            <dt>Banner</dt><dd><input id="setBanner" placeholder="Holiday hours, big restock, show reminder&hellip;" style="width:100%"></dd>
+            <dt>Show banner</dt><dd><button class="switch" role="switch" aria-checked="false" id="setBannerOn" aria-label="Show announcement banner"></button></dd>
+          </dl>
+          <div style="margin-top:16px"><button class="btn" id="setApply" type="button">Apply to site</button></div>
+        </div>
+        <div class="admin-card">
+          <h3>Live rips <span class="pill crit" id="liveStatusPill"><span class="dot crit"></span>Offline</span></h3>
+          <p style="color:var(--ink2); font-size:.9rem">Going live puts a banner across the storefront, lights up the Live tab, and opens break-spot claims.</p>
+          <div style="margin-top:14px"><button class="btn" id="goLiveBtn" type="button">Start live rip</button></div>
+          <h3 style="margin-top:24px">Card show</h3>
+          <dl class="kv">
+            <dt>Next show</dt><dd><input id="setShowDate" value="Sat, Sep 5" style="width:140px"></dd>
+            <dt>Hours</dt><dd><input id="setShowHours" value="10 AM &ndash; 4 PM" style="width:140px"></dd>
+            <dt>Cadence</dt><dd>First Saturday or Sunday &middot; setup from 8 AM</dd>
+          </dl>
+          <div style="margin-top:14px"><button class="btn btn-ghost" id="setShowApply" type="button">Update show info</button></div>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3>Play nights editor</h3>
+          <p style="color:var(--ink2); font-size:.9rem">Edit the weekly schedule and publish &mdash; the Play Nights page updates instantly.</p>
+          <div id="evEditor" style="margin-top:10px"></div>
+          <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap">
+            <button class="btn" id="evApply" type="button">Publish schedule</button>
+            <button class="btn btn-ghost" id="evAdd" type="button">Add night</button>
+          </div>
+        </div>
+        <div class="admin-card">
+          <h3>Channel sync alerts <span class="pill warn"><span class="dot warn"></span><span id="alertCount">2</span> open</span></h3>
+          <p style="color:var(--ink2); font-size:.9rem">When something sells on one channel, the other gets flagged until it's reconciled &mdash; Square (register &amp; this site) on one side, TCGplayer on the other.</p>
+          <div id="alertList" style="margin-top:12px"></div>
+          <h3 style="margin-top:22px">TCGplayer nightly import</h3>
+          <div class="toggle-row">
+            <div class="tl"><b>Pull TCGplayer inventory every morning</b><span>6:00 AM &middot; listings, prices &amp; quantities reconciled into Square</span></div>
+            <button class="switch" role="switch" aria-checked="true" aria-label="Nightly TCGplayer import"></button>
+          </div>
+          <div class="log" id="tcgLog">
+            <div><span class="t">6:00 AM</span> &middot; <span class="ok">OK</span> Nightly import &middot; 1,204 TCGplayer listings &middot; 17 price changes &middot; 2 conflicts flagged</div>
+            <div><span class="t">Yesterday</span> &middot; <span class="ok">OK</span> Nightly import &middot; 1,198 listings &middot; 9 price changes &middot; 0 conflicts</div>
+          </div>
+          <div style="margin-top:12px"><button class="btn btn-ghost" id="tcgRun" type="button">Run import now</button></div>
+        </div>
+      </div>
+
+      <div class="section-head" style="margin-top:40px">
+        <h2>Inventory</h2>
+        <span class="demo-tag">edits push to Square (simulated)</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Item</th><th>Game</th><th>Type</th><th>Cond</th><th>Price</th><th>Stock</th><th>Square</th></tr>
+          </thead>
+          <tbody id="invBody"></tbody>
+        </table>
+      </div>
+
+      <div class="teaser">
+        <div class="tt" style="flex:1; min-width:240px">
+          <b>TCGplayer price sync</b>
+          <span>Link your <code>Top Loaded TCG</code> seller account to reprice singles against market automatically. Preview: Ragavan market <code>$54.12</code> &rarr; your price <code>$58.00 (+7%)</code>.</span>
+        </div>
+        <button class="btn btn-ghost" id="tcgTease">Preview repricing</button>
+      </div>
+    </div>
+  </section>

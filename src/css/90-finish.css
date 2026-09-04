@@ -1,0 +1,20 @@
+/* ============ FINISH LAYER ============ */
+.panel,.stat,.admin-card,.form-card,.vendor-form,.show-date-card,.chat,.prod{
+  background:linear-gradient(180deg, var(--surface2), var(--surface) 42%);
+  box-shadow:inset 0 1px 0 var(--top-light), var(--edge-shadow);
+}
+::selection{background:var(--accent); color:var(--accent-ink)}
+.chat-body,.log,.drawer-body,.table-wrap{scrollbar-width:thin; scrollbar-color:var(--line2) transparent}
+.meter i{background:linear-gradient(90deg, var(--accent), var(--foilA))}
+.toast{border-left:3px solid var(--accent)}
+
+/* press micro-states */
+.btn:active{transform:translateY(1px) scale(.985); filter:brightness(.95)}
+.chip,.add,.spot,.drawer-close,.qty button,.stock-edit button,.mainnav button{transition:transform .12s ease, background .15s ease, color .15s ease, border-color .15s ease}
+.chip:active,.add:active:not(:disabled),.spot:active:not(:disabled),.drawer-close:active,.qty button:active,.stock-edit button:active,.mainnav button:active{transform:scale(.94)}
+
+/* desktop rhythm */
+@media (min-width:961px){
+  .section{padding:84px 0}
+  .view-head{padding:76px 0 34px}
+}

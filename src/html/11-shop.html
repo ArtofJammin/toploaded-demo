@@ -1,0 +1,38 @@
+  <!-- ================= SHOP ================= -->
+  <section class="view" id="view-shop" aria-label="Shop">
+    <div class="wrap">
+      <div class="view-head">
+        <p class="eyebrow">Live inventory &middot; Singles &amp; sealed</p>
+        <h1>The case, online</h1>
+        <p class="lede">Every card here is a live listing from our store &mdash; synced nightly from our TCGplayer seller account. Buy online and we ship it, or call the shop and we'll hold it at the counter.</p>
+      </div>
+      <div class="shop-tools" role="group" aria-label="Filters">
+        <div class="field" style="flex:1 1 230px; min-width:190px;">
+          <label for="shopSearch">Search the case</label>
+          <input id="shopSearch" type="search" placeholder="Card name, set, rarity&hellip;" autocomplete="off">
+        </div>
+        <div class="chip-row" id="gameChips" role="group" aria-label="Filter by game">
+          <button class="chip" data-game="all" aria-pressed="true">All games</button>
+          <button class="chip" data-game="pk" aria-pressed="false">Pokemon</button>
+          <button class="chip" data-game="op" aria-pressed="false">One Piece</button>
+          <button class="chip" data-game="mtg" aria-pressed="false">Magic</button>
+          <button class="chip" data-game="other" aria-pressed="false" id="otherChip" hidden>More games</button>
+        </div>
+        <div class="chip-row" id="typeChips" role="group" aria-label="Filter by product type">
+          <button class="chip" data-type="all" aria-pressed="true">Everything</button>
+          <button class="chip" data-type="single" aria-pressed="false">Singles</button>
+          <button class="chip" data-type="sealed" aria-pressed="false">Sealed</button>
+        </div>
+        <div class="sort-wrap">
+          <label for="sortSel">Sort</label>
+          <select id="sortSel">
+            <option value="feat">Featured</option>
+            <option value="asc">Price: low to high</option>
+            <option value="desc">Price: high to low</option>
+          </select>
+        </div>
+      </div>
+      <div class="freshness" id="shopFresh"><span class="dot"></span>Synced with Square &middot; 2 min ago &middot; <span id="shopCount"></span> items <span class="demo-tag">demo data</span></div>
+      <div class="grid" id="shopGrid"></div>
+    </div>
+  </section>

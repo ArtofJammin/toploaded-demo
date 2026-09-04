@@ -1,0 +1,7 @@
+/* ============ BUYLIST ============ */
+.buy-grid{display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:32px; align-items:start}
+.form-card{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:26px}
+.buy-points{display:grid; gap:14px}
+.buy-points .panel{padding:18px 20px; display:flex; gap:14px; align-items:baseline}
+.buy-points .k{font-family:var(--disp); font-weight:800; font-size:1.6rem; color:var(--accent); min-width:64px; text-transform:uppercase; line-height:1}
+.buy-points p{color:var(--ink2); font-size:.92rem}

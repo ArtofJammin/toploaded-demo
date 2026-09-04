@@ -1,0 +1,52 @@
+/* ============ CART DRAWER ============ */
+.overlay{
+  position:fixed; inset:0; background:rgba(6,8,11,.6); z-index:95; opacity:0; pointer-events:none; transition:opacity .25s ease;
+}
+.overlay.open{opacity:1; pointer-events:auto}
+.drawer{
+  position:fixed; top:0; right:0; bottom:0; width:min(400px,92vw); z-index:100;
+  background:var(--bg2); border-left:1px solid var(--line);
+  transform:translateX(102%); visibility:hidden;
+  transition:transform .3s cubic-bezier(.55,.06,.68,.19), visibility 0s .3s;
+  display:flex; flex-direction:column;
+}
+.drawer.open{transform:none; visibility:visible; transition:transform .5s cubic-bezier(.22,1.18,.36,1), visibility 0s}
+html.cart-open, html.cart-open body{overflow:hidden}
+.drawer-head{display:flex; align-items:center; justify-content:space-between; padding:20px 22px; border-bottom:1px solid var(--line)}
+.drawer-head h2{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.4rem; letter-spacing:.04em}
+.drawer-close{background:none; border:1px solid var(--line); border-radius:4px; width:34px; height:34px; font-size:1rem; color:var(--ink2)}
+.drawer-close:hover{border-color:var(--accent); color:var(--accent)}
+.drawer-body{flex:1; overflow-y:auto; overflow-x:hidden; padding:14px 22px}
+.cart-line{display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--line)}
+.cart-line .ct{flex:1; min-width:0}
+.cart-line .ct b{font-weight:600; font-size:.9rem; display:block}
+.cart-line .ct span{font-family:var(--mono); font-size:.68rem; color:var(--ink3)}
+.qty{display:flex; align-items:center; gap:6px}
+.qty button{width:26px; height:26px; border:1px solid var(--line); background:none; border-radius:3px; color:var(--ink2); font-family:var(--mono)}
+.qty button:hover{border-color:var(--accent); color:var(--accent)}
+.qty span{font-family:var(--mono); font-size:.85rem; min-width:18px; text-align:center; font-variant-numeric:tabular-nums}
+.cart-line .lp{font-family:var(--mono); font-size:.88rem; font-variant-numeric:tabular-nums}
+.cart-empty{color:var(--ink3); font-family:var(--mono); font-size:.8rem; text-align:center; padding:48px 0; letter-spacing:.08em}
+.cart-empty{
+  display:flex; flex-direction:column; align-items:center; gap:16px; padding:52px 0;
+}
+.cart-empty::before{
+  content:""; width:72px; aspect-ratio:5/7; border-radius:7px;
+  border:2px dashed var(--line2);
+  background:linear-gradient(160deg, var(--surface2), transparent 70%);
+}
+.grid .cart-empty{grid-column:1/-1}
+.drawer-foot{border-top:1px solid var(--line); padding:18px 22px 22px}
+.subtotal{display:flex; justify-content:space-between; font-family:var(--mono); margin-bottom:14px}
+.subtotal b{font-variant-numeric:tabular-nums; font-size:1.1rem}
+.drawer-foot .btn{width:100%}
+.drawer-note{font-family:var(--mono); font-size:.64rem; color:var(--ink3); text-align:center; margin-top:10px; letter-spacing:.06em}
+@keyframes lineIn{from{opacity:0; transform:translateX(18px)}to{opacity:1; transform:none}}
+.drawer.opening .cart-line{animation:lineIn .38s cubic-bezier(.2,.7,.2,1) both}
+.drawer.opening .cart-line:nth-child(1){animation-delay:.08s}
+.drawer.opening .cart-line:nth-child(2){animation-delay:.14s}
+.drawer.opening .cart-line:nth-child(3){animation-delay:.2s}
+.drawer.opening .cart-line:nth-child(4){animation-delay:.26s}
+.drawer.opening .cart-line:nth-child(n+5){animation-delay:.32s}
+@keyframes countPop{0%{transform:scale(1)}40%{transform:scale(1.4)}100%{transform:scale(1)}}
+.cart-count.pop{animation:countPop .35s cubic-bezier(.3,.7,.3,1)}

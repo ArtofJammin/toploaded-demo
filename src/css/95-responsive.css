@@ -1,0 +1,63 @@
+/* ============ RESPONSIVE ============ */
+@media (max-width:960px){
+  .topbar .wrap{height:auto; min-height:64px; padding-top:10px; padding-bottom:10px; row-gap:6px; flex-wrap:wrap}
+  .mainnav{
+    order:3; width:calc(100% + 48px); margin:0 -24px;
+    flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    padding:4px 20px 8px; scrollbar-width:none;
+  }
+  .mainnav::-webkit-scrollbar{display:none}
+  .mainnav button{
+    flex:0 0 auto; white-space:nowrap; min-height:40px;
+    border:1px solid var(--line); border-radius:99px; padding:9px 14px;
+  }
+  .mainnav button[aria-current="true"]{border-color:var(--accent)}
+  .cart-btn{margin-left:auto}
+  .grid{grid-template-columns:repeat(3,1fr)}
+  .stat-row{grid-template-columns:repeat(2,1fr)}
+  .admin-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:repeat(2,1fr)}
+  .hero .wrap{grid-template-columns:1fr; min-height:0; padding-top:48px}
+  .stage{min-height:0; margin-top:8px}
+  .show-hero,.buy-grid{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .tri{grid-template-columns:1fr}
+  .gallery{grid-template-columns:repeat(2,1fr)}
+  .form-grid{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:72px 1fr; row-gap:4px}
+  .sched-time{grid-column:2}
+  .sched-fee{grid-column:2}
+  .topbar .wrap{height:auto; padding-top:10px; padding-bottom:10px; row-gap:6px; flex-wrap:wrap}
+  .mainnav{
+    order:3; width:calc(100% + 48px); margin:0 -24px;
+    flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    padding:4px 20px 8px; scrollbar-width:none;
+  }
+  .mainnav::-webkit-scrollbar{display:none}
+  .mainnav button{
+    flex:0 0 auto; white-space:nowrap; min-height:40px;
+    border:1px solid var(--line); border-radius:99px; padding:9px 14px;
+  }
+  .mainnav button[aria-current="true"]{border-color:var(--accent)}
+  .foot-grid{grid-template-columns:1fr}
+  .stat-row{grid-template-columns:1fr 1fr}
+  select,input,textarea{font-size:16px}
+  .ev-edit-row input{font-size:16px}
+  .mini{width:min(150px, calc(100% - 20px))}
+  .section-head .demo-tag{white-space:normal}
+}
+@media (max-width:520px){
+  .kv{grid-template-columns:minmax(0,1fr); gap:4px 0}
+  .kv dt{margin-top:10px}
+  .kv dd input{width:100%}
+  .ev-edit-row{flex-wrap:wrap; row-gap:6px}
+  .ev-edit-row input[data-ev="name"]{flex:1 1 100%; order:-1}
+}
+@media (max-width:420px){
+  .grid{grid-template-columns:1fr}
+  .hero-ctas{gap:10px}
+  .hero-ctas .btn{flex:1 1 100%}
+  .hero .wrap{padding-top:40px; padding-bottom:48px}
+}
