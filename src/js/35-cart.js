@@ -82,3 +82,4 @@
     if(!cartQty()){ toast("Cart is empty"); return; }
     toast("Demo checkout \u2014 on the live site this hands off to Square");
   });
+  TL.on("init", renderCart);

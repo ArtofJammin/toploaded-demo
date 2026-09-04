@@ -34,9 +34,13 @@ export function buildHtml() {
   const css = listSorted(join(src, 'css'), '.css').map(read).join('\n');
   const html = listSorted(join(src, 'html'), '.html').map(read).join('\n');
   const js = listSorted(join(src, 'js'), '.js').map(read).join('\n');
+  // config.default.json is the single source of truth for site settings; the worker
+  // imports the same file. Inlined so the page renders correct hours/events offline.
+  const cfg = JSON.stringify(JSON.parse(read(join(repo, 'config.default.json'))));
   return head +
     '<style>\n' + css + '</style>\n\n' +
     html + '\n' +
+    '<script id="siteConfig">window.TL_DEFAULT_CONFIG=' + cfg.replace(/</g, '\\u003c') + ';</script>\n' +
     '<script id="cardArtData"></script>\n' +
     '<script>\n(function(){\n  "use strict";\n\n' + js + '})();\n</script>\n';
 }

@@ -6,6 +6,7 @@ calls (captured from the seller page). Run nightly; output is committed to
 the repo so GitHub Pages redeploys with fresh stock.
 """
 import json
+import re
 import sys
 import time
 import urllib.request
@@ -16,6 +17,7 @@ API = "https://mp-search-api.tcgplayer.com/v1/search/request?q=&isList=false&mpf
 PAGE_SIZE = 50
 MAX_FROM = 10000  # ES window cap
 OUT = "inventory.json"
+SUMMARY_OUT = "inventory-summary.json"
 
 GAME_KEYS = {
     "pokemon": "pk",
@@ -24,7 +26,66 @@ GAME_KEYS = {
     "magic: the gathering": "mtg",
     "magic": "mtg",
     "gundam card game": "gundam",
+    "disney lorcana": "lorcana",
+    "yugioh": "ygo",
+    "union arena": "ua",
+    "dragon ball super card game fusion world": "dbs",
+    "digimon card game": "digimon",
 }
+
+SEALED_RE = re.compile(r"booster box|elite trainer|booster bundle|collection box|"
+                       r"booster display|booster pack|premium collection|box set|"
+                       r"blister|tin|bundle|case|starter deck|deck|"
+                       r"sleeves|playmat|binder|deck box", re.I)
+
+
+def min_price(item):
+    return min(l["price"] for l in item["listings"] if l.get("price") is not None)
+
+
+def slim(item):
+    """Item as the site consumes it, minus nothing the page needs."""
+    return item
+
+
+def build_summary(items, generated):
+    """Small file the home page loads instead of the full 1MB+ inventory."""
+    games, lines, sets = {}, {}, {}
+    singles = []
+    for it in items:
+        games[it["game"]] = games.get(it["game"], 0) + 1
+        lines[it["line"]] = lines.get(it["line"], 0) + 1
+        if it["set"]:
+            key = it["game"]
+            sets.setdefault(key, {})
+            sets[key][it["set"]] = sets[key].get(it["set"], 0) + 1
+        if not SEALED_RE.search(it["name"] or "") and it["game"] in ("pk", "op", "mtg"):
+            singles.append(it)
+    singles.sort(key=lambda i: -min_price(i))
+    top = singles[:12]
+    by_game = {}
+    for g in ("pk", "op", "mtg"):
+        by_game[g] = [i for i in singles if i["game"] == g][:6]
+    # a "wall" of card art for the marquee: pricey singles, spread across games
+    wall, seen = [], set()
+    for i in singles:
+        if i["id"] in seen or len(wall) >= 48:
+            continue
+        seen.add(i["id"])
+        wall.append({"id": i["id"], "name": i["name"], "game": i["game"], "price": min_price(i)})
+    top_sets = {g: sorted(sets.get(g, {}).items(), key=lambda kv: -kv[1])[:40] for g in sets}
+    return {
+        "generated": generated,
+        "products": len(items),
+        "listings": sum(len(i["listings"]) for i in items),
+        "units": sum(l["qty"] for i in items for l in i["listings"]),
+        "games": games,
+        "lines": lines,
+        "sets": {g: [{"name": n, "count": c} for n, c in v] for g, v in top_sets.items()},
+        "top": top,
+        "topByGame": by_game,
+        "wall": wall,
+    }
 
 
 def page_body(offset):
@@ -113,10 +174,17 @@ def main():
         "units": sum(l["qty"] for i in items for l in i["listings"]),
         "items": items,
     }
+    if not items:
+        print("no items returned - refusing to overwrite %s" % OUT)
+        return 2
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(out, f, separators=(",", ":"), ensure_ascii=False)
     print("wrote %s: %d products, %d listings, %d units" %
           (OUT, out["products"], out["listings"], out["units"]))
+    summary = build_summary(items, out["generated"])
+    with open(SUMMARY_OUT, "w", encoding="utf-8") as f:
+        json.dump(summary, f, separators=(",", ":"), ensure_ascii=False)
+    print("wrote %s: %d top, %d wall" % (SUMMARY_OUT, len(summary["top"]), len(summary["wall"])))
 
 
 if __name__ == "__main__":

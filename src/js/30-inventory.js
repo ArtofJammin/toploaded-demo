@@ -82,3 +82,4 @@
     });
   });
   $("#sortSel").addEventListener("change", function(e){ sortMode = e.target.value; pageCount = 1; renderShop(); });
+  TL.on("init", initLiveInventory);

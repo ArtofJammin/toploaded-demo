@@ -1,0 +1,29 @@
+# Top Loaded TCG API — Cloudflare Worker.
+#   npm i -g wrangler && wrangler login
+#   wrangler kv namespace create KV        → paste the id below
+#   wrangler secret put STAFF_PIN_HASH     (sha256 hex of the staff passcode; see README)
+#   wrangler secret put ADMIN_PIN_HASH
+#   wrangler secret put TOKEN_SECRET       (any long random string)
+#   optional: SQUARE_ACCESS_TOKEN, SQUARE_LOCATION_ID, SQUARE_WEBHOOK_SIGNATURE_KEY,
+#             RESEND_API_KEY, NOTIFY_EMAIL, GITHUB_TOKEN, POKEMONTCG_API_KEY
+#   wrangler deploy
+name = "toploaded-api"
+main = "src/index.js"
+compatibility_date = "2026-08-01"
+workers_dev = true
+
+[[kv_namespaces]]
+binding = "KV"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+[triggers]
+crons = ["0 11 * * *"]
+
+[vars]
+# Comma-separated list of origins allowed to call the API from a browser.
+SITE_ORIGIN = "https://artofjammin.github.io,http://localhost:8787,http://127.0.0.1:8787"
+SQUARE_ENV = "sandbox"
+SQUARE_WEBHOOK_URL = "https://toploaded-api.REPLACE.workers.dev/square/webhook"
+GITHUB_REPO = "ArtofJammin/toploaded-demo"
+GITHUB_WORKFLOW = "inventory.yml"
+SITE_URL = "https://artofjammin.github.io/toploaded-demo/"

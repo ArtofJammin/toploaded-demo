@@ -1,0 +1,40 @@
+# Nightly inventory refresh. Pulls the shop's live TCGplayer listings into
+# inventory.json + inventory-summary.json and commits them when anything changed,
+# which redeploys GitHub Pages. Also runs on demand (the admin "Sync now" button
+# calls workflow_dispatch through the API, or use the Actions tab).
+name: Refresh inventory
+
+on:
+  schedule:
+    - cron: "0 10 * * *"   # 6 AM Eastern (EDT); 5 AM in winter
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: inventory
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pull TCGplayer listings
+        run: python tools/update-inventory.py
+      - name: Commit if changed
+        run: |
+          git config user.name "toploaded-bot"
+          git config user.email "toploaded-bot@users.noreply.github.com"
+          git add inventory.json inventory-summary.json
+          if git diff --cached --quiet; then
+            echo "No inventory changes."
+          else
+            git commit -m "Nightly inventory update $(date -u +%Y-%m-%d)"
+            git push
+          fi

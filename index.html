@@ -10,6 +10,9 @@
 <meta property="og:url" content="https://artofjammin.github.io/toploaded-demo/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="favicon.png">
+<!-- Point the site at the deployed Cloudflare Worker (api/) here, e.g. https://toploaded-api.<account>.workers.dev
+     Leave empty and the site runs fully in demo mode with localStorage fallbacks. -->
+<meta name="tl-api" content="">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#EFF1F4">
 <meta name="theme-color" content="#0C0A06">
 <script>(function(){var t="tl";try{var s=localStorage.getItem("tl-theme");if(s==="light"||s==="dark"||s==="tl")t=s}catch(e){}document.documentElement.setAttribute("data-theme",t)})()</script>
@@ -1688,10 +1691,76 @@ footer::before{
   <p class="drawer-note" style="text-align:left; margin-top:14px">Demo gate &mdash; real staff accounts ship with the live build.</p>
 </div>
 
+<script id="siteConfig">window.TL_DEFAULT_CONFIG={"title":"Top Loaded","tagline":"Trading Cards · NKY","phone":"(513) 222-2573","phoneRaw":"+15132222573","email":"toploadedtcg@gmail.com","address":{"line1":"2514 Hazelwood Dr","city":"Crescent Springs","state":"KY","zip":"41017"},"timezone":"America/New_York","hours":{"mon":null,"tue":["11:00","18:00"],"wed":["11:00","18:00"],"thu":["11:00","18:00"],"fri":["11:00","18:00"],"sat":["10:00","16:00"],"sun":["10:00","16:00"]},"hoursText":{"wk":"Tue–Fri · 11 AM – 6 PM","we":"Sat–Sun · 10 AM – 4 PM"},"banner":{"on":false,"text":""},"logo":null,"show":{"date":"2026-09-05","start":"10:00","end":"16:00","setup":"08:00","hours":"10 AM – 4 PM","venue":"Hilton Cincinnati Airport","address":"7373 Turfway Rd, Florence, KY 41042","tables":24,"booked":11,"cadence":"First Saturday or Sunday of every month","tablePrices":[{"n":1,"price":60},{"n":2,"price":110},{"n":3,"price":150}]},"events":[{"id":"op-wed","day":"Wed","dow":3,"name":"One Piece Locals","small":"Bandai official · winner & participation packs","time":"5:00 PM","start":"17:00","fee":"TBD","game":"op","signup":"tcgplus"},{"id":"op-sat","day":"Sat","dow":6,"name":"One Piece Locals","small":"Bandai official · winner & participation packs","time":"11:00 AM","start":"11:00","fee":"TBD","game":"op","signup":"tcgplus"},{"id":"gd-sat","day":"Sat","dow":6,"name":"Gundam Card Game","small":"Bandai official · winner & participation packs","time":"1:00 PM","start":"13:00","fee":"TBD","game":"gundam","signup":"tcgplus"},{"id":"pk-sun","day":"Sun","dow":0,"name":"Pokemon League","small":"All ages · league promo prizing","time":"11:00 AM","start":"11:00","fee":"TBD","game":"pk","signup":"form"}],"live":{"on":false,"title":"Prismatic Evolutions booster box break","platform":"","embed":"","spotPrice":24.99,"spots":12,"packsPerSpot":3,"schedule":[{"day":"Tue","time":"7 PM","name":"Pokemon rip night","desc":"Sealed singles chases — ETBs, bundles, and a booster box to close the night."},{"day":"Thu","time":"8 PM","name":"One Piece box breaks","desc":"Full box rips with leader giveaways between breaks."},{"day":"Sun","time":"6 PM","name":"Mailbag & trades","desc":"We open what you sent in, price collections live, and take trade offers on air."}]},"links":{"tcgplus":"https://www.bandai-tcg-plus.com/","facebook":"https://www.facebook.com/toploadedtradingcards","instagram":"https://www.instagram.com/toploadedtcg","tcgplayer":"https://www.tcgplayer.com/sellers/Top-Loaded-TCG/5c356cdf","whatnot":"","googleMaps":"https://www.google.com/maps/search/?api=1&query=Top+Loaded+Trading+Cards+2514+Hazelwood+Dr+Crescent+Springs+KY+41017","appleMaps":"https://maps.apple.com/place?place-id=I96E3F1088FE2244C"},"buy":{"rates":{"bulk":0.55,"standard":0.6,"hot":0.7,"graded":0.8},"creditBonus":0.1},"ticker":[["Charizard ex · 151","$85"],["Umbreon VMAX Alt","$450"],["Shanks OP-09 Leader","$42"],["The One Ring","$40"],["Prismatic ETBs","$70"],["Luffy OP-05 Alt","$88"],["Ragavan MH2","$41"],["Base Set holos","ask"],["Sealed booster boxes","top rates"]],"testimonials":[],"updatedAt":null};</script>
 <script id="cardArtData"></script>
 <script>
 (function(){
   "use strict";
+
+  /* ---------- core: shared namespace, event bus, storage, helpers ----------
+     Every file in src/js shares one closure (see tools/build.mjs). Cross-module
+     contract lives on window.TL so modules can be built independently:
+
+       TL.on(ev, fn) / TL.off(ev, fn) / TL.emit(ev, data)   event bus
+       TL.store.get(key, fallback) / .set(key, v) / .del(key) localStorage, JSON, "tl-" prefix, never throws
+       TL.session.*                                           same, on sessionStorage
+       TL.$ / TL.$$ / TL.money / TL.esc / TL.toast            helpers exported by 00-data, 05-toast, 25-products
+       TL.reduceMotion                                        boolean
+       TL.api                                                 API client (02-api.js)
+       TL.config / TL.saveConfig(patch) / TL.shopStatus()     site config (03-config.js)
+       TL.go(view, params) / TL.route()                       router (10-router.js)
+       TL.cart.add(item, qty) / .count() / .open()            cart (35-cart.js)
+       TL.inventory                                           {summary, items, generated, byId(id)} (30-inventory.js)
+       TL.confetti(x, y, opts) / TL.flyTo(fromEl, toEl)       motion hooks — no-ops until a motion module defines them
+       TL.countUp(el, to, opts)                               motion hook, no-op default
+       TL.openQuickView(item) / TL.openModal(html, opts) / TL.closeModal()  overlays, no-op defaults
+
+     Events (name → payload):
+       'init'                            DOM parsed; modules render their initial state (registered handlers run in file order)
+       'api:ready'      {online}         API health check finished
+       'config:change'  {config, patch}  site config loaded or edited
+       'inventory:summary' {summary}     inventory-summary.json loaded
+       'inventory:loaded'  {items, generated}  full inventory.json loaded and normalized
+       'view:change'    {name, params, prev}   a view became active
+       'view:leave'     {name}                 a view is being hidden (stop timers)
+       'cart:change'    {qty, total, lines}
+       'auth:change'    {role}                 'staff' | 'admin' | null
+       'live:change'    {live}                 TL.config.live changed
+       'ready'          {online}               boot finished
+  */
+  var TL = window.TL = window.TL || {};
+  TL.version = "2.0";
+  var _bus = {};
+  TL.on = function(ev, fn){ (_bus[ev] = _bus[ev] || []).push(fn); return function(){ TL.off(ev, fn); }; };
+  TL.off = function(ev, fn){ var l = _bus[ev]; if(!l) return; var i = l.indexOf(fn); if(i > -1) l.splice(i, 1); };
+  TL.emit = function(ev, data){
+    var l = (_bus[ev] || []).slice();
+    for(var i = 0; i < l.length; i++){
+      try { l[i](data); } catch(e){ if(window.console) console.error("[TL:" + ev + "]", e); }
+    }
+  };
+  function mkStore(area){
+    return {
+      get: function(k, fb){ try { var v = window[area].getItem("tl-" + k); return v === null ? fb : JSON.parse(v); } catch(e){ return fb; } },
+      set: function(k, v){ try { window[area].setItem("tl-" + k, JSON.stringify(v)); return true; } catch(e){ return false; } },
+      del: function(k){ try { window[area].removeItem("tl-" + k); } catch(e){} }
+    };
+  }
+  TL.store = mkStore("localStorage");
+  TL.session = mkStore("sessionStorage");
+  TL.uid = function(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); };
+  TL.debounce = function(fn, ms){
+    var t; return function(){ var a = arguments, s = this; clearTimeout(t); t = setTimeout(function(){ fn.apply(s, a); }, ms); };
+  };
+  TL.clamp = function(n, lo, hi){ return Math.min(hi, Math.max(lo, n)); };
+  TL.pad2 = function(n){ return (n < 10 ? "0" : "") + n; };
+  /* no-op defaults; feature modules replace these */
+  TL.confetti = function(){};
+  TL.flyTo = function(){};
+  TL.countUp = function(el, to){ if(el) el.textContent = to; };
+  TL.openQuickView = function(){};
+  TL.openModal = function(){};
+  TL.closeModal = function(){};
 
   /* ---------- data ---------- */
   var GAMES = {pk:"Pokemon", op:"One Piece", mtg:"Magic"};
@@ -1722,6 +1791,195 @@ footer::before{
   var $$ = function(s, c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
   var money = function(n){ return "$" + n.toFixed(2); };
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  TL.$ = $; TL.$$ = $$; TL.money = money; TL.reduceMotion = reduceMotion; TL.GAMES = GAMES; TL.ITEMS = ITEMS;
+
+  /* ---------- api client ----------
+     Discovers the API base URL, first match wins:
+       1. window.TL_API                                  (inline script or devtools override)
+       2. <meta name="tl-api" content="https://toploaded-api.<you>.workers.dev">
+       3. localStorage "tl-api"                          TL.store.set("api", url) points any copy of the page at a worker
+       4. same-origin "/api" when served from localhost  (tools/dev-server.mjs mounts the worker there)
+     With no base, or when GET /health fails, TL.api.online stays false and every
+     feature uses its demo / localStorage fallback. Worker routes have NO /api prefix;
+     the dev server strips it.
+
+       TL.api.request(method, path, body, opts) → Promise<json>; rejects {status, error, data}
+       TL.api.get/post/put/del(path, ...)
+       TL.api.call(method, path, body, demoFn)   → request when online, else Promise.resolve(demoFn())
+       TL.api.setAuth(token, role)               persists to sessionStorage, emits 'auth:change'
+       TL.api.ready                              Promise<boolean online>
+  */
+  TL.api = (function(){
+    function discover(){
+      try {
+        if(window.TL_API) return String(window.TL_API).replace(/\/+$/, "");
+        var m = document.querySelector('meta[name="tl-api"]');
+        if(m && m.content && m.content.trim()) return m.content.trim().replace(/\/+$/, "");
+        var s = TL.store.get("api", null);
+        if(s) return String(s).replace(/\/+$/, "");
+        var h = location.hostname;
+        if(h === "localhost" || h === "127.0.0.1" || h === "[::1]") return location.origin + "/api";
+      } catch(e){}
+      return null;
+    }
+    var api = {
+      base: discover(),
+      online: false,
+      token: TL.session.get("token", null),
+      role: TL.session.get("role", null)
+    };
+    api.request = function(method, path, body, opts){
+      opts = opts || {};
+      if(!api.base) return Promise.reject({status:0, error:"offline"});
+      var ctrl = window.AbortController ? new AbortController() : null;
+      var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, opts.timeout || 8000) : null;
+      var headers = {"Accept":"application/json"};
+      var hasBody = body !== undefined && body !== null;
+      if(hasBody) headers["Content-Type"] = "application/json";
+      if(api.token && !opts.noAuth) headers["Authorization"] = "Bearer " + api.token;
+      return fetch(api.base + path, {
+        method: method, headers: headers,
+        body: hasBody ? JSON.stringify(body) : undefined,
+        signal: ctrl ? ctrl.signal : undefined, credentials: "omit", cache: "no-store"
+      }).then(function(r){
+        clearTimeout(timer);
+        return r.text().then(function(t){
+          var d = null;
+          try { d = t ? JSON.parse(t) : null; } catch(e){ d = {raw: t}; }
+          if(!r.ok){
+            if(r.status === 401 && api.token && !opts.noAuth) api.setAuth(null, null);
+            throw {status: r.status, error: (d && d.error) || r.statusText || "error", data: d};
+          }
+          return d;
+        });
+      }, function(e){
+        clearTimeout(timer);
+        throw {status: 0, error: (e && e.name === "AbortError") ? "timeout" : "network"};
+      });
+    };
+    api.get = function(path, opts){ return api.request("GET", path, null, opts); };
+    api.post = function(path, body, opts){ return api.request("POST", path, body || {}, opts); };
+    api.put = function(path, body, opts){ return api.request("PUT", path, body || {}, opts); };
+    api.del = function(path, opts){ return api.request("DELETE", path, null, opts); };
+    api.call = function(method, path, body, demoFn){
+      if(api.online) return api.request(method, path, body);
+      return Promise.resolve().then(function(){ return demoFn ? demoFn() : null; });
+    };
+    api.setAuth = function(token, role){
+      api.token = token || null; api.role = token ? role : null;
+      if(token){ TL.session.set("token", token); TL.session.set("role", role); }
+      else { TL.session.del("token"); TL.session.del("role"); }
+      TL.emit("auth:change", {role: api.role});
+    };
+    api.ready = api.base
+      ? api.get("/health", {timeout: 4000, noAuth: true}).then(function(d){ api.online = !!(d && d.ok); return api.online; }).catch(function(){ api.online = false; return false; })
+      : Promise.resolve(false);
+    return api;
+  })();
+
+  /* ---------- site config ----------
+     TL.config is the live settings object; its shape is config.default.json (built in
+     as window.TL_DEFAULT_CONFIG). Layers, lowest → highest: defaults → localStorage
+     "config" (admin edits made without an API) → GET /config from the worker.
+
+       TL.saveConfig(patch) merges the patch, persists it (PUT /config when an admin
+         is logged in and online, always localStorage too), emits 'config:change'.
+       TL.shopStatus(date?) → {open, label, sub} computed from config.hours in the shop's timezone
+       TL.nextEvent(date?)  → {event, when:Date} next play night from config.events
+       TL.nextShow(date?)   → Date of the next card show (config.show.date if still ahead,
+                              else the first Saturday of the following month)
+  */
+  function deepMerge(a, b){
+    if(Array.isArray(b)) return b.slice();
+    if(!b || typeof b !== "object") return b;
+    var out = (a && typeof a === "object" && !Array.isArray(a)) ? a : {};
+    Object.keys(b).forEach(function(k){
+      var v = b[k];
+      out[k] = (v && typeof v === "object" && !Array.isArray(v)) ? deepMerge(out[k], v) : (Array.isArray(v) ? v.slice() : v);
+    });
+    return out;
+  }
+  TL.deepMerge = deepMerge;
+  TL.config = deepMerge({}, window.TL_DEFAULT_CONFIG || {});
+  TL.saveConfig = function(patch){
+    TL.config = deepMerge(TL.config, patch);
+    TL.config.updatedAt = new Date().toISOString();
+    TL.store.set("config", deepMerge(TL.store.get("config", {}) || {}, patch));
+    TL.emit("config:change", {config: TL.config, patch: patch});
+    if(patch && patch.live) TL.emit("live:change", {live: TL.config.live});
+    if(TL.api.online && TL.api.role === "admin"){
+      return TL.api.put("/config", patch).catch(function(e){
+        if(TL.toast) TL.toast("Saved on this device only — server said: " + (e.error || "error"));
+      });
+    }
+    return Promise.resolve();
+  };
+  /* ---- time helpers (shop timezone) ---- */
+  var DOW = ["sun","mon","tue","wed","thu","fri","sat"];
+  function tzParts(date){
+    try {
+      var f = new Intl.DateTimeFormat("en-US", {timeZone: TL.config.timezone || "America/New_York", weekday:"short", hour:"numeric", minute:"numeric", hour12:false});
+      var p = {}; f.formatToParts(date).forEach(function(x){ p[x.type] = x.value; });
+      var h = parseInt(p.hour, 10); if(h === 24) h = 0;
+      return {dow: DOW.indexOf(p.weekday.toLowerCase().slice(0,3)), min: h * 60 + parseInt(p.minute, 10)};
+    } catch(e){ return {dow: date.getDay(), min: date.getHours() * 60 + date.getMinutes()}; }
+  }
+  function hm(s){ var a = String(s).split(":"); return parseInt(a[0], 10) * 60 + parseInt(a[1] || "0", 10); }
+  function fmtMin(m){ var h = Math.floor(m / 60) % 24, mm = m % 60, ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12; return h + (mm ? ":" + TL.pad2(mm) : "") + " " + ap; }
+  var DAYN = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  TL.shopStatus = function(date){
+    var now = tzParts(date || new Date()), hours = TL.config.hours || {};
+    var today = hours[DOW[now.dow]];
+    if(today && now.min >= hm(today[0]) && now.min < hm(today[1])){
+      var left = hm(today[1]) - now.min;
+      return {open: true, label: "Open now", sub: left <= 60 ? "Closes in " + left + " min" : "Closes at " + fmtMin(hm(today[1]))};
+    }
+    if(today && now.min < hm(today[0])){
+      return {open: false, label: "Closed", sub: "Opens today at " + fmtMin(hm(today[0]))};
+    }
+    for(var i = 1; i <= 7; i++){
+      var d = (now.dow + i) % 7, hrs = hours[DOW[d]];
+      if(hrs) return {open: false, label: "Closed", sub: "Opens " + (i === 1 ? "tomorrow" : DAYN[d]) + " at " + fmtMin(hm(hrs[0]))};
+    }
+    return {open: false, label: "Closed", sub: ""};
+  };
+  TL.nextEvent = function(date){
+    var now = date || new Date(), t = tzParts(now), best = null;
+    (TL.config.events || []).forEach(function(ev){
+      if(typeof ev.dow !== "number" || !ev.start) return;
+      var days = (ev.dow - t.dow + 7) % 7;
+      if(days === 0 && hm(ev.start) <= t.min) days = 7;
+      var when = new Date(now.getTime() + days * 864e5);
+      when.setHours(Math.floor(hm(ev.start) / 60), hm(ev.start) % 60, 0, 0);
+      if(!best || when < best.when) best = {event: ev, when: when};
+    });
+    return best;
+  };
+  TL.nextShow = function(date){
+    var now = date || new Date(), s = TL.config.show || {};
+    if(s.date){
+      var d = new Date(s.date + "T" + (s.end || "16:00") + ":00");
+      if(!isNaN(d) && d > now) return new Date(s.date + "T" + (s.start || "10:00") + ":00");
+    }
+    var m = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    while(m.getDay() !== 6) m.setDate(m.getDate() + 1);
+    m.setHours(10, 0, 0, 0);
+    return m;
+  };
+  TL.on("init", function(){
+    var local = TL.store.get("config", null);
+    if(local && typeof local === "object") TL.config = deepMerge(TL.config, local);
+    TL.emit("config:change", {config: TL.config, patch: local || {}});
+  });
+  TL.on("api:ready", function(d){
+    if(!d || !d.online) return;
+    TL.api.get("/config", {noAuth: true}).then(function(c){
+      if(!c || typeof c !== "object") return;
+      TL.config = deepMerge(TL.config, c);
+      TL.emit("config:change", {config: TL.config, patch: c});
+      TL.emit("live:change", {live: TL.config.live});
+    }).catch(function(){});
+  });
 
   /* ---------- toast ---------- */
   var toastEl = $("#toast"), toastTimer = null;
@@ -1731,6 +1989,7 @@ footer::before{
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function(){ toastEl.classList.remove("on"); }, 2600);
   }
+  TL.toast = toast;
 
   /* ---------- view switching ---------- */
   var views = {home:"#view-home", shop:"#view-shop", live:"#view-live", show:"#view-show", events:"#view-events", buylist:"#view-buylist", visit:"#view-visit", staff:"#view-staff", admin:"#view-admin"};
@@ -1792,6 +2051,7 @@ footer::before{
   function esc(s){
     return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   }
+  TL.esc = esc;
   var ART = {
     pk:{a:"#3A6EA8", b:"#16202F", label:"POKEMON",
         em:'<path d="M125 92 L96 158 h22 l-14 60 l50 -76 h-25 l21 -50 z" fill="#F5C542"/>'},
@@ -1883,6 +2143,7 @@ footer::before{
     var feat = [ITEMS[1], ITEMS[9], ITEMS[16], ITEMS[6]];
     $("#featuredGrid").innerHTML = feat.map(prodCard).join("");
   }
+  TL.on("init", function(){ renderShop(); renderFeatured(); });
 
   /* ---------- live TCGplayer inventory ---------- */
   var LIVE = null;
@@ -1968,6 +2229,7 @@ footer::before{
     });
   });
   $("#sortSel").addEventListener("change", function(e){ sortMode = e.target.value; pageCount = 1; renderShop(); });
+  TL.on("init", initLiveInventory);
 
   /* ---------- cart ---------- */
   var cart = {}; // id -> qty
@@ -2053,6 +2315,7 @@ footer::before{
     if(!cartQty()){ toast("Cart is empty"); return; }
     toast("Demo checkout \u2014 on the live site this hands off to Square");
   });
+  TL.on("init", renderCart);
 
   /* ---------- forms ---------- */
   $("#vendorForm").addEventListener("submit", function(e){
@@ -2208,6 +2471,7 @@ footer::before{
       inp.value = "";
     });
   }
+  TL.on("init", initLive);
 
   /* ---------- play nights: data-driven schedule + admin editor ---------- */
   var EVENTS = [
@@ -2245,6 +2509,7 @@ footer::before{
     EVENTS.push({day:"Fri", name:"New event", small:"Set details, then publish", time:"6:00 PM", fee:"TBD"});
     renderEvEditor();
   });
+  TL.on("init", function(){ renderSched(); renderEvEditor(); });
 
   /* ---------- site settings / banner / live toggle ---------- */
   var isLive = false;
@@ -2322,6 +2587,7 @@ footer::before{
       toast("TCGplayer import complete — 3 price changes pulled (demo)");
     }, 1100);
   });
+  TL.on("init", renderAlerts);
 
   /* ---------- staff desk: store credit + pricing ---------- */
   var CUSTOMERS = [
@@ -2363,11 +2629,7 @@ footer::before{
   }
   $("#pdMarket").addEventListener("input", recalcPricing);
   $("#pdRate").addEventListener("change", recalcPricing);
-
-  /* ---------- init ---------- */
-  renderShop(); renderFeatured(); renderCart(); initLive();
-  renderSched(); renderEvEditor(); renderAlerts(); renderCred();
-  initLiveInventory();
+  TL.on("init", renderCred);
 
   /* ---------- staff/admin login gate ---------- */
   var AUTH_HASH = "213d2c9854a9b82d6e119914ced2e04b627c8c98d94d89ef1b7953a40d5806c1";
@@ -2443,5 +2705,16 @@ footer::before{
     }, {rootMargin:"0px 0px -10% 0px", threshold:.05});
     srTargets.forEach(function(el){ srIO.observe(el); });
   }
+
+  /* ---------- boot ----------
+     Runs last. Modules register TL.on("init", fn) in their own files; nothing here
+     names a module function. Order: 'init' → API health check → 'api:ready'
+     (03-config.js then fetches /config and emits 'config:change') → 'ready'. */
+  TL.emit("init");
+  TL.api.ready.then(function(online){
+    document.documentElement.classList.toggle("api-online", !!online);
+    TL.emit("api:ready", {online: !!online});
+    TL.emit("ready", {online: !!online});
+  });
 })();
 </script>

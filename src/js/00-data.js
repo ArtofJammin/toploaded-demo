@@ -27,3 +27,4 @@
   var $$ = function(s, c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
   var money = function(n){ return "$" + n.toFixed(2); };
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  TL.$ = $; TL.$$ = $$; TL.money = money; TL.reduceMotion = reduceMotion; TL.GAMES = GAMES; TL.ITEMS = ITEMS;

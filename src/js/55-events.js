@@ -34,3 +34,4 @@
     EVENTS.push({day:"Fri", name:"New event", small:"Set details, then publish", time:"6:00 PM", fee:"TBD"});
     renderEvEditor();
   });
+  TL.on("init", function(){ renderSched(); renderEvEditor(); });

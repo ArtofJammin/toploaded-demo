@@ -1,0 +1,74 @@
+{
+  "title": "Top Loaded",
+  "tagline": "Trading Cards · NKY",
+  "phone": "(513) 222-2573",
+  "phoneRaw": "+15132222573",
+  "email": "toploadedtcg@gmail.com",
+  "address": { "line1": "2514 Hazelwood Dr", "city": "Crescent Springs", "state": "KY", "zip": "41017" },
+  "timezone": "America/New_York",
+  "hours": {
+    "mon": null,
+    "tue": ["11:00", "18:00"],
+    "wed": ["11:00", "18:00"],
+    "thu": ["11:00", "18:00"],
+    "fri": ["11:00", "18:00"],
+    "sat": ["10:00", "16:00"],
+    "sun": ["10:00", "16:00"]
+  },
+  "hoursText": { "wk": "Tue–Fri · 11 AM – 6 PM", "we": "Sat–Sun · 10 AM – 4 PM" },
+  "banner": { "on": false, "text": "" },
+  "logo": null,
+  "show": {
+    "date": "2026-09-05",
+    "start": "10:00",
+    "end": "16:00",
+    "setup": "08:00",
+    "hours": "10 AM – 4 PM",
+    "venue": "Hilton Cincinnati Airport",
+    "address": "7373 Turfway Rd, Florence, KY 41042",
+    "tables": 24,
+    "booked": 11,
+    "cadence": "First Saturday or Sunday of every month",
+    "tablePrices": [ { "n": 1, "price": 60 }, { "n": 2, "price": 110 }, { "n": 3, "price": 150 } ]
+  },
+  "events": [
+    { "id": "op-wed", "day": "Wed", "dow": 3, "name": "One Piece Locals", "small": "Bandai official · winner & participation packs", "time": "5:00 PM", "start": "17:00", "fee": "TBD", "game": "op", "signup": "tcgplus" },
+    { "id": "op-sat", "day": "Sat", "dow": 6, "name": "One Piece Locals", "small": "Bandai official · winner & participation packs", "time": "11:00 AM", "start": "11:00", "fee": "TBD", "game": "op", "signup": "tcgplus" },
+    { "id": "gd-sat", "day": "Sat", "dow": 6, "name": "Gundam Card Game", "small": "Bandai official · winner & participation packs", "time": "1:00 PM", "start": "13:00", "fee": "TBD", "game": "gundam", "signup": "tcgplus" },
+    { "id": "pk-sun", "day": "Sun", "dow": 0, "name": "Pokemon League", "small": "All ages · league promo prizing", "time": "11:00 AM", "start": "11:00", "fee": "TBD", "game": "pk", "signup": "form" }
+  ],
+  "live": {
+    "on": false,
+    "title": "Prismatic Evolutions booster box break",
+    "platform": "",
+    "embed": "",
+    "spotPrice": 24.99,
+    "spots": 12,
+    "packsPerSpot": 3,
+    "schedule": [
+      { "day": "Tue", "time": "7 PM", "name": "Pokemon rip night", "desc": "Sealed singles chases — ETBs, bundles, and a booster box to close the night." },
+      { "day": "Thu", "time": "8 PM", "name": "One Piece box breaks", "desc": "Full box rips with leader giveaways between breaks." },
+      { "day": "Sun", "time": "6 PM", "name": "Mailbag & trades", "desc": "We open what you sent in, price collections live, and take trade offers on air." }
+    ]
+  },
+  "links": {
+    "tcgplus": "https://www.bandai-tcg-plus.com/",
+    "facebook": "https://www.facebook.com/toploadedtradingcards",
+    "instagram": "https://www.instagram.com/toploadedtcg",
+    "tcgplayer": "https://www.tcgplayer.com/sellers/Top-Loaded-TCG/5c356cdf",
+    "whatnot": "",
+    "googleMaps": "https://www.google.com/maps/search/?api=1&query=Top+Loaded+Trading+Cards+2514+Hazelwood+Dr+Crescent+Springs+KY+41017",
+    "appleMaps": "https://maps.apple.com/place?place-id=I96E3F1088FE2244C"
+  },
+  "buy": {
+    "rates": { "bulk": 0.55, "standard": 0.6, "hot": 0.7, "graded": 0.8 },
+    "creditBonus": 0.1
+  },
+  "ticker": [
+    ["Charizard ex · 151", "$85"], ["Umbreon VMAX Alt", "$450"], ["Shanks OP-09 Leader", "$42"],
+    ["The One Ring", "$40"], ["Prismatic ETBs", "$70"], ["Luffy OP-05 Alt", "$88"],
+    ["Ragavan MH2", "$41"], ["Base Set holos", "ask"], ["Sealed booster boxes", "top rates"]
+  ],
+  "testimonials": [],
+  "updatedAt": null
+}

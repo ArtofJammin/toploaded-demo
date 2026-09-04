@@ -68,3 +68,4 @@
       inp.value = "";
     });
   }
+  TL.on("init", initLive);

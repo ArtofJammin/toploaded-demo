@@ -1,0 +1,6 @@
+node_modules/
+api/.dev.vars
+api/.wrangler/
+tools/.dev-kv.json
+tools/update-inventory.log
+.DS_Store

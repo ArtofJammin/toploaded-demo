@@ -6,3 +6,4 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function(){ toastEl.classList.remove("on"); }, 2600);
   }
+  TL.toast = toast;

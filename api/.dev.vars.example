@@ -1,0 +1,30 @@
+# Copy to api/.dev.vars for the local dev server (tools/dev-server.mjs) or
+# `wrangler dev`. Never commit the real file. Everything is optional.
+
+# Passcodes for the local dev server only (production uses the *_PIN_HASH secrets)
+DEV_STAFF_PIN=staff
+DEV_ADMIN_PIN=admin
+
+# Production-style secrets (sha256 hex of each passcode; generate with:
+#   node -e "console.log(require('crypto').createHash('sha256').update('your passcode').digest('hex'))"
+# STAFF_PIN_HASH=
+# ADMIN_PIN_HASH=
+# TOKEN_SECRET=some-long-random-string
+
+# Square (Developer Dashboard → your app). Sandbox first.
+# SQUARE_ENV=sandbox
+# SQUARE_ACCESS_TOKEN=
+# SQUARE_LOCATION_ID=
+# SQUARE_WEBHOOK_SIGNATURE_KEY=
+
+# Email notifications for form submissions (resend.com)
+# RESEND_API_KEY=
+# NOTIFY_EMAIL=toploadedtcg@gmail.com
+# EMAIL_FROM=Top Loaded Website <site@yourdomain.com>
+
+# "Sync now" button → runs the inventory GitHub Action (token needs repo "actions: write")
+# GITHUB_TOKEN=
+# GITHUB_REPO=ArtofJammin/toploaded-demo
+
+# Optional: raises pokemontcg.io rate limits for the card-worth lookup
+# POKEMONTCG_API_KEY=

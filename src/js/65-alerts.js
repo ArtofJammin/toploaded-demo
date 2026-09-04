@@ -27,3 +27,4 @@
       toast("TCGplayer import complete — 3 price changes pulled (demo)");
     }, 1100);
   });
+  TL.on("init", renderAlerts);

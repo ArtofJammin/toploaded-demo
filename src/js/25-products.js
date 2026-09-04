@@ -8,6 +8,7 @@
   function esc(s){
     return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   }
+  TL.esc = esc;
   var ART = {
     pk:{a:"#3A6EA8", b:"#16202F", label:"POKEMON",
         em:'<path d="M125 92 L96 158 h22 l-14 60 l50 -76 h-25 l21 -50 z" fill="#F5C542"/>'},
@@ -99,3 +100,4 @@
     var feat = [ITEMS[1], ITEMS[9], ITEMS[16], ITEMS[6]];
     $("#featuredGrid").innerHTML = feat.map(prodCard).join("");
   }
+  TL.on("init", function(){ renderShop(); renderFeatured(); });

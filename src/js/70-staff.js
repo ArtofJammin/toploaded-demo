@@ -38,3 +38,4 @@
   }
   $("#pdMarket").addEventListener("input", recalcPricing);
   $("#pdRate").addEventListener("change", recalcPricing);
+  TL.on("init", renderCred);
