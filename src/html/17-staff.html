@@ -3,8 +3,8 @@
     <div class="admin-bar">
       <div class="wrap">
         <span class="eyebrow">Staff desk</span>
-        <span class="pill ok"><span class="dot"></span>Register &middot; Crescent Springs</span>
-        <span class="demo-tag">All staff data is simulated for this demo</span>
+        <span class="pill role-pill" id="staffRole"><span class="dot"></span>Staff</span>
+        <span class="pill conn-pill" id="staffConn" role="status"><span class="dot"></span>Checking&hellip;</span>
         <span style="flex:1"></span>
         <button class="linklike logoutBtn" type="button">Log out</button>
         <button class="linklike" data-go="home">&larr; Back to storefront</button>
@@ -13,32 +13,58 @@
     <div class="wrap">
       <div class="view-head" style="padding-top:36px; padding-bottom:20px">
         <h1>Staff desk</h1>
-        <p class="lede">Store credit and pricing tools for the counter.</p>
+        <p class="lede">Store credit and pricing tools for the counter. <span id="staffDate" class="mono" style="color:var(--ink3); font-size:.8rem"></span></p>
       </div>
+      <h2 class="vh">Counter tools</h2>
       <div class="admin-grid">
-        <div class="admin-card">
-          <h3>Store credit</h3>
-          <div class="field" style="margin-bottom:12px"><label for="credSearch">Find customer</label><input id="credSearch" placeholder="Name or phone" autocomplete="off"></div>
-          <div class="table-wrap" style="margin-top:0">
-            <table style="min-width:0">
-              <thead><tr><th>Customer</th><th>Phone</th><th>Credit</th></tr></thead>
+        <div class="admin-card" id="credCard">
+          <h3>Store credit <span class="pill warn" id="credMode"><span class="dot warn"></span>This device</span></h3>
+          <div class="field" style="margin-bottom:12px"><label for="credSearch">Find customer</label><input id="credSearch" placeholder="Name or phone" autocomplete="off" inputmode="search"></div>
+          <div class="table-wrap cred-wrap" style="margin-top:0" tabindex="0" role="region" aria-label="Customer credit balances">
+            <table class="cred-table" style="min-width:0">
+              <caption class="vh">Customers with store credit</caption>
+              <thead><tr><th scope="col">Customer</th><th scope="col">Phone</th><th scope="col" class="num">Credit</th></tr></thead>
               <tbody id="credBody"></tbody>
             </table>
           </div>
           <div class="form-grid" style="margin-top:16px">
             <div class="field"><label for="credWho">Customer</label><select id="credWho"></select></div>
-            <div class="field"><label for="credAmt">Cash value of trade ($)</label><input id="credAmt" type="number" min="0" step="0.01" placeholder="50.00"></div>
-            <div class="field full"><button class="btn" id="credAdd" type="button">Add as store credit (+10%)</button></div>
+            <div class="field"><label for="credAmt">Cash value of trade ($)</label><input id="credAmt" type="number" min="0" step="0.01" placeholder="50.00" inputmode="decimal"></div>
+            <div class="field full"><button class="btn" id="credAdd" type="button">Add as store credit (+<span id="credBonusPct">10</span>%)</button></div>
           </div>
-          <p class="drawer-note" style="text-align:left; margin-top:10px">Trade-ins taken in credit get the 10% bonus applied automatically.</p>
+          <details class="cred-more">
+            <summary>Redeem credit</summary>
+            <div class="form-grid" style="margin-top:8px">
+              <div class="field"><label for="credRedeemAmt">Amount to redeem ($)</label><input id="credRedeemAmt" type="number" min="0" step="0.01" placeholder="20.00" inputmode="decimal"></div>
+              <div class="field" style="justify-content:flex-end"><button class="btn btn-ghost" id="credRedeem" type="button">Redeem from selected</button></div>
+            </div>
+          </details>
+          <details class="cred-more">
+            <summary>New customer</summary>
+            <div class="form-grid" style="margin-top:8px">
+              <div class="field"><label for="credNewName">Name</label><input id="credNewName" autocomplete="off" placeholder="First name + last initial"></div>
+              <div class="field"><label for="credNewPhone">Phone</label><input id="credNewPhone" autocomplete="off" inputmode="tel" placeholder="(859) 555-0100"></div>
+              <div class="field full"><button class="btn btn-ghost" id="credNew" type="button">Create customer</button></div>
+            </div>
+          </details>
+          <div class="cred-history" id="credHistory" hidden>
+            <div class="cred-history-head">
+              <b id="credHistName">History</b>
+              <span style="flex:1"></span>
+              <button class="linklike" type="button" id="credPrint">Print receipt</button>
+              <button class="linklike" type="button" id="credHistClose">Close</button>
+            </div>
+            <div class="log cred-log" id="credLog" tabindex="0" role="region" aria-label="Credit history"></div>
+          </div>
+          <p class="drawer-note" style="text-align:left; margin-top:10px" id="credNote">Trade-ins taken in credit get the bonus applied automatically. Balances are stored in whole cents.</p>
         </div>
         <div class="admin-card">
           <h3>Pricing desk</h3>
           <dl class="kv">
-            <dt>Market price</dt><dd><input id="pdMarket" type="number" min="0" step="0.01" placeholder="100.00" style="width:130px"></dd>
-            <dt>Buy rate</dt><dd><select id="pdRate"><option value="0.55">55% &mdash; bulk / slow movers</option><option value="0.6" selected>60% &mdash; standard singles</option><option value="0.7">70% &mdash; hot / case cards</option><option value="0.8">80% &mdash; graded slabs</option></select> <span class="demo-tag">sample rates</span></dd>
-            <dt>Cash offer</dt><dd class="mono" id="pdCash">&mdash;</dd>
-            <dt>Credit offer (+10%)</dt><dd class="mono" id="pdCredit" style="color:var(--accent)">&mdash;</dd>
+            <dt><label for="pdMarket">Market price</label></dt><dd><input id="pdMarket" type="number" min="0" step="0.01" placeholder="100.00" style="width:130px" inputmode="decimal"></dd>
+            <dt><label for="pdRate">Buy rate</label></dt><dd><select id="pdRate"></select> <span class="demo-tag" id="pdRateTag">from settings</span></dd>
+            <dt>Cash offer</dt><dd class="mono" id="pdCash" role="status">&mdash;</dd>
+            <dt>Credit offer (+<span id="pdBonusPct">10</span>%)</dt><dd class="mono" id="pdCredit" style="color:var(--accent)" role="status">&mdash;</dd>
           </dl>
           <h3 style="margin-top:22px">Sell pricing rules</h3>
           <div class="toggle-row"><div class="tl"><b>Singles</b><span>TCGplayer market, rounded up to .99</span></div><span class="pill ok"><span class="dot"></span>Auto</span></div>
@@ -47,4 +73,5 @@
         </div>
       </div>
     </div>
+    <div class="receipt" id="credReceipt" aria-hidden="true"></div>
   </section>

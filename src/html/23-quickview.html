@@ -1,0 +1,87 @@
+<!-- ================= QUICK VIEW ================= -->
+<div class="overlay" id="qvOverlay"></div>
+<div class="qv" id="qv" role="dialog" aria-modal="true" aria-labelledby="qvName" hidden>
+  <button class="qv-close" id="qvClose" type="button" aria-label="Close quick view">&times;</button>
+  <button class="qv-nav qv-prev" id="qvPrev" type="button" aria-label="Previous card">&lsaquo;</button>
+  <button class="qv-nav qv-next" id="qvNext" type="button" aria-label="Next card">&rsaquo;</button>
+
+  <div class="qv-media">
+    <div class="qv-stage">
+      <button class="qv-card" id="qvCard" type="button" aria-label="Flip the card over" aria-pressed="false">
+        <div class="qv-flip" id="qvFlip">
+          <div class="qv-face qv-front" id="qvFront"></div>
+          <div class="qv-face qv-back" aria-hidden="true">
+            <svg viewBox="0 0 250 350" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+              <defs>
+                <linearGradient id="qvbFoil" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#FFE98A"/><stop offset="45%" stop-color="#FFD23F"/><stop offset="72%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#FFB03A"/>
+                </linearGradient>
+                <pattern id="qvbGrid" width="14" height="14" patternUnits="userSpaceOnUse">
+                  <path d="M14 0H0V14" fill="none" stroke="#2A2410" stroke-width="1"/>
+                </pattern>
+              </defs>
+              <rect width="250" height="350" rx="12" fill="#0F0C06"/>
+              <rect x="10" y="10" width="230" height="330" rx="9" fill="url(#qvbGrid)" stroke="#3A3115" stroke-width="2"/>
+              <rect x="22" y="22" width="206" height="306" rx="7" fill="none" stroke="url(#qvbFoil)" stroke-width="1.5" opacity=".8"/>
+              <g transform="translate(125 168)">
+                <circle r="62" fill="#181305" stroke="url(#qvbFoil)" stroke-width="2"/>
+                <circle r="50" fill="none" stroke="#3A3115" stroke-width="1"/>
+                <text y="16" text-anchor="middle" font-family="Big Shoulders Display, Impact, Arial Narrow, sans-serif" font-weight="800" font-size="54" letter-spacing="2" fill="url(#qvbFoil)">TL</text>
+              </g>
+              <text x="125" y="62" text-anchor="middle" font-family="Spline Sans Mono, monospace" font-size="10" letter-spacing="4" fill="#8E8465">TOP LOADED</text>
+              <text x="125" y="300" text-anchor="middle" font-family="Spline Sans Mono, monospace" font-size="8.5" letter-spacing="3" fill="#8E8465">CRESCENT SPRINGS &#183; KY</text>
+              <text x="125" y="316" text-anchor="middle" font-family="Spline Sans Mono, monospace" font-size="8.5" letter-spacing="3" fill="#5E5740">BUY &#183; SELL &#183; TRADE</text>
+            </svg>
+          </div>
+        </div>
+        <span class="qv-sheen" aria-hidden="true"></span>
+      </button>
+    </div>
+    <p class="qv-hint" aria-hidden="true">Click the card to flip it</p>
+  </div>
+
+  <div class="qv-info">
+    <p class="eyebrow" id="qvEyebrow"></p>
+    <h2 class="qv-name" id="qvName" tabindex="-1"></h2>
+    <div class="qv-price-row">
+      <span class="price qv-price" id="qvPrice"></span>
+      <span class="qv-cond" id="qvCond"></span>
+      <span class="mkt" id="qvMarket" hidden></span>
+    </div>
+    <div class="qv-stock" id="qvStock"></div>
+
+    <div class="table-wrap qv-table-wrap">
+      <table class="qv-table">
+        <caption class="sr-only">Every listing of this product</caption>
+        <thead><tr><th scope="col">Condition</th><th scope="col">Printing</th><th scope="col">Qty</th><th scope="col">Price</th></tr></thead>
+        <tbody id="qvListings"></tbody>
+      </table>
+    </div>
+
+    <div class="qv-buy">
+      <div class="qty qv-qty" id="qvQty">
+        <button id="qvDec" type="button" aria-label="One fewer">&minus;</button>
+        <span id="qvQtyVal" aria-live="polite">1</span>
+        <button id="qvInc" type="button" aria-label="One more">+</button>
+      </div>
+      <button class="btn qv-add" id="qvAdd" type="button">Add to cart</button>
+      <button class="btn btn-ghost qv-wish" id="qvWish" type="button" aria-pressed="false"><span class="heart-ico" aria-hidden="true">&#9829;</span> <span id="qvWishText">Save</span></button>
+    </div>
+
+    <form class="qv-restock" id="qvRestock" hidden>
+      <label for="qvEmail">Sold out &mdash; get an email when it's back</label>
+      <div class="qv-restock-row">
+        <input id="qvEmail" type="email" required placeholder="you@email.com" autocomplete="email">
+        <button class="btn" type="submit">Notify me</button>
+      </div>
+      <input type="text" name="website" class="qv-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+    </form>
+
+    <div class="qv-links">
+      <a id="qvTcg" class="linklike" href="#" target="_blank" rel="noopener noreferrer" hidden>Buy on TCGplayer &#8599;<span class="sr-only"> (opens TCGplayer in a new tab)</span></a>
+      <button class="linklike" id="qvShare" type="button">Share</button>
+      <span class="qv-pos" id="qvPos"></span>
+    </div>
+    <p class="qv-status" id="qvStatus" role="status" aria-live="polite"></p>
+  </div>
+</div>

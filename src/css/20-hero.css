@@ -11,7 +11,11 @@
     radial-gradient(34% 46% at 84% 74%, color-mix(in srgb, var(--foilA) 11%, transparent), transparent 70%),
     radial-gradient(30% 40% at 10% 84%, color-mix(in srgb, var(--foilC) 7%, transparent), transparent 70%);
   animation:aurora 30s ease-in-out infinite;
+  /* scroll parallax: 20-hero.js writes --py on .hero while the hero is on screen */
+  translate:0 var(--py, 0px);
 }
+/* aurora only burns compositor time while it is actually visible */
+.hero.aurora-off::before,html.page-hidden .hero::before{animation-play-state:paused}
 .hero::after{
   content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
   background:
@@ -31,6 +35,7 @@
   font-size:clamp(3.4rem,11vw,8.2rem); line-height:.86; letter-spacing:.01em;
 }
 .hero h1 span{display:block}
+.hero h1 .w i{display:inline-block; font-style:normal}
 .foil-text{
   background:linear-gradient(100deg,var(--foilA) 5%,var(--foilB) 35%,var(--foilC) 62%,var(--foilD) 92%);
   -webkit-background-clip:text; background-clip:text; color:transparent;
@@ -62,15 +67,18 @@
 .chip[aria-pressed="true"]{box-shadow:0 4px 12px -4px color-mix(in srgb, var(--accent) 45%, transparent)}
 .add:hover:not(:disabled){box-shadow:0 6px 16px -6px color-mix(in srgb, var(--accent) 50%, transparent)}
 .sync-pill{
-  display:inline-flex; align-items:center; gap:8px; margin-top:30px;
+  display:inline-flex; align-items:center; gap:8px; margin-top:30px; max-width:100%;
   font-family:var(--mono); font-size:.72rem; letter-spacing:.06em; color:var(--ink3);
   border:1px solid var(--line); border-radius:99px; padding:6px 14px; background:var(--bg2);
+  font-variant-numeric:tabular-nums;
 }
+.sync-pill b{color:var(--ink2); font-weight:500}
+.sync-pill #heroInvTxt{white-space:normal}
 .dot{width:7px; height:7px; border-radius:50%; background:var(--good); flex:0 0 auto}
-.dot.warn{background:var(--warn)} .dot.crit{background:var(--crit)}
+.dot.warn{background:var(--warn)} .dot.crit{background:var(--crit)} .dot.idle{background:var(--ink3)}
 
 /* hero card */
-.stage{perspective:1100px; display:grid; place-items:center; min-height:420px; padding-bottom:56px}
+.stage{perspective:1100px; display:grid; place-items:center; min-height:420px; padding-bottom:56px; translate:0 var(--sy, 0px)}
 .holo{
   width:min(300px,72vw); aspect-ratio:5/7; border-radius:14px; position:relative;
   transform-style:preserve-3d; transition:transform .2s ease-out;
@@ -106,6 +114,7 @@
   font-family:var(--mono); font-size:.58rem; letter-spacing:.22em; text-transform:uppercase;
   text-align:center; padding:14px 0 16px; color:#737B8A;
 }
+/* sheen position comes from --shx/--shy set on .holo by TL.tilt (inherited) */
 .holo .sheen{
   position:absolute; inset:0; border-radius:14px; pointer-events:none; mix-blend-mode:screen; opacity:.55;
   background:linear-gradient(115deg, transparent 30%, rgba(110,231,240,.28) 44%, rgba(244,154,193,.25) 52%, rgba(245,208,111,.22) 58%, transparent 72%);
@@ -126,13 +135,21 @@
 .reveal>*:nth-child(5){animation-delay:.41s}
 .holo{animation:cardIn .9s .3s cubic-bezier(.2,.7,.2,1) backwards}
 
+/* staggered letter reveal for BUY. SELL. (TRADE. arrives as one foil word) */
+@keyframes letterIn{from{opacity:0; transform:translateY(.32em) rotate(3deg)}to{opacity:1; transform:none}}
+.reveal .w i{animation:letterIn .55s cubic-bezier(.2,.7,.2,1) both; animation-delay:calc(.16s + var(--i,0) * .05s)}
+.reveal .w:nth-child(2) i{animation-delay:calc(.36s + var(--i,0) * .05s)}
+.reveal .w i:nth-child(1){--i:0}.reveal .w i:nth-child(2){--i:1}.reveal .w i:nth-child(3){--i:2}
+.reveal .w i:nth-child(4){--i:3}.reveal .w i:nth-child(5){--i:4}.reveal .w i:nth-child(6){--i:5}
+@keyframes wordIn{from{opacity:0; transform:translateY(.25em) scale(.98)}to{opacity:1; transform:none}}
+.reveal h1 .foil-text{animation:wordIn .6s .58s cubic-bezier(.2,.7,.2,1) both, foilGlint 1.2s .7s ease-out both}
+
 /* hero orchestration: foil glint, one-shot sheen pass, caption settle */
 @keyframes foilGlint{
   0%{filter:brightness(.6) saturate(.7)}
   55%{filter:brightness(1.35) saturate(1.25)}
   100%{filter:brightness(1) saturate(1)}
 }
-.reveal .foil-text{animation:foilGlint 1.2s .55s ease-out both}
 @keyframes introSheen{
   0%{transform:translateX(-160%) skewX(-16deg); opacity:0}
   15%{opacity:1}
@@ -147,3 +164,17 @@
 }
 @keyframes captionIn{from{opacity:0; transform:translate(-50%,8px)}to{opacity:1; transform:translate(-50%,0)}}
 .stage-caption{animation:captionIn .5s 1.9s ease both}
+
+/* the intro plays once per page load: 20-hero.js adds html.intro-done when it ends */
+html.intro-done .reveal>*,html.intro-done .reveal .w i,html.intro-done .reveal h1 .foil-text,
+html.intro-done .holo,html.intro-done .holo-frame::after,html.intro-done .stage-caption{animation:none}
+
+@media (max-width:960px){
+  .stage{translate:none}
+}
+@media (prefers-reduced-motion: reduce){
+  .hero::before{animation:none; translate:none}
+  .stage{translate:none}
+  .reveal>*,.reveal .w i,.reveal h1 .foil-text,.holo,.holo-frame::after,.stage-caption{animation:none}
+  .holo{transition:none}
+}

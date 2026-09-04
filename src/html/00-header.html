@@ -3,12 +3,13 @@
 <header class="topbar">
   <div class="wrap">
     <button class="brand" data-go="home" aria-label="Top Loaded TCG home">
-      <img class="brand-logo logo-d" src="logo-dark.png" alt="" aria-hidden="true" onerror="document.documentElement.classList.add('no-logo')">
-      <img class="brand-logo logo-l" src="logo-light.png" alt="" aria-hidden="true" onerror="document.documentElement.classList.add('no-logo')">
+      <img class="brand-logo" id="brandLogo" width="118" height="50" alt="" aria-hidden="true" decoding="async" fetchpriority="high" onerror="document.documentElement.classList.add('no-logo')">
+      <script>(function(){var i=document.getElementById("brandLogo");if(i&&!i.getAttribute("src"))i.src=document.documentElement.getAttribute("data-theme")==="light"?"logo-light.png":"logo-dark.png"})()</script>
       <span class="brand-mark" aria-hidden="true">TL</span>
-      <span class="brand-name" id="brandName">Top Loaded<small>Trading Cards &middot; NKY</small></span>
+      <span class="brand-name" id="brandName">Top Loaded<small id="brandTag">Trading Cards &middot; NKY</small></span>
     </button>
-    <nav class="mainnav" aria-label="Main">
+    <span class="open-pill" id="openPill" role="status" hidden></span>
+    <nav class="mainnav" id="mainnav" aria-label="Main">
       <button data-go="shop">Shop</button>
       <button data-go="live">Live<span class="live-dot" aria-hidden="true"></span></button>
       <button data-go="show">Card Show</button>
@@ -17,12 +18,12 @@
       <button data-go="buylist">Sell to Us</button>
       <button data-go="visit">Visit</button>
     </nav>
-    <button class="theme-btn" id="themeBtn" aria-label="Switch between light and dark mode" title="Light / dark mode">
+    <button class="theme-btn" id="themeBtn" aria-label="Switch theme: Top Loaded, light, or dark" title="Switch theme (Top Loaded / light / dark)">
       <svg class="ic-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v3M12 18.5v3M21.5 12h-3M5.5 12h-3M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1M18.7 18.7l-2.1-2.1M7.4 7.4L5.3 5.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       <svg class="ic-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
       <span class="ic-tl" aria-hidden="true">TL</span>
     </button>
-    <button class="cart-btn" id="cartBtn" aria-haspopup="dialog">
+    <button class="cart-btn" id="cartBtn" aria-haspopup="dialog" aria-controls="drawer">
       Cart <span class="cart-count" id="cartCount">0</span>
     </button>
   </div>
@@ -33,4 +34,5 @@
   <button class="banner-link" id="siteBannerBtn" data-go="live" hidden>Watch &rarr;</button>
 </div>
 
-<main id="main">
+<main id="main" tabindex="-1">
+<div class="scroll-sentinel" id="scrollSentinel" aria-hidden="true"></div>

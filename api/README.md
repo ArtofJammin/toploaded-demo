@@ -85,3 +85,21 @@ commit. Optional secrets: `SQUARE_ACCESS_TOKEN`, `SQUARE_LOCATION_ID`,
 
 `scheduled()` (daily 11:00 UTC): prunes expired spot claims, trims chat to 60,
 clears the inventory status cache.
+
+## Additions made during the build (beyond the table above)
+
+- `POST /checkout` also returns `subtotalCents`, `shippingCents`, `reason`; answers **409** `{error, items:[{id, available, reason}]}`
+  when a `tcg-<id>` line exceeds inventory stock, **502** with Square's code/detail on Square errors. Shipping: `SHIPPING_CENTS`
+  (default 499) flat, free at `FREE_SHIPPING_CENTS` (default 10000). Orders are kept 7 days: `GET /checkout/orders` (staff),
+  `GET /checkout/orders/:id` (public, status only).
+- `POST /live/spots/claim` body is `{spot, name?, sid}`; `POST /live/spots/release {spot, sid}` frees a spot when the sid matches
+  (staff token frees any) → `{ok, released, taken, mine}`; `GET /live?sid=` adds `spots.mine`, `spots.open`, `spots.claims`;
+  `POST /live/spots/:n/confirm` (staff) accepts `{name?}`; `POST /live/chat` accepts `{sys:true}` from staff; `GET /live/chat`
+  returns `{messages, now, viewers}`.
+- `GET /alerts?status=open|acked`; alerts dedupe identical open messages (`count` increments). Webhook alerts carry
+  `source:"square:<event>"` and `sku:"tcg:<productId>"`.
+- `GET /inventory/status` also returns `hooks` (last webhook per event type), `square:{configured, env, webhook}`,
+  `github:{configured, repo, workflow}`, `cached`, `unreachable`; `POST /inventory/sync` answers **429** when a run was
+  dispatched in the last few minutes. `GITHUB_REF` (default `main`) picks the branch.
+- Forms accept and store extra optional fields: vendor `phone, show, waitlist`; signup `eventName, date, contact`;
+  buylist `photosUrl`; newsletter `topic`. Unknown fields are dropped, never rejected.

@@ -3,7 +3,7 @@
 // duplicate element ids and JS references to ids that no HTML defines, and runs
 // the API tests.  Exit code 1 on any hard failure.
 //   node tools/check.mjs [--no-tests]
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
@@ -48,6 +48,20 @@ for (const m of app.matchAll(/getElementById\(\s*["']([\w-]+)["']/g)) refs.add(m
 const dynamicIds = new Set([...app.matchAll(/id=(?:\\)?["']([A-Za-z][\w-]*)(?:\\)?["']/g)].map(m => m[1]));
 const missing = [...refs].filter(id => !seen.has(id) && !dynamicIds.has(id));
 if (missing.length) warn('ids used in JS but not in HTML: ' + missing.join(', ')); else console.log('ok    every JS #id reference exists');
+
+// 4b. Duplicate top-level declarations across src/js (one shared closure: last one wins silently)
+{
+  const decl = new Map();
+  const dir = join(repo, 'src', 'js');
+  for (const f of readdirSync(dir).filter(f => f.endsWith('.js')).sort()) {
+    const text = readFileSync(join(dir, f), 'utf8');
+    for (const m of text.matchAll(/^  (?:var|function|let|const)\s+([A-Za-z_$][\w$]*)/gm)) {
+      const list = decl.get(m[1]) || []; if (!list.includes(f)) list.push(f); decl.set(m[1], list);
+    }
+  }
+  const dupes = [...decl].filter(([, files]) => files.length > 1).map(([n, files]) => `${n} (${files.join(', ')})`);
+  if (dupes.length) fail('same top-level name declared in several src/js files: ' + dupes.join('; ')); else console.log('ok    no duplicate top-level declarations across src/js');
+}
 
 // 5. Required contracts
 for (const needle of ['TL.go = go', 'TL.api = ', 'TL.auth = ', 'TL.emit("init")']) {

@@ -1,0 +1,215 @@
+/* ============ PACK RIP (mini-game) ============ */
+.rip-sr{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+.rip-app{--rip-ease:var(--ease-out, cubic-bezier(.2,.7,.2,1)); --rip-spring:var(--ease-spring, cubic-bezier(.22,1.18,.36,1)); --rip-flip:var(--ease-flip, cubic-bezier(.4,0,.2,1)); padding-bottom:64px; overflow-x:clip}
+.rip-label{display:block; font-family:var(--mono); font-size:.75rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3)}
+.rip-note{font-family:var(--mono); font-size:.75rem; letter-spacing:.03em; color:var(--ink3); line-height:1.5}
+.rip-note .linklike{font-size:inherit}
+.rip-app h3{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.4rem; letter-spacing:.03em}
+
+/* --- setup --- */
+.rip-setup{display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,.9fr); gap:16px; align-items:start}
+.rip-config,.rip-odds-wrap,.rip-stats{padding:24px; min-width:0}
+.rip-config{display:flex; flex-direction:column; gap:18px}
+.rip-field{display:flex; flex-direction:column; gap:8px}
+.rip-config .chip{min-height:40px}
+.rip-config select{width:100%; min-width:0; max-width:100%}
+.rip-price{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 12px; padding-top:14px; border-top:1px dashed var(--line)}
+.rip-price b{font-family:var(--disp); font-weight:800; font-size:2rem; line-height:1; letter-spacing:.01em}
+.rip-price .rip-label{flex-basis:100%}
+.rip-go{width:100%; padding:15px 22px; font-size:.9rem}
+.rip-odds{width:100%; border-collapse:collapse; margin-top:14px; font-family:var(--mono); font-size:.78rem}
+.rip-odds th,.rip-odds td{text-align:left; padding:8px 0; border-bottom:1px solid var(--line)}
+.rip-odds thead th{color:var(--ink3); font-weight:400; font-size:.72rem; letter-spacing:.12em; text-transform:uppercase}
+.rip-odds tbody th{font-weight:500; color:var(--ink)}
+.rip-odds td{text-align:right; font-variant-numeric:tabular-nums; color:var(--ink2)}
+.rip-odds-wrap .rip-note{margin-top:12px}
+.rip-stats dl{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:14px 0 0}
+.rip-stats dl div{background:var(--surface2); border:1px solid var(--line); border-radius:6px; padding:10px 12px}
+.rip-stats dt{font-family:var(--mono); font-size:.68rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3)}
+.rip-stats dd{margin:4px 0 0; font-family:var(--mono); font-size:1rem; font-weight:500; font-variant-numeric:tabular-nums}
+.rip-best-mini{display:flex; align-items:center; gap:12px; margin-top:14px; padding-top:14px; border-top:1px dashed var(--line)}
+.rip-best-mini img,.rip-best-ph{width:48px; height:48px; border-radius:6px; object-fit:cover; background:var(--slab); border:1px solid var(--slab-line); flex:0 0 auto}
+.rip-best-ph{display:inline-block}
+.rip-best-mini b{display:block; font-size:.92rem; font-weight:600; line-height:1.3}
+.rip-best-mini span{font-family:var(--mono); font-size:.72rem; color:var(--ink3)}
+.rip-stats .rip-note{margin-top:12px}
+.rip-cta{margin-top:16px; width:100%; text-align:center}
+
+/* --- stage / pack --- */
+.rip-stage{position:relative; --rip-c:var(--pk)}
+.rip-stage[data-game="op"]{--rip-c:var(--op)}
+.rip-stage[data-game="mtg"]{--rip-c:var(--mtg)}
+.rip-packwrap{display:flex; flex-direction:column; align-items:center; gap:18px; padding:8px 0 28px; transition:opacity .4s var(--rip-ease), transform .4s var(--rip-ease)}
+.rip-packwrap.done{opacity:0; pointer-events:none; transform:scale(.92); position:absolute; inset:0 0 auto 0}
+.rip-hint{color:var(--ink2); font-size:.94rem; text-align:center; max-width:36ch}
+.rip-actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:center}
+.rip-pack{
+  position:relative; width:min(230px, 62vw); aspect-ratio:5/8; border-radius:14px; cursor:grab; user-select:none; -webkit-user-select:none;
+  background:
+    radial-gradient(90% 60% at 50% 30%, rgba(255,255,255,.28), transparent 60%),
+    linear-gradient(160deg, color-mix(in srgb, var(--rip-c) 60%, #fff) 0%, var(--rip-c) 34%, color-mix(in srgb, var(--rip-c) 55%, #000) 78%, color-mix(in srgb, var(--rip-c) 30%, #000) 100%);
+  box-shadow:var(--shadow), inset 0 0 0 1px rgba(255,255,255,.18);
+  animation:ripFloat 5.5s ease-in-out infinite; transform-origin:50% 60%;
+  overflow:visible; touch-action:none;
+}
+.rip-foil{position:absolute; inset:0; border-radius:inherit; overflow:hidden; pointer-events:none}
+.rip-foil::before{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(115deg, transparent 32%, rgba(255,255,255,.34) 46%, rgba(255,255,255,.08) 52%, transparent 64%);
+  mix-blend-mode:screen; animation:ripShimmer 4.2s ease-in-out infinite;
+}
+.rip-pack:focus-visible{outline:3px solid var(--accent); outline-offset:6px}
+.rip-pack.nudge{animation:ripNudge .5s var(--rip-spring)}
+@keyframes ripFloat{0%,100%{transform:rotate(-3deg)}50%{transform:translateY(-8px) rotate(-1.5deg)}}
+@keyframes ripShimmer{0%,25%{transform:translateX(-70%)}60%,100%{transform:translateX(70%)}}
+@keyframes ripNudge{0%{transform:rotate(-3deg)}25%{transform:rotate(3deg) translateX(6px)}55%{transform:rotate(-5deg) translateX(-6px)}100%{transform:rotate(-3deg)}}
+.rip-crimp{position:absolute; left:6px; right:6px; height:10px; background:repeating-linear-gradient(90deg, rgba(0,0,0,.28) 0 3px, transparent 3px 7px); opacity:.7}
+.rip-crimp.top{top:4px}
+.rip-crimp.bottom{bottom:4px}
+.rip-strip{
+  position:absolute; top:16px; left:0; right:0; height:36px; z-index:2; cursor:grab;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--mono); font-size:.62rem; letter-spacing:.24em; text-transform:uppercase; color:rgba(255,255,255,.9);
+  background:linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.36));
+  border-top:1px dashed rgba(255,255,255,.55); border-bottom:1px dashed rgba(255,255,255,.55);
+  clip-path:polygon(0 0,100% 0,100% 88%,96% 100%,92% 86%,88% 100%,84% 86%,80% 100%,76% 86%,72% 100%,68% 86%,64% 100%,60% 86%,56% 100%,52% 86%,48% 100%,44% 86%,40% 100%,36% 86%,32% 100%,28% 86%,24% 100%,20% 86%,16% 100%,12% 86%,8% 100%,4% 86%,0 100%);
+  transform:translateX(calc(var(--tear, 0) * 118%)) rotate(calc(var(--tear, 0) * -7deg)); opacity:calc(1 - var(--tear, 0) * .25);
+  transition:transform .32s var(--rip-spring), opacity .32s ease; will-change:transform;
+}
+.rip-pack.tearing{cursor:grabbing; animation-play-state:paused}
+.rip-pack.tearing .rip-strip{transition:none; cursor:grabbing}
+.rip-strip span{pointer-events:none}
+.rip-packart{position:absolute; inset:60px 14px 20px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; text-align:center; pointer-events:none}
+.rip-packart b{font-family:var(--disp); font-weight:800; font-size:clamp(4rem, 22vw, 5.6rem); line-height:.9; color:#fff; text-shadow:0 3px 0 rgba(0,0,0,.35), 0 12px 30px rgba(0,0,0,.4); letter-spacing:.01em}
+.rip-packgame{font-family:var(--mono); font-size:.64rem; letter-spacing:.3em; text-transform:uppercase; color:rgba(255,255,255,.85)}
+.rip-packset{font-family:var(--body); font-weight:600; font-size:.88rem; color:#fff; text-wrap:balance; text-shadow:0 1px 2px rgba(0,0,0,.5); margin-top:4px}
+.rip-packn{font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.7)}
+.rip-pack.torn{animation:ripOpen .55s var(--rip-ease) both; cursor:default}
+.rip-pack.torn .rip-strip{transition:transform .45s var(--ease-in, cubic-bezier(.55,.06,.68,.19)), opacity .4s ease; transform:translate(130%, -70px) rotate(-28deg); opacity:0}
+@keyframes ripOpen{0%{transform:rotate(-3deg)}30%{transform:rotate(2deg) scale(1.04)}100%{transform:rotate(0) scale(.96) translateY(10px); opacity:.35}}
+.rip-stage.shake{animation:ripShake .5s cubic-bezier(.36,.07,.19,.97) both}
+@keyframes ripShake{10%,90%{transform:translate3d(-2px,0,0)}20%,80%{transform:translate3d(4px,0,0)}30%,50%,70%{transform:translate3d(-7px,0,0)}40%,60%{transform:translate3d(7px,0,0)}}
+
+/* --- cards --- */
+.rip-cards{margin-top:8px}
+.rip-cardbar{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px}
+.rip-progress{font-family:var(--mono); font-size:.78rem; letter-spacing:.08em; color:var(--ink3); font-variant-numeric:tabular-nums}
+.rip-cardbtns{display:flex; gap:8px; flex-wrap:wrap}
+.rip-cardbtns .btn{padding:10px 16px}
+.rip-grid{display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:14px; perspective:1200px}
+.rip-card{
+  position:relative; aspect-ratio:5/7; width:100%; border:0; padding:0; background:none; border-radius:10px;
+  perspective:900px; cursor:pointer; -webkit-tap-highlight-color:transparent; opacity:0;
+}
+.rip-grid.deal .rip-card{animation:ripDeal .55s var(--rip-spring) both; animation-delay:calc(var(--i) * 55ms)}
+@keyframes ripDeal{from{opacity:0; transform:translate(var(--dx, 0px), var(--dy, -40px)) rotate(-9deg) scale(.55)}to{opacity:1; transform:none}}
+.rip-card:focus-visible{outline:3px solid var(--accent); outline-offset:4px}
+.rip-card-inner{display:block; position:absolute; inset:0; transform-style:preserve-3d; transition:transform .6s var(--rip-flip); will-change:transform; border-radius:10px}
+.rip-card:hover:not(.is-flipped) .rip-card-inner{transform:translateY(-4px) rotateY(-8deg)}
+.rip-card.is-flipped .rip-card-inner{transform:rotateY(180deg)}
+.rip-card.is-flipped{cursor:zoom-in}
+.rip-face{
+  position:absolute; inset:0; border-radius:10px; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  border:1px solid var(--slab-line); background:var(--slab); display:grid; place-items:center;
+}
+.rip-face.back{
+  background:
+    repeating-radial-gradient(circle at 50% 50%, transparent 0 9px, rgba(255,255,255,.06) 9px 11px),
+    radial-gradient(70% 55% at 50% 42%, color-mix(in srgb, var(--rip-c) 62%, #000), color-mix(in srgb, var(--rip-c) 18%, #0e0f14) 72%);
+  box-shadow:inset 0 0 0 4px color-mix(in srgb, var(--rip-c) 45%, #fff), inset 0 0 0 6px rgba(0,0,0,.35);
+}
+.rip-face.back b{font-family:var(--disp); font-weight:800; font-size:clamp(1.6rem, 6vw, 3rem); color:#fff; text-shadow:0 2px 0 rgba(0,0,0,.35); letter-spacing:.02em}
+.rip-face.front{transform:rotateY(180deg); background:#fff}
+.rip-face.front img,.rip-face.front svg{display:block; width:100%; height:100%; object-fit:cover}
+.rip-face.front[data-drawn]{background:#12151B}
+.rip-tag{
+  position:absolute; left:6px; right:6px; bottom:6px; padding:3px 6px; border-radius:4px; text-align:center;
+  font-family:var(--mono); font-size:.6rem; letter-spacing:.1em; text-transform:uppercase; line-height:1.3;
+  background:rgba(12,14,18,.82); color:#EEF0F4; border:1px solid rgba(255,255,255,.12); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.rip-tag.rare{background:linear-gradient(90deg, var(--foilA), var(--foilB), var(--foilC), var(--foilD)); color:#0C0E12; border-color:transparent; font-weight:600}
+.rip-sheen{
+  position:absolute; inset:-40%; pointer-events:none; opacity:0; mix-blend-mode:screen;
+  background:linear-gradient(115deg, transparent 30%, color-mix(in srgb, var(--foilA) 55%, transparent) 42%, color-mix(in srgb, var(--foilC) 60%, transparent) 50%, color-mix(in srgb, var(--foilD) 45%, transparent) 58%, transparent 70%);
+  transform:translateX(-60%) rotate(8deg);
+}
+.rip-card.is-rare .rip-sheen{animation:ripSheen 1.3s .35s var(--rip-ease) both}
+.rip-card.is-rare:hover .rip-sheen{animation:ripSheen 1.1s var(--rip-ease) both}
+@keyframes ripSheen{0%{opacity:0; transform:translateX(-60%) rotate(8deg)}30%{opacity:.95}100%{opacity:.35; transform:translateX(60%) rotate(8deg)}}
+.rip-card.is-rare .rip-face.front{border-color:var(--foilB); box-shadow:0 0 0 2px color-mix(in srgb, var(--foilB) 70%, transparent), 0 0 30px color-mix(in srgb, var(--foilA) 55%, transparent)}
+.rip-card.is-hit .rip-face.front{box-shadow:0 0 0 3px var(--accent), 0 0 44px color-mix(in srgb, var(--accent) 65%, transparent)}
+.rip-card.is-hit.is-rare .rip-card-inner{animation:ripHit .9s .55s var(--rip-spring) both}
+@keyframes ripHit{0%{transform:rotateY(180deg)}40%{transform:rotateY(180deg) scale(1.14) translateY(-10px)}100%{transform:rotateY(180deg)}}
+
+/* --- results --- */
+.rip-results{margin-top:36px}
+.rip-sum{padding:28px; position:relative; overflow:hidden}
+.rip-sum::before{content:""; position:absolute; inset:0 auto 0 0; width:5px; background:linear-gradient(180deg,var(--foilA),var(--foilB),var(--foilC),var(--foilD))}
+.rip-sum h2{font-family:var(--disp); font-weight:800; text-transform:uppercase; font-size:clamp(1.7rem, 4vw, 2.6rem); line-height:1; letter-spacing:.02em}
+.rip-sum h2:focus{outline:none}
+.rip-sum h2 .rip-total{color:var(--accent)}
+.rip-sum.up h2 .rip-total{color:var(--good)}
+.rip-sum .rip-note{margin-top:10px; max-width:60ch}
+.rip-bestpull{display:grid; grid-template-columns:150px minmax(0,1fr); gap:22px; align-items:center; margin-top:24px; padding-top:22px; border-top:1px dashed var(--line)}
+.rip-best-art{aspect-ratio:5/7; border-radius:10px; overflow:hidden; border:1px solid var(--foilB); background:#fff; box-shadow:0 0 0 2px color-mix(in srgb, var(--foilB) 60%, transparent), 0 0 34px color-mix(in srgb, var(--foilA) 45%, transparent)}
+.rip-best-art img,.rip-best-art svg{display:block; width:100%; height:100%; object-fit:cover}
+.rip-best-meta h3{font-size:1.6rem; margin-top:4px}
+.rip-best-meta .rip-price{display:block; font-family:var(--mono); font-size:1.5rem; font-weight:500; margin-top:8px; font-variant-numeric:tabular-nums}
+.rip-btns{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
+.rip-again{margin-top:26px; padding-top:22px; border-top:1px dashed var(--line)}
+.rip-list{list-style:none; margin:16px 0 0; padding:0; display:grid; gap:8px}
+.rip-row{display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:12px; align-items:center; background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:8px 12px 8px 8px}
+.rip-row.rare{border-color:color-mix(in srgb, var(--foilB) 55%, var(--line))}
+.rip-row.best{background:color-mix(in srgb, var(--accent) 8%, var(--surface)); border-color:var(--accent)}
+.rip-row-view{display:flex; align-items:center; gap:12px; background:none; border:0; padding:0; text-align:left; min-width:0; color:inherit; border-radius:6px; min-height:44px}
+.rip-row-view img,.rip-row-view .rip-best-ph{width:44px; height:44px; border-radius:6px; object-fit:cover; background:var(--slab); border:1px solid var(--slab-line); flex:0 0 auto}
+.rip-row-name{min-width:0}
+.rip-row-name b{display:block; font-weight:600; font-size:.92rem; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.rip-row-name span{font-family:var(--mono); font-size:.72rem; color:var(--ink3)}
+.rip-row-view:hover b{color:var(--accent)}
+.rip-row-price{font-family:var(--mono); font-size:.95rem; font-variant-numeric:tabular-nums; white-space:nowrap}
+.rip-row-add{margin-top:0; padding:9px 12px; white-space:nowrap}
+
+/* --- responsive --- */
+@media (max-width:960px){
+  .rip-setup{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .rip-stats{grid-column:1/-1}
+  .rip-grid{grid-template-columns:repeat(4, minmax(0,1fr))}
+}
+@media (max-width:640px){
+  .rip-setup{grid-template-columns:minmax(0,1fr)}
+  .rip-config,.rip-odds-wrap,.rip-stats{padding:20px}
+  .rip-grid{grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px}
+  .rip-bestpull{grid-template-columns:110px minmax(0,1fr); gap:16px}
+  .rip-row{grid-template-columns:minmax(0,1fr) auto; row-gap:6px}
+  .rip-row-add{grid-column:1/-1}
+  .rip-again .btn{flex:1 1 100%; text-align:center}
+}
+@media (max-width:400px){
+  .rip-stats dl{grid-template-columns:1fr 1fr}
+  .rip-bestpull{grid-template-columns:1fr}
+  .rip-best-art{width:140px}
+}
+@media (pointer:coarse){
+  .rip-card{min-width:44px}
+  .rip-config .chip{min-height:44px}
+  .rip-cardbtns .btn,.rip-row-add{min-height:44px}
+  .rip-strip{height:44px}
+  .rip-packart{top:68px}
+}
+
+/* --- reduced motion --- */
+@media (prefers-reduced-motion: reduce){
+  .rip-pack,.rip-foil::before,.rip-pack.nudge,.rip-pack.torn{animation:none}
+  .rip-pack.torn{opacity:.35; transform:scale(.96)}
+  .rip-strip,.rip-pack.torn .rip-strip{transition:none; transform:none; opacity:0}
+  .rip-pack:not(.torn) .rip-strip{opacity:1}
+  .rip-stage.shake{animation:none}
+  .rip-grid.deal .rip-card{animation:none; opacity:1}
+  .rip-card-inner{transition:none}
+  .rip-card:hover:not(.is-flipped) .rip-card-inner{transform:none}
+  .rip-card.is-rare .rip-sheen,.rip-card.is-rare:hover .rip-sheen{animation:none; opacity:.35; transform:none}
+  .rip-card.is-hit.is-rare .rip-card-inner{animation:none}
+  .rip-packwrap,.rip-packwrap.done{transition:none}
+  .rip-packwrap.done{opacity:0}
+}

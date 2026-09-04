@@ -9,25 +9,46 @@
       <div class="buy-grid">
         <div class="buy-points">
           <div class="panel"><span class="k">Cash</span><p>Straight cash offer, paid on the spot once we've looked everything over.</p></div>
-          <div class="panel"><span class="k">+10%</span><p>Take store credit instead and we add ten percent to the offer.</p></div>
-          <div class="panel"><span class="k">Big?</span><p>Estate or store-closing sized lot? We travel for large collections across the Tri-State &mdash; call (513) 222-2573.</p></div>
+          <div class="panel"><span class="k" id="buyBonusK">+10%</span><p>Take store credit instead and we add <span id="buyBonusWord">ten percent</span> to the offer.</p></div>
+          <div class="panel"><span class="k">Big?</span><p>Estate or store-closing sized lot? We travel for large collections across the Tri-State &mdash; call <a id="buyPhone" href="tel:+15132222573">(513) 222-2573</a>.</p></div>
           <div class="panel"><span class="k">How</span><p>No appointment needed &mdash; walk in with it, or start a quote here. We sort, price against current market, and the offer is yours to take or leave.</p></div>
         </div>
-        <form class="form-card" id="buyForm">
-          <h3>Start a quote</h3>
-          <p style="color:var(--ink2); font-size:.92rem">Tell us roughly what you've got &mdash; photos help but aren't required. <span class="demo-tag">demo form</span></p>
-          <div class="form-grid">
-            <div class="field"><label for="bName">Name</label><input id="bName" required autocomplete="off"></div>
-            <div class="field"><label for="bContact">Email or phone</label><input id="bContact" required autocomplete="off"></div>
-            <div class="field full"><label for="bGames">What's in it?</label>
-              <select id="bGames"><option>Pokemon</option><option>One Piece</option><option>Magic: The Gathering</option><option>A mix of games</option><option>Sports cards / other</option></select>
+        <div class="buy-col">
+          <div class="form-card worth" id="worth">
+            <p class="eyebrow">Estimator</p>
+            <h3>What's my card worth?</h3>
+            <p class="form-intro">Search a card, pick how it grades, and see roughly what we'd pay &mdash; cash or store credit.</p>
+            <div class="worth-search">
+              <div class="field worth-game"><label for="worthGame">Game</label>
+                <select id="worthGame"><option value="pk">Pokemon</option><option value="op">One Piece</option><option value="mtg">Magic</option><option value="other">Other</option></select>
+              </div>
+              <div class="field worth-q"><label for="worthQ">Card name</label>
+                <input id="worthQ" type="search" autocomplete="off" placeholder="e.g. Charizard ex, Shanks, The One Ring" aria-describedby="worthHint" aria-controls="worthResults">
+              </div>
             </div>
-            <div class="field full"><label for="bDesc">Describe the collection</label>
-              <textarea id="bDesc" rows="4" placeholder="e.g. two binders of modern Pokemon hits, a Base Set Blastoise, and about 4,000 bulk commons"></textarea>
-            </div>
-            <div class="field full"><button class="btn" type="submit">Get my offer</button><p class="drawer-note" style="text-align:left; margin-top:8px">No obligation &mdash; we reply with a real number, and you decide.</p></div>
+            <p class="worth-hint" id="worthHint" role="status" aria-live="polite">Start typing a card name.</p>
+            <ul class="worth-results" id="worthResults" role="list" aria-label="Matching cards"></ul>
+            <div class="worth-pick" id="worthPick" hidden></div>
+            <p class="worth-disclaimer">Estimates only &mdash; market moves daily and final offers are made in person after we see the card.</p>
           </div>
-        </form>
+          <form class="form-card" id="buyForm" novalidate data-kind="buylist">
+            <h3>Start a quote</h3>
+            <p class="form-intro">Tell us roughly what you've got &mdash; photos help but aren't required.</p>
+            <div class="form-grid">
+              <div class="field"><label for="bName">Name</label><input id="bName" name="name" type="text" required autocomplete="name" maxlength="80"></div>
+              <div class="field"><label for="bContact">Email or phone</label><input id="bContact" name="contact" type="text" required autocomplete="email" inputmode="email" maxlength="120"></div>
+              <div class="field full"><label for="bGames">What's in it?</label>
+                <select id="bGames" name="games"><option>Pokemon</option><option>One Piece</option><option>Magic: The Gathering</option><option>Gundam</option><option>Lorcana</option><option>A mix of games</option><option>Sports cards / other</option></select>
+              </div>
+              <div class="field full"><label for="bDesc">Describe the collection</label>
+                <textarea id="bDesc" name="desc" rows="4" required maxlength="2000" placeholder="e.g. two binders of modern Pokemon hits, a Base Set Blastoise, and about 4,000 bulk commons"></textarea>
+              </div>
+              <div class="field full"><label for="bPhotos">Link to photos <small>(optional)</small></label><input id="bPhotos" name="photosUrl" type="url" autocomplete="url" inputmode="url" placeholder="Google Photos, Drive, Imgur&hellip;" maxlength="300"></div>
+              <div class="hp" aria-hidden="true"><label for="bWebsite">Website</label><input id="bWebsite" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+              <div class="field full"><button class="btn" type="submit">Get my offer</button><p class="drawer-note" style="text-align:left; margin-top:8px">No obligation &mdash; we reply with a real number, and you decide.</p></div>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </section>

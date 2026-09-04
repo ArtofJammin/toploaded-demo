@@ -1,14 +1,58 @@
 <!-- ================= CART ================= -->
 <div class="overlay" id="overlay"></div>
-<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Shopping cart" aria-hidden="true">
+<div class="cart-added" id="cartAdded" role="status" aria-live="polite" hidden>
+  <span class="cart-added-txt">Added <i aria-hidden="true">&#10003;</i></span>
+  <span class="cart-sr" id="cartAddedName"></span>
+  <span class="cart-added-sep" aria-hidden="true">&middot;</span>
+  <button type="button" class="cart-added-btn" id="cartAddedView">View cart</button>
+</div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true">
   <div class="drawer-head">
-    <h2>Your cart</h2>
-    <button class="drawer-close" id="drawerClose" aria-label="Close cart">&times;</button>
+    <div class="drawer-head-txt">
+      <p class="eyebrow drawer-eyebrow">Top Loaded &middot; Your cart</p>
+      <h2 id="drawerTitle">Cart <span class="drawer-n" id="drawerCount" aria-hidden="true"></span></h2>
+    </div>
+    <button class="drawer-close" id="drawerClose" type="button" aria-label="Close cart">&times;</button>
   </div>
-  <div class="drawer-body" id="cartBody"></div>
-  <div class="drawer-foot">
-    <div class="subtotal"><span>Subtotal</span><b id="cartTotal">$0.00</b></div>
-    <button class="btn" id="checkoutBtn">Checkout &middot; demo only</button>
-    <p class="drawer-note">Pickup in store or ship &middot; payments run through Square (simulated here)</p>
+  <div class="drawer-body" id="drawerBody" tabindex="0" role="region" aria-label="Cart contents">
+    <p class="cart-sr" id="cartLive" role="status" aria-live="polite"></p>
+    <div id="cartBody"></div>
+    <form class="cart-form" id="cartForm" novalidate hidden>
+      <fieldset class="ful">
+        <legend>How do you want it?</legend>
+        <label class="ful-opt on">
+          <input type="radio" name="fulfillment" value="pickup" checked>
+          <span class="ful-txt"><b>In-store pickup</b><small>2514 Hazelwood Dr &middot; ready next open day</small></span>
+          <span class="ful-price" id="fulPickupPrice">Free</span>
+        </label>
+        <label class="ful-opt">
+          <input type="radio" name="fulfillment" value="ship">
+          <span class="ful-txt"><b>Ship it</b><small>USPS tracked &middot; sleeved &amp; top loaded</small></span>
+          <span class="ful-price" id="fulShipPrice">$4.99</span>
+        </label>
+      </fieldset>
+      <div class="cart-fields">
+        <div class="field">
+          <label for="cartEmail">Email <span class="opt">optional &middot; for your receipt</span></label>
+          <input id="cartEmail" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" maxlength="120">
+        </div>
+        <div class="field">
+          <label for="cartNote">Order note <span class="opt">optional</span></label>
+          <input id="cartNote" type="text" maxlength="200" placeholder="Hold it at the counter till Saturday&hellip;" autocomplete="off">
+        </div>
+      </div>
+      <p class="cart-credit" id="cartCredit">Paying with <b>store credit</b>? Mention it at pickup &mdash; credit is worth 10% more than cash.</p>
+    </form>
+    <div class="cart-done" id="cartDone" hidden></div>
+  </div>
+  <div class="drawer-foot" id="drawerFoot">
+    <div class="cart-sums">
+      <div class="sum"><span>Subtotal</span><b id="cartSubtotal">$0.00</b></div>
+      <div class="sum" id="cartShipRow"><span id="cartShipLbl">Pickup</span><b id="cartShip">Free</b></div>
+      <div class="sum total"><span>Total</span><b id="cartTotal">$0.00</b></div>
+    </div>
+    <div class="cart-err" id="cartErr" role="alert" hidden></div>
+    <button class="btn" id="checkoutBtn" type="button">Checkout</button>
+    <p class="drawer-note" id="cartNoteLine">Pickup in store or ship &middot; payments run through Square</p>
   </div>
 </aside>

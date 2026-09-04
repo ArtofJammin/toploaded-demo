@@ -3,8 +3,9 @@
     <div class="admin-bar">
       <div class="wrap">
         <span class="eyebrow">Back of house</span>
-        <span class="pill ok"><span class="dot"></span>Connected to Square</span>
-        <span class="demo-tag">All admin data is simulated for this demo</span>
+        <span class="pill role-pill" id="adminRole"><span class="dot"></span>Admin</span>
+        <span class="pill conn-pill" id="adminConn" role="status"><span class="dot"></span>Checking&hellip;</span>
+        <button class="pill inbox-pill" id="inboxBadge" type="button" aria-label="Inbox: 0 new" hidden><span class="dot"></span>Inbox <b id="inboxBadgeN">0</b></button>
         <span style="flex:1"></span>
         <button class="linklike logoutBtn" type="button">Log out</button>
         <button class="linklike" data-go="home">&larr; Back to storefront</button>
@@ -13,170 +14,281 @@
     <div class="wrap">
       <div class="view-head" style="padding-top:36px; padding-bottom:20px">
         <h1>Today at Top Loaded</h1>
-        <p class="lede">Wednesday, Aug 27 &middot; register and website, one inventory.</p>
+        <p class="lede"><span id="adminDate">Today</span> &middot; register and website, one inventory.</p>
       </div>
 
-      <div class="stat-row">
+      <div class="stat-row stat-row-6">
         <div class="stat">
-          <span class="lab">Today's sales</span>
-          <span class="val">$1,284</span>
-          <span class="sub up">+18% vs last Wed &middot; via Square</span>
+          <span class="lab">Today's sales <span class="demo-tag">sample</span></span>
+          <span class="val"><span class="pre">$</span><span id="statSales">1,284</span></span>
+          <span class="sub up">Square totals land here once it's connected</span>
           <div class="spark" aria-hidden="true">
             <i style="height:36%"></i><i style="height:52%"></i><i style="height:44%"></i><i style="height:68%"></i><i style="height:58%"></i><i style="height:80%"></i><i class="today" style="height:92%"></i>
           </div>
         </div>
         <div class="stat">
-          <span class="lab">Orders today</span>
-          <span class="val">23</span>
+          <span class="lab">Orders today <span class="demo-tag">sample</span></span>
+          <span class="val" id="statOrders">23</span>
           <span class="sub">18 in-store &middot; 5 online pickup</span>
         </div>
         <div class="stat">
-          <span class="lab">Low-stock alerts</span>
-          <span class="val" id="lowStockVal">0</span>
-          <span class="sub down">Items at 1 or fewer &middot; reorder soon</span>
+          <span class="lab">Products in the case</span>
+          <span class="val" id="admProducts">&mdash;</span>
+          <span class="sub" id="admProductsSub">Loading inventory summary&hellip;</span>
+        </div>
+        <div class="stat">
+          <span class="lab">Low-stock</span>
+          <span class="val" id="lowStockVal">&mdash;</span>
+          <span class="sub down" id="lowStockSub">Items at 1 or fewer &middot; loading&hellip;</span>
         </div>
         <div class="stat">
           <span class="lab">Show tables booked</span>
-          <span class="val">11<span style="font-size:1.2rem; color:var(--ink3)">/24</span></span>
-          <span class="sub" id="statShowDate">Sat, Sep 5 &middot; Hilton, Turfway Rd</span>
+          <span class="val"><span id="statTables">0</span><span class="of">/<span id="statTablesOf">24</span></span></span>
+          <span class="sub" id="statShowDate">&mdash;</span>
+        </div>
+        <div class="stat">
+          <span class="lab">Open alerts</span>
+          <span class="val" id="statAlerts">0</span>
+          <span class="sub" id="statAlertsSub">Channel sync &middot; nothing waiting</span>
+        </div>
+      </div>
+
+      <h2 class="vh">Dashboard</h2>
+      <div class="admin-grid">
+        <div class="admin-card busy-host" id="intCard">
+          <h3>Integrations <span class="pill" id="intPill"><span class="dot"></span>Checking</span></h3>
+          <p class="card-note">What the site can reach right now. Square, email and the sync job light up when their keys are set on the worker.</p>
+          <div id="intList" class="int-list"></div>
+          <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+            <button class="btn" id="syncNow" type="button">Sync now</button>
+            <span class="save-state" id="syncStatus" role="status"></span>
+          </div>
+          <div class="log" id="syncLog" aria-live="polite" tabindex="0" role="region" aria-label="Sync log"></div>
+        </div>
+
+        <div class="admin-card" id="inboxCard">
+          <h3>Inbox <span class="pill warn" id="inboxPill"><span class="dot warn"></span><span id="inboxCount">0</span> new</span></h3>
+          <p class="card-note">Vendor tables, buylist quotes, league signups, restock and contact requests from the site.</p>
+          <div class="chip-row inbox-chips" id="inboxChips" role="group" aria-label="Filter inbox by kind">
+            <button class="chip" type="button" data-kind="all" aria-pressed="true">All</button>
+            <button class="chip" type="button" data-kind="vendor" aria-pressed="false">Vendor</button>
+            <button class="chip" type="button" data-kind="buylist" aria-pressed="false">Buylist</button>
+            <button class="chip" type="button" data-kind="signup" aria-pressed="false">Signup</button>
+            <button class="chip" type="button" data-kind="restock" aria-pressed="false">Restock</button>
+            <button class="chip" type="button" data-kind="contact" aria-pressed="false">Contact</button>
+            <button class="chip" type="button" data-kind="newsletter" aria-pressed="false">Newsletter</button>
+          </div>
+          <div class="inbox-list" id="inboxList" tabindex="0" role="region" aria-label="Inbox messages"></div>
+          <div style="margin-top:10px; display:flex; gap:12px; align-items:center; flex-wrap:wrap">
+            <button class="linklike" type="button" id="inboxRefresh">Refresh</button>
+            <button class="linklike" type="button" id="inboxShowDone" aria-pressed="false">Show done</button>
+            <span class="save-state" id="inboxState" role="status"></span>
+          </div>
         </div>
       </div>
 
       <div class="admin-grid">
-        <div class="admin-card">
-          <h3>Square integration <span class="pill ok"><span class="dot"></span>Healthy</span></h3>
-          <dl class="kv">
-            <dt>Merchant</dt><dd>Top Loaded Trading Cards <span class="mono" style="color:var(--ink3); font-size:.72rem">&middot; MLQ3&hellip;8KF</span></dd>
-            <dt>Location</dt>
-            <dd>
-              <select id="locSel" aria-label="Square location">
-                <option>Top Loaded TCG &mdash; Crescent Springs (2514 Hazelwood Dr)</option>
-                <option>Card Show Booth &mdash; Mobile (Square Terminal)</option>
-              </select>
-            </dd>
-            <dt>Catalog</dt><dd class="mono" style="font-size:.82rem">214 items mapped &middot; last sync <span id="lastSync">1:47 PM</span></dd>
-            <dt>Auto-sync</dt>
-            <dd>
-              <select id="syncInterval" aria-label="Auto-sync interval">
-                <option>Every 5 minutes</option>
-                <option selected>Every 15 minutes</option>
-                <option>Every 30 minutes</option>
-                <option>Hourly</option>
-              </select>
-            </dd>
-          </dl>
-          <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap">
-            <button class="btn" id="syncNow">Sync now</button>
-            <button class="btn btn-ghost" id="viewSquare">Open Square dashboard</button>
-          </div>
-          <div class="log" id="syncLog" aria-live="polite" aria-label="Sync log">
-            <div><span class="t">1:47 PM</span> &middot; <span class="ok">OK</span> Pulled catalog delta &middot; 3 price changes, 1 new item</div>
-            <div><span class="t">1:47 PM</span> &middot; <span class="ok">OK</span> Pushed 2 stock edits to Square (Crescent Springs)</div>
-            <div><span class="t">1:32 PM</span> &middot; <span class="ok">OK</span> Auto-sync complete &middot; 214 items &middot; 0 conflicts</div>
-            <div><span class="t">1:17 PM</span> &middot; <span class="ok">OK</span> Webhook inventory.count.updated &middot; Charizard ex 3 &rarr; 2</div>
-            <div><span class="t">1:02 PM</span> &middot; <span class="ok">OK</span> Auto-sync complete &middot; 214 items &middot; 0 conflicts</div>
-          </div>
-        </div>
-
-        <div class="admin-card">
-          <h3>Sync behavior</h3>
-          <div class="toggle-row">
-            <div class="tl"><b>Push stock changes to Square</b><span>Edits here update the register instantly</span></div>
-            <button class="switch" role="switch" aria-checked="true" aria-label="Push stock changes to Square"></button>
-          </div>
-          <div class="toggle-row">
-            <div class="tl"><b>Pull Square sales into site stock</b><span>Counter sales reduce online counts in seconds</span></div>
-            <button class="switch" role="switch" aria-checked="true" aria-label="Pull Square sales into site stock"></button>
-          </div>
-          <div class="toggle-row">
-            <div class="tl"><b>Auto-hide sold-out items</b><span>Zero stock hides the listing until restocked</span></div>
-            <button class="switch" role="switch" aria-checked="true" aria-label="Auto-hide sold-out items"></button>
-          </div>
-          <div class="toggle-row">
-            <div class="tl"><b>Card show mode</b><span>Route weekend sales to the booth location</span></div>
-            <button class="switch" role="switch" aria-checked="false" aria-label="Card show mode"></button>
-          </div>
-          <h3 style="margin-top:22px">Webhooks</h3>
-          <div class="hook-row"><span class="hn">inventory.count.updated</span><span class="pill ok"><span class="dot"></span>2m ago</span></div>
-          <div class="hook-row"><span class="hn">order.created</span><span class="pill ok"><span class="dot"></span>11m ago</span></div>
-          <div class="hook-row"><span class="hn">catalog.version.updated</span><span class="pill ok"><span class="dot"></span>1h ago</span></div>
-          <div class="hook-row"><span class="hn">payment.updated</span><span class="pill warn"><span class="dot warn"></span>Retrying &middot; 1 of 3</span></div>
-        </div>
-      </div>
-
-      <div class="admin-grid">
-        <div class="admin-card">
-          <h3>Site settings</h3>
-          <dl class="kv">
-            <dt>Site title</dt><dd><input id="setTitle" value="Top Loaded" style="width:180px"></dd>
-            <dt>Logo</dt><dd><button class="btn btn-ghost" id="setLogo" type="button" style="padding:8px 14px">Upload logo</button></dd>
-            <dt>Weekday hours</dt><dd><input id="setHoursWk" value="Tue&ndash;Fri &middot; 11 AM &ndash; 6 PM" style="width:210px"></dd>
-            <dt>Weekend hours</dt><dd><input id="setHoursSun" value="Sat&ndash;Sun &middot; 10 AM &ndash; 4 PM" style="width:210px"></dd>
-            <dt>Banner</dt><dd><input id="setBanner" placeholder="Holiday hours, big restock, show reminder&hellip;" style="width:100%"></dd>
-            <dt>Show banner</dt><dd><button class="switch" role="switch" aria-checked="false" id="setBannerOn" aria-label="Show announcement banner"></button></dd>
-          </dl>
-          <div style="margin-top:16px"><button class="btn" id="setApply" type="button">Apply to site</button></div>
-        </div>
-        <div class="admin-card">
-          <h3>Live rips <span class="pill crit" id="liveStatusPill"><span class="dot crit"></span>Offline</span></h3>
-          <p style="color:var(--ink2); font-size:.9rem">Going live puts a banner across the storefront, lights up the Live tab, and opens break-spot claims.</p>
-          <div style="margin-top:14px"><button class="btn" id="goLiveBtn" type="button">Start live rip</button></div>
-          <h3 style="margin-top:24px">Card show</h3>
-          <dl class="kv">
-            <dt>Next show</dt><dd><input id="setShowDate" value="Sat, Sep 5" style="width:140px"></dd>
-            <dt>Hours</dt><dd><input id="setShowHours" value="10 AM &ndash; 4 PM" style="width:140px"></dd>
-            <dt>Cadence</dt><dd>First Saturday or Sunday &middot; setup from 8 AM</dd>
-          </dl>
-          <div style="margin-top:14px"><button class="btn btn-ghost" id="setShowApply" type="button">Update show info</button></div>
-        </div>
-      </div>
-
-      <div class="admin-grid">
-        <div class="admin-card">
-          <h3>Play nights editor</h3>
-          <p style="color:var(--ink2); font-size:.9rem">Edit the weekly schedule and publish &mdash; the Play Nights page updates instantly.</p>
-          <div id="evEditor" style="margin-top:10px"></div>
-          <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap">
-            <button class="btn" id="evApply" type="button">Publish schedule</button>
-            <button class="btn btn-ghost" id="evAdd" type="button">Add night</button>
-          </div>
-        </div>
-        <div class="admin-card">
-          <h3>Channel sync alerts <span class="pill warn"><span class="dot warn"></span><span id="alertCount">2</span> open</span></h3>
-          <p style="color:var(--ink2); font-size:.9rem">When something sells on one channel, the other gets flagged until it's reconciled &mdash; Square (register &amp; this site) on one side, TCGplayer on the other.</p>
+        <div class="admin-card" id="alertCard">
+          <h3>Channel sync alerts <span class="pill warn" id="alertPill"><span class="dot warn"></span><span id="alertCount">0</span> open</span></h3>
+          <p class="card-note">When something sells on one channel, the other gets flagged until it's reconciled &mdash; Square (register &amp; this site) on one side, TCGplayer on the other.</p>
           <div id="alertList" style="margin-top:12px"></div>
-          <h3 style="margin-top:22px">TCGplayer nightly import</h3>
-          <div class="toggle-row">
-            <div class="tl"><b>Pull TCGplayer inventory every morning</b><span>6:00 AM &middot; listings, prices &amp; quantities reconciled into Square</span></div>
-            <button class="switch" role="switch" aria-checked="true" aria-label="Nightly TCGplayer import"></button>
+          <div class="form-grid" style="margin-top:14px; grid-template-columns:minmax(0,1fr) auto auto">
+            <div class="field"><label for="alertNewMsg" class="vh">New alert</label><input id="alertNewMsg" placeholder="Flag something by hand&hellip;" autocomplete="off"></div>
+            <div class="field"><label for="alertNewCh" class="vh">Reconcile on</label><select id="alertNewCh"><option value="TCGplayer">on TCGplayer</option><option value="Square">on Square</option></select></div>
+            <div class="field" style="justify-content:flex-end"><button class="btn btn-ghost" id="alertNewBtn" type="button">Add alert</button></div>
           </div>
-          <div class="log" id="tcgLog">
-            <div><span class="t">6:00 AM</span> &middot; <span class="ok">OK</span> Nightly import &middot; 1,204 TCGplayer listings &middot; 17 price changes &middot; 2 conflicts flagged</div>
-            <div><span class="t">Yesterday</span> &middot; <span class="ok">OK</span> Nightly import &middot; 1,198 listings &middot; 9 price changes &middot; 0 conflicts</div>
+        </div>
+
+        <div class="admin-card" id="tcgCard">
+          <h3>TCGplayer nightly import <span class="pill ok"><span class="dot"></span>GitHub Action</span></h3>
+          <dl class="kv">
+            <dt>Job</dt><dd><code class="mono">.github/workflows/inventory.yml</code></dd>
+            <dt>Schedule</dt><dd>Daily at 10:00 UTC (6 AM Eastern in summer, 5 AM in winter) &middot; plus <b>Sync now</b> above</dd>
+            <dt>Pulls</dt><dd>Every listing from the <code class="mono">Top Loaded TCG</code> seller page into <code class="mono">inventory.json</code> and <code class="mono">inventory-summary.json</code>, commits only when something changed</dd>
+            <dt>Last file</dt><dd class="mono" id="tcgGenerated">&mdash;</dd>
+            <dt>In file</dt><dd class="mono" id="tcgCounts">&mdash;</dd>
+          </dl>
+          <div class="log" id="tcgLog" tabindex="0" role="region" aria-label="Import log"></div>
+          <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+            <button class="btn btn-ghost" id="tcgRun" type="button">Run import now</button>
+            <a class="linklike" href="https://github.com/ArtofJammin/toploaded-demo/actions/workflows/inventory.yml" target="_blank" rel="noopener noreferrer">Open the Actions tab <span class="vh">(opens in a new tab)</span>&nearr;</a>
           </div>
-          <div style="margin-top:12px"><button class="btn btn-ghost" id="tcgRun" type="button">Run import now</button></div>
         </div>
       </div>
 
       <div class="section-head" style="margin-top:40px">
-        <h2>Inventory</h2>
-        <span class="demo-tag">edits push to Square (simulated)</span>
+        <h2>Site settings</h2>
+        <span class="save-state" id="cfgUpdated" role="status"></span>
       </div>
-      <div class="table-wrap">
+
+      <div class="admin-grid">
+        <div class="admin-card" id="cardSite">
+          <h3>Identity &amp; contact</h3>
+          <dl class="kv">
+            <dt><label for="setTitle">Site title</label></dt><dd><input id="setTitle" style="width:100%"></dd>
+            <dt><label for="setTagline">Tagline</label></dt><dd><input id="setTagline" style="width:100%"></dd>
+            <dt><label for="setPhone">Phone</label></dt><dd><input id="setPhone" inputmode="tel" style="width:100%"></dd>
+            <dt><label for="setEmail">Email</label></dt><dd><input id="setEmail" type="email" style="width:100%"></dd>
+            <dt><label for="setAddr1">Street</label></dt><dd><input id="setAddr1" style="width:100%" autocomplete="off"></dd>
+            <dt>City / State / ZIP</dt>
+            <dd class="addr-row">
+              <input id="setCity" aria-label="City" style="flex:2">
+              <input id="setState" aria-label="State" maxlength="2" style="width:56px">
+              <input id="setZip" aria-label="ZIP" inputmode="numeric" style="width:88px">
+            </dd>
+          </dl>
+          <div class="card-actions"><button class="btn" id="setApply" type="button">Save</button><span class="save-state" role="status" data-state-for="cardSite"></span></div>
+        </div>
+
+        <div class="admin-card" id="cardHours">
+          <h3>Hours</h3>
+          <p class="card-note">Drives the open/closed pill, the Visit page, the footer and the search-engine hours.</p>
+          <div id="hoursEditor" class="hours-editor"></div>
+          <p class="card-note" style="margin-top:10px">Summary: <span id="hoursPreview" class="mono"></span></p>
+          <div class="card-actions"><button class="btn" id="hoursApply" type="button">Save hours</button><span class="save-state" role="status" data-state-for="cardHours"></span></div>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <div class="admin-card" id="cardBanner">
+          <h3>Banner &amp; logo</h3>
+          <dl class="kv">
+            <dt><label for="setBanner">Banner text</label></dt><dd><input id="setBanner" placeholder="Holiday hours, big restock, show reminder&hellip;" style="width:100%"></dd>
+            <dt>Show banner</dt><dd><button class="switch" role="switch" aria-checked="false" id="setBannerOn" aria-label="Show announcement banner" type="button"></button></dd>
+            <dt>Logo</dt>
+            <dd>
+              <div class="logo-row">
+                <span class="logo-preview" id="logoPreview" aria-hidden="true"></span>
+                <div>
+                  <label class="btn btn-ghost file-btn" for="setLogoFile">Upload logo<input id="setLogoFile" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml"></label>
+                  <button class="linklike" type="button" id="setLogoClear" style="margin-left:10px">Use default</button>
+                  <p class="card-note" id="logoNote" style="margin-top:6px">PNG, JPG, WebP or SVG. Scaled to 600px wide, must come out under 150 KB.</p>
+                </div>
+              </div>
+            </dd>
+          </dl>
+          <div class="card-actions"><button class="btn" id="bannerApply" type="button">Save</button><span class="save-state" role="status" data-state-for="cardBanner"></span></div>
+        </div>
+
+        <div class="admin-card" id="cardLinks">
+          <h3>Links &amp; buy rates</h3>
+          <dl class="kv">
+            <dt><label for="setLinkTcgplus">Bandai TCG+</label></dt><dd><input id="setLinkTcgplus" type="url" placeholder="https://www.bandai-tcg-plus.com/&hellip;" style="width:100%"></dd>
+            <dt><label for="setLinkFacebook">Facebook</label></dt><dd><input id="setLinkFacebook" type="url" style="width:100%"></dd>
+            <dt><label for="setLinkInstagram">Instagram</label></dt><dd><input id="setLinkInstagram" type="url" style="width:100%"></dd>
+            <dt><label for="setLinkWhatnot">Whatnot</label></dt><dd><input id="setLinkWhatnot" type="url" placeholder="https://www.whatnot.com/user/&hellip;" style="width:100%"></dd>
+          </dl>
+          <h3 style="margin-top:18px">Buy rates</h3>
+          <div class="rates-grid">
+            <div class="field"><label for="setRateBulk">Bulk %</label><input id="setRateBulk" type="number" min="0" max="100" step="1" inputmode="numeric"></div>
+            <div class="field"><label for="setRateStandard">Standard %</label><input id="setRateStandard" type="number" min="0" max="100" step="1" inputmode="numeric"></div>
+            <div class="field"><label for="setRateHot">Hot %</label><input id="setRateHot" type="number" min="0" max="100" step="1" inputmode="numeric"></div>
+            <div class="field"><label for="setRateGraded">Graded %</label><input id="setRateGraded" type="number" min="0" max="100" step="1" inputmode="numeric"></div>
+            <div class="field"><label for="setCreditBonus">Credit bonus %</label><input id="setCreditBonus" type="number" min="0" max="100" step="1" inputmode="numeric"></div>
+          </div>
+          <div class="card-actions"><button class="btn" id="linksApply" type="button">Save</button><span class="save-state" role="status" data-state-for="cardLinks"></span></div>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <div class="admin-card" id="cardShow">
+          <h3>Card show</h3>
+          <dl class="kv">
+            <dt><label for="setShowDate">Next show</label></dt><dd><input id="setShowDate" type="date"></dd>
+            <dt>Times</dt>
+            <dd class="time-row">
+              <label>Start <input id="setShowStart" type="time"></label>
+              <label>End <input id="setShowEnd" type="time"></label>
+              <label>Setup <input id="setShowSetup" type="time"></label>
+            </dd>
+            <dt><label for="setShowHours">Hours text</label></dt><dd><input id="setShowHours" style="width:100%"></dd>
+            <dt><label for="setShowVenue">Venue</label></dt><dd><input id="setShowVenue" style="width:100%"></dd>
+            <dt><label for="setShowAddress">Address</label></dt><dd><input id="setShowAddress" style="width:100%"></dd>
+            <dt><label for="setShowCadence">Cadence</label></dt><dd><input id="setShowCadence" style="width:100%"></dd>
+            <dt>Tables</dt>
+            <dd class="time-row">
+              <label>Total <input id="setShowTables" type="number" min="0" step="1" inputmode="numeric" style="width:80px"></label>
+              <label>Booked <input id="setShowBooked" type="number" min="0" step="1" inputmode="numeric" style="width:80px"></label>
+            </dd>
+            <dt>Table prices</dt><dd><div id="tablePriceEditor" class="rows-editor"></div></dd>
+          </dl>
+          <div class="card-actions"><button class="btn" id="setShowApply" type="button">Save show</button><span class="save-state" role="status" data-state-for="cardShow"></span></div>
+        </div>
+
+        <div class="admin-card" id="cardLive">
+          <h3>Live rips <span class="pill crit" id="liveStatusPill"><span class="dot crit"></span>Offline</span></h3>
+          <p class="card-note">Going live puts a banner across the storefront, lights up the Live tab, and opens break-spot claims.</p>
+          <div style="margin-top:14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap"><button class="btn" id="goLiveBtn" type="button">Start live rip</button><span class="save-state" id="liveState" role="status"></span></div>
+          <dl class="kv" style="margin-top:18px">
+            <dt><label for="setLiveTitle">Break title</label></dt><dd><input id="setLiveTitle" style="width:100%"></dd>
+            <dt><label for="setLivePlatform">Platform</label></dt>
+            <dd><select id="setLivePlatform"><option value="">Not set</option><option value="whatnot">Whatnot</option><option value="youtube">YouTube</option><option value="twitch">Twitch</option><option value="tiktok">TikTok</option></select></dd>
+            <dt><label for="setLiveEmbed">Embed URL</label></dt><dd><input id="setLiveEmbed" type="url" placeholder="https://&hellip;" style="width:100%"></dd>
+            <dt>Spots</dt>
+            <dd class="time-row">
+              <label>Price $ <input id="setLiveSpotPrice" type="number" min="0" step="0.01" inputmode="decimal" style="width:90px"></label>
+              <label>Count <input id="setLiveSpots" type="number" min="1" max="60" step="1" inputmode="numeric" style="width:70px"></label>
+              <label>Packs each <input id="setLivePacks" type="number" min="1" max="36" step="1" inputmode="numeric" style="width:70px"></label>
+            </dd>
+            <dt>Schedule</dt><dd><div id="liveSchedEditor" class="rows-editor"></div><button class="linklike" type="button" id="liveSchedAdd" style="margin-top:6px">+ Add stream</button></dd>
+          </dl>
+          <div class="card-actions"><button class="btn" id="liveApply" type="button">Save live settings</button><span class="save-state" role="status" data-state-for="cardLive"></span></div>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <div class="admin-card" id="cardEvents">
+          <h3>Play nights</h3>
+          <p class="card-note">Edit the weekly schedule and publish &mdash; the Play Nights page, countdowns and signup cards read from this list.</p>
+          <div id="evEditor" class="ev-editor" data-owner="settings"></div>
+          <div class="card-actions">
+            <button class="btn" id="evApply" type="button">Publish schedule</button>
+            <button class="btn btn-ghost" id="evAdd" type="button">Add night</button>
+            <span class="save-state" role="status" data-state-for="cardEvents"></span>
+          </div>
+        </div>
+
+        <div class="admin-card" id="cardTicker">
+          <h3>Buylist ticker</h3>
+          <p class="card-note">The "Buying now" strip on the home page. Item, then the top price.</p>
+          <div id="tickerEditor" class="rows-editor"></div>
+          <button class="linklike" type="button" id="tickerAdd" style="margin-top:8px">+ Add row</button>
+          <h3 style="margin-top:22px">Testimonials</h3>
+          <p class="card-note">Quote and who said it. Leave empty to hide the section.</p>
+          <div id="testiEditor" class="rows-editor"></div>
+          <button class="linklike" type="button" id="testiAdd" style="margin-top:8px">+ Add quote</button>
+          <div class="card-actions"><button class="btn" id="tickerApply" type="button">Save</button><span class="save-state" role="status" data-state-for="cardTicker"></span></div>
+        </div>
+      </div>
+
+      <div class="reset-row">
+        <div>
+          <b>Reset site settings</b>
+          <span>Puts every setting above back to the built-in defaults &mdash; on the server when connected, and on this device.</span>
+        </div>
+        <button class="btn btn-ghost btn-danger" id="cfgReset" type="button">Reset to defaults</button>
+      </div>
+
+      <div class="section-head" style="margin-top:40px">
+        <h2>Inventory</h2>
+        <span class="mono" id="invMeta" style="font-size:.74rem; color:var(--ink3)"></span>
+      </div>
+      <div class="inv-tools">
+        <div class="field" style="flex:1 1 220px"><label for="invSearch" class="vh">Search inventory</label><input id="invSearch" placeholder="Search name, set, line&hellip;" autocomplete="off" inputmode="search"></div>
+        <div class="field"><label for="invGame" class="vh">Game</label><select id="invGame"><option value="all">All games</option><option value="pk">Pokemon</option><option value="op">One Piece</option><option value="mtg">Magic</option><option value="other">Other</option></select></div>
+        <div class="field"><label for="invSort" class="vh">Sort</label><select id="invSort"><option value="name">Name A&ndash;Z</option><option value="price-desc">Price high&ndash;low</option><option value="price-asc">Price low&ndash;high</option><option value="stock-asc">Stock low&ndash;high</option><option value="stock-desc">Stock high&ndash;low</option></select></div>
+        <label class="inv-low"><input type="checkbox" id="invLowOnly"> Low stock only</label>
+      </div>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Inventory table">
         <table>
+          <caption class="vh">Inventory with stock levels and channel status</caption>
           <thead>
-            <tr><th>Item</th><th>Game</th><th>Type</th><th>Cond</th><th>Price</th><th>Stock</th><th>Square</th></tr>
+            <tr><th scope="col">Item</th><th scope="col">Game</th><th scope="col">Type</th><th scope="col">Cond</th><th scope="col" class="num">Price</th><th scope="col">Stock</th><th scope="col">Channel</th></tr>
           </thead>
           <tbody id="invBody"></tbody>
         </table>
       </div>
-
-      <div class="teaser">
-        <div class="tt" style="flex:1; min-width:240px">
-          <b>TCGplayer price sync</b>
-          <span>Link your <code>Top Loaded TCG</code> seller account to reprice singles against market automatically. Preview: Ragavan market <code>$54.12</code> &rarr; your price <code>$58.00 (+7%)</code>.</span>
-        </div>
-        <button class="btn btn-ghost" id="tcgTease">Preview repricing</button>
-      </div>
+      <div class="inv-pager" id="invPager"></div>
+      <p class="card-note" id="invNote" style="margin-top:10px">Stock edits here are kept as overrides on this device (and flag the other channel) until Square is connected &mdash; TCGplayer has no seller API, so its listing still needs the same change by hand.</p>
     </div>
   </section>

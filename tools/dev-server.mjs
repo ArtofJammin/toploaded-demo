@@ -15,7 +15,8 @@ import { join, dirname, resolve, extname, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { build } from './build.mjs';
-import worker from '../api/src/index.js';
+import workerModule from '../api/src/index.js';
+let worker = workerModule;
 import { MemoryKV } from '../api/src/lib/memory-kv.js';
 
 const tools = dirname(fileURLToPath(import.meta.url));
@@ -108,6 +109,13 @@ if (!flag('--no-watch')) {
   const rebuild = () => { clearTimeout(t); t = setTimeout(() => { try { build(); } catch (e) { console.error('[build]', e.message); } }, 120); };
   for (const d of ['src', 'src/css', 'src/html', 'src/js']) { const dir = join(repo, d); if (existsSync(dir)) watch(dir, rebuild); }
   watch(join(repo, 'config.default.json'), rebuild);
+  // api/src changes: re-import the worker with a cache-busting query so new routes load without a restart
+  let at = null;
+  const reloadWorker = () => { clearTimeout(at); at = setTimeout(async () => {
+    try { worker = (await import(`../api/src/index.js?t=${Date.now()}`)).default; console.log('[api] worker reloaded'); }
+    catch (e) { console.error('[api] reload failed:', e.message); }
+  }, 200); };
+  for (const d of ['api/src', 'api/src/routes', 'api/src/lib']) { const dir = join(repo, d); if (existsSync(dir)) watch(dir, reloadWorker); }
 }
 
 createServer(async (req, res) => {

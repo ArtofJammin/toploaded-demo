@@ -11,7 +11,13 @@
        TL.config / TL.saveConfig(patch) / TL.shopStatus()     site config (03-config.js)
        TL.go(view, params) / TL.route()                       router (10-router.js)
        TL.cart.add(item, qty) / .count() / .open()            cart (35-cart.js)
-       TL.inventory                                           {summary, items, generated, byId(id)} (30-inventory.js)
+       TL.inventory                                           {summary, items, generated, loaded, loading, failed, load(), byId(id),
+                                                              search(q,{game,type,limit}), catalog(), freshness(iso), gameLabel(g), gameCounts()} (30-inventory.js)
+       TL.wishlist / TL.recent / TL.shop                      wishlist + recently viewed (33-wishlist.js), shop state (25-products.js)
+       TL.openQuickView(item, {list, from}) / TL.closeQuickView()   product modal (32-quickview.js)
+       TL.calendar.forEvent(ev) / forShow() / menu(...)       .ics + Google Calendar links (55-events.js)
+       TL.forms.submit(kind, fields, opts)                     shared form submit with offline fallback (40-forms.js)
+       TL.live                                                 live-break state helpers (50-live.js)
        TL.confetti(x, y, opts) / TL.flyTo(fromEl, toEl)       motion hooks — no-ops until a motion module defines them
        TL.countUp(el, to, opts)                               motion hook, no-op default
        TL.openQuickView(item) / TL.openModal(html, opts) / TL.closeModal()  overlays, no-op defaults
@@ -21,10 +27,15 @@
        'api:ready'      {online}         API health check finished
        'config:change'  {config, patch}  site config loaded or edited
        'inventory:summary' {summary}     inventory-summary.json loaded
+       'inventory:loading' / 'inventory:failed'   full inventory fetch started / failed
        'inventory:loaded'  {items, generated}  full inventory.json loaded and normalized
+       'inventory:override' {id, stock, item}   admin stock edit on this device (stock overrides live in TL.store 'stockOverrides')
+       'wishlist:change' / 'recent:change'      wishlist or recently-viewed list changed
+       'theme:change'   {theme}                 tl | light | dark
+       'motion:change'  {reduce}                prefers-reduced-motion flipped at runtime
        'view:change'    {name, params, prev}   a view became active
        'view:leave'     {name}                 a view is being hidden (stop timers)
-       'cart:change'    {qty, total, lines}
+       'cart:change'    {qty, total, subtotal, shipping, lines, reason, added, removed, changed}  reason ∈ add|qty|remove|clear|checkout|options|sync
        'auth:change'    {role}                 'staff' | 'admin' | null
        'live:change'    {live}                 TL.config.live changed
        'ready'          {online}               boot finished

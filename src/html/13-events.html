@@ -4,9 +4,10 @@
       <div class="view-head">
         <p class="eyebrow">In-store play space &middot; Crescent Springs</p>
         <h1>Play nights</h1>
-        <p class="lede">Play runs on our 8-top &mdash; one big table of eight &mdash; and when more of you show up we split into a second list so everyone plays. Weekly events below. <span class="demo-tag">fees TBD</span></p>
+        <p class="lede">Play runs on our 8-top &mdash; one big table of eight &mdash; and when more of you show up we split into a second list so everyone plays. Weekly events below.</p>
       </div>
-      <div class="sched" id="schedList"></div>
+      <div class="next-up" id="evNextUp" role="status" aria-live="polite"></div>
+      <div class="sched" id="schedList" role="list" aria-label="Weekly schedule"></div>
       <div class="section" style="padding-bottom:0">
         <div class="tri">
           <div class="panel"><span class="num">Official</span><h3>Bandai official store</h3><p>We're a Bandai official tournament store &mdash; One Piece and Gundam events here run with official Bandai support and prizing.</p></div>
@@ -15,24 +16,27 @@
         </div>
       </div>
       <div class="section" style="padding-bottom:0">
-        <div class="section-head"><h2>Sign up for next week's events</h2></div>
+        <div class="section-head"><h2>Sign up for this week's events</h2></div>
         <div class="signup-grid">
-          <div class="panel signup-card">
-            <p class="eyebrow">One Piece &amp; Gundam &middot; Wed 5 PM &middot; Sat 11 AM &amp; 1 PM</p>
+          <div class="panel signup-card" id="tcgplusCard">
+            <p class="eyebrow" id="tcgplusEyebrow">One Piece &amp; Gundam &middot; Wed 5 PM &middot; Sat 11 AM &amp; 1 PM</p>
             <h3>Sign up on Bandai TCG+</h3>
             <p>Our Bandai events run through the official TCG+ app. Grab your seat there and check in at the counter &mdash; winner and participation packs come straight from Bandai.</p>
-            <a class="btn" href="https://www.bandai-tcg-plus.com/" target="_blank" rel="noopener noreferrer">Open Bandai TCG+ &rarr;</a>
-            <p class="signup-note">Search "Top Loaded" in the app for this week's events. <span class="demo-tag">direct store link coming</span></p>
+            <a class="btn" id="tcgplusBtn" href="https://www.bandai-tcg-plus.com/" target="_blank" rel="noopener noreferrer">Open Bandai TCG+ &rarr;</a>
+            <p class="signup-note" id="tcgplusNote">Search "Top Loaded" in the app for this week's events.</p>
           </div>
-          <form class="panel signup-card" id="pkSignup">
-            <p class="eyebrow">Pokemon League &middot; Sundays 11 AM</p>
+          <form class="panel signup-card" id="pkSignup" novalidate data-kind="signup">
+            <p class="eyebrow" id="pkEyebrow">Pokemon League &middot; Sundays 11 AM</p>
             <h3>Save your seat</h3>
+            <p class="signup-when" id="pkWhen"></p>
             <div class="form-grid" style="margin-top:2px">
-              <div class="field"><label for="pkName">Name</label><input id="pkName" required autocomplete="off" placeholder="Trainer name"></div>
-              <div class="field"><label for="pkCount">Seats</label><select id="pkCount"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
-              <div class="field full"><button class="btn" type="submit">Email my signup</button></div>
+              <div class="field"><label for="pkName">Name</label><input id="pkName" name="name" type="text" required autocomplete="name" placeholder="Trainer name" maxlength="80"></div>
+              <div class="field"><label for="pkCount">Seats</label><select id="pkCount" name="seats"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+              <div class="field full"><label for="pkContact">Email or phone</label><input id="pkContact" name="contact" type="text" required autocomplete="email" inputmode="email" placeholder="So we can reach you if the table fills" maxlength="120"></div>
+              <div class="hp" aria-hidden="true"><label for="pkWebsite">Website</label><input id="pkWebsite" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+              <div class="field full"><button class="btn" type="submit">Save my seat</button></div>
             </div>
-            <p class="signup-note">Opens your email app with the signup filled out &mdash; or call <a href="tel:+15132222573">(513) 222-2573</a> and we'll pencil you in.</p>
+            <p class="signup-note">Eight at the table, second list after that &mdash; everyone plays. Or call <a id="pkPhone" href="tel:+15132222573">(513) 222-2573</a> and we'll pencil you in.</p>
           </form>
         </div>
       </div>

@@ -10,7 +10,13 @@
     backdrop-filter:blur(14px) saturate(1.15);
   }
 }
-.topbar .wrap{display:flex; align-items:center; gap:22px; height:64px}
+/* scrolled state: shadow fades in (opacity only), logo condenses a touch on desktop */
+.topbar::after{
+  content:""; position:absolute; inset:0; pointer-events:none; z-index:-1;
+  box-shadow:0 10px 30px -18px rgba(0,0,0,.6); opacity:0; transition:opacity .25s ease;
+}
+html.scrolled .topbar::after{opacity:1}
+.topbar .wrap{display:flex; align-items:center; gap:16px; height:64px}
 .brand{
   display:flex; align-items:center; gap:11px; background:none; border:0; padding:0;
 }
@@ -25,22 +31,59 @@
   line-height:1;
 }
 .brand-name small{display:block; font-family:var(--mono); font-weight:400; font-size:.58rem; letter-spacing:.3em; color:var(--ink3); margin-top:3px}
-.mainnav{display:flex; gap:4px; margin-left:auto; flex-wrap:wrap}
+.mainnav{display:flex; gap:2px; margin-left:auto; flex-wrap:wrap}
 .mainnav button{
-  background:none; border:0; padding:8px 12px; border-radius:4px;
+  background:none; border:0; padding:8px 10px; border-radius:4px; white-space:nowrap;
   font-family:var(--mono); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink2);
 }
 .mainnav button:hover{color:var(--ink); background:var(--surface)}
 .mainnav button[aria-current="true"]{color:var(--accent)}
-.brand-logo{height:50px; width:auto; display:none}
-html:not(.no-logo) .brand-logo.logo-d{display:var(--logo-dark)}
-html:not(.no-logo) .brand-logo.logo-l{display:var(--logo-light)}
+/* one logo <img>; src chosen by theme (00-header.html bootstrap + 15-ticker.js swap) */
+.brand-logo{height:50px; width:auto; display:none; transform-origin:left center; transition:transform .25s ease}
+html:not(.no-logo) .brand-logo{display:block}
 html:not(.no-logo) .brand .brand-mark{display:none}
 html:not(.no-logo) .brand .brand-name{display:none}
 .foot-logo{height:62px; width:auto; display:none; margin-bottom:10px}
+html:not(.no-logo) .foot-logo{display:block}
 html:not(.no-logo) .foot-logo.logo-d{display:var(--logo-dark)}
 html:not(.no-logo) .foot-logo.logo-l{display:var(--logo-light)}
 html:not(.no-logo) .foot-brand{display:none}
+@media (min-width:961px){ html.scrolled .brand-logo{transform:scale(.88)} }
+@media (min-width:961px) and (max-width:1220px){
+  .open-pill .open-sub{display:none}
+  .mainnav button{padding:8px 7px; letter-spacing:.06em}
+  .topbar .wrap{gap:12px}
+}
+
+/* live nav dot: static when the shop is not on air, pulses only under html.is-live */
+.mainnav .live-dot,.hero-ctas .live-dot{
+  animation:none; background:var(--ink3); opacity:.55; width:6px; height:6px;
+  transition:background .2s ease, opacity .2s ease;
+}
+.hero-ctas .live-dot{margin:0 8px 0 0; vertical-align:1px}
+html.is-live .mainnav .live-dot,html.is-live .hero-ctas .live-dot{
+  background:var(--crit); opacity:1; animation:livepulse 1.6s ease-in-out infinite;
+}
+
+/* open / closed status pill */
+.open-pill{
+  display:inline-flex; align-items:center; gap:8px; flex:0 0 auto;
+  padding:6px 12px 6px 10px; min-height:30px; border:1px solid var(--line); border-radius:99px; background:var(--surface);
+  font-family:var(--mono); font-size:.68rem; letter-spacing:.06em; color:var(--ink2); white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+.open-pill[hidden]{display:none}
+.open-pill b{font-weight:500; color:var(--ink)}
+.open-pill .dot{position:relative; width:7px; height:7px}
+.open-pill.is-open .dot{background:var(--good)}
+.open-pill.is-soon .dot{background:var(--warn)}
+.open-pill.is-closed .dot{background:var(--crit)}
+.open-pill.is-open .dot::after{
+  content:""; position:absolute; inset:-3px; border-radius:50%; border:2px solid var(--good);
+  animation:breathe 2.4s ease-in-out infinite;
+}
+@keyframes breathe{from{transform:scale(.6); opacity:.9}to{transform:scale(1.9); opacity:0}}
+
 .theme-btn{
   width:38px; height:38px; flex:0 0 auto; display:grid; place-items:center;
   background:var(--surface); border:1px solid var(--line); border-radius:4px; color:var(--ink2);
@@ -64,4 +107,45 @@ html:not(.no-logo) .foot-brand{display:none}
 .cart-count{
   min-width:20px; height:20px; padding:0 5px; border-radius:10px; display:grid; place-items:center;
   background:var(--accent); color:var(--accent-ink); font-weight:600; font-size:.72rem;
+}
+.scroll-sentinel{position:absolute; top:0; left:0; width:1px; height:1px; pointer-events:none}
+main{position:relative}
+main:focus{outline:none}
+
+/* mobile: scrolling nav gets a right-edge fade cue + snap; pill goes compact; cheaper header */
+@media (max-width:960px){
+  .mainnav{scroll-snap-type:x proximity; scroll-padding:0 20px}
+  .mainnav button{scroll-snap-align:start}
+  .mainnav.can-scroll:not(.at-end){
+    -webkit-mask-image:linear-gradient(90deg, #000 0, #000 calc(100% - 56px), transparent);
+    mask-image:linear-gradient(90deg, #000 0, #000 calc(100% - 56px), transparent);
+  }
+  .topbar{-webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px)}
+  .open-pill{order:2}
+}
+@media (max-width:640px){
+  .topbar{-webkit-backdrop-filter:none; backdrop-filter:none; background:var(--bg)}
+  body::after{display:none}
+  .topbar .wrap{gap:8px; min-height:52px; padding-top:6px; padding-bottom:4px; row-gap:4px}
+  .mainnav{padding:2px 20px 6px}
+  .brand-logo{height:36px}
+  .open-pill{padding:5px 10px 5px 8px; min-height:28px}
+  .open-pill .open-sub,.open-pill .open-now{display:none}
+}
+@media (max-width:360px){
+  .open-pill{display:none}
+}
+/* the 7-item nav needs the whole row at the narrow end of desktop; the hero pill carries the status there */
+@media (min-width:961px) and (max-width:1010px){
+  .open-pill{display:none}
+}
+@media (pointer:coarse){
+  .theme-btn{width:44px; height:44px}
+  .cart-btn{min-height:44px}
+}
+@media (prefers-reduced-motion: reduce){
+  .open-pill.is-open .dot::after{animation:none; display:none}
+  html.is-live .mainnav .live-dot,html.is-live .hero-ctas .live-dot{animation:none}
+  .brand-logo,.topbar::after{transition:none}
+  html.scrolled .brand-logo{transform:none}
 }

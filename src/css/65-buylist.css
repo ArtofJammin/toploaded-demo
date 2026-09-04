@@ -1,7 +1,74 @@
 /* ============ BUYLIST ============ */
 .buy-grid{display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:32px; align-items:start}
-.form-card{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:26px}
+.buy-col{display:grid; gap:20px; min-width:0}
+.form-card{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:26px; position:relative}
 .buy-points{display:grid; gap:14px}
 .buy-points .panel{padding:18px 20px; display:flex; gap:14px; align-items:baseline}
 .buy-points .k{font-family:var(--disp); font-weight:800; font-size:1.6rem; color:var(--accent); min-width:64px; text-transform:uppercase; line-height:1}
 .buy-points p{color:var(--ink2); font-size:.92rem}
+.buy-points a{color:var(--accent)}
+/* estimator */
+.worth .eyebrow{margin-bottom:8px}
+.worth-search{display:grid; grid-template-columns:150px minmax(0,1fr); gap:12px; margin-top:16px}
+.worth-search input[type="search"]{-webkit-appearance:none; appearance:none}
+.worth-hint{font-family:var(--mono); font-size:.7rem; letter-spacing:.04em; color:var(--ink3); margin-top:10px; min-height:1.2em}
+.worth-results{list-style:none; margin:10px 0 0; padding:0; display:grid; gap:6px}
+.worth-results:empty{margin:0}
+.worth-row{
+  width:100%; display:grid; grid-template-columns:44px minmax(0,1fr) auto; gap:12px; align-items:center; text-align:left;
+  background:var(--surface2); border:1px solid var(--line); border-radius:6px; padding:8px 12px 8px 8px; color:var(--ink);
+  transition:border-color .15s ease, transform .15s ease;
+}
+.worth-row:hover{border-color:var(--line2); transform:translateY(-1px)}
+.worth-row[aria-pressed="true"]{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent)}
+.worth-thumb{width:44px; height:44px; border-radius:4px; overflow:hidden; background:var(--slab); display:grid; place-items:center; border:1px solid var(--slab-line)}
+.worth-thumb img{width:100%; height:100%; object-fit:cover; display:block}
+.worth-thumb-ph{font-family:var(--mono); font-size:.62rem; letter-spacing:.1em; color:var(--ink3)}
+.worth-txt{min-width:0; display:grid}
+.worth-txt b{font-weight:600; font-size:.92rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.worth-txt small{color:var(--ink3); font-size:.76rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.worth-mkt{font-family:var(--mono); font-size:.86rem; text-align:right; font-variant-numeric:tabular-nums; display:grid}
+.worth-mkt small{font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3)}
+.worth-pick{margin-top:18px; border-top:1px solid var(--line); padding-top:18px; animation:worthIn .35s cubic-bezier(.2,.7,.2,1) both}
+.worth-pick[hidden]{display:none}
+@keyframes worthIn{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+.worth-pick-head{display:flex; gap:16px; align-items:center}
+.worth-pick-head .eyebrow{margin-bottom:4px}
+.worth-pick-head h4{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.4rem; letter-spacing:.03em; line-height:1; margin:0}
+.worth-pick-set{color:var(--ink3); font-size:.82rem; margin-top:4px}
+.worth-pick-img{width:64px; aspect-ratio:5/7; object-fit:cover; border-radius:5px; border:1px solid var(--slab-line); background:var(--slab); flex:0 0 auto}
+.worth-tiers{border:0; padding:0; margin:16px 0 0; display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.worth-tiers legend{font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3); padding:0; margin-bottom:8px}
+.worth-tier{
+  display:flex; gap:10px; align-items:flex-start; border:1px solid var(--line); border-radius:6px; padding:10px 12px; cursor:pointer;
+  font-family:var(--body); text-transform:none; letter-spacing:0; color:var(--ink); transition:border-color .15s ease, background .15s ease;
+}
+.worth-tier:hover{border-color:var(--line2)}
+.worth-tier.on{border-color:var(--accent); background:color-mix(in srgb, var(--accent) 8%, var(--surface))}
+.worth-tier input{margin:3px 0 0; accent-color:var(--accent); flex:0 0 auto}
+.worth-tier span{display:grid; gap:2px; min-width:0}
+.worth-tier b{font-weight:600; font-size:.88rem}
+.worth-tier small{color:var(--ink3); font-size:.72rem; line-height:1.3}
+.worth-nums{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:16px}
+.worth-num{border:1px solid var(--line); border-radius:6px; padding:12px 14px; background:var(--surface2); display:grid; gap:4px; min-width:0}
+.worth-num small{font-family:var(--mono); font-size:.62rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3)}
+.worth-num small em{font-style:normal; color:var(--good)}
+.worth-val{font-family:var(--disp); font-weight:800; font-size:clamp(1.4rem,3vw,1.9rem); line-height:1; font-variant-numeric:tabular-nums; letter-spacing:.01em}
+.worth-num.cash{border-color:color-mix(in srgb, var(--accent) 45%, var(--line))}
+.worth-num.credit{border-color:color-mix(in srgb, var(--good) 55%, var(--line)); background:var(--good-bg)}
+.worth-num.credit .worth-val{color:var(--good)}
+.worth-actions{display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-top:14px}
+.worth-link{color:var(--accent); font-size:.86rem}
+.worth-disclaimer{font-family:var(--mono); font-size:.68rem; letter-spacing:.04em; color:var(--ink3); margin-top:16px}
+@media (max-width:640px){
+  .worth-search{grid-template-columns:1fr}
+  .worth-tiers{grid-template-columns:1fr}
+  .worth-nums{grid-template-columns:1fr}
+  .form-card{padding:22px 18px}
+}
+@media (pointer:coarse){ .worth-row{min-height:60px} .worth-tier{min-height:48px} }
+@media (prefers-reduced-motion: reduce){
+  .worth-pick{animation:none}
+  .worth-row{transition:none}
+  .worth-row:hover{transform:none}
+}

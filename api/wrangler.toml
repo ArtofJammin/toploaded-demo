@@ -27,3 +27,7 @@ SQUARE_WEBHOOK_URL = "https://toploaded-api.REPLACE.workers.dev/square/webhook"
 GITHUB_REPO = "ArtofJammin/toploaded-demo"
 GITHUB_WORKFLOW = "inventory.yml"
 SITE_URL = "https://artofjammin.github.io/toploaded-demo/"
+# Shipping charged by /checkout when fulfillment is "ship": flat rate, free above the threshold (cents).
+SHIPPING_CENTS = "499"
+FREE_SHIPPING_CENTS = "10000"
+GITHUB_REF = "main"

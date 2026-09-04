@@ -6,23 +6,26 @@
         <h1>Come find the shop</h1>
         <p class="lede">Just off the Dixie Highway corridor, minutes from I-71/75. Free parking out front, play space in the back.</p>
       </div>
+      <p class="visit-note" id="visitNote" hidden></p>
       <div class="visit-layout">
         <div class="panel visit-info">
-          <h3>Top Loaded Trading Cards</h3>
+          <h3 id="visitTitle">Top Loaded Trading Cards</h3>
+          <p class="visit-status" id="visitStatus" role="status" aria-live="polite"><span class="dot"></span><b>Open now</b><span class="visit-status-sub"></span></p>
           <dl class="kv" style="margin-top:6px">
-            <dt>Address</dt><dd>2514 Hazelwood Dr<br>Crescent Springs, KY 41017</dd>
-            <dt>Phone</dt><dd><a href="tel:+15132222573">(513) 222-2573</a></dd>
-            <dt>Email</dt><dd><a href="mailto:toploadedtcg@gmail.com">toploadedtcg@gmail.com</a></dd>
-            <dt>Hours</dt><dd>Closed Mondays<br><span id="visitHoursWk">Tue&ndash;Fri &middot; 11 AM &ndash; 6 PM</span><br><span id="visitHoursWe">Sat&ndash;Sun &middot; 10 AM &ndash; 4 PM</span></dd>
+            <dt>Address</dt><dd id="visitAddress">2514 Hazelwood Dr<br>Crescent Springs, KY 41017</dd>
+            <dt>Phone</dt><dd><a id="visitPhone" href="tel:+15132222573">(513) 222-2573</a></dd>
+            <dt>Email</dt><dd><a id="visitEmail" href="mailto:toploadedtcg@gmail.com">toploadedtcg@gmail.com</a></dd>
+            <dt>Hours</dt><dd><span id="visitHoursWk">Tue&ndash;Fri &middot; 11 AM &ndash; 6 PM</span><br><span id="visitHoursWe">Sat&ndash;Sun &middot; 10 AM &ndash; 4 PM</span></dd>
           </dl>
+          <table class="hours-tbl" id="visitHoursTbl" aria-label="Opening hours by day"><tbody></tbody></table>
           <div class="visit-actions">
-            <a class="btn" href="https://www.google.com/maps/search/?api=1&amp;query=Top+Loaded+Trading+Cards+2514+Hazelwood+Dr+Crescent+Springs+KY+41017" target="_blank" rel="noopener noreferrer">Google Maps &rarr;</a>
-            <a class="btn btn-ghost" href="https://maps.apple.com/place?place-id=I96E3F1088FE2244C" target="_blank" rel="noopener noreferrer">Apple Maps &rarr;</a>
+            <a class="btn" id="visitGoogle" href="https://www.google.com/maps/search/?api=1&amp;query=Top+Loaded+Trading+Cards+2514+Hazelwood+Dr+Crescent+Springs+KY+41017" target="_blank" rel="noopener noreferrer">Google Maps &rarr;</a>
+            <a class="btn btn-ghost" id="visitApple" href="https://maps.apple.com/place?place-id=I96E3F1088FE2244C" target="_blank" rel="noopener noreferrer">Apple Maps &rarr;</a>
           </div>
         </div>
         <div class="map-wrap">
           <div class="map-fallback"><span>Map loads on the live site &mdash; use the Google or Apple Maps buttons for directions.</span></div>
-          <iframe title="Map to Top Loaded Trading Cards, 2514 Hazelwood Dr, Crescent Springs KY" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=2514%20Hazelwood%20Dr%2C%20Crescent%20Springs%2C%20KY%2041017&amp;z=15&amp;output=embed"></iframe>
+          <iframe id="visitMap" title="Map to Top Loaded Trading Cards, 2514 Hazelwood Dr, Crescent Springs KY" loading="lazy" referrerpolicy="no-referrer-when-downgrade" data-src="https://maps.google.com/maps?q=2514%20Hazelwood%20Dr%2C%20Crescent%20Springs%2C%20KY%2041017&amp;z=15&amp;output=embed"></iframe>
         </div>
       </div>
     </div>

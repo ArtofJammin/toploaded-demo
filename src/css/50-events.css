@@ -1,12 +1,70 @@
 /* ============ EVENTS ============ */
-.sched{display:grid; gap:0; border:1px solid var(--line); border-radius:8px; overflow:hidden}
-.sched-row{
-  display:grid; grid-template-columns:120px 1fr auto auto; gap:18px; align-items:center;
-  padding:16px 22px; background:var(--surface); border-bottom:1px solid var(--line);
+.next-up{
+  display:flex; align-items:center; gap:10px 16px; flex-wrap:wrap;
+  padding:14px 20px; margin-bottom:16px; border-radius:8px;
+  background:linear-gradient(90deg, color-mix(in srgb, var(--accent) 14%, var(--surface)), var(--surface) 70%);
+  border:1px solid color-mix(in srgb, var(--accent) 40%, var(--line));
+  font-size:.95rem;
 }
-.sched-row:last-child{border-bottom:0}
+.next-up[hidden]{display:none}
+.next-up .nu-k{font-family:var(--mono); font-size:.68rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent)}
+.next-up b{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.3rem; letter-spacing:.03em; line-height:1}
+.next-up .nu-when{color:var(--ink2)}
+.next-up .nu-count{font-family:var(--mono); font-size:.76rem; letter-spacing:.06em; color:var(--ink); font-variant-numeric:tabular-nums}
+.next-up .cal-menu{margin-left:auto}
+.sched{display:grid; gap:0; border:1px solid var(--line); border-radius:8px; overflow:visible; position:relative}
+.sched-row{
+  display:grid; grid-template-columns:110px minmax(0,1fr) auto auto auto; gap:18px; align-items:center;
+  padding:16px 22px; background:var(--surface); border-bottom:1px solid var(--line); position:relative;
+}
+.sched-row:first-child{border-radius:8px 8px 0 0}
+.sched-row:last-child{border-bottom:0; border-radius:0 0 8px 8px}
+.sched-row.is-next{background:linear-gradient(90deg, color-mix(in srgb, var(--accent) 10%, var(--surface)), var(--surface) 55%)}
+.sched-row.is-next::before{content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--accent); border-radius:2px 0 0 2px}
+.sched-row.is-closed{background:var(--bg2)}
+.sched-row.is-closed .sched-day,.sched-row.is-closed .sched-name{color:var(--ink3)}
 .sched-day{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.25rem; letter-spacing:.05em}
-.sched-name{font-weight:600}
+.sched-name{font-weight:600; min-width:0}
 .sched-name small{display:block; font-weight:400; color:var(--ink3); font-size:.8rem}
-.sched-time,.sched-fee{font-family:var(--mono); font-size:.78rem; color:var(--ink2); font-variant-numeric:tabular-nums}
-.fee-free{color:var(--good)}
+.sched-name .next-tag{
+  display:inline-block; margin-left:10px; font-style:normal; font-family:var(--mono); font-size:.62rem; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--accent-ink); background:var(--accent); border-radius:3px; padding:2px 7px; vertical-align:middle; font-variant-numeric:tabular-nums;
+}
+.sched-time,.sched-fee{font-family:var(--mono); font-size:.78rem; color:var(--ink2); font-variant-numeric:tabular-nums; white-space:nowrap}
+.fee-free{color:var(--good); font-weight:500}
+.fee-tbd{color:var(--ink3)}
+.sched-cal{display:flex; justify-content:flex-end; min-width:0}
+/* add-to-calendar menu (shared by events, show, signup success, next-up strip) */
+.cal-menu{position:relative; display:inline-block}
+.cal-btn{
+  display:inline-flex; align-items:center; gap:7px; background:transparent; border:1px solid var(--line2); color:var(--ink2);
+  border-radius:4px; padding:8px 12px; font-family:var(--mono); font-size:.68rem; letter-spacing:.1em; text-transform:uppercase;
+  transition:border-color .15s ease, color .15s ease;
+}
+.cal-btn:hover,.cal-btn[aria-expanded="true"]{border-color:var(--accent); color:var(--accent)}
+.cal-pop{
+  position:absolute; right:0; top:calc(100% + 6px); z-index:30; min-width:200px; display:grid;
+  background:var(--surface); border:1px solid var(--line2); border-radius:6px; padding:6px; box-shadow:var(--shadow);
+  animation:calIn .16s cubic-bezier(.2,.7,.2,1) both;
+}
+.cal-pop[hidden]{display:none}
+@keyframes calIn{from{opacity:0; transform:translateY(-4px)}to{opacity:1; transform:none}}
+.cal-item{
+  display:block; padding:9px 12px; border-radius:4px; color:var(--ink); text-decoration:none; font-size:.86rem;
+}
+.cal-item:hover,.cal-item:focus-visible{background:var(--surface2); color:var(--accent); outline:none}
+.next-up .cal-pop{right:auto; left:0}
+@media (max-width:640px){
+  .sched-row{grid-template-columns:64px minmax(0,1fr); gap:6px 14px; padding:14px 16px}
+  .sched-day{font-size:1.1rem}
+  .sched-time,.sched-fee{grid-column:2}
+  .sched-fee::before{content:"Entry · "; color:var(--ink3)}
+  .sched-cal{grid-column:2; justify-content:flex-start; margin-top:4px}
+  .sched-row.is-closed .sched-cal,.sched-row.is-closed .sched-fee{display:none}
+  .sched-name .next-tag{display:block; margin:6px 0 0; width:max-content; max-width:100%}
+  .next-up{padding:12px 16px}
+  .next-up .cal-menu{margin-left:0; width:100%}
+  .cal-pop{left:0; right:auto}
+}
+@media (pointer:coarse){ .cal-btn{min-height:44px; padding:10px 14px} .cal-item{padding:12px 14px} }
+@media (prefers-reduced-motion: reduce){ .cal-pop{animation:none} }

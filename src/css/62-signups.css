@@ -1,10 +1,51 @@
-/* ============ EVENT SIGNUPS ============ */
+/* ============ EVENT SIGNUPS + shared form states ============ */
 .signup-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
-.signup-card{padding:26px 24px; display:flex; flex-direction:column; gap:12px}
+.signup-card{padding:26px 24px; display:flex; flex-direction:column; gap:12px; position:relative}
 .signup-card h3{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.5rem; letter-spacing:.03em}
 .signup-card p{color:var(--ink2); font-size:.94rem}
 .signup-card .btn{align-self:flex-start; text-decoration:none}
 .signup-card .eyebrow{margin-bottom:4px}
+.signup-when{font-family:var(--mono); font-size:.74rem; letter-spacing:.04em; color:var(--ink2)}
+.signup-when b{color:var(--ink); font-weight:500}
 .signup-note{font-family:var(--mono); font-size:.7rem; letter-spacing:.04em; color:var(--ink3); margin-top:auto}
 .signup-note a{color:var(--accent)}
+/* honeypot: off-screen, never focusable */
+.hp{position:absolute !important; left:-9999px !important; top:auto; width:1px; height:1px; overflow:hidden; opacity:0; pointer-events:none}
+.sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0}
+/* inline validation */
+.field-err{
+  font-family:var(--mono); font-size:.68rem; letter-spacing:.04em; color:var(--crit); margin-top:-2px;
+  display:flex; align-items:center; gap:6px;
+}
+.field-err::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--crit); flex:0 0 auto}
+input[aria-invalid="true"],select[aria-invalid="true"],textarea[aria-invalid="true"]{border-color:var(--crit); box-shadow:0 0 0 2px var(--crit-bg)}
+form[aria-busy="true"] .btn{opacity:.75; cursor:progress}
+/* success panel replaces the form's controls */
+form.is-done > :not(.form-done){display:none !important}
+.form-done{
+  display:flex; gap:14px; align-items:flex-start; padding:4px 0; animation:doneIn .35s cubic-bezier(.2,.7,.2,1) both;
+}
+.form-done:focus{outline:none}
+.form-done-ic{
+  flex:0 0 auto; width:38px; height:38px; border-radius:50%; display:grid; place-items:center;
+  background:var(--good-bg); color:var(--good); animation:doneTick .5s .1s cubic-bezier(.22,1.18,.36,1) both;
+}
+.form-done.local .form-done-ic{background:var(--warn-bg); color:var(--warn); font-size:1rem}
+.form-done-body{display:grid; gap:8px; min-width:0}
+.form-done-body b{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.35rem; letter-spacing:.03em; line-height:1.05; color:var(--ink)}
+.form-done-body p{color:var(--ink2); font-size:.92rem}
+.form-done-note{font-family:var(--mono); font-size:.7rem !important; letter-spacing:.04em; color:var(--warn) !important}
+.form-done-cal{margin-top:4px}
+.form-done-again{margin-top:2px}
+.form-done-alt .form-alt,.form-fail .form-alt{color:var(--accent); font-size:.86rem}
+@keyframes doneIn{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+@keyframes doneTick{from{transform:scale(.4); opacity:0}to{transform:scale(1); opacity:1}}
+/* failure notice, above the submit button */
+.form-fail{
+  grid-column:1/-1; border:1px solid var(--crit); background:var(--crit-bg); border-radius:6px; padding:12px 14px; margin-bottom:12px;
+  display:grid; gap:10px; font-size:.9rem; color:var(--ink);
+}
+.form-fail-actions{display:flex; gap:14px; align-items:center; flex-wrap:wrap}
+.btn.btn-sm{padding:9px 14px; font-size:.72rem}
 @media (max-width:880px){ .signup-grid{grid-template-columns:1fr} }
+@media (prefers-reduced-motion: reduce){ .form-done,.form-done-ic{animation:none} }

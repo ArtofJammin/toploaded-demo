@@ -1,14 +1,32 @@
-/* ============ SITE BANNER ============ */
+/* ============ SITE BANNER (rendered by the admin module into #siteBanner) ============ */
 .site-banner{
   display:flex; gap:14px; align-items:center; justify-content:center; flex-wrap:wrap;
   padding:9px 16px; background:var(--accent); color:var(--accent-ink);
   font-family:var(--mono); font-size:.76rem; letter-spacing:.06em; text-align:center;
+  position:relative; overflow:hidden;
 }
 .site-banner[hidden]{display:none}
+/* a soft foil sweep so a live banner reads as "on air", not an error bar */
+.site-banner::after{
+  content:""; position:absolute; top:0; bottom:0; left:0; width:30%; pointer-events:none;
+  background:linear-gradient(100deg, transparent, rgba(255,255,255,.28) 50%, transparent);
+  transform:translateX(-140%) skewX(-16deg); animation:bannerSweep 5.5s 1s ease-in-out infinite;
+}
+@keyframes bannerSweep{0%,70%{transform:translateX(-140%) skewX(-16deg)}100%{transform:translateX(460%) skewX(-16deg)}}
+html.page-hidden .site-banner::after{animation-play-state:paused}
+.site-banner .live-dot{background:var(--accent-ink); opacity:1; animation:livepulse 1.6s ease-in-out infinite; margin:0 8px 0 0}
 .banner-link{
   background:none; border:0; padding:0; color:var(--accent-ink); font:inherit;
-  text-decoration:underline; letter-spacing:inherit;
+  text-decoration:underline; letter-spacing:inherit; position:relative; z-index:1;
 }
+.banner-link:hover{text-decoration-thickness:2px}
 .ev-edit-row{display:flex; gap:8px; align-items:center; padding:7px 0; border-bottom:1px solid var(--line)}
 .ev-edit-row:last-child{border-bottom:0}
 .ev-edit-row input{padding:7px 9px; font-size:.84rem}
+@media (pointer:coarse){
+  .banner-link{display:inline-flex; align-items:center; min-height:44px; padding:0 8px}
+}
+@media (prefers-reduced-motion: reduce){
+  .site-banner::after{animation:none; display:none}
+  .site-banner .live-dot{animation:none}
+}

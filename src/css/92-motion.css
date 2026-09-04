@@ -1,0 +1,38 @@
+/* ============ MOTION LIBRARY (92-motion.js) ============
+   Confetti canvas, fly-to-cart clone, count-up, pointer tilt + sheen, cursor spotlight.
+   z-order: drawer 100 < confetti 110 < fly clone 115 < toast/login 120 */
+#fxCanvas{position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:110}
+#fxCanvas[hidden]{display:none}
+.fly-clone{
+  position:fixed; z-index:115; pointer-events:none; will-change:transform, opacity;
+  border-radius:6px; overflow:hidden; box-shadow:var(--shadow); background:var(--slab);
+}
+.fly-clone img,.fly-clone svg{display:block; width:100%; height:100%; object-fit:cover}
+@keyframes tlPop{0%{transform:scale(1)}40%{transform:scale(1.4)}100%{transform:scale(1)}}
+.tl-pop{animation:tlPop .35s cubic-bezier(.3,.7,.3,1)}
+@keyframes tlBump{40%{transform:scale(.96)}70%{transform:scale(1.04)}100%{transform:none}}
+.tl-bump{animation:tlBump .3s ease}
+/* pointer-driven tilt (TL.tilt): the element gets the rotation inline; --mx/--my/--shx/--shy
+   drive any sheen inside it. .tl-sheen is the generic sheen TL.tilt adds when none exists. */
+.tl-tilt{transform-style:preserve-3d; will-change:transform}
+.tl-sheen{
+  position:absolute; inset:0; border-radius:inherit; pointer-events:none; mix-blend-mode:screen; opacity:.5;
+  background:linear-gradient(115deg, transparent 30%, color-mix(in srgb, var(--foilA) 40%, transparent) 44%, color-mix(in srgb, var(--foilC) 35%, transparent) 52%, color-mix(in srgb, var(--foilD) 30%, transparent) 58%, transparent 72%);
+  background-size:250% 250%; background-position:var(--shx,50%) var(--shy,50%);
+}
+/* cursor spotlight: 92-motion.js adds .spot-lit and --sx/--sy (px) to the hovered .panel/.prod (pointer:fine only) */
+@media (hover:hover) and (pointer:fine){
+  .spot-lit{isolation:isolate}
+  .spot-lit::before{
+    content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:-1;
+    opacity:0; transition:opacity .3s ease;
+    background:radial-gradient(320px circle at var(--sx,50%) var(--sy,50%), color-mix(in srgb, var(--accent) 11%, transparent), transparent 66%);
+  }
+  .spot-lit:hover::before{opacity:1}
+}
+@media (prefers-reduced-motion: reduce){
+  .fly-clone,#fxCanvas{display:none}
+  .tl-pop,.tl-bump{animation:none}
+  .tl-tilt{will-change:auto}
+  .spot-lit::before{transition:none}
+}
