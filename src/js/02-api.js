@@ -71,9 +71,9 @@
       return Promise.resolve().then(function(){ return demoFn ? demoFn() : null; });
     };
     api.setAuth = function(token, role){
-      api.token = token || null; api.role = token ? role : null;
-      if(token){ TL.session.set("token", token); TL.session.set("role", role); }
-      else { TL.session.del("token"); TL.session.del("role"); }
+      api.token = token || null; api.role = role || null;
+      if(api.token) TL.session.set("token", api.token); else TL.session.del("token");
+      if(api.role) TL.session.set("role", api.role); else TL.session.del("role");
       TL.emit("auth:change", {role: api.role});
     };
     api.ready = api.base
