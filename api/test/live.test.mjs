@@ -1,10 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { makeEnv, client } from './helpers.mjs';
-import { CLAIM_TTL_MS, CHAT_MAX, pruneLive } from '../src/routes/live.js';
+import { CLAIM_TTL_MS, CHAT_MAX, MAX_HOLDS_PER_SID, MAX_HOLDS_PER_IP, VIEWERS_PER_IP, pruneLive } from '../src/routes/live.js';
 
 const SID_A = 'sid-aaaaaaaa';
 const SID_B = 'sid-bbbbbbbb';
+const fromIp = (ip) => ({ headers: { 'cf-connecting-ip': ip } });
 
 test('live: state reflects config, claims hold for 6 h, conflicts 409', async () => {
   const env = makeEnv();
@@ -48,15 +49,69 @@ test('live: state reflects config, claims hold for 6 h, conflicts 409', async ()
   assert.deepEqual(mine.data.spots.mine, [4]);
   assert.deepEqual((await c.get('/live')).data.spots.mine, []);
 
-  assert.equal((await c.post('/live/spots/claim', { spot: 13, sid: SID_A })).status, 400, 'beyond config.live.spots');
-  assert.equal((await c.post('/live/spots/claim', { spot: 0, sid: SID_A })).status, 400);
-  assert.equal((await c.post('/live/spots/claim', { spot: 2.5, sid: SID_A })).status, 400);
-  assert.equal((await c.post('/live/spots/claim', { spot: 2 })).status, 400, 'sid required');
-  assert.equal((await c.post('/live/spots/claim', { spot: 2, sid: 'a b' })).status, 400);
-  assert.equal((await c.post('/live/spots/claim', { spot: 2, sid: SID_A, name: 'x'.repeat(30) })).status, 400);
+  // validation (from another address so these do not eat into the 10 / min claim limit above)
+  const o = fromIp('9.9.9.9');
+  assert.equal((await c.post('/live/spots/claim', { spot: 13, sid: SID_A }, o)).status, 400, 'beyond config.live.spots');
+  assert.equal((await c.post('/live/spots/claim', { spot: 0, sid: SID_A }, o)).status, 400);
+  assert.equal((await c.post('/live/spots/claim', { spot: 2.5, sid: SID_A }, o)).status, 400);
+  assert.equal((await c.post('/live/spots/claim', { spot: 2 }, o)).status, 400, 'sid required');
+  assert.equal((await c.post('/live/spots/claim', { spot: 2, sid: 'a b' }, o)).status, 400);
+  assert.equal((await c.post('/live/spots/claim', { spot: 2, sid: SID_A, name: 'x'.repeat(30) }, o)).status, 400);
 
   const chat = await c.get('/live/chat');
   assert.ok(chat.data.messages.some(m => m.sys && /Spot #4 claimed by Mike R\./.test(m.text)), 'claims post a system chat line');
+});
+
+test('live: one sid holds at most 3 unpaid spots; paid or released spots free up room', async () => {
+  const c = client(makeEnv());
+  for (let n = 1; n <= MAX_HOLDS_PER_SID; n++) assert.equal((await c.post('/live/spots/claim', { spot: n, sid: SID_A })).status, 200, 'hold #' + n);
+  const over = await c.post('/live/spots/claim', { spot: 4, sid: SID_A });
+  assert.equal(over.status, 409);
+  assert.equal(over.data.reason, 'limit');
+  assert.equal(over.data.limit, MAX_HOLDS_PER_SID);
+  assert.match(over.data.error, /up to 3 unpaid spots/);
+  assert.deepEqual(over.data.taken, [1, 2, 3], 'the board state rides along so the client can redraw');
+  assert.deepEqual(over.data.mine, [1, 2, 3]);
+  assert.equal(over.data.open, 9);
+  assert.deepEqual((await c.get('/live')).data.spots.taken, [1, 2, 3], 'nothing was written');
+  assert.equal((await c.post('/live/spots/claim', { spot: 2, sid: SID_A })).status, 200, 're-claiming a spot you already hold is still fine');
+
+  // pay for one → room for another hold
+  const staff = await c.login('staff');
+  await c.post('/live/spots/2/confirm', {}, { token: staff });
+  assert.equal((await c.post('/live/spots/claim', { spot: 4, sid: SID_A })).status, 200, 'confirmed spots are not unpaid holds');
+  assert.equal((await c.post('/live/spots/claim', { spot: 5, sid: SID_A })).data.reason, 'limit');
+  // release one → room again
+  assert.equal((await c.post('/live/spots/release', { spot: 1, sid: SID_A })).data.released, true);
+  assert.equal((await c.post('/live/spots/claim', { spot: 5, sid: SID_A })).status, 200);
+});
+
+test('live: rotating sids from one address stops at 6 unpaid holds', async () => {
+  const c = client(makeEnv());
+  let held = 0;
+  let last;
+  for (let i = 0; i < 8; i++) {
+    last = await c.post('/live/spots/claim', { spot: 1 + i, sid: 'sid-rotate-' + i });
+    if (last.status === 200) held++;
+    else break;
+  }
+  assert.equal(held, MAX_HOLDS_PER_IP, 'the address tops out at 6 unpaid holds');
+  assert.equal(last.status, 409);
+  assert.equal(last.data.reason, 'limit');
+  assert.match(last.data.error, /this connection/);
+  assert.deepEqual(last.data.taken, [1, 2, 3, 4, 5, 6]);
+  const elsewhere = await c.post('/live/spots/claim', { spot: 12, sid: 'sid-other-place' }, fromIp('7.7.7.7'));
+  assert.equal(elsewhere.status, 200, 'another address is unaffected');
+  const pub = await c.get('/live');
+  assert.ok(pub.data.spots.claims.every(x => !('ip' in x) && !('sid' in x)), 'the public board never shows who holds what');
+});
+
+test('live: claims are limited to 10 per minute per IP', async () => {
+  const c = client(makeEnv());
+  let last;
+  for (let i = 0; i < 11; i++) last = await c.post('/live/spots/claim', { spot: 0, sid: SID_A });   // rejected on validation, still counted
+  assert.equal(last.status, 429);
+  assert.equal((await c.post('/live/spots/claim', { spot: 1, sid: SID_B }, fromIp('8.8.8.8'))).status, 200);
 });
 
 test('live: release only with the matching sid; staff can release anything', async () => {
@@ -66,6 +121,10 @@ test('live: release only with the matching sid; staff can release anything', asy
   assert.equal(wrong.status, 403);
   assert.deepEqual(wrong.data.taken, [3]);
   assert.equal((await c.post('/live/spots/release', { spot: 3 })).status, 400, 'sid required for the public');
+  const range = await c.post('/live/spots/release', { spot: 13, sid: SID_A });
+  assert.equal(range.status, 400, 'bounded by config.live.spots like claim and confirm');
+  assert.match(range.data.error, /spot out of range/);
+  assert.equal((await c.post('/live/spots/release', { spot: 150, sid: SID_A })).status, 400);
   const free = await c.post('/live/spots/release', { spot: 9, sid: SID_A });
   assert.equal(free.status, 200);
   assert.equal(free.data.released, false, 'releasing a free spot is a no-op');
@@ -186,13 +245,32 @@ test('live: viewers counts distinct sids seen in the last 60 s', async () => {
   assert.equal((await c.get('/live')).data.viewers, 3);
   assert.equal((await c.get('/live/chat')).data.viewers, 3);
   const map = await env.KV.get('live:viewers', 'json');
-  map[SID_B] = Date.now() - 61 * 1000;
+  assert.deepEqual(Object.keys(map[SID_A]).sort(), ['ip', 't'], 'heartbeats remember the address');
+  map[SID_B] = { t: Date.now() - 61 * 1000, ip: '1.2.3.4' };
+  map['sid-legacy-1'] = Date.now();   // the pre-IP shape still counts
   await env.KV.put('live:viewers', JSON.stringify(map));
-  assert.equal((await c.get('/live')).data.viewers, 2, 'stale heartbeats drop out');
-  assert.equal((await c.post('/live/viewers', { sid: SID_A })).data.viewers, 2);
+  assert.equal((await c.get('/live')).data.viewers, 3, 'stale heartbeats drop out; legacy numbers still count');
+  assert.equal((await c.post('/live/viewers', { sid: SID_A })).data.viewers, 3);
   const pruned = await pruneLive(env);
   assert.equal(pruned.spots, 0);
-  assert.equal(Object.keys(await env.KV.get('live:viewers', 'json')).length, 2);
+  const rewritten = await env.KV.get('live:viewers', 'json');
+  assert.equal(Object.keys(rewritten).length, 3);
+  assert.equal(typeof rewritten['sid-legacy-1'], 'object', 'the cron rewrites legacy entries in the new shape');
+});
+
+test('live: one address counts for at most 3 viewers and heartbeats are limited to 12 per minute', async () => {
+  const c = client(makeEnv());
+  let count;
+  for (let i = 0; i < 8; i++) count = (await c.post('/live/viewers', { sid: 'sid-fake-view-' + i })).data.viewers;
+  assert.equal(count, VIEWERS_PER_IP, 'rotating sids from one address never inflates the count');
+  assert.equal((await c.get('/live')).data.viewers, VIEWERS_PER_IP);
+  assert.equal((await c.post('/live/viewers', { sid: 'sid-fake-view-7' })).data.viewers, VIEWERS_PER_IP, 'a known sid just refreshes');
+  assert.equal((await c.post('/live/viewers', { sid: 'sid-real-second' }, fromIp('5.5.5.5'))).data.viewers, VIEWERS_PER_IP + 1, 'a second address adds one');
+  let last;
+  for (let i = 9; i < 13; i++) last = await c.post('/live/viewers', { sid: 'sid-fake-view-' + i });   // 9 sent so far → 13th trips it
+  assert.equal(last.status, 429);
+  assert.ok(last.headers.get('retry-after'));
+  assert.equal((await c.post('/live/viewers', { sid: 'sid-real-second' }, fromIp('5.5.5.5'))).status, 200, 'other addresses keep heartbeating');
 });
 
 test('live: the daily cron in routes/inventory.js prunes the stored claim shape', async () => {

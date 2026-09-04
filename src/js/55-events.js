@@ -186,21 +186,38 @@
     });
     rows.sort(function(a, b){ var da = (a.dow + 6) % 7, db = (b.dow + 6) % 7; return da - db || a.sort - b.sort; });
     list.innerHTML = rows.map(function(r){ return r.html; }).join("");
-    evRenderNextUp(up);
+    evRenderNextUp(up, true);
   }
-  function evRenderNextUp(up){
+  function evRenderNextUp(up, force){
     var el = $("#evNextUp"); if(!el) return;
     up = up || evUpcoming();
-    if(!up.length){ el.innerHTML = ""; el.hidden = true; return; }
-    var ev = up[0].ev, occ = up[0].occ, evt = calForEvent(ev);
+    if(!up.length){ if(el.innerHTML) el.innerHTML = ""; el.hidden = true; nuLastKey = null; return; }
+    var ev = up[0].ev, occ = up[0].occ;
+    /* The live region (.nu-live) only holds the stable sentence; the ticking countdown and the
+       calendar menu sit outside it, and every text node is written only when it changed, so a
+       screen reader hears the next-up line once, not every minute. */
+    var k = occ.running ? "Happening now" : "Next play night", name = ev.name || "", when = EV_DAY_LONG[eventDow(ev)] + " · " + (ev.time || evClock(eventStart(ev)));
+    var count = occ.running ? "doors open — come play" : evFmtUntil(occ.mins);
+    var key = [ev.id || "", name, when, ymdIso(occ.date)].join("|");
     el.hidden = false;
-    el.innerHTML = '<span class="nu-k">' + (occ.running ? "Happening now" : "Next play night") + '</span>' +
-      '<b>' + esc(ev.name) + '</b><span class="nu-when">' + esc(EV_DAY_LONG[eventDow(ev)]) + " · " + esc(ev.time || evClock(eventStart(ev))) + '</span>' +
-      '<span class="nu-count">' + (occ.running ? "doors open — come play" : esc(evFmtUntil(occ.mins))) + '</span>' +
-      (evt ? calMenu(evt) : "");
+    var live = $(".nu-live", el);
+    if(force || !live){
+      var evt = calForEvent(ev);
+      el.innerHTML = '<span class="nu-live" role="status" aria-live="polite"><span class="nu-k">' + esc(k) + '</span>' +
+        '<b>' + esc(name) + '</b><span class="nu-when">' + esc(when) + '</span></span>' +
+        '<span class="nu-count">' + esc(count) + '</span>' +
+        '<span class="nu-cal">' + (evt ? calMenu(evt) : "") + '</span>';
+      nuLastKey = key;
+      return;
+    }
+    evSetText($(".nu-k", live), k); evSetText($("b", live), name); evSetText($(".nu-when", live), when);
+    evSetText($(".nu-count", el), count);
+    if(nuLastKey !== key){ var calEl = $(".nu-cal", el), evt2 = calForEvent(ev); if(calEl) calEl.innerHTML = evt2 ? calMenu(evt2) : ""; nuLastKey = key; }
   }
+  var nuLastKey = null;
+  function evSetText(node, txt){ if(node && node.textContent !== txt) node.textContent = txt; }
   function tickEvents(){ if(document.hidden) return; var up = evUpcoming(); evRenderNextUp(up);
-    var nextEl = $("#schedList .is-next .next-tag"); if(nextEl && up.length){ nextEl.textContent = up[0].occ.running ? "Happening now" : "Next up · " + evFmtUntil(up[0].occ.mins); }
+    var nextEl = $("#schedList .is-next .next-tag"); if(nextEl && up.length){ evSetText(nextEl, up[0].occ.running ? "Happening now" : "Next up · " + evFmtUntil(up[0].occ.mins)); }
     var rowNow = $("#schedList .is-next"); if(rowNow && up.length && rowNow.dataset.ev !== (up[0].ev.id || "")) renderSched(); }
   function tcgplusIsGeneric(u){ return !u || /^https?:\/\/(www\.)?bandai-tcg-plus\.com\/?$/i.test(String(u).trim()); }
   function pkEvent(){ var evs = TL.config.events || []; return evs.filter(function(e){ return e.signup === "form"; })[0] || evs.filter(function(e){ return e.id === "pk-sun"; })[0] || evs.filter(function(e){ return e.game === "pk"; })[0] || null; }
@@ -231,6 +248,8 @@
         var pk = pkEvent(), occ = pk ? evNextOcc(pk) : null, contact = $("#pkContact", f).value.trim();
         var out = {name: $("#pkName", f).value.trim(), seats: parseInt($("#pkCount", f).value, 10) || 1, eventId: pk ? (pk.id || "pk-sun") : "pk-sun", eventName: pk ? pk.name : "Pokemon League", website: $("#pkWebsite", f).value};
         if(occ) out.date = ymdIso(occ.date);
+        /* the API stores `contact`; email/phone ride along so the inbox and the notification can label it */
+        out.contact = contact;
         if(TL.forms.looksEmail(contact)) out.email = contact; else out.phone = contact;
         return out;
       },
@@ -240,7 +259,7 @@
         return null;
       },
       mailto: function(fields){
-        return {href: TL.forms.mailto(fields.eventName + " signup — " + EV_DAY_LONG[eventDow(pkEvent() || {dow: 0})], ["Name: " + fields.name, "Seats: " + fields.seats, "Contact: " + (fields.email || fields.phone || ""), fields.date ? "Date: " + fields.date : "", "", "See you there!"]), label: "Email the signup instead"};
+        return {href: TL.forms.mailto(fields.eventName + " signup — " + EV_DAY_LONG[eventDow(pkEvent() || {dow: 0})], ["Name: " + fields.name, "Seats: " + fields.seats, "Contact: " + (fields.contact || fields.email || fields.phone || ""), fields.date ? "Date: " + fields.date : "", "", "See you there!"]), label: "Email the signup instead"};
       },
       success: function(fields, res, st){
         var pk = pkEvent(), evt = pk ? calForEvent(pk) : null, occ = pk ? evNextOcc(pk) : null;
@@ -254,7 +273,6 @@
   /* ---- card show ---- */
   function showNext(){ var d = TL.nextShow(); return (d && !isNaN(d)) ? d : null; }
   function showFromConfig(d){ var s = TL.config.show || {}; return !!(s.date && d && ymdIso({y: d.getFullYear(), m: d.getMonth() + 1, d: d.getDate()}) === s.date); }
-  function pendingTables(){ return TL.forms.local("vendor").reduce(function(n, r){ return n + (parseInt(r.tables, 10) || 0); }, 0); }
   var lastTablesShown = null;
   function renderShow(){
     var s = TL.config.show || {}, d = showNext();
@@ -271,12 +289,14 @@
     if((el = $("#showCadence"))) el.textContent = String(s.cadence || "First Saturday or Sunday").replace(/\s+of every month\.?$/i, "");
     if((el = $("#showEyebrow"))) el.textContent = String(s.cadence || "First Saturday or Sunday").replace(/\s+of every month\.?$/i, "") + " \u00b7 " + (s.venue || "Hilton") + (s.address ? " \u00b7 " + s.address.split(",").slice(1, 3).join(",").trim() : "");
     if((el = $("#showMapLink"))) el.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent([s.venue, s.address].filter(Boolean).join(", "));
-    var total = parseInt(s.tables, 10) || 24, booked = Math.min(total, (parseInt(s.booked, 10) || 0) + pendingTables());
+    /* booked count comes from config only ("as of the last update") — a request sent from this
+       device is not a booking until staff confirm it, so it never bumps the meter */
+    var total = parseInt(s.tables, 10) || 24, booked = Math.min(total, parseInt(s.booked, 10) || 0);
     var n = $("#tablesLabel .tables-n"), t = $("#tablesLabel .tables-t"), meter = $("#tablesMeter");
     if(t) t.textContent = total;
     if(n){ if(lastTablesShown !== booked){ n.textContent = lastTablesShown === null ? "0" : String(lastTablesShown); evCountTo(n, booked, {duration: 900}); lastTablesShown = booked; } }
     else if((el = $("#tablesLabel"))) el.textContent = booked + " of " + total;
-    if(meter){ meter.setAttribute("aria-label", booked + " of " + total + " vendor tables booked"); var bar = meter.querySelector("i"); if(bar) bar.style.width = Math.round(booked / total * 100) + "%"; meter.classList.toggle("full", booked >= total); }
+    if(meter){ meter.setAttribute("aria-label", booked + " of " + total + " vendor tables booked as of the last update"); var bar = meter.querySelector("i"); if(bar) bar.style.width = Math.round(booked / total * 100) + "%"; meter.classList.toggle("full", booked >= total); }
     var cal = $("#showCal"), evt = calForShow(); if(cal) cal.innerHTML = evt ? calMenu(evt) : "";
     var sel = $("#vTables");
     if(sel && Array.isArray(s.tablePrices) && s.tablePrices.length){
@@ -291,13 +311,14 @@
   }
   function tickShow(){
     var el = $("#showCountdown"); if(!el) return;
-    var s = TL.config.show || {}, d = showNext(); if(!d){ el.textContent = ""; return; }
+    var s = TL.config.show || {}, d = showNext(); if(!d){ evSetText(el, ""); return; }
     var now = new Date(), st = evHmMin(s.start), en = evHmMin(s.end);
     var endMs = d.getTime() + Math.max(60, ((en !== null ? en : 960) - (st !== null ? st : 600))) * 60000;
     var mins = Math.round((d.getTime() - now.getTime()) / 60000);
-    if(mins <= 0 && now.getTime() < endMs){ el.textContent = "Happening now \u00b7 doors open till " + evClock(en !== null ? en : 960); el.classList.add("live"); return; }
+    /* plain text pill, not a live region: the digits tick every minute and nobody needs that read out */
+    if(mins <= 0 && now.getTime() < endMs){ evSetText(el, "Happening now \u00b7 doors open till " + evClock(en !== null ? en : 960)); el.classList.add("live"); return; }
     el.classList.remove("live");
-    el.textContent = mins <= 0 ? "" : evFmtUntil(mins);
+    evSetText(el, mins <= 0 ? "" : evFmtUntil(mins));
   }
   function bindVendor(){
     var form = $("#vendorForm"); if(!form) return;
@@ -316,9 +337,9 @@
       success: function(fields, res, st){
         var d = showNext(), when = d ? EV_DAY_LONG[d.getDay()] + ", " + EV_MON_SHORT[d.getMonth()] + " " + d.getDate() : "the next show";
         var prices = ((TL.config.show || {}).tablePrices || []).filter(function(p){ return p.n === fields.tables; })[0];
-        return "<b>" + (fields.waitlist ? "You\u2019re on the vendor waitlist" : "Table request received") + "</b><p>" + fields.tables + (fields.tables === 1 ? " table" : " tables") + " for " + esc(when) + (prices && prices.price ? " \u00b7 " + money(prices.price).replace(/\.00$/, "") : "") + ". We\u2019ll confirm by email within a day" + (fields.waitlist ? " if a table opens up" : "") + " \u2014 setup opens at " + esc($("#showSetup") ? $("#showSetup").textContent : "8 AM") + ".</p>";
-      },
-      onSuccess: function(fields, res, st){ if(st.local) renderShow(); else { var s = TL.config.show || {}; lastTablesShown = null; TL.config.show = TL.deepMerge(s, {booked: (parseInt(s.booked, 10) || 0) + fields.tables}); renderShow(); } }
+        return "<b>" + (fields.waitlist ? "You\u2019re on the vendor waitlist" : "Table request received") + "</b><p>" + fields.tables + (fields.tables === 1 ? " table" : " tables") + " for " + esc(when) + (prices && prices.price ? " \u00b7 " + money(prices.price).replace(/\.00$/, "") : "") + ". It\u2019s a request until we confirm \u2014 we\u2019ll email within a day" + (fields.waitlist ? " if a table opens up" : "") + " \u2014 setup opens at " + esc($("#showSetup") ? $("#showSetup").textContent : "8 AM") + ".</p>";
+      }
+      /* no onSuccess: the booked meter only reflects config.show.booked, which staff update */
     });
   }
 
@@ -352,9 +373,11 @@
     var el = $("#visitStatus"); if(!el) return;
     var s = TL.shopStatus(), dot = el.querySelector(".dot"), lab = el.querySelector("b"), sub = el.querySelector(".visit-status-sub");
     var soon = s.open && /Closes in/.test(s.sub || "");
-    if(dot) dot.className = "dot" + (s.open ? (soon ? " warn" : "") : " crit");
-    if(lab) lab.textContent = soon ? "Closing soon" : s.label;
-    if(sub) sub.textContent = s.sub ? " \u00b7 " + s.sub : "";
+    var dotCls = "dot" + (s.open ? (soon ? " warn" : "") : " crit");
+    if(dot && dot.className !== dotCls) dot.className = dotCls;
+    /* only the label (<b>, the live region) announces; the "closes in N min" sub ticks outside it */
+    evSetText(lab, soon ? "Closing soon" : s.label);
+    evSetText(sub, s.sub ? " \u00b7 " + s.sub : "");
     el.classList.toggle("open", !!s.open);
   }
   function evLoadMap(){

@@ -63,7 +63,7 @@ commit. Optional secrets: `SQUARE_ACCESS_TOKEN`, `SQUARE_LOCATION_ID`,
 | POST | `/forms/:kind` | – | `kind` ∈ `vendor` (name, email, tables 1-3, game), `buylist` (name, contact, games, desc, photos? no), `signup` (name, seats 1-4, eventId), `newsletter` (email), `restock` (email, productId, productName), `contact` (name, email, message). Body also accepts `website` honeypot. Stores `form:<kind>:<id>` with `{id, kind, at, ip, ...fields, status:"new"}`, emails `NOTIFY_EMAIL` when configured. Returns `{ok, id, emailed}`. 5 / 10 min per IP per kind. |
 | GET | `/forms?kind=&status=&limit=` | staff | Inbox, newest first |
 | PUT | `/forms/:kind/:id` | staff | `{status:"new"|"done"|"archived", note?}` |
-| POST | `/checkout` | – | `{lines:[{id, name, price, qty, game?}], fulfillment:"pickup"|"ship", email?, note?}` → creates a Square Payment Link (ad-hoc line items, `SQUARE_ENV` sandbox/production). Returns `{url, orderId, mock:false}`. Without Square configured returns `{url:null, mock:true, orderId, total}` so the UI can show a demo confirmation. Validates qty 1-20, price 0.01-10000, ≤ 40 lines. |
+| POST | `/checkout` | – | `{lines:[{id, name, price, qty, game?}], fulfillment:"pickup"|"ship", email?, note?}` → creates a Square Payment Link (ad-hoc line items, `SQUARE_ENV` sandbox/production). Returns `{url, orderId, mock:false}`. Without Square configured returns `{url:null, mock:true, orderId, total}` so the UI can show a demo confirmation. Validates qty 1-20, price 0.01-10000, ≤ 40 lines. **Prices and names are never taken from the client**: `tcg-<productId>` lines are priced from inventory.json, `live-spot-<n>` from `config.live.spotPrice` (qty forced to 1); ids are trimmed/lower-cased first. With Square configured any other id is a **400** and an unreachable inventory.json is a **503**; in mock mode such lines are accepted with the client's figures and flagged `trusted:false`. |
 | POST | `/square/webhook` | Square signature | Verifies `x-square-hmacsha256-signature` (HMAC-SHA256 of `SQUARE_WEBHOOK_URL + body` with `SQUARE_WEBHOOK_SIGNATURE_KEY`). On `inventory.count.updated`, `order.created`, `payment.updated` appends to `alerts` (`{id, at, ch:"TCGplayer"|"Square", msg, source, ack:false}`), keeps the raw event under `square:event:<id>` for 7 days. Returns 200 always once verified; 401 on bad signature. |
 | GET | `/alerts` | staff | `{alerts:[...open first...], open:n}` |
 | POST | `/alerts` | staff | `{msg, ch}` → creates a manual alert (used when stock is edited on the site) |
@@ -74,11 +74,11 @@ commit. Optional secrets: `SQUARE_ACCESS_TOKEN`, `SQUARE_LOCATION_ID`,
 | GET | `/credit/:id` | staff | customer + last 50 ledger entries |
 | GET | `/credit/lookup?phone=` | – | public balance check: returns `{found, balance}` only when the phone matches exactly (last 4 digits masked name); rate limited 10 / 10 min |
 | GET | `/live` | – | `{live:config.live, spots:{taken:[n…], price, total}, viewers}` |
-| POST | `/live/spots/claim` | – | `{spot, name?}` → claims spot n if free (atomic-ish via KV read-modify-write + re-check), returns `{ok, spot, taken:[…]}`; 409 when taken. Claims expire after 6 h unless `POST /live/spots/:n/confirm` (staff) |
+| POST | `/live/spots/claim` | – | `{spot, name?}` → claims spot n if free (atomic-ish via KV read-modify-write + re-check), returns `{ok, spot, taken:[…]}`; 409 when taken, 409 `{reason:"limit"}` once a sid holds 3 unpaid spots (an IP 6); 10 / min per IP. Claims expire after 6 h unless `POST /live/spots/:n/confirm` (staff) |
 | POST | `/live/spots/reset` | staff | clear all claims |
 | GET | `/live/chat?since=<ts>` | – | `{messages:[{id, at, user, text, sys?}]}` newest last, max 60 |
 | POST | `/live/chat` | – | `{user, text}` → append (text ≤ 200 chars, user ≤ 24, 20 msgs / min per IP, basic profanity/URL strip) |
-| POST | `/live/viewers` | – | heartbeat `{sid}` → counts distinct sids in the last 60 s; returns `{viewers}` |
+| POST | `/live/viewers` | – | heartbeat `{sid}` → counts distinct sids in the last 60 s (at most 3 per IP; 12 / min per IP); returns `{viewers}` |
 | GET | `/inventory/status` | – | `{generated, products, units, lastRun:{at, ok, message}, syncing}` — `generated` read from `SITE_URL + inventory-summary.json` (cached 5 min in KV) |
 | POST | `/inventory/sync` | admin | Dispatches the `inventory.yml` GitHub Action via `POST /repos/{GITHUB_REPO}/actions/workflows/{GITHUB_WORKFLOW}/dispatches`; returns `{ok, dispatched:true}` or `{ok:false, reason}` when no `GITHUB_TOKEN` |
 | GET | `/price?game=pk|op|mtg&q=` | – | Card price lookup for the buylist estimator: `{results:[{name, set, number?, img?, market, source:"scryfall"|"pokemontcg"|"inventory", url?}]}` ≤ 10. MTG → Scryfall `cards/search`; Pokemon → pokemontcg.io v2 (`POKEMONTCG_API_KEY` optional); One Piece / others → the shop's own inventory-summary/inventory (market field). Cached 6 h per query. 30 / 10 min per IP |
@@ -88,10 +88,12 @@ clears the inventory status cache.
 
 ## Additions made during the build (beyond the table above)
 
-- `POST /checkout` also returns `subtotalCents`, `shippingCents`, `reason`; answers **409** `{error, items:[{id, available, reason}]}`
-  when a `tcg-<id>` line exceeds inventory stock, **502** with Square's code/detail on Square errors. Shipping: `SHIPPING_CENTS`
-  (default 499) flat, free at `FREE_SHIPPING_CENTS` (default 10000). Orders are kept 7 days: `GET /checkout/orders` (staff),
-  `GET /checkout/orders/:id` (public, status only).
+- `POST /checkout` also returns `subtotalCents`, `shippingCents`, `reason` and `lines:[{id, name, price, qty, trusted}]` (the
+  server-priced cart); answers **409** `{error, items:[{id, available, reason}]}` when a `tcg-<id>` line exceeds inventory stock
+  or a `live-spot-<n>` does not exist / has no price, **502** with Square's code/detail on Square errors. Shipping: `SHIPPING_CENTS`
+  (default 499) flat, free at `FREE_SHIPPING_CENTS` (default 10000). Orders are kept 7 days with `priced` ∈ `inventory|mixed|client`
+  and a `trusted` flag per line: `GET /checkout/orders` (staff, everything but the IP), `GET /checkout/orders/:id` (public) returns
+  only `{order:{id, status, total, at, fulfillment}}` — never the note, email, lines or Square link.
 - `POST /live/spots/claim` body is `{spot, name?, sid}`; `POST /live/spots/release {spot, sid}` frees a spot when the sid matches
   (staff token frees any) → `{ok, released, taken, mine}`; `GET /live?sid=` adds `spots.mine`, `spots.open`, `spots.claims`;
   `POST /live/spots/:n/confirm` (staff) accepts `{name?}`; `POST /live/chat` accepts `{sys:true}` from staff; `GET /live/chat`
@@ -101,5 +103,7 @@ clears the inventory status cache.
 - `GET /inventory/status` also returns `hooks` (last webhook per event type), `square:{configured, env, webhook}`,
   `github:{configured, repo, workflow}`, `cached`, `unreachable`; `POST /inventory/sync` answers **429** when a run was
   dispatched in the last few minutes. `GITHUB_REF` (default `main`) picks the branch.
-- Forms accept and store extra optional fields: vendor `phone, show, waitlist`; signup `eventName, date, contact`;
+- Forms accept and store extra optional fields: vendor `phone, show, waitlist`; signup `eventName, date`;
   buylist `photosUrl`; newsletter `topic`. Unknown fields are dropped, never rejected.
+- `signup` needs at least one of `contact`, `email`, `phone` (400 otherwise); all three are stored, `contact` falls back
+  to the email or phone, and the notification email lists them (reply-to set when there is an email).

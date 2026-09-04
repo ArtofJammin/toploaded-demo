@@ -44,7 +44,9 @@ test('forms: vendor submission is stored, cleaned, and listed newest first for s
 
 test('forms: every kind validates its fields', async () => {
   const c = client(makeEnv());
-  const bad = async (kind, body) => (await c.post('/forms/' + kind, body)).status;
+  // each rejected POST still counts toward the 5 / 10 min limit, so spread them across addresses
+  let n = 0;
+  const bad = async (kind, body) => (await c.post('/forms/' + kind, body, { headers: { 'cf-connecting-ip': '10.9.0.' + (++n) } })).status;
   assert.equal(await bad('vendor', { ...vendor, email: 'nope' }), 400);
   assert.equal(await bad('vendor', { ...vendor, tables: 4 }), 400);
   assert.equal(await bad('vendor', { ...vendor, tables: 1.5 }), 400);
@@ -52,9 +54,13 @@ test('forms: every kind validates its fields', async () => {
   assert.equal(await bad('vendor', { ...vendor, phone: '12' }), 400);
   assert.equal(await bad('buylist', { name: 'Al', contact: 'al@x.io', games: ['pk'] }), 400);
   assert.equal(await bad('buylist', { name: 'Al', contact: 'al@x.io', games: [], desc: 'binder' }), 400);
-  assert.equal(await bad('signup', { name: 'Al', seats: 5, eventId: 'pk-sun' }), 400);
-  assert.equal(await bad('signup', { name: 'Al', seats: 2, eventId: 'bad id!' }), 400);
-  assert.equal(await bad('signup', { name: 'Al', seats: 2, eventId: 'pk-sun', date: '2026-13-99' }), 400);
+  assert.equal(await bad('signup', { name: 'Al', seats: 5, eventId: 'pk-sun', email: 'al@x.io' }), 400);
+  assert.equal(await bad('signup', { name: 'Al', seats: 2, eventId: 'bad id!', email: 'al@x.io' }), 400);
+  assert.equal(await bad('signup', { name: 'Al', seats: 2, eventId: 'pk-sun', date: '2026-13-99', email: 'al@x.io' }), 400);
+  assert.equal(await bad('signup', { name: 'Al', seats: 2, eventId: 'pk-sun' }), 400, 'a signup needs a way to reach the player');
+  assert.equal(await bad('signup', { name: 'Al', seats: 2, eventId: 'pk-sun', contact: '' }), 400);
+  assert.equal(await bad('signup', { name: 'Al', seats: 2, eventId: 'pk-sun', email: 'nope' }), 400);
+  assert.equal(await bad('signup', { name: 'Al', seats: 2, eventId: 'pk-sun', phone: '12' }), 400);
   assert.equal(await bad('newsletter', { email: 'x' }), 400);
   assert.equal(await bad('restock', { email: 'a@b.co', productId: '', productName: 'ETB' }), 400);
   assert.equal(await bad('contact', { name: 'A', email: 'a@b.co', message: 'hi' }), 400);
@@ -65,7 +71,7 @@ test('forms: every kind validates its fields', async () => {
 
   const ok = async (kind, body) => { const r = await c.post('/forms/' + kind, body); assert.equal(r.status, 200, kind + ' ' + JSON.stringify(r.data)); return r.data; };
   await ok('buylist', { name: 'Al Pine', contact: '(513) 555-0100', games: ['pk', 'mtg'], desc: 'Two binders of holos' });
-  await ok('signup', { name: 'Al Pine', seats: '2', eventId: 'pk-sun', date: '2026-09-06' });
+  await ok('signup', { name: 'Al Pine', seats: '2', eventId: 'pk-sun', date: '2026-09-06', email: 'Al@Example.com' });
   await ok('newsletter', { email: 'al@x.io' });
   await ok('restock', { email: 'al@x.io', productId: '614504', productName: 'Charizard ex' });
   await ok('contact', { name: 'Al Pine', email: 'al@x.io', message: 'Open Labor Day?' });
@@ -76,8 +82,31 @@ test('forms: every kind validates its fields', async () => {
   assert.equal(signup.seats, 2, 'numeric strings coerce');
   assert.equal(signup.eventName, 'Pokemon League', 'event name resolved from config');
   assert.equal(signup.date, '2026-09-06');
+  assert.equal(signup.email, 'al@example.com', 'the email the player typed is stored (lower-cased)');
+  assert.equal(signup.contact, 'al@example.com', 'contact is never empty when an email or phone was given');
+  assert.equal(signup.phone, '');
   const buy = inbox.data.forms.find(f => f.kind === 'buylist');
   assert.equal(buy.games, 'pk, mtg');
+});
+
+test('forms: signup keeps whichever contact the player typed and folds it into contact', async () => {
+  const c = client(makeEnv());
+  const base = { name: 'Al Pine', seats: 1, eventId: 'pk-sun' };
+  let n = 0;
+  const ok = async (body) => { const r = await c.post('/forms/signup', body, { headers: { 'cf-connecting-ip': '10.8.0.' + (++n) } }); assert.equal(r.status, 200, JSON.stringify(r.data)); return r.data.id; };
+  const byPhone = await ok({ ...base, phone: '(859) 555-0100' });
+  const byContactEmail = await ok({ ...base, contact: 'Al@Example.com' });
+  const byContactPhone = await ok({ ...base, contact: '513-555-0199' });
+  const byContactText = await ok({ ...base, contact: 'DM @alpine on Instagram' });
+  const both = await ok({ ...base, contact: 'text me first', email: 'al@x.io', phone: '8595550100' });
+  const staff = await c.login('staff');
+  const rows = (await c.get('/forms?kind=signup', { token: staff })).data.forms;
+  const rec = (id) => rows.find(f => f.id === id);
+  assert.deepEqual([rec(byPhone).contact, rec(byPhone).phone, rec(byPhone).email], ['(859) 555-0100', '(859) 555-0100', ''], 'phone only → contact is the phone');
+  assert.deepEqual([rec(byContactEmail).contact, rec(byContactEmail).email, rec(byContactEmail).phone], ['Al@Example.com', 'al@example.com', ''], 'an email typed as contact is recognised');
+  assert.deepEqual([rec(byContactPhone).contact, rec(byContactPhone).phone, rec(byContactPhone).email], ['513-555-0199', '513-555-0199', ''], 'a phone typed as contact is recognised');
+  assert.deepEqual([rec(byContactText).contact, rec(byContactText).email, rec(byContactText).phone], ['DM @alpine on Instagram', '', ''], 'free text stays as contact');
+  assert.deepEqual([rec(both).contact, rec(both).email, rec(both).phone], ['text me first', 'al@x.io', '8595550100'], 'all three are kept when all three are sent');
 });
 
 test('forms: honeypot returns ok but stores nothing', async () => {
@@ -141,9 +170,19 @@ test('forms: emails NOTIFY_EMAIL with a readable subject when Resend is configur
     assert.deepEqual(calls[0].body.to, ['owner@toploaded.test']);
     assert.equal(calls[0].body.reply_to, 'jane@example.com');
     assert.match(calls[0].body.text, /Tables: 2/);
-    const s = await c.post('/forms/signup', { name: 'Al Pine', seats: 2, eventId: 'pk-sun' });
+    const s = await c.post('/forms/signup', { name: 'Al Pine', seats: 2, eventId: 'pk-sun', phone: '(859) 555-0100' });
     assert.equal(s.data.emailed, true);
     assert.equal(calls[1].body.subject, '[Top Loaded] Pokemon League signup from Al Pine (2 seats)');
+    assert.match(calls[1].body.text, /Phone: \(859\) 555-0100/, 'the notification carries the phone the player typed');
+    assert.doesNotMatch(calls[1].body.text, /Contact:/, 'no duplicate Contact line when it is just the phone');
+    assert.equal(calls[1].body.reply_to, undefined);
+    const s2 = await c.post('/forms/signup', { name: 'Bea Lee', seats: 1, eventId: 'pk-sun', email: 'Bea@Example.com' });
+    assert.equal(s2.status, 200);
+    assert.match(calls[2].body.text, /Email: bea@example\.com/);
+    assert.equal(calls[2].body.reply_to, 'bea@example.com', 'the shop can hit reply');
+    const s3 = await c.post('/forms/signup', { name: 'Cy Dee', seats: 1, eventId: 'pk-sun', contact: 'DM @cy on IG', email: 'cy@x.io' });
+    assert.equal(s3.status, 200);
+    assert.match(calls[3].body.text, /Email: cy@x\.io\nContact: DM @cy on IG/, 'a distinct contact note is listed as well');
     const staff = await c.login('staff');
     const inbox = await c.get('/forms?kind=vendor', { token: staff });
     assert.equal(inbox.data.forms[0].emailed, true);

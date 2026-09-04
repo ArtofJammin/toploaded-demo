@@ -92,7 +92,7 @@
           <h3>Channel sync alerts <span class="pill warn" id="alertPill"><span class="dot warn"></span><span id="alertCount">0</span> open</span></h3>
           <p class="card-note">When something sells on one channel, the other gets flagged until it's reconciled &mdash; Square (register &amp; this site) on one side, TCGplayer on the other.</p>
           <div id="alertList" style="margin-top:12px"></div>
-          <div class="form-grid" style="margin-top:14px; grid-template-columns:minmax(0,1fr) auto auto">
+          <div class="form-grid alert-new" style="margin-top:14px">
             <div class="field"><label for="alertNewMsg" class="vh">New alert</label><input id="alertNewMsg" placeholder="Flag something by hand&hellip;" autocomplete="off"></div>
             <div class="field"><label for="alertNewCh" class="vh">Reconcile on</label><select id="alertNewCh"><option value="TCGplayer">on TCGplayer</option><option value="Square">on Square</option></select></div>
             <div class="field" style="justify-content:flex-end"><button class="btn btn-ghost" id="alertNewBtn" type="button">Add alert</button></div>
@@ -283,7 +283,7 @@
         <table>
           <caption class="vh">Inventory with stock levels and channel status</caption>
           <thead>
-            <tr><th scope="col">Item</th><th scope="col">Game</th><th scope="col">Type</th><th scope="col">Cond</th><th scope="col" class="num">Price</th><th scope="col">Stock</th><th scope="col">Channel</th></tr>
+            <tr><th scope="col">Item</th><th scope="col">Stock</th><th scope="col" class="num">Price</th><th scope="col">Game</th><th scope="col">Type</th><th scope="col">Cond</th><th scope="col">Channel</th></tr>
           </thead>
           <tbody id="invBody"></tbody>
         </table>

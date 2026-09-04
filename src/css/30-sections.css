@@ -9,6 +9,7 @@
   background:none; border:0; padding:0; color:var(--accent);
   font-family:var(--mono); font-size:.76rem; letter-spacing:.12em; text-transform:uppercase;
 }
+a.linklike{text-decoration:none}
 .linklike:hover{text-decoration:underline}
 .panel{background:var(--surface); border:1px solid var(--line); border-radius:8px; position:relative}
 .tri{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
@@ -43,7 +44,7 @@
 .nextup-cell:first-child .nextup-btn{padding-right:28px}
 .nextup-cell[hidden]{display:none}
 .nextup-btn{
-  width:100%; text-align:left; background:none; border:0; padding:18px 0; color:inherit; cursor:pointer;
+  width:100%; text-align:left; background:none; border:0; padding:18px 0; color:inherit; cursor:pointer; text-decoration:none;
   display:grid; grid-template-columns:minmax(0,1fr) auto; gap:2px 18px; align-items:center; border-radius:4px;
 }
 .nextup-btn:hover .nextup-name{color:var(--accent)}
@@ -52,7 +53,11 @@
   font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.3rem; letter-spacing:.03em; line-height:1.05;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap; transition:color .15s ease;
 }
-.nextup-when{font-family:var(--mono); font-size:.7rem; color:var(--ink3); letter-spacing:.04em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+/* date · time · venue may wrap once (two lines, then clamp) so phones keep the venue and the show hours */
+.nextup-when{
+  font-family:var(--mono); font-size:.7rem; color:var(--ink3); letter-spacing:.04em; line-height:1.35;
+  overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow-wrap:anywhere;
+}
 .nextup-cd{
   grid-column:2; grid-row:1/4; font-family:var(--mono); font-size:1.15rem; color:var(--ink);
   font-variant-numeric:tabular-nums; white-space:nowrap; display:flex; align-items:baseline; gap:2px;
@@ -74,6 +79,10 @@
 }
 .wall::before{top:0} .wall::after{bottom:0}
 .wall-head .section-head{margin-bottom:18px}
+/* shop link + the marquee pause/play toggle (WCAG 2.2.2: moving content needs a user-operable stop) */
+.wall-tools{display:flex; align-items:center; gap:14px}
+.wall-pause{width:32px; height:32px}
+@media (pointer:coarse){ .wall-pause{width:44px; height:44px} }
 .case-stats{display:flex; flex-wrap:wrap; gap:16px 44px; margin:0 0 6px}
 .case-stats > div{min-width:0}
 .case-stats dt{font-family:var(--mono); font-size:.64rem; letter-spacing:.16em; text-transform:uppercase; color:var(--ink3)}
@@ -89,8 +98,8 @@
 .wall-track{display:flex; width:max-content; will-change:transform; animation:wallScroll var(--wall-dur,70s) linear infinite}
 .wall-row[data-dir="rev"] .wall-track{animation-direction:reverse}
 .wall-set{display:flex; gap:14px; padding-right:14px; flex:0 0 auto}
-.wall:not(.in-view) .wall-track,html.page-hidden .wall-track,
-.wall-row:hover .wall-track,.wall-row:focus-within .wall-track{animation-play-state:paused}
+.wall:not(.in-view) .wall-track,html.page-hidden .wall-track,.wall.paused .wall-track,
+.wall-row:hover .wall-track,.wall:focus-within .wall-track{animation-play-state:paused}
 @keyframes wallScroll{to{transform:translateX(-50%)}}
 .wall-card{
   flex:0 0 auto; width:110px; aspect-ratio:5/7; border-radius:8px; overflow:hidden; position:relative; padding:0;
@@ -121,7 +130,7 @@
 /* ---- rip a pack promo ---- */
 .promo-rip{
   width:100%; display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:24px; align-items:center;
-  padding:22px 26px; text-align:left; color:inherit; cursor:pointer; overflow:hidden; font:inherit;
+  padding:22px 26px; text-align:left; color:inherit; cursor:pointer; overflow:hidden; font:inherit; text-decoration:none;
 }
 .promo-rip:hover{border-color:var(--line2)}
 .promo-pack{
@@ -180,6 +189,7 @@
   .sr{opacity:1; transform:none; transition:none}
   .faq summary::after,.wall-card,.wall-card .wc-sheen,.promo-pack,.promo-tear,.promo-peek,.promo-cta,.nextup-name{transition:none}
   .wall-track{animation:none; will-change:auto; width:auto}
+  .wall-pause{display:none}
   .wall-row{overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:thin; padding:10px 24px; -webkit-mask-image:none; mask-image:none}
   .wall-card{scroll-snap-align:start; transform:none}
   .wall-card:hover,.wall-card:focus-visible{transform:none}

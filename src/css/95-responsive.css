@@ -7,7 +7,7 @@
     padding:4px 20px 8px; scrollbar-width:none;
   }
   .mainnav::-webkit-scrollbar{display:none}
-  .mainnav button{
+  .mainnav a{
     flex:0 0 auto; white-space:nowrap; min-height:40px;
     border:1px solid var(--line); border-radius:99px; padding:9px 14px;
   }
@@ -36,7 +36,7 @@
     padding:4px 20px 8px; scrollbar-width:none;
   }
   .mainnav::-webkit-scrollbar{display:none}
-  .mainnav button{
+  .mainnav a{
     flex:0 0 auto; white-space:nowrap; min-height:40px;
     border:1px solid var(--line); border-radius:99px; padding:9px 14px;
   }

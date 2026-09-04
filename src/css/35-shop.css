@@ -18,11 +18,12 @@ input[type=search]::-webkit-search-cancel-button{display:none}
   font-family:var(--mono); font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink2);
   white-space:nowrap;
 }
-.chip b{font-weight:400; opacity:.65; margin-left:2px; font-variant-numeric:tabular-nums; letter-spacing:0}
+/* counts stay solid colour (no opacity) so they keep AA contrast in every theme */
+.chip b{font-weight:400; color:var(--ink2); margin-left:2px; font-variant-numeric:tabular-nums; letter-spacing:0}
 .chip:hover{border-color:var(--line2); color:var(--ink)}
 .chip[aria-pressed="true"]{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
-.chip[aria-pressed="true"] b{opacity:.8}
-.chip[data-empty="1"]{opacity:.55}
+.chip[aria-pressed="true"] b{color:var(--accent-ink)}
+.chip[data-empty="1"]{border-style:dashed}
 .chip-label{font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3); margin-right:4px}
 .chip-wish .heart-ico{color:var(--crit); font-size:.9em; margin-right:2px}
 .chip-wish[aria-pressed="true"] .heart-ico{color:var(--accent-ink)}
@@ -99,7 +100,10 @@ mark{background:color-mix(in srgb, var(--accent) 28%, transparent); color:inheri
   background:radial-gradient(120% 90% at 50% 18%, color-mix(in srgb, var(--accent) 8%, var(--slab)), var(--slab) 62%);
   perspective:700px;
 }
-.flip{position:relative; width:150px; aspect-ratio:5/7; transform-style:preserve-3d}
+.flip{position:relative; width:150px; aspect-ratio:5/7; transform-style:preserve-3d; transition:transform .55s cubic-bezier(.4,0,.2,1)}
+.prod.is-flipped .flip{transform:rotateY(180deg)}
+.prod.is-flipped .holo-hover{animation:none; opacity:0}
+.prod.is-flipped .qv-hint{display:none}
 .tilt{
   position:absolute; inset:0; transform-style:preserve-3d;
   transform:translateY(var(--lift,0px)) rotateX(var(--ry,0deg)) rotateY(var(--rx,0deg));
@@ -145,6 +149,22 @@ mark{background:color-mix(in srgb, var(--accent) 28%, transparent); color:inheri
 .back-body::before{content:""; height:2px; margin:-4px 0 6px; background:linear-gradient(90deg,var(--foilA),var(--foilB),var(--foilC),var(--foilD)); border-radius:1px}
 .back-body .back-k{color:#7E8798; letter-spacing:.18em; text-transform:uppercase; font-size:.6rem}
 .back-body b{color:#EEF0F4; font-family:var(--body); font-size:.8rem; font-weight:600; letter-spacing:0; line-height:1.25}
+.back-qv{
+  margin-top:auto; align-self:flex-start; border:1px solid #3A4152; background:rgba(255,255,255,.06); color:#EEF0F4; border-radius:4px;
+  padding:6px 10px; font-family:var(--mono); font-size:.62rem; letter-spacing:.12em; text-transform:uppercase; min-height:30px;
+}
+.back-qv:hover{border-color:var(--accent); color:var(--accent)}
+.back-qv:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+/* flip button: the only keyboard route to the back face (aria-expanded mirrors .is-flipped) */
+.flip-btn{
+  position:absolute; bottom:8px; right:8px; width:34px; height:34px; border-radius:50%; padding:0; z-index:2;
+  border:1px solid var(--line2); background:color-mix(in srgb, var(--surface) 82%, transparent); color:var(--ink2);
+  display:grid; place-items:center; cursor:pointer;
+  transition:color .15s ease, border-color .15s ease, transform .15s ease;
+}
+.flip-btn svg{width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:transform .55s cubic-bezier(.4,0,.2,1)}
+.flip-btn:hover,.flip-btn[aria-expanded="true"]{color:var(--accent); border-color:var(--accent)}
+.flip-btn[aria-expanded="true"] svg{transform:rotate(180deg)}
 .cond{
   position:absolute; top:10px; right:10px; pointer-events:none;
   font-family:var(--mono); font-size:.75rem; letter-spacing:.08em;
@@ -249,14 +269,15 @@ html.qv-open,html.qv-open body{overflow:hidden}
   .rv-tile{max-width:180px}
 }
 @media (pointer:coarse){
-  .heart{width:44px; height:44px}
-  .heart svg{width:20px; height:20px}
+  .heart,.flip-btn{width:44px; height:44px}
+  .heart svg,.flip-btn svg{width:20px; height:20px}
+  .back-qv{min-height:44px; padding:10px 14px}
   .search-clear{width:38px; height:38px}
   .prod.tilting .tilt{transition:transform .45s cubic-bezier(.2,.7,.2,1)}
   .qv-hint{display:none}
 }
 @media (prefers-reduced-motion: reduce){
-  .prod,.prod::before,.prod::after,.tilt,.mini img.card-img,.heart,.qv-hint,.rv-tile{transition:none}
+  .prod,.prod::before,.prod::after,.tilt,.flip,.flip-btn,.flip-btn svg,.mini img.card-img,.heart,.qv-hint,.rv-tile{transition:none}
   .prod:hover{transform:none; --lift:0px}
   .prod.tilting .tilt{transform:none}
   .prod:hover .holo-hover,.prod:focus-within .holo-hover,.prod.tilting .holo-hover{animation:none; opacity:.55}

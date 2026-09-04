@@ -11,9 +11,9 @@
           </h1>
           <p class="sub">Northern Kentucky's card shop for Pokemon, One Piece, Magic, and Gundam. Singles and sealed straight from the case, cash for your collection, and a seat at the table whenever the door's open.</p>
           <div class="hero-ctas">
-            <button class="btn" data-go="shop">Shop live inventory</button>
-            <button class="btn btn-ghost" data-go="buylist">Sell us your collection</button>
-            <button class="btn btn-ghost" data-go="live"><span class="live-dot" aria-hidden="true"></span>Watch the break</button>
+            <a class="btn" href="#/shop" data-go="shop">Shop live inventory</a>
+            <a class="btn btn-ghost" href="#/buylist" data-go="buylist">Sell us your collection</a>
+            <a class="btn btn-ghost" href="#/live" data-go="live"><span class="live-dot" aria-hidden="true"></span>Watch the break</a>
           </div>
           <span class="sync-pill" id="heroInv"><span class="dot"></span><span id="heroInvTxt">Live inventory from our TCGplayer store &middot; refreshed every morning</span></span>
         </div>
@@ -48,20 +48,20 @@
       <div class="wrap">
         <ul class="nextup-list" aria-label="Next up at the shop">
           <li class="nextup-cell" id="nuEvCell">
-            <button class="nextup-btn" type="button" data-go="events">
+            <a class="nextup-btn" href="#/events" data-go="events">
               <span class="nextup-k">Next play night</span>
               <span class="nextup-name" id="nuEvName">Play nights</span>
               <span class="nextup-when" id="nuEvWhen">See the schedule</span>
               <span class="nextup-cd" id="nuEvCd" role="timer" aria-live="off"></span>
-            </button>
+            </a>
           </li>
           <li class="nextup-cell" id="nuShowCell">
-            <button class="nextup-btn" type="button" data-go="show">
+            <a class="nextup-btn" href="#/show" data-go="show">
               <span class="nextup-k">Next card show</span>
               <span class="nextup-name" id="nuShowName">Card show &middot; Hilton, Turfway Rd</span>
               <span class="nextup-when" id="nuShowWhen">First Saturday or Sunday &middot; 10&ndash;4</span>
               <span class="nextup-cd" id="nuShowCd" role="timer" aria-live="off"></span>
-            </button>
+            </a>
           </li>
         </ul>
       </div>
@@ -93,7 +93,7 @@
       <div class="wrap">
         <div class="section-head">
           <h2>Chase cards in the case right now</h2>
-          <button class="linklike" data-go="shop">Browse all inventory &rarr;</button>
+          <a class="linklike" href="#/shop" data-go="shop">Browse all inventory &rarr;</a>
         </div>
         <div class="freshness" id="homeFresh"><span class="dot"></span>Live from our TCGplayer store <span class="demo-tag">demo data</span></div>
         <div class="grid" id="featuredGrid"></div>
@@ -104,7 +104,13 @@
       <div class="wrap wall-head">
         <div class="section-head">
           <h2>In the case right now</h2>
-          <button class="linklike" data-go="shop">Shop the case &rarr;</button>
+          <div class="wall-tools">
+            <a class="linklike" href="#/shop" data-go="shop">Shop the case &rarr;</a>
+            <button class="ticker-pause wall-pause" id="wallPause" type="button" aria-pressed="false" aria-label="Pause the card wall">
+              <svg class="ic-pause" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="1.5" width="3" height="9" rx=".8" fill="currentColor"/><rect x="7" y="1.5" width="3" height="9" rx=".8" fill="currentColor"/></svg>
+              <svg class="ic-play" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.8v8.4l7-4.2z" fill="currentColor"/></svg>
+            </button>
+          </div>
         </div>
         <dl class="case-stats" id="caseStats">
           <div><dt>Cards in the case</dt><dd><span class="num-up" id="statProducts">&mdash;</span></dd></div>
@@ -119,7 +125,7 @@
 
     <div class="section" style="padding-top:0">
       <div class="wrap">
-        <button class="promo-rip panel" type="button" data-go="rip" aria-label="Rip a virtual pack: open a pack of real cards from the case">
+        <a class="promo-rip panel" href="#/rip" data-go="rip" aria-label="Rip a virtual pack: open a pack of real cards from the case">
           <span class="promo-pack" aria-hidden="true"><span class="promo-peek"></span><span class="promo-tear"></span><b>TL</b></span>
           <span class="promo-copy">
             <span class="num">Free &middot; no account &middot; real cards</span>
@@ -127,7 +133,7 @@
             <span class="promo-p">Pick a game and a set, tear the wrapper, and see what you pull &mdash; every card is a real single from the case, with its real price.</span>
           </span>
           <span class="promo-cta">Open one &rarr;</span>
-        </button>
+        </a>
       </div>
     </div>
 

@@ -6,8 +6,12 @@
      every 3 s, POST /live/viewers heartbeat every 20 s, claims via
      POST /live/spots/claim, releases via POST /live/spots/release. Every timer runs
      only while the Live view is showing AND the tab is visible.
-     API offline, or the live endpoints answering 404: simulated chat and viewers,
-     localStorage spot claims ("liveSpots"), newsletter signups into TL.store "forms".
+     API offline, or the live endpoints answering 404: simulated chat (aria-live off, a visible
+     pause, and it stops after LV_SIM_MAX lines until the visitor interacts) and viewers, sample
+     seats tagged as such, localStorage spot claims ("liveSpots"), newsletter signups into
+     TL.store "forms". With an API the board shows "Checking spots…" until GET /live answers —
+     taken seats come only from the server. The claim owner id ("sid") lives in localStorage next
+     to the claims. Off air, claiming is labelled a pre-claim for the next break.
        TL.live.state()          {on, active, online, embed, spots:{taken, mine, total, price}}
        TL.live.refresh()        re-fetch /live (online) or re-render (offline)
        TL.live.claim(n, el?)    same path as clicking a spot button
@@ -31,16 +35,38 @@
     ["packrat_pete", "see everyone at the Turfway show, first weekend of the month"]
   ];
   var LV_HYPE = ["LETS GOOOO", "no way", "W pull", "that's the chase!!", "sheesh", "pack luck is unreal tonight", "who had that spot??"];
+  var LV_SIM_MAX = 8; /* simulated chat lines per sitting — the replay stops after this many until the visitor interacts */
   var lv = {
-    booted: false, active: false, api: null, mounted: "", timers: {}, sid: null, name: "",
-    taken: {}, mine: {}, claimAt: {}, demoTaken: [2, 5, 9], total: 12, price: 24.99,
+    booted: false, active: false, api: null, apiReady: false, mounted: "", timers: {}, sid: null, name: "",
+    taken: {}, mine: {}, claimAt: {}, demoTaken: [2, 5, 9], total: 12, price: 24.99, spotsLoaded: false, spotsErr: false,
     viewers: 214, chatIdx: 0, chatMode: "", chatSeen: {}, chatSeenN: 0, chatSince: 0, chatBusy: false, lastReact: 0,
+    simN: 0, simIdle: false, chatPaused: false,
     pack: 7, packs: 36, ripped: 0, hitPool: [], hits: [], hitMap: {}, lastRip: ""
   };
   function liveCfg(){ return (TL.config && TL.config.live) || {}; }
   function liveIsOn(){ return !!liveCfg().on; }
   function liveOnline(){ return !!(TL.api && TL.api.online) && lv.api !== false; }
-  function lvSid(){ var s = TL.session.get("sid", null); if(!s){ s = TL.uid(); TL.session.set("sid", s); } return s; }
+  /* spots and chat are simulated when there is no API at all, or the live endpoints answer 404.
+     While the health check is still pending (API configured, api:ready not yet fired) the answer is
+     "not yet" — the grid shows a loading state instead of sample seats. */
+  function lvDemoMode(){
+    if(lv.api === false) return true;
+    if(lv.api === true) return false;
+    if(!TL.api || !TL.api.base) return true;
+    return lv.apiReady ? !TL.api.online : false;
+  }
+  /* the sid owns this browser's spot claims on the server; claims are remembered in localStorage,
+     so the sid lives there too (a reload or a second tab keeps ownership of what it shows as "Yours") */
+  function lvSid(){
+    var ok = /^[A-Za-z0-9_-]{6,64}$/;
+    var s = TL.store.get("sid", null);
+    if(!ok.test(String(s || ""))){
+      s = TL.session.get("sid", null); /* older builds kept it per tab — carry that one over */
+      if(!ok.test(String(s || ""))) s = TL.uid();
+      TL.store.set("sid", s);
+    }
+    return s;
+  }
   function lvEl(id){ return document.getElementById(id); }
   function lvDispatch(name, detail){ try { document.dispatchEvent(new CustomEvent(name, {detail: detail})); } catch(e){} }
   /* ---- timers: named, and only alive while the view shows and the tab is visible ---- */
@@ -58,7 +84,7 @@
       if(on){ lvHeartbeat(); lvEvery("viewers", lvHeartbeat, 20000); }
     } else {
       lvChatMode("sim");
-      lvEvery("chat", lvSimChat, 4200);
+      lvSimStart();
       if(on) lvEvery("viewers", lvSimViewers, 5000);
     }
     if(on) lvScheduleRip(); else { lvRenderOffair(); lvEvery("clock", lvRenderOffair, 60000); }
@@ -119,7 +145,8 @@
     if(Array.isArray(cfg.taken)) lv.demoTaken = cfg.taken.map(Number);
     if(lv.api !== true){
       lv.taken = {};
-      lv.demoTaken.forEach(function(n){ if(n >= 1 && n <= lv.total) lv.taken[n] = true; });
+      /* sample seats only when the board is simulated; with an API the server is the only source of taken spots */
+      if(lvDemoMode()){ lv.demoTaken.forEach(function(n){ if(n >= 1 && n <= lv.total) lv.taken[n] = true; }); lv.spotsLoaded = true; }
       Object.keys(lv.mine).forEach(function(n){ lv.taken[n] = true; });
     }
     lv.packs = Number(cfg.packs) > 0 ? Number(cfg.packs) : (Number(cfg.spots) > 0 ? Number(cfg.spots) : 12) * (Number(cfg.packsPerSpot) > 0 ? Number(cfg.packsPerSpot) : 3);
@@ -144,8 +171,11 @@
       if(tag) tag.hidden = true;
     }
     if(screen){ screen.classList.toggle("off", !on); screen.classList.toggle("embedded", !!(on && emb && emb.src)); }
-    var head = lvEl("spotHead"); if(head) head.textContent = on ? "Claim a spot in this break" : "Claim a spot in the next break";
+    var head = lvEl("spotHead"); if(head) head.textContent = on ? "Claim a spot in this break" : "Pre-claim for the next break";
+    var note = lvEl("spotNote"); if(note) note.hidden = on;
     var hl = lvEl("hitsLabel"); if(hl) hl.textContent = on ? "Recent hits" : "Last break's hits";
+    /* every hit on the strip is drawn from the case by the simulation — there is no real rip history yet */
+    var ht = lvEl("hitsDemoTag"); if(ht) ht.hidden = false;
     var vn = lvEl("viewerNum"); if(vn && on && !vn.dataset.set){ vn.dataset.set = "1"; vn.textContent = lv.viewers; }
     var ct = lvEl("chatTag"); if(ct){ ct.hidden = liveOnline() && lv.api === true; ct.textContent = on ? "simulated" : "replay · simulated"; }
     if(was !== on){ lvDispatch("tl:live-state", {on: on}); }
@@ -227,24 +257,34 @@
   function lvSpotsLeft(){ var left = 0; for(var i = 1; i <= lv.total; i++){ if(!lv.taken[i]) left++; } return left; }
   function lvRenderSpots(){
     var grid = lvEl("spotGrid"); if(!grid) return;
-    var cfg = liveCfg(), html = "", left = lvSpotsLeft();
+    var cfg = liveCfg(), html = "", left = lvSpotsLeft(), on = liveIsOn(), loading = !lv.spotsLoaded, demo = lvDemoMode();
+    var verb = on ? "Claim" : "Pre-claim", tailWord = on ? "" : " for the next break";
     for(var i = 1; i <= lv.total; i++){
       var t = !!lv.taken[i], m = !!lv.mine[i];
+      if(loading){ html += '<button type="button" class="spot loading" data-spot="' + i + '" disabled aria-label="Spot ' + i + ' — checking availability">#' + i + '</button>'; continue; }
       html += '<button type="button" class="spot' + (m ? " mine" : t ? " taken" : "") + '" data-spot="' + i + '"' +
-        (m ? ' aria-label="Spot ' + i + ' is yours — open cart"' : t ? ' disabled aria-label="Spot ' + i + ' taken"' : ' aria-label="Claim spot ' + i + ' for ' + esc(money(lv.price)) + '"') + '>' +
+        (m ? ' aria-label="Spot ' + i + ' is yours' + tailWord + ' — open cart"' : t ? ' disabled aria-label="Spot ' + i + ' taken"' : ' aria-label="' + verb + ' spot ' + i + ' for ' + esc(money(lv.price)) + tailWord + '"') + '>' +
         (m ? "Yours" : t ? "Taken" : "#" + i) + "</button>";
     }
     grid.innerHTML = html;
+    grid.setAttribute("aria-busy", loading ? "true" : "false");
     var num = lvEl("spotsLeftNum"), so = lvEl("spotsOpen");
     if(so && num){
-      TL.countUp(num, left);
       var tail = so.lastChild;
-      if(tail && tail.nodeType === 3) tail.nodeValue = " of " + lv.total + (left === 0 ? " spots — sold out" : " spots left");
-      so.classList.toggle("sold", left === 0);
+      if(loading){
+        num.textContent = "";
+        if(tail && tail.nodeType === 3) tail.nodeValue = lv.spotsErr ? "Spots unavailable — retrying…" : "Checking spots…";
+        so.classList.remove("sold");
+      } else {
+        if(num.textContent === "") num.textContent = String(left); else TL.countUp(num, left);
+        if(tail && tail.nodeType === 3) tail.nodeValue = " of " + lv.total + (left === 0 ? " spots — sold out" : " spots left");
+        so.classList.toggle("sold", left === 0);
+      }
     }
+    var dt = lvEl("spotsDemoTag"); if(dt) dt.hidden = !(demo && !loading && lv.demoTaken.length > 0);
     var meter = lvEl("spotMeter");
     if(meter){
-      var claimed = lv.total - left;
+      var claimed = loading ? 0 : lv.total - left;
       meter.style.setProperty("--fill", String(lv.total ? claimed / lv.total : 0));
       meter.setAttribute("aria-valuemax", String(lv.total));
       meter.setAttribute("aria-valuenow", String(claimed));
@@ -254,6 +294,7 @@
   }
   function lvApplyServer(spots){
     if(!spots) return;
+    lv.spotsLoaded = true; lv.spotsErr = false;
     if(Number(spots.total) > 0) lv.total = Number(spots.total);
     if(Number(spots.price) > 0) lv.price = Number(spots.price);
     lv.taken = {};
@@ -290,12 +331,15 @@
       if(first) lvRenderState();
       if(d && d.live) lvSyncLiveCfg(d.live);
     }).catch(function(e){
-      if(e && e.status === 404){ lv.api = false; lvLoadCfg(); lvRenderSpots(); lvRenderState(); if(lv.active) lvStart(); }
+      if(e && e.status === 404){ lv.api = false; lvLoadCfg(); lvRenderSpots(); lvRenderState(); if(lv.active) lvStart(); return; }
+      /* network trouble: keep whatever the board showed; a first load stays in its checking state and the poll retries */
+      if(!lv.spotsLoaded){ lv.spotsErr = true; lvRenderSpots(); }
     });
   }
   function lvSpotItem(n){
-    var cfg = liveCfg();
-    return {id: "live-spot-" + n, name: "Break spot #" + n + " · " + (cfg.title || "Rip & ship break"), set: "Rip & ship · ships next morning",
+    var cfg = liveCfg(), on = liveIsOn();
+    return {id: "live-spot-" + n, name: "Break spot #" + n + " · " + (cfg.title || "Rip & ship break"),
+      set: on ? "Rip & ship · ships next morning" : "Pre-claim for the next break · ships the morning after",
       game: "pk", type: "sealed", cond: null, price: lv.price, stock: 1, live: true};
   }
   function lvAddToCart(item, el){
@@ -319,8 +363,9 @@
       lvAddToCart(item, btn);
       lvRenderSpots();
       if(btn && !reduceMotion){ var r = btn.getBoundingClientRect(); TL.confetti(r.left + r.width / 2, r.top + r.height / 2, {count: 36, spread: 70}); }
-      pushChat(null, "you claimed spot #" + n, true);
-      toast("Spot #" + n + " claimed — added to cart" + (lv.api === true ? "" : " (demo)"));
+      var pre = !liveIsOn();
+      pushChat(null, pre ? "you pre-claimed spot #" + n + " for the next break" : "you claimed spot #" + n, true);
+      toast("Spot #" + n + (pre ? " pre-claimed for the next break" : " claimed") + " — added to cart" + (lv.api === true ? "" : " (demo)"));
       TL.emit("live:spot", {spot: n, el: btn, item: item});
       lvDispatch("tl:spot-claimed", {n: n, el: lvEl("spotGrid") ? lvEl("spotGrid").querySelector('[data-spot="' + n + '"]') : null});
       return true;
@@ -334,9 +379,9 @@
       return finish();
     }).catch(function(e){
       if(e && e.status === 409){
-        var t = e.data && Array.isArray(e.data.taken) ? e.data.taken : null;
-        if(t) lvApplyServer({taken: t}); else lv.taken[n] = true;
-        lvRenderSpots(); toast("Spot #" + n + " was just taken — pick another"); lvRefresh(); return false;
+        var t = e.data && Array.isArray(e.data.taken) ? e.data.taken : null, capped = !!(e.data && e.data.reason === "limit");
+        if(t) lvApplyServer({taken: t}); else if(!capped) lv.taken[n] = true;
+        lvRenderSpots(); toast(capped ? "You can hold up to " + ((e.data && e.data.limit) || 3) + " unpaid spots at once — pay for one first" : "Spot #" + n + " was just taken — pick another"); lvRefresh(); return false;
       }
       if(e && e.status === 404){ lv.api = false; lvLoadCfg(); var ok = finish(); if(lv.active) lvStart(); return ok; }
       lvRenderSpots();
@@ -427,11 +472,37 @@
       pushChat(null, liveIsOn() ? "You're in the live chat — be cool, we ship what we pull" : "Chat is open while we're off air — say hi", true, {seed: true});
     }
     lvNewPill(false);
+    /* filler is never announced; real chat is read politely (own sends are also reported through the toast) */
+    body.setAttribute("aria-live", mode === "api" ? "polite" : "off");
+    if(mode === "sim"){ lv.simN = 0; lv.simIdle = false; }
     var ct = lvEl("chatTag"); if(ct) ct.hidden = mode === "api";
+    lvRenderChatPause();
   }
+  /* ---- simulated feed: runs while the view shows, stops after LV_SIM_MAX lines until the visitor interacts, and has a visible pause ---- */
+  function lvSimRunning(){ return lv.active && !document.hidden && lv.chatMode === "sim" && !lv.chatPaused && !lv.simIdle; }
+  function lvSimStart(){ lvStop("chat"); if(lvSimRunning()) lvEvery("chat", lvSimChat, 4200); lvRenderChatPause(); }
   function lvSimChat(){
+    if(!lvSimRunning()){ lvStop("chat"); lvRenderChatPause(); return; }
     var c = CHAT_FEED[lv.chatIdx++ % CHAT_FEED.length];
     pushChat(c[0], c[1]);
+    if(++lv.simN >= LV_SIM_MAX){
+      lv.simIdle = true; lvStop("chat");
+      pushChat(null, "Replay paused — send a message, react, or press play to keep it going", true);
+      lvRenderChatPause();
+    }
+  }
+  function lvSimResume(){ /* the visitor did something: an idle replay picks back up; a manual pause stays */
+    if(!lv.simIdle) return;
+    lv.simIdle = false; lv.simN = 0;
+    lvSimStart();
+  }
+  function lvRenderChatPause(){
+    var b = lvEl("chatPause"); if(!b) return;
+    b.hidden = lv.chatMode !== "sim";
+    var paused = lv.chatPaused || lv.simIdle;
+    b.setAttribute("aria-pressed", String(paused));
+    b.setAttribute("aria-label", paused ? "Resume the simulated chat" : "Pause the simulated chat");
+    b.title = paused ? "Resume the simulated chat" : "Pause the simulated chat";
   }
   function lvSeen(id){
     if(lv.chatSeen[id]) return true;
@@ -462,9 +533,10 @@
       if(e && e.status === 404){ lv.api = false; lvLoadCfg(); lvRenderSpots(); lvRenderState(); lvRenderNameRow(); if(lv.active) lvStart(); }
     });
   }
+  /* returns false when the message could not be taken yet (a display name is needed first) — the caller keeps the text */
   function lvSendChat(text){
     if(liveOnline()){
-      if(!lv.name){ lvRenderNameRow(); var ni = lvEl("chatNameInput"); if(ni){ lvEl("chatNameRow").hidden = false; ni.focus(); } toast("Pick a display name first"); return; }
+      if(!lv.name){ lvRenderNameRow(); var ni = lvEl("chatNameInput"); if(ni){ lvEl("chatNameRow").hidden = false; ni.focus(); } toast("Pick a display name, then hit Send again"); return false; }
       TL.api.post("/live/chat", {user: lv.name, text: text}).then(function(d){
         var m = d && (d.message || (d.id ? d : null));
         if(m && m.id){ lvAddServerMsg(m); } else lvPollChat();
@@ -473,6 +545,7 @@
         toast(e && e.status === 429 ? "Slow down — chat is rate limited" : "Message didn't send — try again");
       });
     } else pushChat(lv.name || "you", text, false, {me: true});
+    return true;
   }
   function lvFloat(em, btn){
     if(reduceMotion) return;
@@ -559,14 +632,19 @@
     lvLoadCfg(); lvBuildPool(); lvSeedHits(); lvChatMode("sim");
     lvRenderAll();
   }
-  function lvEnter(){ lvBoot(); lv.active = true; lvRenderPlayer(); lvStart(); }
+  function lvEnter(){ lvBoot(); lv.active = true; lv.simN = 0; lv.simIdle = false; lvRenderPlayer(); lvStart(); }
   function lvLeave(){ lv.active = false; lvStopAll(); lvRenderPlayer(); }
   /* lvBoot can run early (the router emits view:change during its own init when the page
      lands on #/live); the cart reconcile waits for this file's init slot, after 35-cart loaded */
   TL.on("init", function(){ lvBoot(); lvReconcileCart(); });
   TL.on("view:change", function(d){ if(!d || d.name !== "live") return; if(d.paramsOnly && lv.active) return; lvEnter(); });
   TL.on("view:leave", function(d){ if(d && d.name === "live") lvLeave(); });
-  TL.on("api:ready", function(){ if(lv.booted){ lvRenderNameRow(); lvRenderState(); } if(lv.active) lvStart(); });
+  TL.on("api:ready", function(){
+    lv.apiReady = true;
+    /* offline: the board becomes a labelled sample; online: it stays "checking" until the first /live answer */
+    if(lv.booted){ lvLoadCfg(); lvRenderSpots(); lvRenderNameRow(); lvRenderState(); }
+    if(lv.active) lvStart();
+  });
   TL.on("live:change", function(){
     if(!lv.syncing) lv.localChangeAt = Date.now();
     lvBoot(); lvLoadCfg(); lvRenderAll();
@@ -587,6 +665,11 @@
     if(as){ var row = lvEl("chatNameRow"), ni = lvEl("chatNameInput"); if(row){ row.hidden = false; if(ni){ ni.value = lv.name; ni.focus(); ni.select(); } } return; }
     var np = e.target.closest("#chatNew");
     if(np){ var body = lvEl("chatBody"); if(body) body.scrollTop = body.scrollHeight; lvNewPill(false); return; }
+    var cp = e.target.closest("#chatPause");
+    if(cp){
+      if(lv.chatPaused || lv.simIdle){ lv.chatPaused = false; lv.simIdle = false; lv.simN = 0; } else lv.chatPaused = true;
+      lvSimStart(); return;
+    }
     /* legacy cart (no TL.cart): a spot line removed with the minus button frees the spot */
     var dec = e.target.closest("[data-dec]");
     if(dec && !TL.cart && /^live-spot-\d+$/.test(dec.dataset.dec || "")) setTimeout(function(){ lvReconcileCart(); }, 0);
@@ -604,8 +687,10 @@
       }
       var text = inp ? inp.value.trim().slice(0, 200) : "";
       if(!text){ if(row && !row.hidden && ni && !ni.value.trim()){ ni.focus(); } return; }
+      /* the input is cleared only once the message is taken — when a name is still needed the text waits for the resend */
+      if(lvSendChat(text) === false) return;
       inp.value = "";
-      lvSendChat(text);
+      lvSimResume();
       inp.focus();
     });
     var reacts = lvEl("chatReacts");
@@ -614,6 +699,7 @@
       var now = Date.now(); if(now - lv.lastReact < 350) return; lv.lastReact = now;
       var em = b.dataset.react;
       lvFloat(em, b);
+      lvSimResume();
       if(liveOnline()){
         TL.api.post("/live/chat", {user: lv.name || "guest", text: em}).then(function(d){ var m = d && (d.message || (d.id ? d : null)); if(m && m.id) lvAddServerMsg(m); })
           .catch(function(err){ if(err && err.status === 404){ lv.api = false; pushChat(lv.name || "you", em, false, {me: true}); if(lv.active) lvStart(); } });

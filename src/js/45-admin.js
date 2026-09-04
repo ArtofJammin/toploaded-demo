@@ -305,16 +305,17 @@
       ? '<span class="pill warn"><span class="dot"></span>Edited here</span>'
       : (it.tcg ? '<span class="pill ok"><span class="dot"></span>TCGplayer</span>' : '<span class="pill"><span class="dot"></span>Demo item</span>');
     return '<tr data-row="' + esc(it.id) + '">' +
-      '<td><div class="inv-name">' + name + '<span class="sub">' + esc(it.set || "") + '</span></div></td>' +
-      '<td>' + esc(it.lineName || gameName(it.game)) + '</td>' +
-      '<td>' + (it.type === "single" ? "Single" : "Sealed") + '</td>' +
-      '<td>' + esc(it.cond || "—") + '</td>' +
-      '<td class="num">' + money(it.price) + '</td>' +
+      '<td class="inv-item"><div class="inv-name">' + name + '<span class="sub">' + esc(it.set || "") + '</span></div></td>' +
+      /* Stock sits right after Item so the column staff edit on the floor is reachable on a phone (Item is sticky under 640px) */
       '<td><span class="stock-edit">' +
         '<button type="button" data-stk="-1" data-id="' + esc(it.id) + '" aria-label="Decrease stock for ' + esc(it.name) + '">&minus;</button>' +
         '<span class="' + cls + '" data-stock="' + esc(it.id) + '">' + st + '</span>' +
         '<button type="button" data-stk="1" data-id="' + esc(it.id) + '" aria-label="Increase stock for ' + esc(it.name) + '">+</button>' +
       '</span></td>' +
+      '<td class="num">' + money(it.price) + '</td>' +
+      '<td>' + esc(it.lineName || gameName(it.game)) + '</td>' +
+      '<td>' + (it.type === "single" ? "Single" : "Sealed") + '</td>' +
+      '<td>' + esc(it.cond || "—") + '</td>' +
       '<td>' + chan + '</td></tr>';
   }
   function renderInvTable(){
@@ -328,10 +329,11 @@
       if(pages <= 1){ pager.innerHTML = list.length ? '<span>' + fmtInt(list.length) + ' products</span>' : ""; }
       else {
         var lo = Math.max(1, inv.page - 2), hi = Math.min(pages, lo + 4); lo = Math.max(1, hi - 4);
-        var h = '<button type="button" data-page="' + (inv.page - 1) + '"' + (inv.page === 1 ? " disabled" : "") + ' aria-label="Previous page">&lsaquo;</button>';
+        /* prev + pages + next stay on one line (.inv-pages nowrap); only the count wraps below on phones */
+        var h = '<span class="inv-pages"><button type="button" data-page="' + (inv.page - 1) + '"' + (inv.page === 1 ? " disabled" : "") + ' aria-label="Previous page">&lsaquo;</button>';
         for(var p = lo; p <= hi; p++) h += '<button type="button" data-page="' + p + '"' + (p === inv.page ? ' aria-current="page"' : "") + ' aria-label="Page ' + p + '">' + p + '</button>';
-        h += '<button type="button" data-page="' + (inv.page + 1) + '"' + (inv.page === pages ? " disabled" : "") + ' aria-label="Next page">&rsaquo;</button>';
-        h += '<span>' + fmtInt(start + 1) + "–" + fmtInt(start + shown.length) + " of " + fmtInt(list.length) + '</span>';
+        h += '<button type="button" data-page="' + (inv.page + 1) + '"' + (inv.page === pages ? " disabled" : "") + ' aria-label="Next page">&rsaquo;</button></span>';
+        h += '<span class="inv-count">' + fmtInt(start + 1) + "–" + fmtInt(start + shown.length) + " of " + fmtInt(list.length) + '</span>';
         pager.innerHTML = h;
       }
     }

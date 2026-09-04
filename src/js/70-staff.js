@@ -26,13 +26,21 @@
   function fromLocal(c){ return {id: c.id, name: c.name, phone: c.phone || "", balance: (c.balanceCents || 0) / 100, updatedAt: c.updatedAt, demo: !!c.demo, local: true}; }
   function fromServer(c){ return {id: c.id, name: c.name, phone: c.phoneDisplay || c.phone || "", balance: Number(c.balance) || 0, updatedAt: c.updatedAt, local: false}; }
   function normalizePhone(p){ return String(p || "").replace(/\D/g, ""); }
+  /* credMode(true) → API ledger, credMode(false) → this device, credMode("checking") → probe in flight
+     (writes stay local-only until the probe says the server ledger answers). */
   function credMode(server){
-    credServer = server;
+    var checking = server === "checking";
+    credServer = server === true;
     var pill = $("#credMode"), note = $("#credNote");
-    if(pill){ pill.className = "pill " + (server ? "ok" : "warn"); pill.innerHTML = '<span class="dot"></span>' + (server ? "API ledger" : "This device"); }
-    if(note) note.textContent = server
-      ? "Balances live on the shop's API ledger — every register sees the same numbers. Trade-ins taken in credit get the " + Math.round(bonusRate() * 100) + "% bonus automatically."
-      : (TL.api.online ? "The API has no credit ledger route yet, so balances are kept on this device in whole cents. " : "Demo mode — balances are kept on this device in whole cents. ") + "Trade-ins taken in credit get the " + Math.round(bonusRate() * 100) + "% bonus automatically.";
+    if(pill){
+      pill.className = "pill " + (checking ? "" : (credServer ? "ok" : "warn"));
+      pill.innerHTML = '<span class="dot"></span>' + (checking ? "Checking ledger…" : (credServer ? "API ledger" : "This device"));
+    }
+    if(note) note.textContent = checking
+      ? "Checking whether the shop's API ledger is reachable…"
+      : credServer
+        ? "Balances live on the shop's API ledger — every register sees the same numbers. Trade-ins taken in credit get the " + Math.round(bonusRate() * 100) + "% bonus automatically."
+        : (TL.api.online ? "The API has no credit ledger route yet, so balances are kept on this device in whole cents. " : "Demo mode — balances are kept on this device in whole cents. ") + "Trade-ins taken in credit get the " + Math.round(bonusRate() * 100) + "% bonus automatically.";
   }
   function fetchCustomers(q){
     q = (q || "").trim();
@@ -56,7 +64,8 @@
     var body = $("#credBody"); if(!body) return;
     body.innerHTML = list.length ? list.map(function(c){
       return '<tr data-cust="' + esc(c.id) + '"' + (credSelected && c.id === credSelected.id ? ' class="sel"' : "") + ' tabindex="0" role="button" aria-label="Select ' + esc(c.name) + '">' +
-        '<td>' + esc(c.name) + (c.demo ? ' <span class="demo-tag">sample</span>' : "") + '</td><td class="num">' + esc(c.phone || "—") + '</td><td class="num">' + money(c.balance) + '</td></tr>';
+        '<td>' + esc(c.name) + (c.demo ? ' <span class="demo-tag">sample</span>' : "") + (c.phone ? '<span class="sub cred-phone">' + esc(c.phone) + '</span>' : "") + '</td>' +
+        '<td class="num cred-phone-col">' + esc(c.phone || "—") + '</td><td class="num">' + money(c.balance) + '</td></tr>';
     }).join("") : '<tr class="empty"><td colspan="3">No matches — add the customer under "New customer" below.</td></tr>';
   }
   function renderCredWho(list){
@@ -242,7 +251,7 @@
     if(!sel.value && keys.length) sel.value = keys.indexOf("standard") > -1 ? "standard" : keys[0];
     var b = Math.round(bonusRate() * 100);
     ["#pdBonusPct", "#credBonusPct"].forEach(function(s){ var el = $(s); if(el) el.textContent = b; });
-    var tag = $("#pdRateTag"); if(tag) tag.textContent = TL.config.updatedAt ? "from settings" : "default rates";
+    var tag = $("#pdRateTag"); if(tag) tag.textContent = (typeof TL.sameAsDefault === "function" && TL.sameAsDefault("buy")) ? "default rates" : "from settings";
     recalcPricing();
   }
   function recalcPricing(){
@@ -255,15 +264,31 @@
   $("#pdMarket").addEventListener("input", recalcPricing);
   $("#pdRate").addEventListener("change", recalcPricing);
 
+  /* Decide the data source. Always waits for the /health probe (TL.api.ready) first, so a
+     direct load of #/staff — where 'view:change' fires during 'init', before 'api:ready' —
+     never settles on the local ledger while the API is still being checked. Re-run on
+     'api:ready' and 'auth:change' so the desk flips to the server ledger as soon as it can.
+     credProbe counts runs so a slow, superseded probe cannot overwrite a newer decision. */
+  var credProbe = 0, credChecking = false;
   function openStaff(){
-    credMode(false);
-    var probe = TL.api.online ? apiTry("GET", "/credit?q=") : Promise.resolve({ok: false});
-    probe.then(function(r){
-      credMode(!!(r.ok && r.data && Array.isArray(r.data.customers)));
-      refreshCredit("").then(function(list){ if(list.length && !credSelected) selectCustomer(list[0].id, false); });
+    var run = ++credProbe;
+    credChecking = true;
+    credMode("checking");
+    var body = $("#credBody");
+    if(body && TL.api.base) body.innerHTML = '<tr class="empty"><td colspan="3">Checking the shop ledger…</td></tr>';
+    TL.api.ready.then(function(){
+      if(run !== credProbe) return;
+      return (TL.api.online ? apiTry("GET", "/credit?q=") : Promise.resolve({ok: false})).then(function(r){
+        if(run !== credProbe) return;
+        credChecking = false;
+        credMode(!!(r.ok && r.data && Array.isArray(r.data.customers)));
+        refreshCredit("").then(function(list){ if(list.length && !credSelected) selectCustomer(list[0].id, false); });
+      });
     });
     renderRates();
   }
-  TL.on("config:change", function(){ renderRates(); if(TL.current === "staff") credMode(credServer); });
+  TL.on("config:change", function(){ renderRates(); if(TL.current === "staff" && !credChecking) credMode(credServer); });
   TL.on("view:change", function(d){ if(d && d.name === "staff" && !d.paramsOnly) openStaff(); });
-  TL.on("init", function(){ renderRates(); renderCredTable(localSearch("")); renderCredWho(localSearch("")); });
+  TL.on("api:ready", function(d){ if(d && d.online && TL.current === "staff") openStaff(); });
+  TL.on("auth:change", function(d){ if(d && d.role && TL.current === "staff") openStaff(); });
+  TL.on("init", function(){ renderRates(); if(!TL.api.base){ renderCredTable(localSearch("")); renderCredWho(localSearch("")); } });

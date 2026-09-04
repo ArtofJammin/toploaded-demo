@@ -109,7 +109,10 @@
       '<span>' + (it.cond ? esc(it.cond) : (it.type === "sealed" ? "Sealed" : "")) + (it.printing && !/normal/i.test(it.printing) ? ' \u00b7 ' + esc(it.printing) : '') + '</span>' +
       '<span>' + (out ? "Sold out" : (Number(it.stock) || 0) + " in stock") + '</span>' +
       (typeof it.market === "number" ? '<span>Market ' + money(it.market) + ' / Ours ' + money(it.price) + '</span>' : '<span>Ours ' + money(it.price) + '</span>') +
+      '<button class="back-qv" type="button">Quick view</button>' +
       '</div>';
+    var flipBtn = '<button class="flip-btn" type="button" aria-expanded="false" aria-label="Show details for ' + esc(it.name) + '">' +
+      '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 0 1 13.6-5.7L20 8.5M20 4v4.5h-4.5M20 12a8 8 0 0 1-13.6 5.7L4 15.5M4 20v-4.5h4.5"/></svg></button>';
     var action;
     if(out) action = '<button class="add notify" type="button" data-notify="' + esc(it.id) + '">Notify me when it\u2019s back</button>';
     else action = '<button class="add" type="button" data-cart="' + esc(it.id) + '">Add to cart</button>';
@@ -122,9 +125,9 @@
       '<div class="thumb" data-qv="' + esc(it.id) + '">' +
         '<div class="flip"><div class="tilt">' +
           '<div class="mini face front">' + art + '<span class="holo-hover"></span></div>' +
-          '<div class="mini face back" aria-hidden="true">' + back + '</div>' +
+          '<div class="mini face back" aria-hidden="true" inert>' + back + '</div>' +
         '</div></div>' +
-        cond + heartBtn(it) +
+        cond + heartBtn(it) + flipBtn +
         '<span class="qv-hint" aria-hidden="true">Quick view</span>' +
       "</div>" +
       '<div class="p-meta"><h3>' + hl(it.name, terms) + "</h3>" +
@@ -257,7 +260,9 @@
     var order = CORE_GAMES.concat(["lorcana", "other"]), html = '<button class="chip" data-game="all" aria-pressed="' + (F.game === "all") + '">All games <b>' + fmtInt(total) + '</b></button>';
     order.forEach(function(g){
       var n = counts[g] || 0;
-      if(CORE_GAMES.indexOf(g) === -1 && !n && F.game !== g) return;
+      /* a chip that can only produce an empty grid is hidden (core games included) unless it is the active filter;
+         with no counts at all (nothing loaded yet) the core games stay so the row is never bare */
+      if(!n && F.game !== g && (total > 0 || CORE_GAMES.indexOf(g) === -1)) return;
       html += '<button class="chip" data-game="' + g + '" aria-pressed="' + (F.game === g) + '"' + (!n ? ' data-empty="1"' : '') + '>' + esc(gameLabel(g)) + ' <b>' + fmtInt(n) + '</b></button>';
     });
     wrap.innerHTML = html;
@@ -525,6 +530,24 @@
     var svg = wrap.firstChild;
     if(svg) host.replaceChild(svg, img); else img.style.visibility = "hidden";
   }, true);
+  /* ---- card flip: .flip-btn toggles .is-flipped; the back face is inert/aria-hidden until shown ---- */
+  function setFlipped(card, on, focus){
+    if(!card) return;
+    var btn = card.querySelector(".flip-btn"), back = card.querySelector(".face.back");
+    on = !!on;
+    card.classList.toggle("is-flipped", on);
+    if(btn){ btn.setAttribute("aria-expanded", String(on)); btn.setAttribute("aria-label", (on ? "Hide details for " : "Show details for ") + (card.querySelector("h3") ? card.querySelector("h3").textContent : "this card")); }
+    if(back){
+      back.setAttribute("aria-hidden", String(!on));
+      if(on) back.removeAttribute("inert"); else back.setAttribute("inert", "");
+    }
+    if(!focus) return;
+    var target = on ? (back && back.querySelector("button, a, [tabindex]")) : btn;
+    if(target) try { target.focus({preventScroll: true}); } catch(e){}
+  }
+  function unflipAll(except){
+    $$(".prod.is-flipped").forEach(function(c){ if(c !== except) setFlipped(c, false, false); });
+  }
   /* ---- events ---- */
   function qvFromEl(el){
     var card = el.closest("[data-id]"), id = card ? card.dataset.id : el.dataset.qv;
@@ -544,6 +567,12 @@
       return;
     }
     if(t.closest("[data-wish]") || t.closest(".tcg-link")) return; /* wishlist module / plain link */
+    var flipBtn = t.closest(".flip-btn");
+    if(flipBtn){
+      var fc = flipBtn.closest(".prod");
+      if(fc && !fc.classList.contains("skel")){ unflipAll(fc); setFlipped(fc, !fc.classList.contains("is-flipped"), true); }
+      return;
+    }
     var notify = t.closest("[data-notify]");
     if(notify){
       var ni = TL.inventory ? TL.inventory.byId(notify.dataset.notify) : null;
@@ -578,9 +607,15 @@
     }
   });
   document.addEventListener("keydown", function(e){
-    if(e.key !== "Enter" && e.key !== " ") return;
     var t = e.target;
-    if(!t || !t.classList || !t.classList.contains("prod") || t.classList.contains("skel")) return;
+    if(!t || !t.closest) return;
+    if(e.key === "Escape"){
+      var flipped = t.closest(".prod.is-flipped");
+      if(flipped){ e.preventDefault(); setFlipped(flipped, false, true); }
+      return;
+    }
+    if(e.key !== "Enter" && e.key !== " ") return;
+    if(!t.classList || !t.classList.contains("prod") || t.classList.contains("skel")) return;
     e.preventDefault();
     qvFromEl(t);
   });

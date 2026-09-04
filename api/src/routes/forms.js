@@ -5,7 +5,8 @@
 // Kinds and their fields:
 //   vendor     name, email, tables (1-3), game, phone?, message?
 //   buylist    name, contact, games (string or string[]), desc
-//   signup     name, seats (1-4), eventId, contact?, date? (YYYY-MM-DD)
+//   signup     name, seats (1-4), eventId, date? (YYYY-MM-DD), and at least one of contact / email / phone
+//              (all three are stored; contact falls back to the email or phone so the shop can always reach them)
 //   newsletter email
 //   restock    email, productId, productName
 //   contact    name, email, message
@@ -58,6 +59,8 @@ function phone(x) {
   if (s && s.replace(/\D/g, '').length < 7) throw new HttpError(400, 'phone looks wrong');
   return s;
 }
+const LOOKS_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const looksPhone = (s) => /^\+?[\d\s().-]{7,}$/.test(s) && s.replace(/\D/g, '').length >= 7;
 function slug(x, { name, max = 40 }) {
   const s = text(x, { max, min: 1, name });
   if (!/^[A-Za-z0-9][A-Za-z0-9_.:-]*$/.test(s)) throw new HttpError(400, `${name} looks wrong`);
@@ -91,11 +94,22 @@ export function validateFields(kind, b) {
       };
     }
     case 'signup': {
+      // The site sends whichever the player typed as `email` or `phone`; older
+      // clients send a single `contact`. Keep all three and make sure `contact`
+      // is never empty, since that is the field the counter reads.
+      const contact = optText(b.contact, { max: 200, name: 'contact' });
+      let email = (b.email === undefined || b.email === null || b.email === '') ? '' : v.email(b.email);
+      let ph = phone(b.phone);
+      if (!email && LOOKS_EMAIL.test(contact)) email = v.email(contact);
+      if (!ph && !email && contact && looksPhone(contact)) ph = phone(contact);
+      if (!contact && !email && !ph) throw new HttpError(400, 'an email or phone number is required');
       const out = {
         name: text(b.name, { max: 80, min: 2, name: 'name' }),
         seats: int(b.seats, { min: 1, max: 4, name: 'seats' }),
         eventId: slug(b.eventId, { name: 'eventId' }),
-        contact: optText(b.contact, { max: 200, name: 'contact' }),
+        contact: contact || email || ph,
+        email,
+        phone: ph,
       };
       const date = optText(b.date, { max: 10, name: 'date' });
       if (date) {
@@ -139,7 +153,9 @@ export function emailFor(kind, f, extra = {}) {
       break;
     case 'signup':
       subject = `[Top Loaded] ${extra.eventName || 'Event'} signup from ${f.name} (${f.seats} seat${f.seats === 1 ? '' : 's'})`;
-      lines.push(`Name: ${f.name}`, `Seats: ${f.seats}`, `Event: ${extra.eventName || f.eventId}`, f.date && `Date: ${f.date}`, f.contact && `Contact: ${f.contact}`);
+      lines.push(`Name: ${f.name}`, `Seats: ${f.seats}`, `Event: ${extra.eventName || f.eventId}`, f.date && `Date: ${f.date}`,
+        f.email && `Email: ${f.email}`, f.phone && `Phone: ${f.phone}`,
+        f.contact && f.contact !== f.email && f.contact !== f.phone && `Contact: ${f.contact}`);
       break;
     case 'newsletter':
       subject = `[Top Loaded] Newsletter signup: ${f.email}`;

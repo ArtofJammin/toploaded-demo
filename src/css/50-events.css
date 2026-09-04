@@ -7,6 +7,8 @@
   font-size:.95rem;
 }
 .next-up[hidden]{display:none}
+.next-up .nu-live{display:inline-flex; align-items:center; gap:10px 16px; flex-wrap:wrap; min-width:0}
+.next-up .nu-cal{display:contents}
 .next-up .nu-k{font-family:var(--mono); font-size:.68rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent)}
 .next-up b{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.3rem; letter-spacing:.03em; line-height:1}
 .next-up .nu-when{color:var(--ink2)}

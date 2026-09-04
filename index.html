@@ -147,8 +147,11 @@ button{font-family:inherit; color:inherit; cursor:pointer}
 }
 html.scrolled .topbar::after{opacity:1}
 .topbar .wrap{display:flex; align-items:center; gap:16px; height:64px}
+/* the brand row wrapper only becomes a box on phones (see the 640px block); elsewhere its children sit in the .wrap flex row */
+.topbar-row{display:contents}
 .brand{
   display:flex; align-items:center; gap:11px; background:none; border:0; padding:0;
+  color:inherit; text-decoration:none;
 }
 .brand-mark{
   width:34px; height:34px; flex:0 0 auto; border-radius:5px;
@@ -162,11 +165,15 @@ html.scrolled .topbar::after{opacity:1}
 }
 .brand-name small{display:block; font-family:var(--mono); font-weight:400; font-size:.58rem; letter-spacing:.3em; color:var(--ink3); margin-top:3px}
 .mainnav{display:flex; gap:2px; margin-left:auto; flex-wrap:wrap}
-.mainnav button{
+/* nav items are real links (#/shop …): the router intercepts plain clicks, modified clicks open a new tab */
+.mainnav a{
+  display:inline-flex; align-items:center; text-decoration:none;
   background:none; border:0; padding:8px 10px; border-radius:4px; white-space:nowrap;
   font-family:var(--mono); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink2);
+  transition:transform .12s ease, background .15s ease, color .15s ease, border-color .15s ease;
 }
-.mainnav button:hover{color:var(--ink); background:var(--surface)}
+.mainnav a:hover{color:var(--ink); background:var(--surface)}
+.mainnav a:active{transform:scale(.94)}
 .mainnav [aria-current]{color:var(--accent)}
 /* one logo <img>; src chosen by theme (00-header.html bootstrap + 15-ticker.js swap) */
 .brand-logo{height:50px; width:auto; display:none; transform-origin:left center; transition:transform .25s ease}
@@ -181,7 +188,7 @@ html:not(.no-logo) .foot-brand{display:none}
 @media (min-width:961px){ html.scrolled .brand-logo{transform:scale(.88)} }
 @media (min-width:961px) and (max-width:1220px){
   .open-pill .open-sub{display:none}
-  .mainnav button{padding:8px 7px; letter-spacing:.06em}
+  .mainnav a{padding:8px 7px; letter-spacing:.06em}
   .topbar .wrap{gap:12px}
 }
 
@@ -245,7 +252,7 @@ main:focus{outline:none}
 /* mobile: scrolling nav gets a right-edge fade cue + snap; pill goes compact; cheaper header */
 @media (max-width:960px){
   .mainnav{scroll-snap-type:x proximity; scroll-padding:0 20px}
-  .mainnav button{scroll-snap-align:start}
+  .mainnav a{scroll-snap-align:start}
   .mainnav.can-scroll:not(.at-end){
     -webkit-mask-image:linear-gradient(90deg, #000 0, #000 calc(100% - 56px), transparent);
     mask-image:linear-gradient(90deg, #000 0, #000 calc(100% - 56px), transparent);
@@ -254,10 +261,27 @@ main:focus{outline:none}
   .open-pill{order:2}
 }
 @media (max-width:640px){
-  .topbar{-webkit-backdrop-filter:none; backdrop-filter:none; background:var(--bg)}
+  /* Phones: the header box stays sticky but paints nothing itself; the brand row is the only
+     chrome that stays on screen. Once you scroll down, 15-ticker.js adds html.nav-tuck and the nav
+     row fades out (its in-flow space is kept, so the page never jumps) — scrolling up brings it back. */
+  .topbar{-webkit-backdrop-filter:none; backdrop-filter:none; background:transparent; border-bottom:0; pointer-events:none}
+  .topbar::after{display:none}
   body::after{display:none}
-  .topbar .wrap{gap:8px; min-height:52px; padding-top:6px; padding-bottom:4px; row-gap:4px}
-  .mainnav{padding:2px 20px 6px}
+  header.topbar .wrap{gap:8px; min-height:0; padding-top:0; padding-bottom:0; row-gap:0} /* beats 95-responsive's .topbar .wrap padding */
+  .topbar-row{
+    display:flex; align-items:center; gap:8px; flex:1 1 100%; min-height:52px; position:relative;
+    margin:0 -24px; padding:6px 24px 4px; background:var(--bg); border-bottom:1px solid var(--line); pointer-events:auto;
+  }
+  .topbar-row::after{
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:-1;
+    box-shadow:0 10px 30px -18px rgba(0,0,0,.6); opacity:0; transition:opacity .25s ease;
+  }
+  html.scrolled .topbar-row::after{opacity:1}
+  .mainnav{
+    padding:6px 20px 8px; background:var(--bg); border-bottom:1px solid var(--line); pointer-events:auto;
+    transition:opacity .18s ease, visibility 0s linear 0s;
+  }
+  html.nav-tuck .mainnav{opacity:0; visibility:hidden; pointer-events:none; transition:opacity .18s ease, visibility 0s linear .18s}
   .brand-logo{height:36px}
   .open-pill{padding:5px 10px 5px 8px; min-height:28px}
   .open-pill .open-sub,.open-pill .open-now{display:none}
@@ -276,7 +300,8 @@ main:focus{outline:none}
 @media (prefers-reduced-motion: reduce){
   .open-pill.is-open .dot::after{animation:none; display:none}
   html.is-live .mainnav .live-dot,html.is-live .hero-ctas .live-dot{animation:none}
-  .brand-logo,.topbar::after{transition:none}
+  .brand-logo,.topbar::after,.topbar-row::after,.mainnav,.mainnav a{transition:none}
+  .mainnav a:active{transform:none}
   html.scrolled .brand-logo{transform:none}
 }
 
@@ -365,6 +390,8 @@ html.vt .view.active{animation:none}
 .btn-ghost{
   background:transparent; color:var(--ink); border:1px solid var(--line2);
 }
+/* the same class on a real link (hero CTAs are <a href="#/…" data-go>) */
+a.btn{display:inline-flex; align-items:center; justify-content:center; text-decoration:none}
 .btn-ghost:hover{border-color:var(--accent); color:var(--accent); filter:none}
 .btn{
   box-shadow:inset 0 1px 0 rgba(255,255,255,.22),
@@ -557,6 +584,7 @@ html.page-hidden .ticker-track{animation-play-state:paused}
   background:none; border:0; padding:0; color:var(--accent);
   font-family:var(--mono); font-size:.76rem; letter-spacing:.12em; text-transform:uppercase;
 }
+a.linklike{text-decoration:none}
 .linklike:hover{text-decoration:underline}
 .panel{background:var(--surface); border:1px solid var(--line); border-radius:8px; position:relative}
 .tri{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
@@ -591,7 +619,7 @@ html.page-hidden .ticker-track{animation-play-state:paused}
 .nextup-cell:first-child .nextup-btn{padding-right:28px}
 .nextup-cell[hidden]{display:none}
 .nextup-btn{
-  width:100%; text-align:left; background:none; border:0; padding:18px 0; color:inherit; cursor:pointer;
+  width:100%; text-align:left; background:none; border:0; padding:18px 0; color:inherit; cursor:pointer; text-decoration:none;
   display:grid; grid-template-columns:minmax(0,1fr) auto; gap:2px 18px; align-items:center; border-radius:4px;
 }
 .nextup-btn:hover .nextup-name{color:var(--accent)}
@@ -600,7 +628,11 @@ html.page-hidden .ticker-track{animation-play-state:paused}
   font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.3rem; letter-spacing:.03em; line-height:1.05;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap; transition:color .15s ease;
 }
-.nextup-when{font-family:var(--mono); font-size:.7rem; color:var(--ink3); letter-spacing:.04em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+/* date · time · venue may wrap once (two lines, then clamp) so phones keep the venue and the show hours */
+.nextup-when{
+  font-family:var(--mono); font-size:.7rem; color:var(--ink3); letter-spacing:.04em; line-height:1.35;
+  overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow-wrap:anywhere;
+}
 .nextup-cd{
   grid-column:2; grid-row:1/4; font-family:var(--mono); font-size:1.15rem; color:var(--ink);
   font-variant-numeric:tabular-nums; white-space:nowrap; display:flex; align-items:baseline; gap:2px;
@@ -622,6 +654,10 @@ html.page-hidden .ticker-track{animation-play-state:paused}
 }
 .wall::before{top:0} .wall::after{bottom:0}
 .wall-head .section-head{margin-bottom:18px}
+/* shop link + the marquee pause/play toggle (WCAG 2.2.2: moving content needs a user-operable stop) */
+.wall-tools{display:flex; align-items:center; gap:14px}
+.wall-pause{width:32px; height:32px}
+@media (pointer:coarse){ .wall-pause{width:44px; height:44px} }
 .case-stats{display:flex; flex-wrap:wrap; gap:16px 44px; margin:0 0 6px}
 .case-stats > div{min-width:0}
 .case-stats dt{font-family:var(--mono); font-size:.64rem; letter-spacing:.16em; text-transform:uppercase; color:var(--ink3)}
@@ -637,8 +673,8 @@ html.page-hidden .ticker-track{animation-play-state:paused}
 .wall-track{display:flex; width:max-content; will-change:transform; animation:wallScroll var(--wall-dur,70s) linear infinite}
 .wall-row[data-dir="rev"] .wall-track{animation-direction:reverse}
 .wall-set{display:flex; gap:14px; padding-right:14px; flex:0 0 auto}
-.wall:not(.in-view) .wall-track,html.page-hidden .wall-track,
-.wall-row:hover .wall-track,.wall-row:focus-within .wall-track{animation-play-state:paused}
+.wall:not(.in-view) .wall-track,html.page-hidden .wall-track,.wall.paused .wall-track,
+.wall-row:hover .wall-track,.wall:focus-within .wall-track{animation-play-state:paused}
 @keyframes wallScroll{to{transform:translateX(-50%)}}
 .wall-card{
   flex:0 0 auto; width:110px; aspect-ratio:5/7; border-radius:8px; overflow:hidden; position:relative; padding:0;
@@ -669,7 +705,7 @@ html.page-hidden .ticker-track{animation-play-state:paused}
 /* ---- rip a pack promo ---- */
 .promo-rip{
   width:100%; display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:24px; align-items:center;
-  padding:22px 26px; text-align:left; color:inherit; cursor:pointer; overflow:hidden; font:inherit;
+  padding:22px 26px; text-align:left; color:inherit; cursor:pointer; overflow:hidden; font:inherit; text-decoration:none;
 }
 .promo-rip:hover{border-color:var(--line2)}
 .promo-pack{
@@ -728,6 +764,7 @@ html.page-hidden .ticker-track{animation-play-state:paused}
   .sr{opacity:1; transform:none; transition:none}
   .faq summary::after,.wall-card,.wall-card .wc-sheen,.promo-pack,.promo-tear,.promo-peek,.promo-cta,.nextup-name{transition:none}
   .wall-track{animation:none; will-change:auto; width:auto}
+  .wall-pause{display:none}
   .wall-row{overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:thin; padding:10px 24px; -webkit-mask-image:none; mask-image:none}
   .wall-card{scroll-snap-align:start; transform:none}
   .wall-card:hover,.wall-card:focus-visible{transform:none}
@@ -756,11 +793,12 @@ input[type=search]::-webkit-search-cancel-button{display:none}
   font-family:var(--mono); font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink2);
   white-space:nowrap;
 }
-.chip b{font-weight:400; opacity:.65; margin-left:2px; font-variant-numeric:tabular-nums; letter-spacing:0}
+/* counts stay solid colour (no opacity) so they keep AA contrast in every theme */
+.chip b{font-weight:400; color:var(--ink2); margin-left:2px; font-variant-numeric:tabular-nums; letter-spacing:0}
 .chip:hover{border-color:var(--line2); color:var(--ink)}
 .chip[aria-pressed="true"]{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
-.chip[aria-pressed="true"] b{opacity:.8}
-.chip[data-empty="1"]{opacity:.55}
+.chip[aria-pressed="true"] b{color:var(--accent-ink)}
+.chip[data-empty="1"]{border-style:dashed}
 .chip-label{font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3); margin-right:4px}
 .chip-wish .heart-ico{color:var(--crit); font-size:.9em; margin-right:2px}
 .chip-wish[aria-pressed="true"] .heart-ico{color:var(--accent-ink)}
@@ -837,7 +875,10 @@ mark{background:color-mix(in srgb, var(--accent) 28%, transparent); color:inheri
   background:radial-gradient(120% 90% at 50% 18%, color-mix(in srgb, var(--accent) 8%, var(--slab)), var(--slab) 62%);
   perspective:700px;
 }
-.flip{position:relative; width:150px; aspect-ratio:5/7; transform-style:preserve-3d}
+.flip{position:relative; width:150px; aspect-ratio:5/7; transform-style:preserve-3d; transition:transform .55s cubic-bezier(.4,0,.2,1)}
+.prod.is-flipped .flip{transform:rotateY(180deg)}
+.prod.is-flipped .holo-hover{animation:none; opacity:0}
+.prod.is-flipped .qv-hint{display:none}
 .tilt{
   position:absolute; inset:0; transform-style:preserve-3d;
   transform:translateY(var(--lift,0px)) rotateX(var(--ry,0deg)) rotateY(var(--rx,0deg));
@@ -883,6 +924,22 @@ mark{background:color-mix(in srgb, var(--accent) 28%, transparent); color:inheri
 .back-body::before{content:""; height:2px; margin:-4px 0 6px; background:linear-gradient(90deg,var(--foilA),var(--foilB),var(--foilC),var(--foilD)); border-radius:1px}
 .back-body .back-k{color:#7E8798; letter-spacing:.18em; text-transform:uppercase; font-size:.6rem}
 .back-body b{color:#EEF0F4; font-family:var(--body); font-size:.8rem; font-weight:600; letter-spacing:0; line-height:1.25}
+.back-qv{
+  margin-top:auto; align-self:flex-start; border:1px solid #3A4152; background:rgba(255,255,255,.06); color:#EEF0F4; border-radius:4px;
+  padding:6px 10px; font-family:var(--mono); font-size:.62rem; letter-spacing:.12em; text-transform:uppercase; min-height:30px;
+}
+.back-qv:hover{border-color:var(--accent); color:var(--accent)}
+.back-qv:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+/* flip button: the only keyboard route to the back face (aria-expanded mirrors .is-flipped) */
+.flip-btn{
+  position:absolute; bottom:8px; right:8px; width:34px; height:34px; border-radius:50%; padding:0; z-index:2;
+  border:1px solid var(--line2); background:color-mix(in srgb, var(--surface) 82%, transparent); color:var(--ink2);
+  display:grid; place-items:center; cursor:pointer;
+  transition:color .15s ease, border-color .15s ease, transform .15s ease;
+}
+.flip-btn svg{width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:transform .55s cubic-bezier(.4,0,.2,1)}
+.flip-btn:hover,.flip-btn[aria-expanded="true"]{color:var(--accent); border-color:var(--accent)}
+.flip-btn[aria-expanded="true"] svg{transform:rotate(180deg)}
 .cond{
   position:absolute; top:10px; right:10px; pointer-events:none;
   font-family:var(--mono); font-size:.75rem; letter-spacing:.08em;
@@ -987,14 +1044,15 @@ html.qv-open,html.qv-open body{overflow:hidden}
   .rv-tile{max-width:180px}
 }
 @media (pointer:coarse){
-  .heart{width:44px; height:44px}
-  .heart svg{width:20px; height:20px}
+  .heart,.flip-btn{width:44px; height:44px}
+  .heart svg,.flip-btn svg{width:20px; height:20px}
+  .back-qv{min-height:44px; padding:10px 14px}
   .search-clear{width:38px; height:38px}
   .prod.tilting .tilt{transition:transform .45s cubic-bezier(.2,.7,.2,1)}
   .qv-hint{display:none}
 }
 @media (prefers-reduced-motion: reduce){
-  .prod,.prod::before,.prod::after,.tilt,.mini img.card-img,.heart,.qv-hint,.rv-tile{transition:none}
+  .prod,.prod::before,.prod::after,.tilt,.flip,.flip-btn,.flip-btn svg,.mini img.card-img,.heart,.qv-hint,.rv-tile{transition:none}
   .prod:hover{transform:none; --lift:0px}
   .prod.tilting .tilt{transform:none}
   .prod:hover .holo-hover,.prod:focus-within .holo-hover,.prod.tilting .holo-hover{animation:none; opacity:.55}
@@ -1074,8 +1132,9 @@ html.qv-open,html.qv-open body{overflow:hidden}
 .qv-stock{font-family:var(--mono); font-size:.75rem; color:var(--ink3); display:flex; gap:10px; align-items:center; flex-wrap:wrap}
 .qv-stock .stock{font-size:.78rem}
 .qv-stock-note{color:var(--ink3)}
-.qv-table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:6px; max-height:180px; overflow-y:auto}
-.qv-table{width:100%; border-collapse:collapse; font-size:.86rem}
+/* not .table-wrap on purpose: the admin table rule (min-width:720px) must not leak into the dialog */
+.qv-table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:6px; max-height:180px; overflow-y:auto; background:var(--surface); scrollbar-width:thin; scrollbar-color:var(--line2) transparent}
+.qv-table-wrap .qv-table{width:100%; min-width:0; border-collapse:collapse; font-size:.86rem; table-layout:auto}
 .qv-table th{
   text-align:left; font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3);
   font-weight:400; padding:8px 12px; border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0;
@@ -1115,6 +1174,11 @@ html.qv-open,html.qv-open body{overflow:hidden}
   .qv-nav{top:12px; transform:none; height:38px; width:38px; border-radius:50%; font-size:1.5rem; padding:0 0 3px}
   .qv-prev{left:12px} .qv-next{right:60px}
   .qv-hint{display:none}
+  /* four listing columns fit a 320px dialog: tighter cells, wrapping text, long condition name stacked under the code */
+  .qv-table-wrap .qv-table{font-size:.8rem}
+  .qv-table th,.qv-table td{padding:7px 8px; overflow-wrap:anywhere}
+  .qv-table th{font-size:.62rem; letter-spacing:.08em}
+  .qv-cond-long{display:block; margin-left:0; font-size:.66rem}
 }
 @media (pointer:coarse){
   .qv-qty button{width:38px; height:38px}
@@ -1220,7 +1284,7 @@ html.cart-open, html.cart-open body{overflow:hidden}
 .ful-opt input{margin:0; width:16px; height:16px; accent-color:var(--accent); flex:0 0 auto}
 .ful-txt{display:flex; flex-direction:column; min-width:0; gap:1px}
 .ful-txt b{font-weight:600; font-size:.9rem}
-.ful-txt small{font-family:var(--mono); font-size:.64rem; color:var(--ink3); letter-spacing:.03em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.ful-txt small{font-family:var(--mono); font-size:.64rem; color:var(--ink2); letter-spacing:.03em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .ful-price{font-family:var(--mono); font-size:.82rem; font-variant-numeric:tabular-nums; color:var(--ink2)}
 .ful-opt.on .ful-price{color:var(--accent)}
 .cart-fields{display:flex; flex-direction:column; gap:10px}
@@ -1318,7 +1382,7 @@ html.cart-open, html.cart-open body{overflow:hidden}
 .cart-count.pop,.qty-n.pop{animation:countPop .35s cubic-bezier(.3,.7,.3,1)}
 @keyframes cartIdle{50%{transform:translateY(-4px) rotate(-2deg)}}
 .drawer.open .cart-empty::before{animation:cartIdle 4s ease-in-out infinite}
-html.hidden .drawer .cart-empty::before{animation-play-state:paused}
+html.page-hidden .drawer .cart-empty::before{animation-play-state:paused}
 
 /* ---- touch + small screens ---- */
 @media (pointer:coarse){
@@ -1375,6 +1439,7 @@ html.hidden .drawer .cart-empty::before{animation-play-state:paused}
 .show-meta b{color:var(--ink); font-weight:500}
 .show-meta .show-tables{margin-top:8px}
 .tables-n,.tables-t{font-variant-numeric:tabular-nums}
+.show-tables-note{color:var(--ink3); font-size:.72rem; letter-spacing:0; text-transform:none}
 .meter{height:8px; background:var(--surface2); border:1px solid var(--line); border-radius:99px; overflow:hidden; margin-top:8px}
 .meter i{display:block; height:100%; width:46%; background:var(--accent); transition:width .6s cubic-bezier(.2,.7,.2,1)}
 .meter.full i{background:var(--warn)}
@@ -1413,7 +1478,10 @@ html.hidden .drawer .cart-empty::before{animation-play-state:paused}
   position:absolute; top:10px; right:10px; font-style:normal; font-family:var(--mono); font-size:.58rem; letter-spacing:.14em; text-transform:uppercase;
   color:#F5D06F; border:1px dashed rgba(245,208,111,.55); padding:2px 7px; border-radius:3px; background:rgba(12,14,18,.55);
 }
-@media (max-width:640px){ .gallery{grid-template-columns:repeat(2,minmax(0,1fr))} .show-date-card{padding:24px 20px} }
+@media (max-width:640px){
+  .gallery{grid-template-columns:repeat(2,minmax(0,1fr))} .show-date-card{padding:24px 20px}
+  .gal span{white-space:normal; overflow:visible; text-overflow:clip; line-height:1.35}
+}
 @media (max-width:400px){ .gallery{grid-template-columns:1fr} .gal .gal-tag{display:none} }
 @media (prefers-reduced-motion: reduce){
   .meter i{transition:none}
@@ -1429,6 +1497,8 @@ html.hidden .drawer .cart-empty::before{animation-play-state:paused}
   font-size:.95rem;
 }
 .next-up[hidden]{display:none}
+.next-up .nu-live{display:inline-flex; align-items:center; gap:10px 16px; flex-wrap:wrap; min-width:0}
+.next-up .nu-cal{display:contents}
 .next-up .nu-k{font-family:var(--mono); font-size:.68rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent)}
 .next-up b{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.3rem; letter-spacing:.03em; line-height:1}
 .next-up .nu-when{color:var(--ink2)}
@@ -1525,7 +1595,7 @@ html.hidden .drawer .cart-empty::before{animation-play-state:paused}
 .visit-actions .btn-ghost:hover{color:var(--accent)}
 .visit-actions .btn[hidden]{display:none}
 .map-wrap{position:relative; border:1px solid var(--line); border-radius:8px; overflow:hidden; min-height:400px; background:var(--slab)}
-.map-fallback{position:absolute; inset:0; display:grid; place-items:center; padding:24px; text-align:center; font-family:var(--mono); font-size:.74rem; letter-spacing:.06em; color:var(--ink3); max-width:44ch; margin:0 auto}
+.map-fallback{position:absolute; inset:0; display:grid; place-items:center; padding:24px; text-align:center; font-family:var(--mono); font-size:.74rem; letter-spacing:.06em; color:#A6ADBB; max-width:44ch; margin:0 auto} /* --slab is dark in every theme, so a fixed light ink keeps AA */
 .map-wrap iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
 .map-wrap iframe:not([src]){visibility:hidden}
 @media (max-width:880px){ .visit-layout{grid-template-columns:1fr} .map-wrap{min-height:300px} }
@@ -1830,6 +1900,8 @@ form.is-done > :not(.form-done){display:none !important}
 @keyframes alertOut{to{max-height:0; padding-top:0; padding-bottom:0; opacity:0; border-bottom-width:0}}
 .alert-row.going{animation:alertOut .32s cubic-bezier(.55,.06,.68,.19) forwards; pointer-events:none}
 .alert-empty{color:var(--ink3); font-family:var(--mono); font-size:.72rem; letter-spacing:.06em; padding:8px 0}
+/* "Add alert" row: message | channel | button on one line; stacks under 520px (see the responsive block) */
+.form-grid.alert-new{grid-template-columns:minmax(0,1fr) auto auto}
 /* hours editor */
 .hours-editor{display:flex; flex-direction:column}
 .hours-row{display:grid; grid-template-columns:44px 84px minmax(0,1fr) auto minmax(0,1fr); gap:8px 10px; align-items:center; padding:7px 0; border-bottom:1px solid var(--line); font-size:.86rem}
@@ -1911,6 +1983,8 @@ td a:hover{color:var(--accent); text-decoration:underline}
 @keyframes stockFlash{0%{transform:scale(1); color:var(--accent)}40%{transform:scale(1.35); color:var(--accent)}100%{transform:scale(1)}}
 .stock-edit span.flash{animation:stockFlash .45s cubic-bezier(.3,.7,.3,1)}
 .inv-pager{display:flex; gap:8px; align-items:center; justify-content:center; margin-top:14px; flex-wrap:wrap; font-family:var(--mono); font-size:.74rem; color:var(--ink3)}
+.inv-pages{display:inline-flex; gap:8px; align-items:center; white-space:nowrap}
+.inv-count{white-space:nowrap}
 .inv-pager button{min-width:40px; min-height:36px; padding:6px 10px; border:1px solid var(--line); background:var(--surface); border-radius:4px; color:var(--ink2); font-family:var(--mono)}
 .inv-pager button[aria-current="page"]{background:var(--accent); color:var(--accent-ink); border-color:var(--accent)}
 .inv-pager button:disabled{opacity:.4; cursor:default}
@@ -1921,6 +1995,7 @@ td a:hover{color:var(--accent); text-decoration:underline}
 .cred-table tbody tr:hover td{background:var(--surface2)}
 .cred-table tbody tr.sel td{background:var(--surface2); box-shadow:inset 3px 0 0 var(--accent)}
 .cred-table td.num{text-align:right}
+.cred-table .cred-phone{display:none} /* phone folds under the name on phones (see the 640px block) */
 .cred-table .empty td{cursor:default; color:var(--ink3)}
 .cred-more{margin-top:12px; border-top:1px solid var(--line); padding-top:8px}
 .cred-more summary{cursor:pointer; font-family:var(--mono); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink2); padding:6px 0; list-style:none; display:flex; align-items:center; gap:8px; min-height:32px}
@@ -1982,16 +2057,42 @@ td a:hover{color:var(--accent); text-decoration:underline}
   .ev-row .ev-small{grid-column:1 / 2}
   .ev-row .row-del{grid-column:2; grid-row:1}
   .logo-row{flex-wrap:wrap}
+  /* staff credit table: drop the Phone column (it shows under the name) so name + balance fit 280px */
+  .cred-table th,.cred-table td{padding:8px 10px}
+  .cred-table .cred-phone-col{display:none}
+  .cred-table .cred-phone{display:block}
+  /* admin inventory: Item stays pinned while the rest scrolls sideways, Stock is the next column */
+  #view-admin .table-wrap th,#view-admin .table-wrap td{padding:10px 10px}
+  #view-admin .table-wrap th:first-child,#view-admin .table-wrap td:first-child{position:sticky; left:0; z-index:1; background:var(--surface); box-shadow:1px 0 0 var(--line)}
+  #view-admin .table-wrap th:first-child{background:var(--surface2); z-index:2}
+  .inv-name{max-width:150px}
+}
+@media (max-width:520px){
+  .form-grid.alert-new{grid-template-columns:1fr}
 }
 @media (max-width:420px){
   .hours-row{grid-template-columns:40px minmax(0,1fr) minmax(0,1fr); gap:6px 8px}
   .hours-row label.closed{grid-column:2 / 4}
-  .hours-row input[type=time]{grid-row:2; padding:7px 6px}
+  .hours-row input[type=time]{grid-row:2; padding:7px 4px; font-size:.9rem}
+  .hours-row input[type=time]::-webkit-calendar-picker-indicator{display:none}
   .hours-row input[data-open]{grid-column:2}
   .hours-row input[data-close]{grid-column:3}
   .hours-row .dash{display:none}
   .row-line{flex-wrap:wrap}
   .row-line .grow{flex-basis:100%}
+  .inv-pager{flex-direction:column; gap:8px}
+  .inv-pager button{min-width:36px; padding:6px 4px}
+}
+@media (max-width:360px){
+  .inv-pages{gap:4px}
+  .inv-pager button{min-width:34px}
+}
+@media (max-width:340px){
+  /* open and close times each get a full row */
+  .hours-row{grid-template-columns:40px minmax(0,1fr)}
+  .hours-row label.closed{grid-column:2}
+  .hours-row input[data-open]{grid-column:2; grid-row:2}
+  .hours-row input[data-close]{grid-column:2; grid-row:3}
 }
 @media (prefers-reduced-motion: reduce){
   .view.active .spark i{animation:none}
@@ -2028,8 +2129,10 @@ html:not(.is-live) .live-pill,html:not(.is-live) .viewers{display:none}
 @keyframes ripRoll{from{transform:translate(-50%,8px); opacity:0}to{transform:translateX(-50%); opacity:1}}
 .screen .rip.roll{animation:ripRoll .32s cubic-bezier(.2,.7,.2,1) both}
 .live-pill{position:absolute; top:14px; left:14px; display:inline-flex; align-items:center; gap:7px; background:rgba(12,14,18,.82); border:1px solid #2A3140; border-radius:99px; padding:5px 12px; font-family:var(--mono); font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; color:#EEF0F4; z-index:2}
-.live-pill i{width:8px; height:8px; border-radius:50%; background:var(--crit); animation:livepulse 1.6s infinite, ringPulse 1.6s ease-out infinite}
-@keyframes ringPulse{0%{box-shadow:0 0 0 0 var(--crit)}70%,100%{box-shadow:0 0 0 7px transparent}}
+.live-pill i{position:relative; width:8px; height:8px; border-radius:50%; background:var(--crit); animation:livepulse 1.6s infinite}
+/* the expanding ring is a pseudo-element scaled up and faded — transform/opacity only, no box-shadow repaint per frame */
+.live-pill i::after{content:""; position:absolute; inset:0; border-radius:50%; border:2px solid var(--crit); animation:ringPulse 1.6s ease-out infinite; will-change:transform,opacity}
+@keyframes ringPulse{0%{transform:scale(1); opacity:.9}70%,100%{transform:scale(2.75); opacity:0}}
 .viewers{position:absolute; top:14px; right:14px; background:rgba(12,14,18,.82); border:1px solid #2A3140; border-radius:99px; padding:5px 12px; font-family:var(--mono); font-size:.68rem; color:#A6ADBB; z-index:2; font-variant-numeric:tabular-nums}
 .viewers b{font-weight:500; color:#EEF0F4}
 @keyframes vTick{0%{transform:scale(1)}45%{transform:scale(1.12)}100%{transform:scale(1)}}
@@ -2062,6 +2165,7 @@ html:not(.is-live) .live-pill,html:not(.is-live) .viewers{display:none}
 .hit-meta{display:flex; flex-direction:column; min-width:0; gap:2px}
 .hit-meta b{font-size:.78rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .hit-meta span{font-family:var(--mono); font-size:.62rem; color:#A6ADBB; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.hits-tag{flex:0 0 auto; align-self:center; color:#A6ADBB; border-color:var(--slab-line)}
 @keyframes hitIn{from{opacity:0; transform:translateX(-12px)}to{opacity:1; transform:none}}
 .hit.new{animation:hitIn .45s cubic-bezier(.2,.7,.2,1) both}
 .hit.new .hit-art{box-shadow:0 0 0 1px var(--foilB)}
@@ -2082,6 +2186,16 @@ html:not(.is-live) .live-pill,html:not(.is-live) .viewers{display:none}
 .chat-head-r{display:inline-flex; align-items:center; gap:8px; min-width:0}
 .chat-as{background:none; border:1px solid var(--line); border-radius:99px; padding:3px 10px; font-family:var(--mono); font-size:.64rem; letter-spacing:.06em; text-transform:none; color:var(--ink2); max-width:160px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .chat-as:hover{border-color:var(--accent); color:var(--accent)}
+/* pause/play for the simulated feed (mirrors #tickerPause); hidden when real chat is connected */
+.chat-pause{
+  flex:0 0 auto; width:28px; height:28px; display:grid; place-items:center; padding:0;
+  background:var(--surface); border:1px solid var(--line); border-radius:4px; color:var(--ink2);
+  transition:border-color .15s ease, color .15s ease;
+}
+.chat-pause:hover{border-color:var(--accent); color:var(--accent)}
+.chat-pause .ic-play{display:none}
+.chat-pause[aria-pressed="true"] .ic-pause{display:none}
+.chat-pause[aria-pressed="true"] .ic-play{display:block}
 .chat-wrap{position:relative; flex:1; display:flex; min-height:0}
 .chat-body{flex:1; overflow-y:auto; padding:12px 16px; display:flex; flex-direction:column; gap:9px; max-height:440px; min-height:240px; overscroll-behavior:contain}
 .chat-line{font-size:.84rem; line-height:1.4; overflow-wrap:anywhere}
@@ -2119,6 +2233,9 @@ html:not(.is-live) .live-pill,html:not(.is-live) .viewers{display:none}
 .spot{position:relative; border:1px solid var(--line2); background:none; border-radius:4px; padding:11px 0; font-family:var(--mono); font-size:.78rem; color:var(--ink); transition:background .15s ease,color .15s ease,border-color .15s ease}
 .spot:hover:not(:disabled){background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
 .spot:disabled{opacity:.35; cursor:not-allowed; text-decoration:line-through}
+.spot.loading:disabled{opacity:.5; cursor:progress; text-decoration:none}
+.spot-note{margin:12px 0 0; max-width:64ch; font-family:var(--mono); font-size:.72rem; line-height:1.5; color:var(--ink2)}
+.spot-note b{color:var(--ink); font-weight:600}
 .spot.mine{border-color:var(--accent); color:var(--accent); background:color-mix(in srgb, var(--accent) 10%, transparent); text-decoration:none; opacity:1}
 .spot.mine:hover{background:var(--accent); color:var(--accent-ink)}
 .spot.pending{opacity:.6; text-decoration:none}
@@ -2137,7 +2254,7 @@ html:not(.is-live) .live-pill,html:not(.is-live) .viewers{display:none}
 .screen.off .pack{animation-duration:9s}
 
 @media (max-width:960px){ .live-grid{grid-template-columns:1fr} .spots{grid-template-columns:repeat(4,1fr)} .chat-body{max-height:320px} }
-@media (max-width:640px){ .hits-k{writing-mode:horizontal-tb; transform:none} .hits{flex-direction:column; align-items:stretch; gap:6px} .hit{max-width:200px} .offair{bottom:8%} .screen .rip{font-size:.6rem} }
+@media (max-width:640px){ .hits-k{writing-mode:horizontal-tb; transform:none} .hits{flex-direction:column; align-items:stretch; gap:6px} .hits-tag{align-self:flex-start} .hit{max-width:200px} .offair{bottom:8%} .screen .rip{font-size:.6rem} }
 @media (max-width:480px){ .spots{grid-template-columns:repeat(3,1fr)} .notify-row .btn{flex:1 1 100%} .chat-row .btn{padding-left:14px; padding-right:14px} }
 @media (pointer:coarse){
   .spot{min-height:44px}
@@ -2145,9 +2262,11 @@ html:not(.is-live) .live-pill,html:not(.is-live) .viewers{display:none}
   .chat-new{min-height:44px}
   .hit{min-height:44px}
   .chat-as{min-height:32px}
+  .chat-pause{width:44px; height:44px}
 }
 @media (prefers-reduced-motion: reduce){
-  html.is-live .live-dot,.live-pill i,.screen .pack,.screen .glow,.viewers.tick,.screen .rip.roll,.hit.new,.chat-body .chat-line{animation:none}
+  html.is-live .live-dot,.live-pill i,.live-pill i::after,.screen .pack,.screen .glow,.viewers.tick,.screen .rip.roll,.hit.new,.chat-body .chat-line{animation:none}
+  .live-pill i::after{display:none}
   .react{animation:none; display:none}
   .spot-meter i{transition:none}
   .screen .pack,.hit,.chat-reacts button,.spot{transition:none}
@@ -2279,8 +2398,10 @@ html:not(.is-live) .live-pill,html:not(.is-live) .viewers{display:none}
 .rip-face.front[data-drawn]{background:#12151B}
 .rip-tag{
   position:absolute; left:6px; right:6px; bottom:6px; padding:3px 6px; border-radius:4px; text-align:center;
-  font-family:var(--mono); font-size:.6rem; letter-spacing:.1em; text-transform:uppercase; line-height:1.3;
-  background:rgba(12,14,18,.82); color:#EEF0F4; border:1px solid rgba(255,255,255,.12); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  font-family:var(--mono); font-size:.6rem; letter-spacing:.1em; text-transform:uppercase; line-height:1.15;
+  background:rgba(12,14,18,.82); color:#EEF0F4; border:1px solid rgba(255,255,255,.12);
+  /* wrap, never truncate: "Reverse holo" and "Special Illustration Rare" must stay readable on the 3-column phone grid */
+  white-space:normal; overflow-wrap:anywhere;
 }
 .rip-tag.rare{background:linear-gradient(90deg, var(--foilA), var(--foilB), var(--foilC), var(--foilD)); color:#0C0E12; border-color:transparent; font-weight:600}
 .rip-sheen{
@@ -2335,6 +2456,7 @@ html:not(.is-live) .live-pill,html:not(.is-live) .viewers{display:none}
   .rip-setup{grid-template-columns:minmax(0,1fr)}
   .rip-config,.rip-odds-wrap,.rip-stats{padding:20px}
   .rip-grid{grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px}
+  .rip-tag{left:4px; right:4px; bottom:4px; padding:3px 4px; letter-spacing:.06em}
   .rip-bestpull{grid-template-columns:110px minmax(0,1fr); gap:16px}
   .rip-row{grid-template-columns:minmax(0,1fr) auto; row-gap:6px}
   .rip-row-add{grid-column:1/-1}
@@ -2527,7 +2649,7 @@ footer::before{
     padding:4px 20px 8px; scrollbar-width:none;
   }
   .mainnav::-webkit-scrollbar{display:none}
-  .mainnav button{
+  .mainnav a{
     flex:0 0 auto; white-space:nowrap; min-height:40px;
     border:1px solid var(--line); border-radius:99px; padding:9px 14px;
   }
@@ -2556,7 +2678,7 @@ footer::before{
     padding:4px 20px 8px; scrollbar-width:none;
   }
   .mainnav::-webkit-scrollbar{display:none}
-  .mainnav button{
+  .mainnav a{
     flex:0 0 auto; white-space:nowrap; min-height:40px;
     border:1px solid var(--line); border-radius:99px; padding:9px 14px;
   }
@@ -2617,36 +2739,39 @@ footer::before{
 
 <header class="topbar">
   <div class="wrap">
-    <button class="brand" data-go="home" aria-label="Top Loaded TCG home">
-      <img class="brand-logo" id="brandLogo" width="118" height="50" alt="" aria-hidden="true" decoding="async" fetchpriority="high" onerror="document.documentElement.classList.add('no-logo')">
-      <script>(function(){var i=document.getElementById("brandLogo");if(i&&!i.getAttribute("src"))i.src=document.documentElement.getAttribute("data-theme")==="light"?"logo-light.png":"logo-dark.png"})()</script>
-      <span class="brand-mark" aria-hidden="true">TL</span>
-      <span class="brand-name" id="brandName">Top Loaded<small id="brandTag">Trading Cards &middot; NKY</small></span>
-    </button>
-    <span class="open-pill" id="openPill" role="status" hidden></span>
+    <!-- .topbar-row is display:contents except on phones, where it is the one row that stays sticky (10-header.css) -->
+    <div class="topbar-row" id="topbarRow">
+      <a class="brand" href="#/" data-go="home" aria-label="Top Loaded TCG home">
+        <img class="brand-logo" id="brandLogo" width="118" height="50" alt="" aria-hidden="true" decoding="async" fetchpriority="high" onerror="document.documentElement.classList.add('no-logo')">
+        <script>(function(){var i=document.getElementById("brandLogo");if(i&&!i.getAttribute("src"))i.src=document.documentElement.getAttribute("data-theme")==="light"?"logo-light.png":"logo-dark.png"})()</script>
+        <span class="brand-mark" aria-hidden="true">TL</span>
+        <span class="brand-name" id="brandName">Top Loaded<small id="brandTag">Trading Cards &middot; NKY</small></span>
+      </a>
+      <span class="open-pill" id="openPill" role="status" hidden></span>
+      <button class="theme-btn" id="themeBtn" aria-label="Switch theme: Top Loaded, light, or dark" title="Switch theme (Top Loaded / light / dark)">
+        <svg class="ic-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v3M12 18.5v3M21.5 12h-3M5.5 12h-3M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1M18.7 18.7l-2.1-2.1M7.4 7.4L5.3 5.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <svg class="ic-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span class="ic-tl" aria-hidden="true">TL</span>
+      </button>
+      <button class="cart-btn" id="cartBtn" aria-haspopup="dialog" aria-controls="drawer">
+        Cart <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
     <nav class="mainnav" id="mainnav" aria-label="Main">
-      <button data-go="shop">Shop</button>
-      <button data-go="live">Live<span class="live-dot" aria-hidden="true"></span></button>
-      <button data-go="show">Card Show</button>
-      <button data-go="events">Play Nights</button>
-      <button data-go="rip">Rip a Pack</button>
-      <button data-go="buylist">Sell to Us</button>
-      <button data-go="visit">Visit</button>
+      <a href="#/shop" data-go="shop">Shop</a>
+      <a href="#/live" data-go="live">Live<span class="live-dot" aria-hidden="true"></span></a>
+      <a href="#/show" data-go="show">Card Show</a>
+      <a href="#/events" data-go="events">Play Nights</a>
+      <a href="#/rip" data-go="rip">Rip a Pack</a>
+      <a href="#/buylist" data-go="buylist">Sell to Us</a>
+      <a href="#/visit" data-go="visit">Visit</a>
     </nav>
-    <button class="theme-btn" id="themeBtn" aria-label="Switch theme: Top Loaded, light, or dark" title="Switch theme (Top Loaded / light / dark)">
-      <svg class="ic-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v3M12 18.5v3M21.5 12h-3M5.5 12h-3M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1M18.7 18.7l-2.1-2.1M7.4 7.4L5.3 5.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      <svg class="ic-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-      <span class="ic-tl" aria-hidden="true">TL</span>
-    </button>
-    <button class="cart-btn" id="cartBtn" aria-haspopup="dialog" aria-controls="drawer">
-      Cart <span class="cart-count" id="cartCount">0</span>
-    </button>
   </div>
 </header>
 
 <div class="site-banner" id="siteBanner" role="status" hidden>
   <span id="siteBannerText"></span>
-  <button class="banner-link" id="siteBannerBtn" data-go="live" hidden>Watch &rarr;</button>
+  <a class="banner-link" id="siteBannerBtn" href="#/live" data-go="live" hidden>Watch &rarr;</a>
 </div>
 
 <main id="main" tabindex="-1">
@@ -2665,9 +2790,9 @@ footer::before{
           </h1>
           <p class="sub">Northern Kentucky's card shop for Pokemon, One Piece, Magic, and Gundam. Singles and sealed straight from the case, cash for your collection, and a seat at the table whenever the door's open.</p>
           <div class="hero-ctas">
-            <button class="btn" data-go="shop">Shop live inventory</button>
-            <button class="btn btn-ghost" data-go="buylist">Sell us your collection</button>
-            <button class="btn btn-ghost" data-go="live"><span class="live-dot" aria-hidden="true"></span>Watch the break</button>
+            <a class="btn" href="#/shop" data-go="shop">Shop live inventory</a>
+            <a class="btn btn-ghost" href="#/buylist" data-go="buylist">Sell us your collection</a>
+            <a class="btn btn-ghost" href="#/live" data-go="live"><span class="live-dot" aria-hidden="true"></span>Watch the break</a>
           </div>
           <span class="sync-pill" id="heroInv"><span class="dot"></span><span id="heroInvTxt">Live inventory from our TCGplayer store &middot; refreshed every morning</span></span>
         </div>
@@ -2702,20 +2827,20 @@ footer::before{
       <div class="wrap">
         <ul class="nextup-list" aria-label="Next up at the shop">
           <li class="nextup-cell" id="nuEvCell">
-            <button class="nextup-btn" type="button" data-go="events">
+            <a class="nextup-btn" href="#/events" data-go="events">
               <span class="nextup-k">Next play night</span>
               <span class="nextup-name" id="nuEvName">Play nights</span>
               <span class="nextup-when" id="nuEvWhen">See the schedule</span>
               <span class="nextup-cd" id="nuEvCd" role="timer" aria-live="off"></span>
-            </button>
+            </a>
           </li>
           <li class="nextup-cell" id="nuShowCell">
-            <button class="nextup-btn" type="button" data-go="show">
+            <a class="nextup-btn" href="#/show" data-go="show">
               <span class="nextup-k">Next card show</span>
               <span class="nextup-name" id="nuShowName">Card show &middot; Hilton, Turfway Rd</span>
               <span class="nextup-when" id="nuShowWhen">First Saturday or Sunday &middot; 10&ndash;4</span>
               <span class="nextup-cd" id="nuShowCd" role="timer" aria-live="off"></span>
-            </button>
+            </a>
           </li>
         </ul>
       </div>
@@ -2747,7 +2872,7 @@ footer::before{
       <div class="wrap">
         <div class="section-head">
           <h2>Chase cards in the case right now</h2>
-          <button class="linklike" data-go="shop">Browse all inventory &rarr;</button>
+          <a class="linklike" href="#/shop" data-go="shop">Browse all inventory &rarr;</a>
         </div>
         <div class="freshness" id="homeFresh"><span class="dot"></span>Live from our TCGplayer store <span class="demo-tag">demo data</span></div>
         <div class="grid" id="featuredGrid"></div>
@@ -2758,7 +2883,13 @@ footer::before{
       <div class="wrap wall-head">
         <div class="section-head">
           <h2>In the case right now</h2>
-          <button class="linklike" data-go="shop">Shop the case &rarr;</button>
+          <div class="wall-tools">
+            <a class="linklike" href="#/shop" data-go="shop">Shop the case &rarr;</a>
+            <button class="ticker-pause wall-pause" id="wallPause" type="button" aria-pressed="false" aria-label="Pause the card wall">
+              <svg class="ic-pause" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="1.5" width="3" height="9" rx=".8" fill="currentColor"/><rect x="7" y="1.5" width="3" height="9" rx=".8" fill="currentColor"/></svg>
+              <svg class="ic-play" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.8v8.4l7-4.2z" fill="currentColor"/></svg>
+            </button>
+          </div>
         </div>
         <dl class="case-stats" id="caseStats">
           <div><dt>Cards in the case</dt><dd><span class="num-up" id="statProducts">&mdash;</span></dd></div>
@@ -2773,7 +2904,7 @@ footer::before{
 
     <div class="section" style="padding-top:0">
       <div class="wrap">
-        <button class="promo-rip panel" type="button" data-go="rip" aria-label="Rip a virtual pack: open a pack of real cards from the case">
+        <a class="promo-rip panel" href="#/rip" data-go="rip" aria-label="Rip a virtual pack: open a pack of real cards from the case">
           <span class="promo-pack" aria-hidden="true"><span class="promo-peek"></span><span class="promo-tear"></span><b>TL</b></span>
           <span class="promo-copy">
             <span class="num">Free &middot; no account &middot; real cards</span>
@@ -2781,7 +2912,7 @@ footer::before{
             <span class="promo-p">Pick a game and a set, tear the wrapper, and see what you pull &mdash; every card is a real single from the case, with its real price.</span>
           </span>
           <span class="promo-cta">Open one &rarr;</span>
-        </button>
+        </a>
       </div>
     </div>
 
@@ -2906,7 +3037,6 @@ footer::before{
             <button class="chip" data-game="pk" aria-pressed="false">Pokemon</button>
             <button class="chip" data-game="op" aria-pressed="false">One Piece</button>
             <button class="chip" data-game="mtg" aria-pressed="false">Magic</button>
-            <button class="chip" data-game="gundam" aria-pressed="false">Gundam</button>
           </div>
           <button class="chip chip-wish" id="wishChip" aria-pressed="false" type="button"><span class="heart-ico" aria-hidden="true">&#9829;</span> Wishlist (<span id="wishChipCount">0</span>)</button>
           <button class="chip more-filters" id="moreFilters" type="button" aria-expanded="false" aria-controls="shopFacets">More filters<span id="moreFiltersCount"></span></button>
@@ -2985,7 +3115,7 @@ footer::before{
         <div class="show-date-card">
           <div class="show-date-top">
             <p class="eyebrow">Next show</p>
-            <span class="show-count" id="showCountdown" role="status" aria-live="polite"></span>
+            <span class="show-count" id="showCountdown"></span>
           </div>
           <p class="show-date" id="showDateBig">Sat<br>Sep 5</p>
           <p class="show-tbc" id="showTbc" hidden>Exact date confirmed on our socials &mdash; usually the first Saturday or Sunday.</p>
@@ -2993,7 +3123,7 @@ footer::before{
             <span><b id="showHours">10 AM &ndash; 4 PM</b> &middot; vendor setup from <span id="showSetup">8 AM</span></span>
             <span><b id="showVenue">Hilton Cincinnati Airport</b> &middot; <span id="showAddress">7373 Turfway Rd, Florence, KY 41042</span></span>
             <span><b id="showCadence">First Saturday or Sunday</b> of every month &middot; free admission</span>
-            <span class="show-tables">Vendor tables booked &middot; <b id="tablesLabel"><span class="tables-n">11</span> of <span class="tables-t">24</span></b></span>
+            <span class="show-tables">Vendor tables booked &middot; <b id="tablesLabel"><span class="tables-n">11</span> of <span class="tables-t">24</span></b> <small class="show-tables-note">as of the last update</small></span>
           </div>
           <div class="meter" id="tablesMeter" role="img" aria-label="11 of 24 vendor tables booked"><i></i></div>
           <div class="show-actions">
@@ -3042,7 +3172,7 @@ footer::before{
         <h1>Play nights</h1>
         <p class="lede">Play runs on our 8-top &mdash; one big table of eight &mdash; and when more of you show up we split into a second list so everyone plays. Weekly events below.</p>
       </div>
-      <div class="next-up" id="evNextUp" role="status" aria-live="polite"></div>
+      <div class="next-up" id="evNextUp"></div>
       <div class="sched" id="schedList" role="list" aria-label="Weekly schedule"></div>
       <div class="section" style="padding-bottom:0">
         <div class="tri">
@@ -3166,6 +3296,7 @@ footer::before{
           <div class="hits" id="recentHits" aria-label="Recent hits">
             <span class="hits-k" id="hitsLabel">Recent hits</span>
             <div class="hits-row" id="hitsRow"></div>
+            <span class="demo-tag hits-tag" id="hitsDemoTag" title="Sample pulls drawn from the case &mdash; not a real break">sample</span>
           </div>
           <div class="notify" id="liveNotify">
             <form class="notify-form" id="notifyForm" novalidate>
@@ -3185,10 +3316,15 @@ footer::before{
             <span class="chat-head-r">
               <button class="chat-as" id="chatAs" type="button" hidden></button>
               <span class="demo-tag" id="chatTag">simulated</span>
+              <button class="chat-pause" id="chatPause" type="button" aria-pressed="false" aria-label="Pause the simulated chat" hidden>
+                <svg class="ic-pause" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="1.5" width="3" height="9" rx=".8" fill="currentColor"/><rect x="7" y="1.5" width="3" height="9" rx=".8" fill="currentColor"/></svg>
+                <svg class="ic-play" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.8v8.4l7-4.2z" fill="currentColor"/></svg>
+              </button>
             </span>
           </div>
           <div class="chat-wrap">
-            <div class="chat-body" id="chatBody" tabindex="0" role="log" aria-live="polite" aria-label="Chat messages"></div>
+            <!-- aria-live is "off" while the feed is simulated; 50-live.js flips it to "polite" for real chat -->
+            <div class="chat-body" id="chatBody" tabindex="0" role="log" aria-live="off" aria-label="Chat messages"></div>
             <button class="chat-new" id="chatNew" type="button" hidden>New messages &darr;</button>
             <div class="react-layer" id="reactLayer" aria-hidden="true"></div>
           </div>
@@ -3211,9 +3347,10 @@ footer::before{
       <div class="section" style="padding-bottom:0">
         <div class="section-head">
           <h2 id="spotHead">Claim a spot in the next break</h2>
-          <span class="spot-tags"><span class="demo-tag" id="spotPrice">$24.99 per spot</span><span class="demo-tag spots-open" id="spotsOpen"><b id="spotsLeftNum">9</b> of 12 spots left</span></span>
+          <span class="spot-tags"><span class="demo-tag" id="spotPrice">$24.99 per spot</span><span class="demo-tag spots-open" id="spotsOpen"><b id="spotsLeftNum"></b>Checking spots&hellip;</span><span class="demo-tag" id="spotsDemoTag" title="Sample seats &mdash; the live board fills from real claims" hidden>sample seats</span></span>
         </div>
         <p class="lede" style="max-width:64ch">One spot = three packs ripped live under your name. Hits ship free the next morning; bulk converts to store credit if you'd rather skip shipping. Claimed spots land straight in your cart.</p>
+        <p class="spot-note" id="spotNote" hidden>We're off air &mdash; a spot you claim now is a <b>pre-claim for the next break</b> (see the schedule below). It holds your seat and rips when we go live.</p>
         <div class="spot-meter" id="spotMeter" role="progressbar" aria-label="Spots claimed" aria-valuemin="0" aria-valuemax="12" aria-valuenow="3"><i></i></div>
         <div class="spots" id="spotGrid"></div>
       </div>
@@ -3236,7 +3373,7 @@ footer::before{
       <div class="visit-layout">
         <div class="panel visit-info">
           <h3 id="visitTitle">Top Loaded Trading Cards</h3>
-          <p class="visit-status" id="visitStatus" role="status" aria-live="polite"><span class="dot"></span><b>Open now</b><span class="visit-status-sub"></span></p>
+          <p class="visit-status" id="visitStatus"><span class="dot"></span><b role="status" aria-live="polite">Open now</b><span class="visit-status-sub"></span></p>
           <dl class="kv" style="margin-top:6px">
             <dt>Address</dt><dd id="visitAddress">2514 Hazelwood Dr<br>Crescent Springs, KY 41017</dd>
             <dt>Phone</dt><dd><a id="visitPhone" href="tel:+15132222573">(513) 222-2573</a></dd>
@@ -3251,7 +3388,7 @@ footer::before{
         </div>
         <div class="map-wrap">
           <div class="map-fallback"><span>Map loads on the live site &mdash; use the Google or Apple Maps buttons for directions.</span></div>
-          <iframe id="visitMap" title="Map to Top Loaded Trading Cards, 2514 Hazelwood Dr, Crescent Springs KY" loading="lazy" referrerpolicy="no-referrer-when-downgrade" data-src="https://maps.google.com/maps?q=2514%20Hazelwood%20Dr%2C%20Crescent%20Springs%2C%20KY%2041017&amp;z=15&amp;output=embed"></iframe>
+          <iframe id="visitMap" title="Map to Top Loaded Trading Cards, 2514 Hazelwood Dr, Crescent Springs KY" loading="lazy" referrerpolicy="no-referrer-when-downgrade" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" data-src="https://maps.google.com/maps?q=2514%20Hazelwood%20Dr%2C%20Crescent%20Springs%2C%20KY%2041017&amp;z=15&amp;output=embed"></iframe>
         </div>
       </div>
     </div>
@@ -3282,7 +3419,7 @@ footer::before{
           <div class="table-wrap cred-wrap" style="margin-top:0" tabindex="0" role="region" aria-label="Customer credit balances">
             <table class="cred-table" style="min-width:0">
               <caption class="vh">Customers with store credit</caption>
-              <thead><tr><th scope="col">Customer</th><th scope="col">Phone</th><th scope="col" class="num">Credit</th></tr></thead>
+              <thead><tr><th scope="col">Customer</th><th scope="col" class="num cred-phone-col">Phone</th><th scope="col" class="num">Credit</th></tr></thead>
               <tbody id="credBody"></tbody>
             </table>
           </div>
@@ -3429,7 +3566,7 @@ footer::before{
           <h3>Channel sync alerts <span class="pill warn" id="alertPill"><span class="dot warn"></span><span id="alertCount">0</span> open</span></h3>
           <p class="card-note">When something sells on one channel, the other gets flagged until it's reconciled &mdash; Square (register &amp; this site) on one side, TCGplayer on the other.</p>
           <div id="alertList" style="margin-top:12px"></div>
-          <div class="form-grid" style="margin-top:14px; grid-template-columns:minmax(0,1fr) auto auto">
+          <div class="form-grid alert-new" style="margin-top:14px">
             <div class="field"><label for="alertNewMsg" class="vh">New alert</label><input id="alertNewMsg" placeholder="Flag something by hand&hellip;" autocomplete="off"></div>
             <div class="field"><label for="alertNewCh" class="vh">Reconcile on</label><select id="alertNewCh"><option value="TCGplayer">on TCGplayer</option><option value="Square">on Square</option></select></div>
             <div class="field" style="justify-content:flex-end"><button class="btn btn-ghost" id="alertNewBtn" type="button">Add alert</button></div>
@@ -3620,7 +3757,7 @@ footer::before{
         <table>
           <caption class="vh">Inventory with stock levels and channel status</caption>
           <thead>
-            <tr><th scope="col">Item</th><th scope="col">Game</th><th scope="col">Type</th><th scope="col">Cond</th><th scope="col" class="num">Price</th><th scope="col">Stock</th><th scope="col">Channel</th></tr>
+            <tr><th scope="col">Item</th><th scope="col">Stock</th><th scope="col" class="num">Price</th><th scope="col">Game</th><th scope="col">Type</th><th scope="col">Cond</th><th scope="col">Channel</th></tr>
           </thead>
           <tbody id="invBody"></tbody>
         </table>
@@ -3851,7 +3988,7 @@ footer::before{
     </div>
     <div class="qv-stock" id="qvStock"></div>
 
-    <div class="table-wrap qv-table-wrap">
+    <div class="qv-table-wrap">
       <table class="qv-table">
         <caption class="sr-only">Every listing of this product</caption>
         <thead><tr><th scope="col">Condition</th><th scope="col">Printing</th><th scope="col">Qty</th><th scope="col">Price</th></tr></thead>
@@ -4361,10 +4498,18 @@ footer::before{
 
   /* ---------- ticker + header chrome ----------
      Ticker: TL.config.ticker → #tickerTrack (rebuilt on config:change), a pause toggle,
-     and an sr-only list for assistive tech. "sample offers" tag shows until the shop has
-     saved a config (TL.config.updatedAt).
+     and an sr-only list for assistive tech. "sample offers" tag shows while the list still
+     equals the built-in defaults (TL_DEFAULT_CONFIG.ticker), whatever else the shop has saved.
      Header: open/closed pill (TL.shopStatus, every 60 s + config:change), logo/title from
-     TL.config, live nav dot only under html.is-live, mobile nav edge cue, scrolled shadow. */
+     TL.config, live nav dot only under html.is-live, mobile nav edge cue, scrolled shadow,
+     and on phones html.nav-tuck (nav row hides on scroll-down, returns on scroll-up). */
+  function sameAsDefault(key){
+    var def = (window.TL_DEFAULT_CONFIG || {})[key], cur = TL.config && TL.config[key];
+    try { return JSON.stringify(cur) === JSON.stringify(def); } catch(e){ return false; }
+  }
+  TL.sameAsDefault = sameAsDefault;
+  /* "$85" / "85" / "$1,200+" are prices → "up to $85"; "ask" / "top rates" are notes → "· ask" */
+  function isPrice(p){ return /^\s*\$?\s*\d/.test(String(p || "")); }
   function tickerItems(){
     var list = (TL.config && TL.config.ticker) || [];
     if(!Array.isArray(list)) return [];
@@ -4381,13 +4526,13 @@ footer::before{
     if(wrap) wrap.hidden = !items.length;
     if(!items.length){ track.innerHTML = ""; return; }
     var half = items.map(function(b){
-      return "<span>Buying now · <b>" + esc(b.n) + "</b>" + (b.p ? " up to <b>" + esc(b.p) + "</b>" : "") + "</span>";
+      return "<span>Buying now · <b>" + esc(b.n) + "</b>" + (b.p ? (isPrice(b.p) ? " up to " : " · ") + "<b>" + esc(b.p) + "</b>" : "") + "</span>";
     }).join("");
     track.innerHTML = reduceMotion ? half : half + half;
     var ul = $("#tickerList");
-    if(ul) ul.innerHTML = items.map(function(b){ return "<li>" + esc(b.n) + (b.p ? " — up to " + esc(b.p) : "") + "</li>"; }).join("");
+    if(ul) ul.innerHTML = items.map(function(b){ return "<li>" + esc(b.n) + (b.p ? (isPrice(b.p) ? " — up to " : " — ") + esc(b.p) : "") + "</li>"; }).join("");
     var tag = $("#tickerDemo");
-    if(tag) tag.hidden = !!(TL.config && TL.config.updatedAt);
+    if(tag) tag.hidden = !sameAsDefault("ticker");
   }
   (function(){
     var btn = $("#tickerPause"), wrap = $("#ticker");
@@ -4488,7 +4633,7 @@ footer::before{
       edge();
       if(!(d && d.name) || d.paramsOnly) return;
       if(nav.scrollWidth <= nav.clientWidth + 2) return;
-      var b = nav.querySelector('button[data-go="' + d.name + '"]');
+      var b = nav.querySelector('[data-go="' + d.name + '"]');
       if(!b) return;
       var left = Math.max(0, b.offsetLeft - 20);
       try { nav.scrollTo({left: left, behavior: reduceMotion ? "auto" : "smooth"}); } catch(e){ nav.scrollLeft = left; }
@@ -4502,6 +4647,37 @@ footer::before{
     new IntersectionObserver(function(entries){
       document.documentElement.classList.toggle("scrolled", !entries[0].isIntersecting);
     }, {threshold: 0}).observe(s);
+  })();
+
+  /* ---- phones: only the brand row stays on screen. Scrolling down tucks the nav row
+     (html.nav-tuck → 10-header.css fades it, keeps its space), scrolling up, changing view,
+     or tabbing into the nav brings it back. Bound only while the 640px query matches. ---- */
+  (function(){
+    var nav = $("#mainnav"), mq = window.matchMedia ? window.matchMedia("(max-width:640px)") : null;
+    if(!nav || !mq) return;
+    var lastY = 0, bound = false, tucked = false;
+    function y(){ return window.scrollY || window.pageYOffset || 0; }
+    function set(t){
+      if(t === tucked) return;
+      tucked = t; document.documentElement.classList.toggle("nav-tuck", t);
+    }
+    /* cheap enough to run inline (one scrollY read, one class toggle) — no layout reads, no rAF */
+    function onScroll(){
+      var cur = y(), dy = cur - lastY;
+      if(cur < 96) set(false);
+      else if(dy > 6) set(true);
+      else if(dy < -6) set(false);
+      lastY = cur;
+    }
+    function sync(){
+      var want = mq.matches;
+      if(want && !bound){ bound = true; lastY = y(); window.addEventListener("scroll", onScroll, {passive: true}); }
+      else if(!want && bound){ bound = false; window.removeEventListener("scroll", onScroll); set(false); }
+    }
+    if(mq.addEventListener) mq.addEventListener("change", sync); else if(mq.addListener) mq.addListener(sync);
+    sync();
+    nav.addEventListener("focusin", function(){ set(false); });
+    TL.on("view:change", function(d){ if(d && d.paramsOnly) return; set(false); lastY = y(); });
   })();
 
   /* ---------- hero + home ----------
@@ -4615,8 +4791,12 @@ footer::before{
     }, 2500);
   });
 
-  /* ---- next up strip ---- */
+  /* ---- next up strip ----
+     Writes only when the string changes; the countdown digits live in role="timer" aria-live="off"
+     elements and nothing in #nextUp is a live region, so a ticking clock is never announced. */
   var nuTimer = 0;
+  function setText(el, s){ if(el && el.textContent !== s) el.textContent = s; }
+  function setHtml(el, s){ if(el && el.innerHTML !== s) el.innerHTML = s; }
   function fmtWhen(d){
     try {
       return new Intl.DateTimeFormat("en-US", {weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit"}).format(d).replace(":00", "");
@@ -4625,14 +4805,14 @@ footer::before{
   function renderCd(el, when, windowMs){
     if(!el) return;
     var ms = when.getTime() - Date.now();
-    if(ms <= 0 && ms > -(windowMs || 3 * 36e5)){ el.innerHTML = '<span class="now">Happening now</span>'; return; }
-    if(ms <= 0){ el.innerHTML = ""; return; }
+    if(ms <= 0 && ms > -(windowMs || 3 * 36e5)){ setHtml(el, '<span class="now">Happening now</span>'); return; }
+    if(ms <= 0){ setHtml(el, ""); return; }
     var s = Math.floor(ms / 1000), d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
     var html = "";
     if(d) html += "<b>" + d + "</b><small>d</small>";
     html += "<b>" + TL.pad2(h) + "</b><small>h</small><b>" + TL.pad2(m) + "</b><small>m</small>";
     if(!reduceMotion && !d) html += "<b>" + TL.pad2(sec) + "</b><small>s</small>";
-    el.innerHTML = html;
+    setHtml(el, html);
   }
   function tickNextUp(){
     var ev = null, show = null;
@@ -4640,19 +4820,19 @@ footer::before{
     try { show = TL.nextShow && TL.nextShow(); } catch(e){}
     var evCell = $("#nuEvCell");
     if(ev && ev.event && ev.when){
-      $("#nuEvName").textContent = ev.event.name || "Play night";
-      $("#nuEvWhen").textContent = fmtWhen(ev.when) + (ev.event.small ? " · " + ev.event.small.split(" · ")[0] : "");
+      setText($("#nuEvName"), ev.event.name || "Play night");
+      setText($("#nuEvWhen"), fmtWhen(ev.when) + (ev.event.small ? " · " + ev.event.small.split(" · ")[0] : ""));
       renderCd($("#nuEvCd"), ev.when);
-      if(evCell) evCell.hidden = false;
-    } else if(evCell) evCell.hidden = true;
+      if(evCell && evCell.hidden) evCell.hidden = false;
+    } else if(evCell && !evCell.hidden) evCell.hidden = true;
     var showCell = $("#nuShowCell");
     if(show && !isNaN(show)){
       var cfg = (TL.config && TL.config.show) || {};
-      $("#nuShowName").textContent = "Card show · " + (cfg.venue ? cfg.venue.replace("Cincinnati Airport", "").trim() : "Hilton");
-      $("#nuShowWhen").textContent = fmtWhen(show).replace(/,\s*\d{1,2}(:\d{2})?\s*(AM|PM)$/i, "") + " · " + (cfg.hours || "10 AM – 4 PM") + " · Turfway Rd";
+      setText($("#nuShowName"), "Card show · " + (cfg.venue ? cfg.venue.replace("Cincinnati Airport", "").trim() : "Hilton"));
+      setText($("#nuShowWhen"), fmtWhen(show).replace(/,\s*\d{1,2}(:\d{2})?\s*(AM|PM)$/i, "") + " · " + (cfg.hours || "10 AM – 4 PM") + " · Turfway Rd");
       renderCd($("#nuShowCd"), show, 6 * 36e5);
-      if(showCell) showCell.hidden = false;
-    } else if(showCell) showCell.hidden = true;
+      if(showCell && showCell.hidden) showCell.hidden = false;
+    } else if(showCell && !showCell.hidden) showCell.hidden = true;
   }
   function startNextUp(){
     stopNextUp();
@@ -4724,6 +4904,17 @@ footer::before{
     if(wall) TL.motion.watch(wall, function(inView){ wall.classList.toggle("in-view", inView); });
   });
   TL.on("motion:change", renderWall);
+  /* pause / play for the marquee (mirrors #tickerPause); hover and focus-within pause it too via CSS */
+  (function(){
+    var btn = $("#wallPause"), wall = $("#wall");
+    if(!btn || !wall) return;
+    btn.addEventListener("click", function(){
+      var on = btn.getAttribute("aria-pressed") !== "true";
+      btn.setAttribute("aria-pressed", String(on));
+      btn.setAttribute("aria-label", on ? "Resume the card wall" : "Pause the card wall");
+      wall.classList.toggle("paused", on);
+    });
+  })();
 
   /* ---- testimonials from config (sample quotes stay until the shop adds real ones) ---- */
   function renderTestimonials(){
@@ -4737,7 +4928,8 @@ footer::before{
     box.innerHTML = real.map(function(t){
       return '<div class="panel"><p class="quote">“' + esc(t.q) + '”</p>' + (t.who ? '<p class="p-set quote-who">' + esc(t.who) + "</p>" : "") + "</div>";
     }).join("");
-    if(tag) tag.hidden = true;
+    /* the "sample quotes" tag only clears once the list differs from the built-in defaults */
+    if(tag) tag.hidden = !(typeof TL.sameAsDefault === "function" && TL.sameAsDefault("testimonials"));
   }
   TL.on("config:change", renderTestimonials);
 
@@ -4852,7 +5044,10 @@ footer::before{
       '<span>' + (it.cond ? esc(it.cond) : (it.type === "sealed" ? "Sealed" : "")) + (it.printing && !/normal/i.test(it.printing) ? ' \u00b7 ' + esc(it.printing) : '') + '</span>' +
       '<span>' + (out ? "Sold out" : (Number(it.stock) || 0) + " in stock") + '</span>' +
       (typeof it.market === "number" ? '<span>Market ' + money(it.market) + ' / Ours ' + money(it.price) + '</span>' : '<span>Ours ' + money(it.price) + '</span>') +
+      '<button class="back-qv" type="button">Quick view</button>' +
       '</div>';
+    var flipBtn = '<button class="flip-btn" type="button" aria-expanded="false" aria-label="Show details for ' + esc(it.name) + '">' +
+      '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 0 1 13.6-5.7L20 8.5M20 4v4.5h-4.5M20 12a8 8 0 0 1-13.6 5.7L4 15.5M4 20v-4.5h4.5"/></svg></button>';
     var action;
     if(out) action = '<button class="add notify" type="button" data-notify="' + esc(it.id) + '">Notify me when it\u2019s back</button>';
     else action = '<button class="add" type="button" data-cart="' + esc(it.id) + '">Add to cart</button>';
@@ -4865,9 +5060,9 @@ footer::before{
       '<div class="thumb" data-qv="' + esc(it.id) + '">' +
         '<div class="flip"><div class="tilt">' +
           '<div class="mini face front">' + art + '<span class="holo-hover"></span></div>' +
-          '<div class="mini face back" aria-hidden="true">' + back + '</div>' +
+          '<div class="mini face back" aria-hidden="true" inert>' + back + '</div>' +
         '</div></div>' +
-        cond + heartBtn(it) +
+        cond + heartBtn(it) + flipBtn +
         '<span class="qv-hint" aria-hidden="true">Quick view</span>' +
       "</div>" +
       '<div class="p-meta"><h3>' + hl(it.name, terms) + "</h3>" +
@@ -5000,7 +5195,9 @@ footer::before{
     var order = CORE_GAMES.concat(["lorcana", "other"]), html = '<button class="chip" data-game="all" aria-pressed="' + (F.game === "all") + '">All games <b>' + fmtInt(total) + '</b></button>';
     order.forEach(function(g){
       var n = counts[g] || 0;
-      if(CORE_GAMES.indexOf(g) === -1 && !n && F.game !== g) return;
+      /* a chip that can only produce an empty grid is hidden (core games included) unless it is the active filter;
+         with no counts at all (nothing loaded yet) the core games stay so the row is never bare */
+      if(!n && F.game !== g && (total > 0 || CORE_GAMES.indexOf(g) === -1)) return;
       html += '<button class="chip" data-game="' + g + '" aria-pressed="' + (F.game === g) + '"' + (!n ? ' data-empty="1"' : '') + '>' + esc(gameLabel(g)) + ' <b>' + fmtInt(n) + '</b></button>';
     });
     wrap.innerHTML = html;
@@ -5268,6 +5465,24 @@ footer::before{
     var svg = wrap.firstChild;
     if(svg) host.replaceChild(svg, img); else img.style.visibility = "hidden";
   }, true);
+  /* ---- card flip: .flip-btn toggles .is-flipped; the back face is inert/aria-hidden until shown ---- */
+  function setFlipped(card, on, focus){
+    if(!card) return;
+    var btn = card.querySelector(".flip-btn"), back = card.querySelector(".face.back");
+    on = !!on;
+    card.classList.toggle("is-flipped", on);
+    if(btn){ btn.setAttribute("aria-expanded", String(on)); btn.setAttribute("aria-label", (on ? "Hide details for " : "Show details for ") + (card.querySelector("h3") ? card.querySelector("h3").textContent : "this card")); }
+    if(back){
+      back.setAttribute("aria-hidden", String(!on));
+      if(on) back.removeAttribute("inert"); else back.setAttribute("inert", "");
+    }
+    if(!focus) return;
+    var target = on ? (back && back.querySelector("button, a, [tabindex]")) : btn;
+    if(target) try { target.focus({preventScroll: true}); } catch(e){}
+  }
+  function unflipAll(except){
+    $$(".prod.is-flipped").forEach(function(c){ if(c !== except) setFlipped(c, false, false); });
+  }
   /* ---- events ---- */
   function qvFromEl(el){
     var card = el.closest("[data-id]"), id = card ? card.dataset.id : el.dataset.qv;
@@ -5287,6 +5502,12 @@ footer::before{
       return;
     }
     if(t.closest("[data-wish]") || t.closest(".tcg-link")) return; /* wishlist module / plain link */
+    var flipBtn = t.closest(".flip-btn");
+    if(flipBtn){
+      var fc = flipBtn.closest(".prod");
+      if(fc && !fc.classList.contains("skel")){ unflipAll(fc); setFlipped(fc, !fc.classList.contains("is-flipped"), true); }
+      return;
+    }
     var notify = t.closest("[data-notify]");
     if(notify){
       var ni = TL.inventory ? TL.inventory.byId(notify.dataset.notify) : null;
@@ -5321,9 +5542,15 @@ footer::before{
     }
   });
   document.addEventListener("keydown", function(e){
-    if(e.key !== "Enter" && e.key !== " ") return;
     var t = e.target;
-    if(!t || !t.classList || !t.classList.contains("prod") || t.classList.contains("skel")) return;
+    if(!t || !t.closest) return;
+    if(e.key === "Escape"){
+      var flipped = t.closest(".prod.is-flipped");
+      if(flipped){ e.preventDefault(); setFlipped(flipped, false, true); }
+      return;
+    }
+    if(e.key !== "Enter" && e.key !== " ") return;
+    if(!t.classList || !t.classList.contains("prod") || t.classList.contains("skel")) return;
     e.preventDefault();
     qvFromEl(t);
   });
@@ -5723,12 +5950,26 @@ footer::before{
     ["--rx", "--ry", "--mx", "--my"].forEach(function(v){ qvCardBtn.style.removeProperty(v); });
     qvCardBtn.classList.remove("tilting");
   }
+  /* the motion package's TL.tilt writes the rotation + --mx/--my but never toggles a class; the designed
+     .qv-sheen spotlight is shown by .qv-card.tilting, so mirror the pointer state here (mouse/pen only) */
+  function qvTiltEnter(e){ if(reduceMotion || (e && e.pointerType === "touch")) return; qvCardBtn.classList.add("tilting"); }
+  function qvTiltExit(){ if(qvCardBtn) qvCardBtn.classList.remove("tilting"); }
   function qvStartTilt(){
     qvStopTilt();
     if(!qvCardBtn || reduceMotion) return;
     var d = null;
-    try { d = TL.tilt(qvCardBtn, {max: 14}); } catch(e){ d = null; }
-    if(typeof d === "function"){ QV.destroyTilt = d; return; }
+    try { d = TL.tilt(qvCardBtn, {max: 14, sheen: false}); } catch(e){ d = null; }
+    if(typeof d === "function"){
+      qvCardBtn.addEventListener("pointerenter", qvTiltEnter);
+      qvCardBtn.addEventListener("pointerleave", qvTiltExit);
+      QV.destroyTilt = function(){
+        qvCardBtn.removeEventListener("pointerenter", qvTiltEnter);
+        qvCardBtn.removeEventListener("pointerleave", qvTiltExit);
+        qvTiltExit();
+        d();
+      };
+      return;
+    }
     if(!window.PointerEvent) return;
     qvCardBtn.addEventListener("pointermove", qvTiltMove, {passive: true});
     qvCardBtn.addEventListener("pointerleave", qvTiltLeave);
@@ -5905,6 +6146,11 @@ footer::before{
     else if(e.key === "ArrowRight"){ e.preventDefault(); qvStep(1); }
   }, true);
   TL.on("wishlist:change", qvSyncWish);
+  /* reduced-motion flipped while the dialog is open: stop (or resume) the tilt in place */
+  TL.on("motion:change", function(d){
+    if(!QV.open) return;
+    if(d && d.reduce) qvStopTilt(); else qvStartTilt();
+  });
   /* ---- deep link: #/shop?item=<id> ---- */
   function qvDeepLink(id){
     if(!id) return;
@@ -6034,9 +6280,14 @@ footer::before{
      the DOM event 'tl:cart-changed'; [data-add] clicks also dispatch 'tl:cart-add'
      {id, sourceEl, item} for the fly-to-cart motion. A removed 'live-spot-*' id shows up in
      `removed` so the live page can release the claim (reason 'checkout' means it was bought).
-     Checkout: POST /checkout {lines, fulfillment, email, note} → {url} redirects to Square;
-     {mock} shows the in-drawer confirmation; offline (or an API without the route yet) shows
-     the same confirmation labelled demo. Any other error becomes a retry state.
+     Checkout: POST /checkout {lines, fulfillment, email, note} → {url} redirects to Square
+     (only http(s) links are followed); {mock} shows the in-drawer confirmation; offline (or an
+     API without the route yet) shows the same confirmation labelled demo. Any other error
+     becomes a retry state. The button/note only promise Square when GET /health reports
+     integrations.square — fetched once on 'api:ready' and kept on TL.api.integrations.
+     Cross-tab: a checkout writes TL.store "cart-order" {orderId, at, ids} before emptying the
+     cart, so the storage listener in other tabs re-emits those ids with reason 'checkout'
+     (not 'sync') and the live page keeps the paid spot claims.
      Kept for other modules: var cart, renderCart(), openCart(), closeCart(), cartQty(). */
   var cart = {}; // id -> {qty, item}
   var lastCartQty = 0;
@@ -6318,7 +6569,20 @@ footer::before{
       prev = li;
     });
   }
-  function cartCheckoutLabel(){ return TL.api.online ? "Checkout with Square" : "Checkout · demo"; }
+  /* Square is only promised when the API is up AND /health says Square is configured; until
+     that answer arrives (or when it says no) the drawer tells the demo truth up front. */
+  function cartSquareLive(){
+    var ints = TL.api.integrations || (TL.api.health && TL.api.health.integrations) || null;
+    return !!(TL.api.online && ints && ints.square === true);
+  }
+  function cartCheckoutLabel(){ return cartSquareLive() ? "Checkout with Square" : "Checkout · demo"; }
+  var CART_ORDER_TTL = 10 * 60 * 1000;
+  function cartOrderMarker(){
+    var m = TL.store.get("cart-order", null);
+    if(!m || typeof m !== "object" || !Array.isArray(m.ids)) return null;
+    if(!isFinite(Number(m.at)) || Date.now() - Number(m.at) > CART_ORDER_TTL) return null;
+    return m;
+  }
   function cartRenderSums(lines){
     var sub = cartSubtotal(), ship = cartShipping(), tot = Math.round((sub + ship) * 100) / 100;
     var shipping = cartOpts.fulfillment === "ship", quote = cartShipQuote(lines);
@@ -6483,8 +6747,11 @@ footer::before{
     $("#cartBody").hidden = true; $("#cartForm").hidden = true;
     cartDoneShown = true; drawer.classList.add("done");
     cartRecordOrder(o);
+    var boughtIds = o.lines.map(function(l){ return l.item.id; });
+    /* written BEFORE the cart empties so other tabs see the marker when their storage event fires */
+    TL.store.set("cart-order", {orderId: o.orderId, at: Date.now(), ids: boughtIds});
     cart = {};
-    cartCommit("checkout", {removed: o.lines.map(function(l){ return l.item.id; })});
+    cartCommit("checkout", {removed: boughtIds});
     if(!drawer.classList.contains("open")) openCart();
     var h = $("#cartDoneTitle"); if(h) try { h.focus({preventScroll: true}); } catch(e){}
     cartAnnounce("Order " + o.orderId + " placed. Total " + money(o.total) + ".");
@@ -6515,8 +6782,8 @@ footer::before{
     };
     if(email) body.email = email;
     if(note) body.note = note;
-    var online = !!TL.api.online;
-    cartSetBusy(true, online ? "Taking you to Square…" : "Placing demo order…");
+    var square = cartSquareLive();
+    cartSetBusy(true, square ? "Taking you to Square…" : "Placing demo order…");
     function done(extra){
       cartShowDone({
         orderId: (extra && extra.orderId) || cartDemoId(),
@@ -6531,9 +6798,16 @@ footer::before{
     } catch(e){ p = Promise.reject({status: 0, error: "error"}); }
     p.then(function(d){
       if(d && d.url){
-        TL.store.set("cart-pending", {orderId: d.orderId || null, at: Date.now(), url: String(d.url)});
+        var link = cartCheckoutLink(d.url);
+        if(!link){
+          cartSetBusy(false);
+          toast("Unexpected checkout link — nothing was charged");
+          cartError("The checkout sent a link that isn't a web address — nothing was charged.", true);
+          return;
+        }
+        TL.store.set("cart-pending", {orderId: d.orderId || null, at: Date.now(), url: link});
         cartSetBusy(true, "Taking you to Square…");
-        setTimeout(function(){ window.location.href = String(d.url); }, 350);
+        setTimeout(function(){ window.location.href = link; }, 350);
         setTimeout(function(){ if(cartBusy) cartSetBusy(false); }, 6000);
         return;
       }
@@ -6570,10 +6844,28 @@ footer::before{
       cartError(msg, true);
     });
   }
+  /* Only http(s) links leave the site; anything else (javascript:, data:, a bare path) is refused. */
+  function cartCheckoutLink(u){
+    var s = String(u || "").trim();
+    if(!/^https?:\/\//i.test(s)) return null;
+    try { var p = new URL(s); if(p.protocol !== "http:" && p.protocol !== "https:") return null; return p.href; } catch(e){ return null; }
+  }
   function cartUpdateMode(){
     if(!cartBusy){ var b = $("#checkoutBtn"); if(b) b.textContent = cartCheckoutLabel(); }
     var n = $("#cartNoteLine");
-    if(n) n.textContent = TL.api.online ? "Pickup in store or ship · secure payment through Square" : "Demo mode — Square Checkout goes live with the API keys";
+    if(!n) return;
+    if(cartSquareLive()) n.textContent = "Pickup in store or ship · secure payment through Square";
+    else if(TL.api.online) n.textContent = "Demo mode — Square checkout goes live once the shop connects Square";
+    else n.textContent = "Demo mode — Square Checkout goes live with the API keys";
+  }
+  /* GET /health once after the API answers; another module may already have stashed it. */
+  function cartLoadIntegrations(){
+    var known = TL.api.integrations || (TL.api.health && TL.api.health.integrations) || null;
+    if(known && typeof known === "object"){ TL.api.integrations = known; cartUpdateMode(); return; }
+    TL.api.get("/health", {noAuth: true, timeout: 4000}).then(function(h){
+      TL.api.integrations = (h && h.integrations && typeof h.integrations === "object") ? h.integrations : {};
+      cartUpdateMode();
+    }).catch(function(){ /* unknown stays "demo" — the honest default */ });
   }
   function cartSyncOptsUI(){
     $$('#cartForm input[name="fulfillment"]').forEach(function(r){
@@ -6657,7 +6949,14 @@ footer::before{
   })();
   window.addEventListener("storage", function(e){
     if(e && e.key !== null && e.key !== "tl-cart") return;
-    cartLoad(); renderCart(); cartEmit("sync", {});
+    var before = Object.keys(cart);
+    cartLoad(); renderCart();
+    var removed = before.filter(function(id){ return !cart[id]; });
+    var added = Object.keys(cart).filter(function(id){ return before.indexOf(id) < 0; });
+    /* ids the other tab just bought arrive as 'checkout', so 50-live keeps the paid claims */
+    var marker = removed.length ? cartOrderMarker() : null;
+    var bought = marker ? removed.filter(function(id){ return marker.ids.indexOf(id) > -1; }) : [];
+    cartEmit(bought.length ? "checkout" : "sync", {removed: removed, added: added});
   });
 
   /* Re-validate against the loaded inventory: refresh snapshots, clamp to stock, drop sold-out. */
@@ -6709,7 +7008,7 @@ footer::before{
     if(TL.inventory && TL.inventory.loaded) cartRevalidate();
   });
   TL.on("inventory:loaded", cartRevalidate);
-  TL.on("api:ready", cartUpdateMode);
+  TL.on("api:ready", function(d){ cartUpdateMode(); if(d && d.online) cartLoadIntegrations(); });
   TL.on("view:change", function(d){
     if(d && d.paramsOnly) return;
     if(!drawer.classList.contains("open")) return;
@@ -7374,16 +7673,17 @@ footer::before{
       ? '<span class="pill warn"><span class="dot"></span>Edited here</span>'
       : (it.tcg ? '<span class="pill ok"><span class="dot"></span>TCGplayer</span>' : '<span class="pill"><span class="dot"></span>Demo item</span>');
     return '<tr data-row="' + esc(it.id) + '">' +
-      '<td><div class="inv-name">' + name + '<span class="sub">' + esc(it.set || "") + '</span></div></td>' +
-      '<td>' + esc(it.lineName || gameName(it.game)) + '</td>' +
-      '<td>' + (it.type === "single" ? "Single" : "Sealed") + '</td>' +
-      '<td>' + esc(it.cond || "—") + '</td>' +
-      '<td class="num">' + money(it.price) + '</td>' +
+      '<td class="inv-item"><div class="inv-name">' + name + '<span class="sub">' + esc(it.set || "") + '</span></div></td>' +
+      /* Stock sits right after Item so the column staff edit on the floor is reachable on a phone (Item is sticky under 640px) */
       '<td><span class="stock-edit">' +
         '<button type="button" data-stk="-1" data-id="' + esc(it.id) + '" aria-label="Decrease stock for ' + esc(it.name) + '">&minus;</button>' +
         '<span class="' + cls + '" data-stock="' + esc(it.id) + '">' + st + '</span>' +
         '<button type="button" data-stk="1" data-id="' + esc(it.id) + '" aria-label="Increase stock for ' + esc(it.name) + '">+</button>' +
       '</span></td>' +
+      '<td class="num">' + money(it.price) + '</td>' +
+      '<td>' + esc(it.lineName || gameName(it.game)) + '</td>' +
+      '<td>' + (it.type === "single" ? "Single" : "Sealed") + '</td>' +
+      '<td>' + esc(it.cond || "—") + '</td>' +
       '<td>' + chan + '</td></tr>';
   }
   function renderInvTable(){
@@ -7397,10 +7697,11 @@ footer::before{
       if(pages <= 1){ pager.innerHTML = list.length ? '<span>' + fmtInt(list.length) + ' products</span>' : ""; }
       else {
         var lo = Math.max(1, inv.page - 2), hi = Math.min(pages, lo + 4); lo = Math.max(1, hi - 4);
-        var h = '<button type="button" data-page="' + (inv.page - 1) + '"' + (inv.page === 1 ? " disabled" : "") + ' aria-label="Previous page">&lsaquo;</button>';
+        /* prev + pages + next stay on one line (.inv-pages nowrap); only the count wraps below on phones */
+        var h = '<span class="inv-pages"><button type="button" data-page="' + (inv.page - 1) + '"' + (inv.page === 1 ? " disabled" : "") + ' aria-label="Previous page">&lsaquo;</button>';
         for(var p = lo; p <= hi; p++) h += '<button type="button" data-page="' + p + '"' + (p === inv.page ? ' aria-current="page"' : "") + ' aria-label="Page ' + p + '">' + p + '</button>';
-        h += '<button type="button" data-page="' + (inv.page + 1) + '"' + (inv.page === pages ? " disabled" : "") + ' aria-label="Next page">&rsaquo;</button>';
-        h += '<span>' + fmtInt(start + 1) + "–" + fmtInt(start + shown.length) + " of " + fmtInt(list.length) + '</span>';
+        h += '<button type="button" data-page="' + (inv.page + 1) + '"' + (inv.page === pages ? " disabled" : "") + ' aria-label="Next page">&rsaquo;</button></span>';
+        h += '<span class="inv-count">' + fmtInt(start + 1) + "–" + fmtInt(start + shown.length) + " of " + fmtInt(list.length) + '</span>';
         pager.innerHTML = h;
       }
     }
@@ -7498,8 +7799,12 @@ footer::before{
      every 3 s, POST /live/viewers heartbeat every 20 s, claims via
      POST /live/spots/claim, releases via POST /live/spots/release. Every timer runs
      only while the Live view is showing AND the tab is visible.
-     API offline, or the live endpoints answering 404: simulated chat and viewers,
-     localStorage spot claims ("liveSpots"), newsletter signups into TL.store "forms".
+     API offline, or the live endpoints answering 404: simulated chat (aria-live off, a visible
+     pause, and it stops after LV_SIM_MAX lines until the visitor interacts) and viewers, sample
+     seats tagged as such, localStorage spot claims ("liveSpots"), newsletter signups into
+     TL.store "forms". With an API the board shows "Checking spots…" until GET /live answers —
+     taken seats come only from the server. The claim owner id ("sid") lives in localStorage next
+     to the claims. Off air, claiming is labelled a pre-claim for the next break.
        TL.live.state()          {on, active, online, embed, spots:{taken, mine, total, price}}
        TL.live.refresh()        re-fetch /live (online) or re-render (offline)
        TL.live.claim(n, el?)    same path as clicking a spot button
@@ -7523,16 +7828,38 @@ footer::before{
     ["packrat_pete", "see everyone at the Turfway show, first weekend of the month"]
   ];
   var LV_HYPE = ["LETS GOOOO", "no way", "W pull", "that's the chase!!", "sheesh", "pack luck is unreal tonight", "who had that spot??"];
+  var LV_SIM_MAX = 8; /* simulated chat lines per sitting — the replay stops after this many until the visitor interacts */
   var lv = {
-    booted: false, active: false, api: null, mounted: "", timers: {}, sid: null, name: "",
-    taken: {}, mine: {}, claimAt: {}, demoTaken: [2, 5, 9], total: 12, price: 24.99,
+    booted: false, active: false, api: null, apiReady: false, mounted: "", timers: {}, sid: null, name: "",
+    taken: {}, mine: {}, claimAt: {}, demoTaken: [2, 5, 9], total: 12, price: 24.99, spotsLoaded: false, spotsErr: false,
     viewers: 214, chatIdx: 0, chatMode: "", chatSeen: {}, chatSeenN: 0, chatSince: 0, chatBusy: false, lastReact: 0,
+    simN: 0, simIdle: false, chatPaused: false,
     pack: 7, packs: 36, ripped: 0, hitPool: [], hits: [], hitMap: {}, lastRip: ""
   };
   function liveCfg(){ return (TL.config && TL.config.live) || {}; }
   function liveIsOn(){ return !!liveCfg().on; }
   function liveOnline(){ return !!(TL.api && TL.api.online) && lv.api !== false; }
-  function lvSid(){ var s = TL.session.get("sid", null); if(!s){ s = TL.uid(); TL.session.set("sid", s); } return s; }
+  /* spots and chat are simulated when there is no API at all, or the live endpoints answer 404.
+     While the health check is still pending (API configured, api:ready not yet fired) the answer is
+     "not yet" — the grid shows a loading state instead of sample seats. */
+  function lvDemoMode(){
+    if(lv.api === false) return true;
+    if(lv.api === true) return false;
+    if(!TL.api || !TL.api.base) return true;
+    return lv.apiReady ? !TL.api.online : false;
+  }
+  /* the sid owns this browser's spot claims on the server; claims are remembered in localStorage,
+     so the sid lives there too (a reload or a second tab keeps ownership of what it shows as "Yours") */
+  function lvSid(){
+    var ok = /^[A-Za-z0-9_-]{6,64}$/;
+    var s = TL.store.get("sid", null);
+    if(!ok.test(String(s || ""))){
+      s = TL.session.get("sid", null); /* older builds kept it per tab — carry that one over */
+      if(!ok.test(String(s || ""))) s = TL.uid();
+      TL.store.set("sid", s);
+    }
+    return s;
+  }
   function lvEl(id){ return document.getElementById(id); }
   function lvDispatch(name, detail){ try { document.dispatchEvent(new CustomEvent(name, {detail: detail})); } catch(e){} }
   /* ---- timers: named, and only alive while the view shows and the tab is visible ---- */
@@ -7550,7 +7877,7 @@ footer::before{
       if(on){ lvHeartbeat(); lvEvery("viewers", lvHeartbeat, 20000); }
     } else {
       lvChatMode("sim");
-      lvEvery("chat", lvSimChat, 4200);
+      lvSimStart();
       if(on) lvEvery("viewers", lvSimViewers, 5000);
     }
     if(on) lvScheduleRip(); else { lvRenderOffair(); lvEvery("clock", lvRenderOffair, 60000); }
@@ -7611,7 +7938,8 @@ footer::before{
     if(Array.isArray(cfg.taken)) lv.demoTaken = cfg.taken.map(Number);
     if(lv.api !== true){
       lv.taken = {};
-      lv.demoTaken.forEach(function(n){ if(n >= 1 && n <= lv.total) lv.taken[n] = true; });
+      /* sample seats only when the board is simulated; with an API the server is the only source of taken spots */
+      if(lvDemoMode()){ lv.demoTaken.forEach(function(n){ if(n >= 1 && n <= lv.total) lv.taken[n] = true; }); lv.spotsLoaded = true; }
       Object.keys(lv.mine).forEach(function(n){ lv.taken[n] = true; });
     }
     lv.packs = Number(cfg.packs) > 0 ? Number(cfg.packs) : (Number(cfg.spots) > 0 ? Number(cfg.spots) : 12) * (Number(cfg.packsPerSpot) > 0 ? Number(cfg.packsPerSpot) : 3);
@@ -7636,8 +7964,11 @@ footer::before{
       if(tag) tag.hidden = true;
     }
     if(screen){ screen.classList.toggle("off", !on); screen.classList.toggle("embedded", !!(on && emb && emb.src)); }
-    var head = lvEl("spotHead"); if(head) head.textContent = on ? "Claim a spot in this break" : "Claim a spot in the next break";
+    var head = lvEl("spotHead"); if(head) head.textContent = on ? "Claim a spot in this break" : "Pre-claim for the next break";
+    var note = lvEl("spotNote"); if(note) note.hidden = on;
     var hl = lvEl("hitsLabel"); if(hl) hl.textContent = on ? "Recent hits" : "Last break's hits";
+    /* every hit on the strip is drawn from the case by the simulation — there is no real rip history yet */
+    var ht = lvEl("hitsDemoTag"); if(ht) ht.hidden = false;
     var vn = lvEl("viewerNum"); if(vn && on && !vn.dataset.set){ vn.dataset.set = "1"; vn.textContent = lv.viewers; }
     var ct = lvEl("chatTag"); if(ct){ ct.hidden = liveOnline() && lv.api === true; ct.textContent = on ? "simulated" : "replay · simulated"; }
     if(was !== on){ lvDispatch("tl:live-state", {on: on}); }
@@ -7719,24 +8050,34 @@ footer::before{
   function lvSpotsLeft(){ var left = 0; for(var i = 1; i <= lv.total; i++){ if(!lv.taken[i]) left++; } return left; }
   function lvRenderSpots(){
     var grid = lvEl("spotGrid"); if(!grid) return;
-    var cfg = liveCfg(), html = "", left = lvSpotsLeft();
+    var cfg = liveCfg(), html = "", left = lvSpotsLeft(), on = liveIsOn(), loading = !lv.spotsLoaded, demo = lvDemoMode();
+    var verb = on ? "Claim" : "Pre-claim", tailWord = on ? "" : " for the next break";
     for(var i = 1; i <= lv.total; i++){
       var t = !!lv.taken[i], m = !!lv.mine[i];
+      if(loading){ html += '<button type="button" class="spot loading" data-spot="' + i + '" disabled aria-label="Spot ' + i + ' — checking availability">#' + i + '</button>'; continue; }
       html += '<button type="button" class="spot' + (m ? " mine" : t ? " taken" : "") + '" data-spot="' + i + '"' +
-        (m ? ' aria-label="Spot ' + i + ' is yours — open cart"' : t ? ' disabled aria-label="Spot ' + i + ' taken"' : ' aria-label="Claim spot ' + i + ' for ' + esc(money(lv.price)) + '"') + '>' +
+        (m ? ' aria-label="Spot ' + i + ' is yours' + tailWord + ' — open cart"' : t ? ' disabled aria-label="Spot ' + i + ' taken"' : ' aria-label="' + verb + ' spot ' + i + ' for ' + esc(money(lv.price)) + tailWord + '"') + '>' +
         (m ? "Yours" : t ? "Taken" : "#" + i) + "</button>";
     }
     grid.innerHTML = html;
+    grid.setAttribute("aria-busy", loading ? "true" : "false");
     var num = lvEl("spotsLeftNum"), so = lvEl("spotsOpen");
     if(so && num){
-      TL.countUp(num, left);
       var tail = so.lastChild;
-      if(tail && tail.nodeType === 3) tail.nodeValue = " of " + lv.total + (left === 0 ? " spots — sold out" : " spots left");
-      so.classList.toggle("sold", left === 0);
+      if(loading){
+        num.textContent = "";
+        if(tail && tail.nodeType === 3) tail.nodeValue = lv.spotsErr ? "Spots unavailable — retrying…" : "Checking spots…";
+        so.classList.remove("sold");
+      } else {
+        if(num.textContent === "") num.textContent = String(left); else TL.countUp(num, left);
+        if(tail && tail.nodeType === 3) tail.nodeValue = " of " + lv.total + (left === 0 ? " spots — sold out" : " spots left");
+        so.classList.toggle("sold", left === 0);
+      }
     }
+    var dt = lvEl("spotsDemoTag"); if(dt) dt.hidden = !(demo && !loading && lv.demoTaken.length > 0);
     var meter = lvEl("spotMeter");
     if(meter){
-      var claimed = lv.total - left;
+      var claimed = loading ? 0 : lv.total - left;
       meter.style.setProperty("--fill", String(lv.total ? claimed / lv.total : 0));
       meter.setAttribute("aria-valuemax", String(lv.total));
       meter.setAttribute("aria-valuenow", String(claimed));
@@ -7746,6 +8087,7 @@ footer::before{
   }
   function lvApplyServer(spots){
     if(!spots) return;
+    lv.spotsLoaded = true; lv.spotsErr = false;
     if(Number(spots.total) > 0) lv.total = Number(spots.total);
     if(Number(spots.price) > 0) lv.price = Number(spots.price);
     lv.taken = {};
@@ -7782,12 +8124,15 @@ footer::before{
       if(first) lvRenderState();
       if(d && d.live) lvSyncLiveCfg(d.live);
     }).catch(function(e){
-      if(e && e.status === 404){ lv.api = false; lvLoadCfg(); lvRenderSpots(); lvRenderState(); if(lv.active) lvStart(); }
+      if(e && e.status === 404){ lv.api = false; lvLoadCfg(); lvRenderSpots(); lvRenderState(); if(lv.active) lvStart(); return; }
+      /* network trouble: keep whatever the board showed; a first load stays in its checking state and the poll retries */
+      if(!lv.spotsLoaded){ lv.spotsErr = true; lvRenderSpots(); }
     });
   }
   function lvSpotItem(n){
-    var cfg = liveCfg();
-    return {id: "live-spot-" + n, name: "Break spot #" + n + " · " + (cfg.title || "Rip & ship break"), set: "Rip & ship · ships next morning",
+    var cfg = liveCfg(), on = liveIsOn();
+    return {id: "live-spot-" + n, name: "Break spot #" + n + " · " + (cfg.title || "Rip & ship break"),
+      set: on ? "Rip & ship · ships next morning" : "Pre-claim for the next break · ships the morning after",
       game: "pk", type: "sealed", cond: null, price: lv.price, stock: 1, live: true};
   }
   function lvAddToCart(item, el){
@@ -7811,8 +8156,9 @@ footer::before{
       lvAddToCart(item, btn);
       lvRenderSpots();
       if(btn && !reduceMotion){ var r = btn.getBoundingClientRect(); TL.confetti(r.left + r.width / 2, r.top + r.height / 2, {count: 36, spread: 70}); }
-      pushChat(null, "you claimed spot #" + n, true);
-      toast("Spot #" + n + " claimed — added to cart" + (lv.api === true ? "" : " (demo)"));
+      var pre = !liveIsOn();
+      pushChat(null, pre ? "you pre-claimed spot #" + n + " for the next break" : "you claimed spot #" + n, true);
+      toast("Spot #" + n + (pre ? " pre-claimed for the next break" : " claimed") + " — added to cart" + (lv.api === true ? "" : " (demo)"));
       TL.emit("live:spot", {spot: n, el: btn, item: item});
       lvDispatch("tl:spot-claimed", {n: n, el: lvEl("spotGrid") ? lvEl("spotGrid").querySelector('[data-spot="' + n + '"]') : null});
       return true;
@@ -7826,9 +8172,9 @@ footer::before{
       return finish();
     }).catch(function(e){
       if(e && e.status === 409){
-        var t = e.data && Array.isArray(e.data.taken) ? e.data.taken : null;
-        if(t) lvApplyServer({taken: t}); else lv.taken[n] = true;
-        lvRenderSpots(); toast("Spot #" + n + " was just taken — pick another"); lvRefresh(); return false;
+        var t = e.data && Array.isArray(e.data.taken) ? e.data.taken : null, capped = !!(e.data && e.data.reason === "limit");
+        if(t) lvApplyServer({taken: t}); else if(!capped) lv.taken[n] = true;
+        lvRenderSpots(); toast(capped ? "You can hold up to " + ((e.data && e.data.limit) || 3) + " unpaid spots at once — pay for one first" : "Spot #" + n + " was just taken — pick another"); lvRefresh(); return false;
       }
       if(e && e.status === 404){ lv.api = false; lvLoadCfg(); var ok = finish(); if(lv.active) lvStart(); return ok; }
       lvRenderSpots();
@@ -7919,11 +8265,37 @@ footer::before{
       pushChat(null, liveIsOn() ? "You're in the live chat — be cool, we ship what we pull" : "Chat is open while we're off air — say hi", true, {seed: true});
     }
     lvNewPill(false);
+    /* filler is never announced; real chat is read politely (own sends are also reported through the toast) */
+    body.setAttribute("aria-live", mode === "api" ? "polite" : "off");
+    if(mode === "sim"){ lv.simN = 0; lv.simIdle = false; }
     var ct = lvEl("chatTag"); if(ct) ct.hidden = mode === "api";
+    lvRenderChatPause();
   }
+  /* ---- simulated feed: runs while the view shows, stops after LV_SIM_MAX lines until the visitor interacts, and has a visible pause ---- */
+  function lvSimRunning(){ return lv.active && !document.hidden && lv.chatMode === "sim" && !lv.chatPaused && !lv.simIdle; }
+  function lvSimStart(){ lvStop("chat"); if(lvSimRunning()) lvEvery("chat", lvSimChat, 4200); lvRenderChatPause(); }
   function lvSimChat(){
+    if(!lvSimRunning()){ lvStop("chat"); lvRenderChatPause(); return; }
     var c = CHAT_FEED[lv.chatIdx++ % CHAT_FEED.length];
     pushChat(c[0], c[1]);
+    if(++lv.simN >= LV_SIM_MAX){
+      lv.simIdle = true; lvStop("chat");
+      pushChat(null, "Replay paused — send a message, react, or press play to keep it going", true);
+      lvRenderChatPause();
+    }
+  }
+  function lvSimResume(){ /* the visitor did something: an idle replay picks back up; a manual pause stays */
+    if(!lv.simIdle) return;
+    lv.simIdle = false; lv.simN = 0;
+    lvSimStart();
+  }
+  function lvRenderChatPause(){
+    var b = lvEl("chatPause"); if(!b) return;
+    b.hidden = lv.chatMode !== "sim";
+    var paused = lv.chatPaused || lv.simIdle;
+    b.setAttribute("aria-pressed", String(paused));
+    b.setAttribute("aria-label", paused ? "Resume the simulated chat" : "Pause the simulated chat");
+    b.title = paused ? "Resume the simulated chat" : "Pause the simulated chat";
   }
   function lvSeen(id){
     if(lv.chatSeen[id]) return true;
@@ -7954,9 +8326,10 @@ footer::before{
       if(e && e.status === 404){ lv.api = false; lvLoadCfg(); lvRenderSpots(); lvRenderState(); lvRenderNameRow(); if(lv.active) lvStart(); }
     });
   }
+  /* returns false when the message could not be taken yet (a display name is needed first) — the caller keeps the text */
   function lvSendChat(text){
     if(liveOnline()){
-      if(!lv.name){ lvRenderNameRow(); var ni = lvEl("chatNameInput"); if(ni){ lvEl("chatNameRow").hidden = false; ni.focus(); } toast("Pick a display name first"); return; }
+      if(!lv.name){ lvRenderNameRow(); var ni = lvEl("chatNameInput"); if(ni){ lvEl("chatNameRow").hidden = false; ni.focus(); } toast("Pick a display name, then hit Send again"); return false; }
       TL.api.post("/live/chat", {user: lv.name, text: text}).then(function(d){
         var m = d && (d.message || (d.id ? d : null));
         if(m && m.id){ lvAddServerMsg(m); } else lvPollChat();
@@ -7965,6 +8338,7 @@ footer::before{
         toast(e && e.status === 429 ? "Slow down — chat is rate limited" : "Message didn't send — try again");
       });
     } else pushChat(lv.name || "you", text, false, {me: true});
+    return true;
   }
   function lvFloat(em, btn){
     if(reduceMotion) return;
@@ -8051,14 +8425,19 @@ footer::before{
     lvLoadCfg(); lvBuildPool(); lvSeedHits(); lvChatMode("sim");
     lvRenderAll();
   }
-  function lvEnter(){ lvBoot(); lv.active = true; lvRenderPlayer(); lvStart(); }
+  function lvEnter(){ lvBoot(); lv.active = true; lv.simN = 0; lv.simIdle = false; lvRenderPlayer(); lvStart(); }
   function lvLeave(){ lv.active = false; lvStopAll(); lvRenderPlayer(); }
   /* lvBoot can run early (the router emits view:change during its own init when the page
      lands on #/live); the cart reconcile waits for this file's init slot, after 35-cart loaded */
   TL.on("init", function(){ lvBoot(); lvReconcileCart(); });
   TL.on("view:change", function(d){ if(!d || d.name !== "live") return; if(d.paramsOnly && lv.active) return; lvEnter(); });
   TL.on("view:leave", function(d){ if(d && d.name === "live") lvLeave(); });
-  TL.on("api:ready", function(){ if(lv.booted){ lvRenderNameRow(); lvRenderState(); } if(lv.active) lvStart(); });
+  TL.on("api:ready", function(){
+    lv.apiReady = true;
+    /* offline: the board becomes a labelled sample; online: it stays "checking" until the first /live answer */
+    if(lv.booted){ lvLoadCfg(); lvRenderSpots(); lvRenderNameRow(); lvRenderState(); }
+    if(lv.active) lvStart();
+  });
   TL.on("live:change", function(){
     if(!lv.syncing) lv.localChangeAt = Date.now();
     lvBoot(); lvLoadCfg(); lvRenderAll();
@@ -8079,6 +8458,11 @@ footer::before{
     if(as){ var row = lvEl("chatNameRow"), ni = lvEl("chatNameInput"); if(row){ row.hidden = false; if(ni){ ni.value = lv.name; ni.focus(); ni.select(); } } return; }
     var np = e.target.closest("#chatNew");
     if(np){ var body = lvEl("chatBody"); if(body) body.scrollTop = body.scrollHeight; lvNewPill(false); return; }
+    var cp = e.target.closest("#chatPause");
+    if(cp){
+      if(lv.chatPaused || lv.simIdle){ lv.chatPaused = false; lv.simIdle = false; lv.simN = 0; } else lv.chatPaused = true;
+      lvSimStart(); return;
+    }
     /* legacy cart (no TL.cart): a spot line removed with the minus button frees the spot */
     var dec = e.target.closest("[data-dec]");
     if(dec && !TL.cart && /^live-spot-\d+$/.test(dec.dataset.dec || "")) setTimeout(function(){ lvReconcileCart(); }, 0);
@@ -8096,8 +8480,10 @@ footer::before{
       }
       var text = inp ? inp.value.trim().slice(0, 200) : "";
       if(!text){ if(row && !row.hidden && ni && !ni.value.trim()){ ni.focus(); } return; }
+      /* the input is cleared only once the message is taken — when a name is still needed the text waits for the resend */
+      if(lvSendChat(text) === false) return;
       inp.value = "";
-      lvSendChat(text);
+      lvSimResume();
       inp.focus();
     });
     var reacts = lvEl("chatReacts");
@@ -8106,6 +8492,7 @@ footer::before{
       var now = Date.now(); if(now - lv.lastReact < 350) return; lv.lastReact = now;
       var em = b.dataset.react;
       lvFloat(em, b);
+      lvSimResume();
       if(liveOnline()){
         TL.api.post("/live/chat", {user: lv.name || "guest", text: em}).then(function(d){ var m = d && (d.message || (d.id ? d : null)); if(m && m.id) lvAddServerMsg(m); })
           .catch(function(err){ if(err && err.status === 404){ lv.api = false; pushChat(lv.name || "you", em, false, {me: true}); if(lv.active) lvStart(); } });
@@ -8331,21 +8718,38 @@ footer::before{
     });
     rows.sort(function(a, b){ var da = (a.dow + 6) % 7, db = (b.dow + 6) % 7; return da - db || a.sort - b.sort; });
     list.innerHTML = rows.map(function(r){ return r.html; }).join("");
-    evRenderNextUp(up);
+    evRenderNextUp(up, true);
   }
-  function evRenderNextUp(up){
+  function evRenderNextUp(up, force){
     var el = $("#evNextUp"); if(!el) return;
     up = up || evUpcoming();
-    if(!up.length){ el.innerHTML = ""; el.hidden = true; return; }
-    var ev = up[0].ev, occ = up[0].occ, evt = calForEvent(ev);
+    if(!up.length){ if(el.innerHTML) el.innerHTML = ""; el.hidden = true; nuLastKey = null; return; }
+    var ev = up[0].ev, occ = up[0].occ;
+    /* The live region (.nu-live) only holds the stable sentence; the ticking countdown and the
+       calendar menu sit outside it, and every text node is written only when it changed, so a
+       screen reader hears the next-up line once, not every minute. */
+    var k = occ.running ? "Happening now" : "Next play night", name = ev.name || "", when = EV_DAY_LONG[eventDow(ev)] + " · " + (ev.time || evClock(eventStart(ev)));
+    var count = occ.running ? "doors open — come play" : evFmtUntil(occ.mins);
+    var key = [ev.id || "", name, when, ymdIso(occ.date)].join("|");
     el.hidden = false;
-    el.innerHTML = '<span class="nu-k">' + (occ.running ? "Happening now" : "Next play night") + '</span>' +
-      '<b>' + esc(ev.name) + '</b><span class="nu-when">' + esc(EV_DAY_LONG[eventDow(ev)]) + " · " + esc(ev.time || evClock(eventStart(ev))) + '</span>' +
-      '<span class="nu-count">' + (occ.running ? "doors open — come play" : esc(evFmtUntil(occ.mins))) + '</span>' +
-      (evt ? calMenu(evt) : "");
+    var live = $(".nu-live", el);
+    if(force || !live){
+      var evt = calForEvent(ev);
+      el.innerHTML = '<span class="nu-live" role="status" aria-live="polite"><span class="nu-k">' + esc(k) + '</span>' +
+        '<b>' + esc(name) + '</b><span class="nu-when">' + esc(when) + '</span></span>' +
+        '<span class="nu-count">' + esc(count) + '</span>' +
+        '<span class="nu-cal">' + (evt ? calMenu(evt) : "") + '</span>';
+      nuLastKey = key;
+      return;
+    }
+    evSetText($(".nu-k", live), k); evSetText($("b", live), name); evSetText($(".nu-when", live), when);
+    evSetText($(".nu-count", el), count);
+    if(nuLastKey !== key){ var calEl = $(".nu-cal", el), evt2 = calForEvent(ev); if(calEl) calEl.innerHTML = evt2 ? calMenu(evt2) : ""; nuLastKey = key; }
   }
+  var nuLastKey = null;
+  function evSetText(node, txt){ if(node && node.textContent !== txt) node.textContent = txt; }
   function tickEvents(){ if(document.hidden) return; var up = evUpcoming(); evRenderNextUp(up);
-    var nextEl = $("#schedList .is-next .next-tag"); if(nextEl && up.length){ nextEl.textContent = up[0].occ.running ? "Happening now" : "Next up · " + evFmtUntil(up[0].occ.mins); }
+    var nextEl = $("#schedList .is-next .next-tag"); if(nextEl && up.length){ evSetText(nextEl, up[0].occ.running ? "Happening now" : "Next up · " + evFmtUntil(up[0].occ.mins)); }
     var rowNow = $("#schedList .is-next"); if(rowNow && up.length && rowNow.dataset.ev !== (up[0].ev.id || "")) renderSched(); }
   function tcgplusIsGeneric(u){ return !u || /^https?:\/\/(www\.)?bandai-tcg-plus\.com\/?$/i.test(String(u).trim()); }
   function pkEvent(){ var evs = TL.config.events || []; return evs.filter(function(e){ return e.signup === "form"; })[0] || evs.filter(function(e){ return e.id === "pk-sun"; })[0] || evs.filter(function(e){ return e.game === "pk"; })[0] || null; }
@@ -8376,6 +8780,8 @@ footer::before{
         var pk = pkEvent(), occ = pk ? evNextOcc(pk) : null, contact = $("#pkContact", f).value.trim();
         var out = {name: $("#pkName", f).value.trim(), seats: parseInt($("#pkCount", f).value, 10) || 1, eventId: pk ? (pk.id || "pk-sun") : "pk-sun", eventName: pk ? pk.name : "Pokemon League", website: $("#pkWebsite", f).value};
         if(occ) out.date = ymdIso(occ.date);
+        /* the API stores `contact`; email/phone ride along so the inbox and the notification can label it */
+        out.contact = contact;
         if(TL.forms.looksEmail(contact)) out.email = contact; else out.phone = contact;
         return out;
       },
@@ -8385,7 +8791,7 @@ footer::before{
         return null;
       },
       mailto: function(fields){
-        return {href: TL.forms.mailto(fields.eventName + " signup — " + EV_DAY_LONG[eventDow(pkEvent() || {dow: 0})], ["Name: " + fields.name, "Seats: " + fields.seats, "Contact: " + (fields.email || fields.phone || ""), fields.date ? "Date: " + fields.date : "", "", "See you there!"]), label: "Email the signup instead"};
+        return {href: TL.forms.mailto(fields.eventName + " signup — " + EV_DAY_LONG[eventDow(pkEvent() || {dow: 0})], ["Name: " + fields.name, "Seats: " + fields.seats, "Contact: " + (fields.contact || fields.email || fields.phone || ""), fields.date ? "Date: " + fields.date : "", "", "See you there!"]), label: "Email the signup instead"};
       },
       success: function(fields, res, st){
         var pk = pkEvent(), evt = pk ? calForEvent(pk) : null, occ = pk ? evNextOcc(pk) : null;
@@ -8399,7 +8805,6 @@ footer::before{
   /* ---- card show ---- */
   function showNext(){ var d = TL.nextShow(); return (d && !isNaN(d)) ? d : null; }
   function showFromConfig(d){ var s = TL.config.show || {}; return !!(s.date && d && ymdIso({y: d.getFullYear(), m: d.getMonth() + 1, d: d.getDate()}) === s.date); }
-  function pendingTables(){ return TL.forms.local("vendor").reduce(function(n, r){ return n + (parseInt(r.tables, 10) || 0); }, 0); }
   var lastTablesShown = null;
   function renderShow(){
     var s = TL.config.show || {}, d = showNext();
@@ -8416,12 +8821,14 @@ footer::before{
     if((el = $("#showCadence"))) el.textContent = String(s.cadence || "First Saturday or Sunday").replace(/\s+of every month\.?$/i, "");
     if((el = $("#showEyebrow"))) el.textContent = String(s.cadence || "First Saturday or Sunday").replace(/\s+of every month\.?$/i, "") + " \u00b7 " + (s.venue || "Hilton") + (s.address ? " \u00b7 " + s.address.split(",").slice(1, 3).join(",").trim() : "");
     if((el = $("#showMapLink"))) el.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent([s.venue, s.address].filter(Boolean).join(", "));
-    var total = parseInt(s.tables, 10) || 24, booked = Math.min(total, (parseInt(s.booked, 10) || 0) + pendingTables());
+    /* booked count comes from config only ("as of the last update") — a request sent from this
+       device is not a booking until staff confirm it, so it never bumps the meter */
+    var total = parseInt(s.tables, 10) || 24, booked = Math.min(total, parseInt(s.booked, 10) || 0);
     var n = $("#tablesLabel .tables-n"), t = $("#tablesLabel .tables-t"), meter = $("#tablesMeter");
     if(t) t.textContent = total;
     if(n){ if(lastTablesShown !== booked){ n.textContent = lastTablesShown === null ? "0" : String(lastTablesShown); evCountTo(n, booked, {duration: 900}); lastTablesShown = booked; } }
     else if((el = $("#tablesLabel"))) el.textContent = booked + " of " + total;
-    if(meter){ meter.setAttribute("aria-label", booked + " of " + total + " vendor tables booked"); var bar = meter.querySelector("i"); if(bar) bar.style.width = Math.round(booked / total * 100) + "%"; meter.classList.toggle("full", booked >= total); }
+    if(meter){ meter.setAttribute("aria-label", booked + " of " + total + " vendor tables booked as of the last update"); var bar = meter.querySelector("i"); if(bar) bar.style.width = Math.round(booked / total * 100) + "%"; meter.classList.toggle("full", booked >= total); }
     var cal = $("#showCal"), evt = calForShow(); if(cal) cal.innerHTML = evt ? calMenu(evt) : "";
     var sel = $("#vTables");
     if(sel && Array.isArray(s.tablePrices) && s.tablePrices.length){
@@ -8436,13 +8843,14 @@ footer::before{
   }
   function tickShow(){
     var el = $("#showCountdown"); if(!el) return;
-    var s = TL.config.show || {}, d = showNext(); if(!d){ el.textContent = ""; return; }
+    var s = TL.config.show || {}, d = showNext(); if(!d){ evSetText(el, ""); return; }
     var now = new Date(), st = evHmMin(s.start), en = evHmMin(s.end);
     var endMs = d.getTime() + Math.max(60, ((en !== null ? en : 960) - (st !== null ? st : 600))) * 60000;
     var mins = Math.round((d.getTime() - now.getTime()) / 60000);
-    if(mins <= 0 && now.getTime() < endMs){ el.textContent = "Happening now \u00b7 doors open till " + evClock(en !== null ? en : 960); el.classList.add("live"); return; }
+    /* plain text pill, not a live region: the digits tick every minute and nobody needs that read out */
+    if(mins <= 0 && now.getTime() < endMs){ evSetText(el, "Happening now \u00b7 doors open till " + evClock(en !== null ? en : 960)); el.classList.add("live"); return; }
     el.classList.remove("live");
-    el.textContent = mins <= 0 ? "" : evFmtUntil(mins);
+    evSetText(el, mins <= 0 ? "" : evFmtUntil(mins));
   }
   function bindVendor(){
     var form = $("#vendorForm"); if(!form) return;
@@ -8461,9 +8869,9 @@ footer::before{
       success: function(fields, res, st){
         var d = showNext(), when = d ? EV_DAY_LONG[d.getDay()] + ", " + EV_MON_SHORT[d.getMonth()] + " " + d.getDate() : "the next show";
         var prices = ((TL.config.show || {}).tablePrices || []).filter(function(p){ return p.n === fields.tables; })[0];
-        return "<b>" + (fields.waitlist ? "You\u2019re on the vendor waitlist" : "Table request received") + "</b><p>" + fields.tables + (fields.tables === 1 ? " table" : " tables") + " for " + esc(when) + (prices && prices.price ? " \u00b7 " + money(prices.price).replace(/\.00$/, "") : "") + ". We\u2019ll confirm by email within a day" + (fields.waitlist ? " if a table opens up" : "") + " \u2014 setup opens at " + esc($("#showSetup") ? $("#showSetup").textContent : "8 AM") + ".</p>";
-      },
-      onSuccess: function(fields, res, st){ if(st.local) renderShow(); else { var s = TL.config.show || {}; lastTablesShown = null; TL.config.show = TL.deepMerge(s, {booked: (parseInt(s.booked, 10) || 0) + fields.tables}); renderShow(); } }
+        return "<b>" + (fields.waitlist ? "You\u2019re on the vendor waitlist" : "Table request received") + "</b><p>" + fields.tables + (fields.tables === 1 ? " table" : " tables") + " for " + esc(when) + (prices && prices.price ? " \u00b7 " + money(prices.price).replace(/\.00$/, "") : "") + ". It\u2019s a request until we confirm \u2014 we\u2019ll email within a day" + (fields.waitlist ? " if a table opens up" : "") + " \u2014 setup opens at " + esc($("#showSetup") ? $("#showSetup").textContent : "8 AM") + ".</p>";
+      }
+      /* no onSuccess: the booked meter only reflects config.show.booked, which staff update */
     });
   }
 
@@ -8497,9 +8905,11 @@ footer::before{
     var el = $("#visitStatus"); if(!el) return;
     var s = TL.shopStatus(), dot = el.querySelector(".dot"), lab = el.querySelector("b"), sub = el.querySelector(".visit-status-sub");
     var soon = s.open && /Closes in/.test(s.sub || "");
-    if(dot) dot.className = "dot" + (s.open ? (soon ? " warn" : "") : " crit");
-    if(lab) lab.textContent = soon ? "Closing soon" : s.label;
-    if(sub) sub.textContent = s.sub ? " \u00b7 " + s.sub : "";
+    var dotCls = "dot" + (s.open ? (soon ? " warn" : "") : " crit");
+    if(dot && dot.className !== dotCls) dot.className = dotCls;
+    /* only the label (<b>, the live region) announces; the "closes in N min" sub ticks outside it */
+    evSetText(lab, soon ? "Closing soon" : s.label);
+    evSetText(sub, s.sub ? " \u00b7 " + s.sub : "");
     el.classList.toggle("open", !!s.open);
   }
   function evLoadMap(){
@@ -9144,7 +9554,7 @@ footer::before{
     if(e.target.closest("[data-rip-again]")){ ripStartPack(); return; }
     if(e.target.closest("[data-rip-share]")){ ripShare(); return; }
     if((t = e.target.closest("#ripPack")) && rip.stage === "pack"){
-      /* keyboard activation (Enter/Space) arrives as a click with detail 0 */
+      /* a click with detail 0 (assistive tech, programmatic .click()) tears straight away; real keys are handled in keydown below */
       if(e.detail === 0 || reduceMotion || rip.drag === "done"){ ripTear(); return; }
       if(rip.drag === "moved"){ rip.drag = null; return; }
       t.classList.remove("nudge"); void t.offsetWidth; t.classList.add("nudge");
@@ -9155,8 +9565,10 @@ footer::before{
     if(e.target && e.target.id === "ripSet"){ rip.set = e.target.value; TL.store.set("rip", {game: rip.game, set: rip.set}); }
   });
   ripApp.addEventListener("keydown", function(e){
+    /* #ripPack is a div[role=button], so the browser synthesises no click for Enter or Space — tear on both here,
+       exactly like the Open pack button (the aria-label, the hint and the #ripLive announcement all promise Enter) */
     var pack = e.target.closest && e.target.closest("#ripPack");
-    if(pack && (e.key === " " || e.key === "Spacebar") && rip.stage === "pack"){ e.preventDefault(); ripTear(); }
+    if(pack && (e.key === "Enter" || e.key === " " || e.key === "Spacebar") && rip.stage === "pack"){ e.preventDefault(); ripTear(); }
   });
   /* drag / swipe across the strip */
   ripApp.addEventListener("pointerdown", function(e){
@@ -9854,13 +10266,21 @@ footer::before{
   function fromLocal(c){ return {id: c.id, name: c.name, phone: c.phone || "", balance: (c.balanceCents || 0) / 100, updatedAt: c.updatedAt, demo: !!c.demo, local: true}; }
   function fromServer(c){ return {id: c.id, name: c.name, phone: c.phoneDisplay || c.phone || "", balance: Number(c.balance) || 0, updatedAt: c.updatedAt, local: false}; }
   function normalizePhone(p){ return String(p || "").replace(/\D/g, ""); }
+  /* credMode(true) → API ledger, credMode(false) → this device, credMode("checking") → probe in flight
+     (writes stay local-only until the probe says the server ledger answers). */
   function credMode(server){
-    credServer = server;
+    var checking = server === "checking";
+    credServer = server === true;
     var pill = $("#credMode"), note = $("#credNote");
-    if(pill){ pill.className = "pill " + (server ? "ok" : "warn"); pill.innerHTML = '<span class="dot"></span>' + (server ? "API ledger" : "This device"); }
-    if(note) note.textContent = server
-      ? "Balances live on the shop's API ledger — every register sees the same numbers. Trade-ins taken in credit get the " + Math.round(bonusRate() * 100) + "% bonus automatically."
-      : (TL.api.online ? "The API has no credit ledger route yet, so balances are kept on this device in whole cents. " : "Demo mode — balances are kept on this device in whole cents. ") + "Trade-ins taken in credit get the " + Math.round(bonusRate() * 100) + "% bonus automatically.";
+    if(pill){
+      pill.className = "pill " + (checking ? "" : (credServer ? "ok" : "warn"));
+      pill.innerHTML = '<span class="dot"></span>' + (checking ? "Checking ledger…" : (credServer ? "API ledger" : "This device"));
+    }
+    if(note) note.textContent = checking
+      ? "Checking whether the shop's API ledger is reachable…"
+      : credServer
+        ? "Balances live on the shop's API ledger — every register sees the same numbers. Trade-ins taken in credit get the " + Math.round(bonusRate() * 100) + "% bonus automatically."
+        : (TL.api.online ? "The API has no credit ledger route yet, so balances are kept on this device in whole cents. " : "Demo mode — balances are kept on this device in whole cents. ") + "Trade-ins taken in credit get the " + Math.round(bonusRate() * 100) + "% bonus automatically.";
   }
   function fetchCustomers(q){
     q = (q || "").trim();
@@ -9884,7 +10304,8 @@ footer::before{
     var body = $("#credBody"); if(!body) return;
     body.innerHTML = list.length ? list.map(function(c){
       return '<tr data-cust="' + esc(c.id) + '"' + (credSelected && c.id === credSelected.id ? ' class="sel"' : "") + ' tabindex="0" role="button" aria-label="Select ' + esc(c.name) + '">' +
-        '<td>' + esc(c.name) + (c.demo ? ' <span class="demo-tag">sample</span>' : "") + '</td><td class="num">' + esc(c.phone || "—") + '</td><td class="num">' + money(c.balance) + '</td></tr>';
+        '<td>' + esc(c.name) + (c.demo ? ' <span class="demo-tag">sample</span>' : "") + (c.phone ? '<span class="sub cred-phone">' + esc(c.phone) + '</span>' : "") + '</td>' +
+        '<td class="num cred-phone-col">' + esc(c.phone || "—") + '</td><td class="num">' + money(c.balance) + '</td></tr>';
     }).join("") : '<tr class="empty"><td colspan="3">No matches — add the customer under "New customer" below.</td></tr>';
   }
   function renderCredWho(list){
@@ -10070,7 +10491,7 @@ footer::before{
     if(!sel.value && keys.length) sel.value = keys.indexOf("standard") > -1 ? "standard" : keys[0];
     var b = Math.round(bonusRate() * 100);
     ["#pdBonusPct", "#credBonusPct"].forEach(function(s){ var el = $(s); if(el) el.textContent = b; });
-    var tag = $("#pdRateTag"); if(tag) tag.textContent = TL.config.updatedAt ? "from settings" : "default rates";
+    var tag = $("#pdRateTag"); if(tag) tag.textContent = (typeof TL.sameAsDefault === "function" && TL.sameAsDefault("buy")) ? "default rates" : "from settings";
     recalcPricing();
   }
   function recalcPricing(){
@@ -10083,18 +10504,34 @@ footer::before{
   $("#pdMarket").addEventListener("input", recalcPricing);
   $("#pdRate").addEventListener("change", recalcPricing);
 
+  /* Decide the data source. Always waits for the /health probe (TL.api.ready) first, so a
+     direct load of #/staff — where 'view:change' fires during 'init', before 'api:ready' —
+     never settles on the local ledger while the API is still being checked. Re-run on
+     'api:ready' and 'auth:change' so the desk flips to the server ledger as soon as it can.
+     credProbe counts runs so a slow, superseded probe cannot overwrite a newer decision. */
+  var credProbe = 0, credChecking = false;
   function openStaff(){
-    credMode(false);
-    var probe = TL.api.online ? apiTry("GET", "/credit?q=") : Promise.resolve({ok: false});
-    probe.then(function(r){
-      credMode(!!(r.ok && r.data && Array.isArray(r.data.customers)));
-      refreshCredit("").then(function(list){ if(list.length && !credSelected) selectCustomer(list[0].id, false); });
+    var run = ++credProbe;
+    credChecking = true;
+    credMode("checking");
+    var body = $("#credBody");
+    if(body && TL.api.base) body.innerHTML = '<tr class="empty"><td colspan="3">Checking the shop ledger…</td></tr>';
+    TL.api.ready.then(function(){
+      if(run !== credProbe) return;
+      return (TL.api.online ? apiTry("GET", "/credit?q=") : Promise.resolve({ok: false})).then(function(r){
+        if(run !== credProbe) return;
+        credChecking = false;
+        credMode(!!(r.ok && r.data && Array.isArray(r.data.customers)));
+        refreshCredit("").then(function(list){ if(list.length && !credSelected) selectCustomer(list[0].id, false); });
+      });
     });
     renderRates();
   }
-  TL.on("config:change", function(){ renderRates(); if(TL.current === "staff") credMode(credServer); });
+  TL.on("config:change", function(){ renderRates(); if(TL.current === "staff" && !credChecking) credMode(credServer); });
   TL.on("view:change", function(d){ if(d && d.name === "staff" && !d.paramsOnly) openStaff(); });
-  TL.on("init", function(){ renderRates(); renderCredTable(localSearch("")); renderCredWho(localSearch("")); });
+  TL.on("api:ready", function(d){ if(d && d.online && TL.current === "staff") openStaff(); });
+  TL.on("auth:change", function(d){ if(d && d.role && TL.current === "staff") openStaff(); });
+  TL.on("init", function(){ renderRates(); if(!TL.api.base){ renderCredTable(localSearch("")); renderCredWho(localSearch("")); } });
 
   /* ---------- staff/admin auth ----------
      Two roles. With the API online the worker decides (POST /auth/login → HMAC token);

@@ -30,6 +30,7 @@
           <div class="hits" id="recentHits" aria-label="Recent hits">
             <span class="hits-k" id="hitsLabel">Recent hits</span>
             <div class="hits-row" id="hitsRow"></div>
+            <span class="demo-tag hits-tag" id="hitsDemoTag" title="Sample pulls drawn from the case &mdash; not a real break">sample</span>
           </div>
           <div class="notify" id="liveNotify">
             <form class="notify-form" id="notifyForm" novalidate>
@@ -49,10 +50,15 @@
             <span class="chat-head-r">
               <button class="chat-as" id="chatAs" type="button" hidden></button>
               <span class="demo-tag" id="chatTag">simulated</span>
+              <button class="chat-pause" id="chatPause" type="button" aria-pressed="false" aria-label="Pause the simulated chat" hidden>
+                <svg class="ic-pause" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="1.5" width="3" height="9" rx=".8" fill="currentColor"/><rect x="7" y="1.5" width="3" height="9" rx=".8" fill="currentColor"/></svg>
+                <svg class="ic-play" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.8v8.4l7-4.2z" fill="currentColor"/></svg>
+              </button>
             </span>
           </div>
           <div class="chat-wrap">
-            <div class="chat-body" id="chatBody" tabindex="0" role="log" aria-live="polite" aria-label="Chat messages"></div>
+            <!-- aria-live is "off" while the feed is simulated; 50-live.js flips it to "polite" for real chat -->
+            <div class="chat-body" id="chatBody" tabindex="0" role="log" aria-live="off" aria-label="Chat messages"></div>
             <button class="chat-new" id="chatNew" type="button" hidden>New messages &darr;</button>
             <div class="react-layer" id="reactLayer" aria-hidden="true"></div>
           </div>
@@ -75,9 +81,10 @@
       <div class="section" style="padding-bottom:0">
         <div class="section-head">
           <h2 id="spotHead">Claim a spot in the next break</h2>
-          <span class="spot-tags"><span class="demo-tag" id="spotPrice">$24.99 per spot</span><span class="demo-tag spots-open" id="spotsOpen"><b id="spotsLeftNum">9</b> of 12 spots left</span></span>
+          <span class="spot-tags"><span class="demo-tag" id="spotPrice">$24.99 per spot</span><span class="demo-tag spots-open" id="spotsOpen"><b id="spotsLeftNum"></b>Checking spots&hellip;</span><span class="demo-tag" id="spotsDemoTag" title="Sample seats &mdash; the live board fills from real claims" hidden>sample seats</span></span>
         </div>
         <p class="lede" style="max-width:64ch">One spot = three packs ripped live under your name. Hits ship free the next morning; bulk converts to store credit if you'd rather skip shipping. Claimed spots land straight in your cart.</p>
+        <p class="spot-note" id="spotNote" hidden>We're off air &mdash; a spot you claim now is a <b>pre-claim for the next break</b> (see the schedule below). It holds your seat and rips when we go live.</p>
         <div class="spot-meter" id="spotMeter" role="progressbar" aria-label="Spots claimed" aria-valuemin="0" aria-valuemax="12" aria-valuenow="3"><i></i></div>
         <div class="spots" id="spotGrid"></div>
       </div>

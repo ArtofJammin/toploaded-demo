@@ -1,9 +1,17 @@
   /* ---------- ticker + header chrome ----------
      Ticker: TL.config.ticker → #tickerTrack (rebuilt on config:change), a pause toggle,
-     and an sr-only list for assistive tech. "sample offers" tag shows until the shop has
-     saved a config (TL.config.updatedAt).
+     and an sr-only list for assistive tech. "sample offers" tag shows while the list still
+     equals the built-in defaults (TL_DEFAULT_CONFIG.ticker), whatever else the shop has saved.
      Header: open/closed pill (TL.shopStatus, every 60 s + config:change), logo/title from
-     TL.config, live nav dot only under html.is-live, mobile nav edge cue, scrolled shadow. */
+     TL.config, live nav dot only under html.is-live, mobile nav edge cue, scrolled shadow,
+     and on phones html.nav-tuck (nav row hides on scroll-down, returns on scroll-up). */
+  function sameAsDefault(key){
+    var def = (window.TL_DEFAULT_CONFIG || {})[key], cur = TL.config && TL.config[key];
+    try { return JSON.stringify(cur) === JSON.stringify(def); } catch(e){ return false; }
+  }
+  TL.sameAsDefault = sameAsDefault;
+  /* "$85" / "85" / "$1,200+" are prices → "up to $85"; "ask" / "top rates" are notes → "· ask" */
+  function isPrice(p){ return /^\s*\$?\s*\d/.test(String(p || "")); }
   function tickerItems(){
     var list = (TL.config && TL.config.ticker) || [];
     if(!Array.isArray(list)) return [];
@@ -20,13 +28,13 @@
     if(wrap) wrap.hidden = !items.length;
     if(!items.length){ track.innerHTML = ""; return; }
     var half = items.map(function(b){
-      return "<span>Buying now · <b>" + esc(b.n) + "</b>" + (b.p ? " up to <b>" + esc(b.p) + "</b>" : "") + "</span>";
+      return "<span>Buying now · <b>" + esc(b.n) + "</b>" + (b.p ? (isPrice(b.p) ? " up to " : " · ") + "<b>" + esc(b.p) + "</b>" : "") + "</span>";
     }).join("");
     track.innerHTML = reduceMotion ? half : half + half;
     var ul = $("#tickerList");
-    if(ul) ul.innerHTML = items.map(function(b){ return "<li>" + esc(b.n) + (b.p ? " — up to " + esc(b.p) : "") + "</li>"; }).join("");
+    if(ul) ul.innerHTML = items.map(function(b){ return "<li>" + esc(b.n) + (b.p ? (isPrice(b.p) ? " — up to " : " — ") + esc(b.p) : "") + "</li>"; }).join("");
     var tag = $("#tickerDemo");
-    if(tag) tag.hidden = !!(TL.config && TL.config.updatedAt);
+    if(tag) tag.hidden = !sameAsDefault("ticker");
   }
   (function(){
     var btn = $("#tickerPause"), wrap = $("#ticker");
@@ -127,7 +135,7 @@
       edge();
       if(!(d && d.name) || d.paramsOnly) return;
       if(nav.scrollWidth <= nav.clientWidth + 2) return;
-      var b = nav.querySelector('button[data-go="' + d.name + '"]');
+      var b = nav.querySelector('[data-go="' + d.name + '"]');
       if(!b) return;
       var left = Math.max(0, b.offsetLeft - 20);
       try { nav.scrollTo({left: left, behavior: reduceMotion ? "auto" : "smooth"}); } catch(e){ nav.scrollLeft = left; }
@@ -141,4 +149,35 @@
     new IntersectionObserver(function(entries){
       document.documentElement.classList.toggle("scrolled", !entries[0].isIntersecting);
     }, {threshold: 0}).observe(s);
+  })();
+
+  /* ---- phones: only the brand row stays on screen. Scrolling down tucks the nav row
+     (html.nav-tuck → 10-header.css fades it, keeps its space), scrolling up, changing view,
+     or tabbing into the nav brings it back. Bound only while the 640px query matches. ---- */
+  (function(){
+    var nav = $("#mainnav"), mq = window.matchMedia ? window.matchMedia("(max-width:640px)") : null;
+    if(!nav || !mq) return;
+    var lastY = 0, bound = false, tucked = false;
+    function y(){ return window.scrollY || window.pageYOffset || 0; }
+    function set(t){
+      if(t === tucked) return;
+      tucked = t; document.documentElement.classList.toggle("nav-tuck", t);
+    }
+    /* cheap enough to run inline (one scrollY read, one class toggle) — no layout reads, no rAF */
+    function onScroll(){
+      var cur = y(), dy = cur - lastY;
+      if(cur < 96) set(false);
+      else if(dy > 6) set(true);
+      else if(dy < -6) set(false);
+      lastY = cur;
+    }
+    function sync(){
+      var want = mq.matches;
+      if(want && !bound){ bound = true; lastY = y(); window.addEventListener("scroll", onScroll, {passive: true}); }
+      else if(!want && bound){ bound = false; window.removeEventListener("scroll", onScroll); set(false); }
+    }
+    if(mq.addEventListener) mq.addEventListener("change", sync); else if(mq.addListener) mq.addListener(sync);
+    sync();
+    nav.addEventListener("focusin", function(){ set(false); });
+    TL.on("view:change", function(d){ if(d && d.paramsOnly) return; set(false); lastY = y(); });
   })();

@@ -56,12 +56,26 @@
     ["--rx", "--ry", "--mx", "--my"].forEach(function(v){ qvCardBtn.style.removeProperty(v); });
     qvCardBtn.classList.remove("tilting");
   }
+  /* the motion package's TL.tilt writes the rotation + --mx/--my but never toggles a class; the designed
+     .qv-sheen spotlight is shown by .qv-card.tilting, so mirror the pointer state here (mouse/pen only) */
+  function qvTiltEnter(e){ if(reduceMotion || (e && e.pointerType === "touch")) return; qvCardBtn.classList.add("tilting"); }
+  function qvTiltExit(){ if(qvCardBtn) qvCardBtn.classList.remove("tilting"); }
   function qvStartTilt(){
     qvStopTilt();
     if(!qvCardBtn || reduceMotion) return;
     var d = null;
-    try { d = TL.tilt(qvCardBtn, {max: 14}); } catch(e){ d = null; }
-    if(typeof d === "function"){ QV.destroyTilt = d; return; }
+    try { d = TL.tilt(qvCardBtn, {max: 14, sheen: false}); } catch(e){ d = null; }
+    if(typeof d === "function"){
+      qvCardBtn.addEventListener("pointerenter", qvTiltEnter);
+      qvCardBtn.addEventListener("pointerleave", qvTiltExit);
+      QV.destroyTilt = function(){
+        qvCardBtn.removeEventListener("pointerenter", qvTiltEnter);
+        qvCardBtn.removeEventListener("pointerleave", qvTiltExit);
+        qvTiltExit();
+        d();
+      };
+      return;
+    }
     if(!window.PointerEvent) return;
     qvCardBtn.addEventListener("pointermove", qvTiltMove, {passive: true});
     qvCardBtn.addEventListener("pointerleave", qvTiltLeave);
@@ -238,6 +252,11 @@
     else if(e.key === "ArrowRight"){ e.preventDefault(); qvStep(1); }
   }, true);
   TL.on("wishlist:change", qvSyncWish);
+  /* reduced-motion flipped while the dialog is open: stop (or resume) the tilt in place */
+  TL.on("motion:change", function(d){
+    if(!QV.open) return;
+    if(d && d.reduce) qvStopTilt(); else qvStartTilt();
+  });
   /* ---- deep link: #/shop?item=<id> ---- */
   function qvDeepLink(id){
     if(!id) return;

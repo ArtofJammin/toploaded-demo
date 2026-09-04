@@ -22,8 +22,10 @@ html:not(.is-live) .live-pill,html:not(.is-live) .viewers{display:none}
 @keyframes ripRoll{from{transform:translate(-50%,8px); opacity:0}to{transform:translateX(-50%); opacity:1}}
 .screen .rip.roll{animation:ripRoll .32s cubic-bezier(.2,.7,.2,1) both}
 .live-pill{position:absolute; top:14px; left:14px; display:inline-flex; align-items:center; gap:7px; background:rgba(12,14,18,.82); border:1px solid #2A3140; border-radius:99px; padding:5px 12px; font-family:var(--mono); font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; color:#EEF0F4; z-index:2}
-.live-pill i{width:8px; height:8px; border-radius:50%; background:var(--crit); animation:livepulse 1.6s infinite, ringPulse 1.6s ease-out infinite}
-@keyframes ringPulse{0%{box-shadow:0 0 0 0 var(--crit)}70%,100%{box-shadow:0 0 0 7px transparent}}
+.live-pill i{position:relative; width:8px; height:8px; border-radius:50%; background:var(--crit); animation:livepulse 1.6s infinite}
+/* the expanding ring is a pseudo-element scaled up and faded — transform/opacity only, no box-shadow repaint per frame */
+.live-pill i::after{content:""; position:absolute; inset:0; border-radius:50%; border:2px solid var(--crit); animation:ringPulse 1.6s ease-out infinite; will-change:transform,opacity}
+@keyframes ringPulse{0%{transform:scale(1); opacity:.9}70%,100%{transform:scale(2.75); opacity:0}}
 .viewers{position:absolute; top:14px; right:14px; background:rgba(12,14,18,.82); border:1px solid #2A3140; border-radius:99px; padding:5px 12px; font-family:var(--mono); font-size:.68rem; color:#A6ADBB; z-index:2; font-variant-numeric:tabular-nums}
 .viewers b{font-weight:500; color:#EEF0F4}
 @keyframes vTick{0%{transform:scale(1)}45%{transform:scale(1.12)}100%{transform:scale(1)}}
@@ -56,6 +58,7 @@ html:not(.is-live) .live-pill,html:not(.is-live) .viewers{display:none}
 .hit-meta{display:flex; flex-direction:column; min-width:0; gap:2px}
 .hit-meta b{font-size:.78rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .hit-meta span{font-family:var(--mono); font-size:.62rem; color:#A6ADBB; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.hits-tag{flex:0 0 auto; align-self:center; color:#A6ADBB; border-color:var(--slab-line)}
 @keyframes hitIn{from{opacity:0; transform:translateX(-12px)}to{opacity:1; transform:none}}
 .hit.new{animation:hitIn .45s cubic-bezier(.2,.7,.2,1) both}
 .hit.new .hit-art{box-shadow:0 0 0 1px var(--foilB)}
@@ -76,6 +79,16 @@ html:not(.is-live) .live-pill,html:not(.is-live) .viewers{display:none}
 .chat-head-r{display:inline-flex; align-items:center; gap:8px; min-width:0}
 .chat-as{background:none; border:1px solid var(--line); border-radius:99px; padding:3px 10px; font-family:var(--mono); font-size:.64rem; letter-spacing:.06em; text-transform:none; color:var(--ink2); max-width:160px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .chat-as:hover{border-color:var(--accent); color:var(--accent)}
+/* pause/play for the simulated feed (mirrors #tickerPause); hidden when real chat is connected */
+.chat-pause{
+  flex:0 0 auto; width:28px; height:28px; display:grid; place-items:center; padding:0;
+  background:var(--surface); border:1px solid var(--line); border-radius:4px; color:var(--ink2);
+  transition:border-color .15s ease, color .15s ease;
+}
+.chat-pause:hover{border-color:var(--accent); color:var(--accent)}
+.chat-pause .ic-play{display:none}
+.chat-pause[aria-pressed="true"] .ic-pause{display:none}
+.chat-pause[aria-pressed="true"] .ic-play{display:block}
 .chat-wrap{position:relative; flex:1; display:flex; min-height:0}
 .chat-body{flex:1; overflow-y:auto; padding:12px 16px; display:flex; flex-direction:column; gap:9px; max-height:440px; min-height:240px; overscroll-behavior:contain}
 .chat-line{font-size:.84rem; line-height:1.4; overflow-wrap:anywhere}
@@ -113,6 +126,9 @@ html:not(.is-live) .live-pill,html:not(.is-live) .viewers{display:none}
 .spot{position:relative; border:1px solid var(--line2); background:none; border-radius:4px; padding:11px 0; font-family:var(--mono); font-size:.78rem; color:var(--ink); transition:background .15s ease,color .15s ease,border-color .15s ease}
 .spot:hover:not(:disabled){background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
 .spot:disabled{opacity:.35; cursor:not-allowed; text-decoration:line-through}
+.spot.loading:disabled{opacity:.5; cursor:progress; text-decoration:none}
+.spot-note{margin:12px 0 0; max-width:64ch; font-family:var(--mono); font-size:.72rem; line-height:1.5; color:var(--ink2)}
+.spot-note b{color:var(--ink); font-weight:600}
 .spot.mine{border-color:var(--accent); color:var(--accent); background:color-mix(in srgb, var(--accent) 10%, transparent); text-decoration:none; opacity:1}
 .spot.mine:hover{background:var(--accent); color:var(--accent-ink)}
 .spot.pending{opacity:.6; text-decoration:none}
@@ -131,7 +147,7 @@ html:not(.is-live) .live-pill,html:not(.is-live) .viewers{display:none}
 .screen.off .pack{animation-duration:9s}
 
 @media (max-width:960px){ .live-grid{grid-template-columns:1fr} .spots{grid-template-columns:repeat(4,1fr)} .chat-body{max-height:320px} }
-@media (max-width:640px){ .hits-k{writing-mode:horizontal-tb; transform:none} .hits{flex-direction:column; align-items:stretch; gap:6px} .hit{max-width:200px} .offair{bottom:8%} .screen .rip{font-size:.6rem} }
+@media (max-width:640px){ .hits-k{writing-mode:horizontal-tb; transform:none} .hits{flex-direction:column; align-items:stretch; gap:6px} .hits-tag{align-self:flex-start} .hit{max-width:200px} .offair{bottom:8%} .screen .rip{font-size:.6rem} }
 @media (max-width:480px){ .spots{grid-template-columns:repeat(3,1fr)} .notify-row .btn{flex:1 1 100%} .chat-row .btn{padding-left:14px; padding-right:14px} }
 @media (pointer:coarse){
   .spot{min-height:44px}
@@ -139,9 +155,11 @@ html:not(.is-live) .live-pill,html:not(.is-live) .viewers{display:none}
   .chat-new{min-height:44px}
   .hit{min-height:44px}
   .chat-as{min-height:32px}
+  .chat-pause{width:44px; height:44px}
 }
 @media (prefers-reduced-motion: reduce){
-  html.is-live .live-dot,.live-pill i,.screen .pack,.screen .glow,.viewers.tick,.screen .rip.roll,.hit.new,.chat-body .chat-line{animation:none}
+  html.is-live .live-dot,.live-pill i,.live-pill i::after,.screen .pack,.screen .glow,.viewers.tick,.screen .rip.roll,.hit.new,.chat-body .chat-line{animation:none}
+  .live-pill i::after{display:none}
   .react{animation:none; display:none}
   .spot-meter i{transition:none}
   .screen .pack,.hit,.chat-reacts button,.spot{transition:none}

@@ -68,8 +68,9 @@
 .qv-stock{font-family:var(--mono); font-size:.75rem; color:var(--ink3); display:flex; gap:10px; align-items:center; flex-wrap:wrap}
 .qv-stock .stock{font-size:.78rem}
 .qv-stock-note{color:var(--ink3)}
-.qv-table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:6px; max-height:180px; overflow-y:auto}
-.qv-table{width:100%; border-collapse:collapse; font-size:.86rem}
+/* not .table-wrap on purpose: the admin table rule (min-width:720px) must not leak into the dialog */
+.qv-table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:6px; max-height:180px; overflow-y:auto; background:var(--surface); scrollbar-width:thin; scrollbar-color:var(--line2) transparent}
+.qv-table-wrap .qv-table{width:100%; min-width:0; border-collapse:collapse; font-size:.86rem; table-layout:auto}
 .qv-table th{
   text-align:left; font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3);
   font-weight:400; padding:8px 12px; border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0;
@@ -109,6 +110,11 @@
   .qv-nav{top:12px; transform:none; height:38px; width:38px; border-radius:50%; font-size:1.5rem; padding:0 0 3px}
   .qv-prev{left:12px} .qv-next{right:60px}
   .qv-hint{display:none}
+  /* four listing columns fit a 320px dialog: tighter cells, wrapping text, long condition name stacked under the code */
+  .qv-table-wrap .qv-table{font-size:.8rem}
+  .qv-table th,.qv-table td{padding:7px 8px; overflow-wrap:anywhere}
+  .qv-table th{font-size:.62rem; letter-spacing:.08em}
+  .qv-cond-long{display:block; margin-left:0; font-size:.66rem}
 }
 @media (pointer:coarse){
   .qv-qty button{width:38px; height:38px}

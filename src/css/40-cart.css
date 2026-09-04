@@ -89,7 +89,7 @@ html.cart-open, html.cart-open body{overflow:hidden}
 .ful-opt input{margin:0; width:16px; height:16px; accent-color:var(--accent); flex:0 0 auto}
 .ful-txt{display:flex; flex-direction:column; min-width:0; gap:1px}
 .ful-txt b{font-weight:600; font-size:.9rem}
-.ful-txt small{font-family:var(--mono); font-size:.64rem; color:var(--ink3); letter-spacing:.03em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.ful-txt small{font-family:var(--mono); font-size:.64rem; color:var(--ink2); letter-spacing:.03em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .ful-price{font-family:var(--mono); font-size:.82rem; font-variant-numeric:tabular-nums; color:var(--ink2)}
 .ful-opt.on .ful-price{color:var(--accent)}
 .cart-fields{display:flex; flex-direction:column; gap:10px}
@@ -187,7 +187,7 @@ html.cart-open, html.cart-open body{overflow:hidden}
 .cart-count.pop,.qty-n.pop{animation:countPop .35s cubic-bezier(.3,.7,.3,1)}
 @keyframes cartIdle{50%{transform:translateY(-4px) rotate(-2deg)}}
 .drawer.open .cart-empty::before{animation:cartIdle 4s ease-in-out infinite}
-html.hidden .drawer .cart-empty::before{animation-play-state:paused}
+html.page-hidden .drawer .cart-empty::before{animation-play-state:paused}
 
 /* ---- touch + small screens ---- */
 @media (pointer:coarse){

@@ -17,8 +17,11 @@
 }
 html.scrolled .topbar::after{opacity:1}
 .topbar .wrap{display:flex; align-items:center; gap:16px; height:64px}
+/* the brand row wrapper only becomes a box on phones (see the 640px block); elsewhere its children sit in the .wrap flex row */
+.topbar-row{display:contents}
 .brand{
   display:flex; align-items:center; gap:11px; background:none; border:0; padding:0;
+  color:inherit; text-decoration:none;
 }
 .brand-mark{
   width:34px; height:34px; flex:0 0 auto; border-radius:5px;
@@ -32,11 +35,15 @@ html.scrolled .topbar::after{opacity:1}
 }
 .brand-name small{display:block; font-family:var(--mono); font-weight:400; font-size:.58rem; letter-spacing:.3em; color:var(--ink3); margin-top:3px}
 .mainnav{display:flex; gap:2px; margin-left:auto; flex-wrap:wrap}
-.mainnav button{
+/* nav items are real links (#/shop …): the router intercepts plain clicks, modified clicks open a new tab */
+.mainnav a{
+  display:inline-flex; align-items:center; text-decoration:none;
   background:none; border:0; padding:8px 10px; border-radius:4px; white-space:nowrap;
   font-family:var(--mono); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink2);
+  transition:transform .12s ease, background .15s ease, color .15s ease, border-color .15s ease;
 }
-.mainnav button:hover{color:var(--ink); background:var(--surface)}
+.mainnav a:hover{color:var(--ink); background:var(--surface)}
+.mainnav a:active{transform:scale(.94)}
 .mainnav [aria-current]{color:var(--accent)}
 /* one logo <img>; src chosen by theme (00-header.html bootstrap + 15-ticker.js swap) */
 .brand-logo{height:50px; width:auto; display:none; transform-origin:left center; transition:transform .25s ease}
@@ -51,7 +58,7 @@ html:not(.no-logo) .foot-brand{display:none}
 @media (min-width:961px){ html.scrolled .brand-logo{transform:scale(.88)} }
 @media (min-width:961px) and (max-width:1220px){
   .open-pill .open-sub{display:none}
-  .mainnav button{padding:8px 7px; letter-spacing:.06em}
+  .mainnav a{padding:8px 7px; letter-spacing:.06em}
   .topbar .wrap{gap:12px}
 }
 
@@ -115,7 +122,7 @@ main:focus{outline:none}
 /* mobile: scrolling nav gets a right-edge fade cue + snap; pill goes compact; cheaper header */
 @media (max-width:960px){
   .mainnav{scroll-snap-type:x proximity; scroll-padding:0 20px}
-  .mainnav button{scroll-snap-align:start}
+  .mainnav a{scroll-snap-align:start}
   .mainnav.can-scroll:not(.at-end){
     -webkit-mask-image:linear-gradient(90deg, #000 0, #000 calc(100% - 56px), transparent);
     mask-image:linear-gradient(90deg, #000 0, #000 calc(100% - 56px), transparent);
@@ -124,10 +131,27 @@ main:focus{outline:none}
   .open-pill{order:2}
 }
 @media (max-width:640px){
-  .topbar{-webkit-backdrop-filter:none; backdrop-filter:none; background:var(--bg)}
+  /* Phones: the header box stays sticky but paints nothing itself; the brand row is the only
+     chrome that stays on screen. Once you scroll down, 15-ticker.js adds html.nav-tuck and the nav
+     row fades out (its in-flow space is kept, so the page never jumps) — scrolling up brings it back. */
+  .topbar{-webkit-backdrop-filter:none; backdrop-filter:none; background:transparent; border-bottom:0; pointer-events:none}
+  .topbar::after{display:none}
   body::after{display:none}
-  .topbar .wrap{gap:8px; min-height:52px; padding-top:6px; padding-bottom:4px; row-gap:4px}
-  .mainnav{padding:2px 20px 6px}
+  header.topbar .wrap{gap:8px; min-height:0; padding-top:0; padding-bottom:0; row-gap:0} /* beats 95-responsive's .topbar .wrap padding */
+  .topbar-row{
+    display:flex; align-items:center; gap:8px; flex:1 1 100%; min-height:52px; position:relative;
+    margin:0 -24px; padding:6px 24px 4px; background:var(--bg); border-bottom:1px solid var(--line); pointer-events:auto;
+  }
+  .topbar-row::after{
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:-1;
+    box-shadow:0 10px 30px -18px rgba(0,0,0,.6); opacity:0; transition:opacity .25s ease;
+  }
+  html.scrolled .topbar-row::after{opacity:1}
+  .mainnav{
+    padding:6px 20px 8px; background:var(--bg); border-bottom:1px solid var(--line); pointer-events:auto;
+    transition:opacity .18s ease, visibility 0s linear 0s;
+  }
+  html.nav-tuck .mainnav{opacity:0; visibility:hidden; pointer-events:none; transition:opacity .18s ease, visibility 0s linear .18s}
   .brand-logo{height:36px}
   .open-pill{padding:5px 10px 5px 8px; min-height:28px}
   .open-pill .open-sub,.open-pill .open-now{display:none}
@@ -146,6 +170,7 @@ main:focus{outline:none}
 @media (prefers-reduced-motion: reduce){
   .open-pill.is-open .dot::after{animation:none; display:none}
   html.is-live .mainnav .live-dot,html.is-live .hero-ctas .live-dot{animation:none}
-  .brand-logo,.topbar::after{transition:none}
+  .brand-logo,.topbar::after,.topbar-row::after,.mainnav,.mainnav a{transition:none}
+  .mainnav a:active{transform:none}
   html.scrolled .brand-logo{transform:none}
 }

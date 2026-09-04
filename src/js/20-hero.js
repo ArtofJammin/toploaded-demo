@@ -109,8 +109,12 @@
     }, 2500);
   });
 
-  /* ---- next up strip ---- */
+  /* ---- next up strip ----
+     Writes only when the string changes; the countdown digits live in role="timer" aria-live="off"
+     elements and nothing in #nextUp is a live region, so a ticking clock is never announced. */
   var nuTimer = 0;
+  function setText(el, s){ if(el && el.textContent !== s) el.textContent = s; }
+  function setHtml(el, s){ if(el && el.innerHTML !== s) el.innerHTML = s; }
   function fmtWhen(d){
     try {
       return new Intl.DateTimeFormat("en-US", {weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit"}).format(d).replace(":00", "");
@@ -119,14 +123,14 @@
   function renderCd(el, when, windowMs){
     if(!el) return;
     var ms = when.getTime() - Date.now();
-    if(ms <= 0 && ms > -(windowMs || 3 * 36e5)){ el.innerHTML = '<span class="now">Happening now</span>'; return; }
-    if(ms <= 0){ el.innerHTML = ""; return; }
+    if(ms <= 0 && ms > -(windowMs || 3 * 36e5)){ setHtml(el, '<span class="now">Happening now</span>'); return; }
+    if(ms <= 0){ setHtml(el, ""); return; }
     var s = Math.floor(ms / 1000), d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
     var html = "";
     if(d) html += "<b>" + d + "</b><small>d</small>";
     html += "<b>" + TL.pad2(h) + "</b><small>h</small><b>" + TL.pad2(m) + "</b><small>m</small>";
     if(!reduceMotion && !d) html += "<b>" + TL.pad2(sec) + "</b><small>s</small>";
-    el.innerHTML = html;
+    setHtml(el, html);
   }
   function tickNextUp(){
     var ev = null, show = null;
@@ -134,19 +138,19 @@
     try { show = TL.nextShow && TL.nextShow(); } catch(e){}
     var evCell = $("#nuEvCell");
     if(ev && ev.event && ev.when){
-      $("#nuEvName").textContent = ev.event.name || "Play night";
-      $("#nuEvWhen").textContent = fmtWhen(ev.when) + (ev.event.small ? " · " + ev.event.small.split(" · ")[0] : "");
+      setText($("#nuEvName"), ev.event.name || "Play night");
+      setText($("#nuEvWhen"), fmtWhen(ev.when) + (ev.event.small ? " · " + ev.event.small.split(" · ")[0] : ""));
       renderCd($("#nuEvCd"), ev.when);
-      if(evCell) evCell.hidden = false;
-    } else if(evCell) evCell.hidden = true;
+      if(evCell && evCell.hidden) evCell.hidden = false;
+    } else if(evCell && !evCell.hidden) evCell.hidden = true;
     var showCell = $("#nuShowCell");
     if(show && !isNaN(show)){
       var cfg = (TL.config && TL.config.show) || {};
-      $("#nuShowName").textContent = "Card show · " + (cfg.venue ? cfg.venue.replace("Cincinnati Airport", "").trim() : "Hilton");
-      $("#nuShowWhen").textContent = fmtWhen(show).replace(/,\s*\d{1,2}(:\d{2})?\s*(AM|PM)$/i, "") + " · " + (cfg.hours || "10 AM – 4 PM") + " · Turfway Rd";
+      setText($("#nuShowName"), "Card show · " + (cfg.venue ? cfg.venue.replace("Cincinnati Airport", "").trim() : "Hilton"));
+      setText($("#nuShowWhen"), fmtWhen(show).replace(/,\s*\d{1,2}(:\d{2})?\s*(AM|PM)$/i, "") + " · " + (cfg.hours || "10 AM – 4 PM") + " · Turfway Rd");
       renderCd($("#nuShowCd"), show, 6 * 36e5);
-      if(showCell) showCell.hidden = false;
-    } else if(showCell) showCell.hidden = true;
+      if(showCell && showCell.hidden) showCell.hidden = false;
+    } else if(showCell && !showCell.hidden) showCell.hidden = true;
   }
   function startNextUp(){
     stopNextUp();
@@ -218,6 +222,17 @@
     if(wall) TL.motion.watch(wall, function(inView){ wall.classList.toggle("in-view", inView); });
   });
   TL.on("motion:change", renderWall);
+  /* pause / play for the marquee (mirrors #tickerPause); hover and focus-within pause it too via CSS */
+  (function(){
+    var btn = $("#wallPause"), wall = $("#wall");
+    if(!btn || !wall) return;
+    btn.addEventListener("click", function(){
+      var on = btn.getAttribute("aria-pressed") !== "true";
+      btn.setAttribute("aria-pressed", String(on));
+      btn.setAttribute("aria-label", on ? "Resume the card wall" : "Pause the card wall");
+      wall.classList.toggle("paused", on);
+    });
+  })();
 
   /* ---- testimonials from config (sample quotes stay until the shop adds real ones) ---- */
   function renderTestimonials(){
@@ -231,6 +246,7 @@
     box.innerHTML = real.map(function(t){
       return '<div class="panel"><p class="quote">“' + esc(t.q) + '”</p>' + (t.who ? '<p class="p-set quote-who">' + esc(t.who) + "</p>" : "") + "</div>";
     }).join("");
-    if(tag) tag.hidden = true;
+    /* the "sample quotes" tag only clears once the list differs from the built-in defaults */
+    if(tag) tag.hidden = !(typeof TL.sameAsDefault === "function" && TL.sameAsDefault("testimonials"));
   }
   TL.on("config:change", renderTestimonials);

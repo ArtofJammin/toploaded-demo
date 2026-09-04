@@ -499,7 +499,7 @@
     if(e.target.closest("[data-rip-again]")){ ripStartPack(); return; }
     if(e.target.closest("[data-rip-share]")){ ripShare(); return; }
     if((t = e.target.closest("#ripPack")) && rip.stage === "pack"){
-      /* keyboard activation (Enter/Space) arrives as a click with detail 0 */
+      /* a click with detail 0 (assistive tech, programmatic .click()) tears straight away; real keys are handled in keydown below */
       if(e.detail === 0 || reduceMotion || rip.drag === "done"){ ripTear(); return; }
       if(rip.drag === "moved"){ rip.drag = null; return; }
       t.classList.remove("nudge"); void t.offsetWidth; t.classList.add("nudge");
@@ -510,8 +510,10 @@
     if(e.target && e.target.id === "ripSet"){ rip.set = e.target.value; TL.store.set("rip", {game: rip.game, set: rip.set}); }
   });
   ripApp.addEventListener("keydown", function(e){
+    /* #ripPack is a div[role=button], so the browser synthesises no click for Enter or Space — tear on both here,
+       exactly like the Open pack button (the aria-label, the hint and the #ripLive announcement all promise Enter) */
     var pack = e.target.closest && e.target.closest("#ripPack");
-    if(pack && (e.key === " " || e.key === "Spacebar") && rip.stage === "pack"){ e.preventDefault(); ripTear(); }
+    if(pack && (e.key === "Enter" || e.key === " " || e.key === "Spacebar") && rip.stage === "pack"){ e.preventDefault(); ripTear(); }
   });
   /* drag / swipe across the strip */
   ripApp.addEventListener("pointerdown", function(e){

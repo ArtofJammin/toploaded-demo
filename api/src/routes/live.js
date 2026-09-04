@@ -1,13 +1,16 @@
 // Live break state: spot claims, chat and the viewer count.
 //   GET  /live?sid=                  public → {live:config.live, spots:{taken,mine,price,total,claims}, viewers}
-//   POST /live/spots/claim           public → {spot, name?, sid} claims spot n (6 h hold); 409 when someone else has it
+//   POST /live/spots/claim           public → {spot, name?, sid} claims spot n (6 h hold); 409 when someone else has it,
+//                                             409 {reason:"limit"} once a sid holds 3 unpaid spots (an IP 6); 10 / min per IP
 //   POST /live/spots/release         public → {spot, sid} frees a spot you hold (staff can free any) → {ok, released, taken}
 //   POST /live/spots/:n/confirm      staff  → mark a spot paid: no expiry
 //   POST /live/spots/reset           staff  → clear every claim
 //   GET  /live/chat?since=<ms|iso>   public → {messages:[newest last, ≤ 60], now, viewers}
 //   POST /live/chat                  public → {user, text} → {ok, message}; 20 / min per IP, 200 chars, links + slurs filtered
-//   POST /live/viewers               public → heartbeat {sid} → {viewers} (distinct sids seen in the last 60 s)
-// KV: "live:spots" {claims:[{spot,name,sid,at,exp,expires,confirmed}]}, "live:chat" [messages], "live:viewers" {sid:ms}.
+//   POST /live/viewers               public → heartbeat {sid} → {viewers} (distinct sids seen in the last 60 s;
+//                                             12 / min per IP, and one IP counts for at most 3 sids)
+// KV: "live:spots" {claims:[{spot,name,sid,ip,at,exp,expires,confirmed}]}, "live:chat" [messages],
+// "live:viewers" {sid:{t:ms, ip}} (older docs stored {sid:ms}; both read fine).
 // (claims is an array so the daily cron in routes/inventory.js can prune it with the same rules.)
 // KV has no compare-and-swap, so a claim writes then re-reads and yields if another sid won.
 import { getJSON, putJSON } from '../lib/kv.js';
@@ -20,8 +23,14 @@ const SPOTS = 'live:spots';
 const CHAT = 'live:chat';
 const VIEWERS = 'live:viewers';
 export const CLAIM_TTL_MS = 6 * 3600 * 1000;
+// Unpaid holds one browser (sid) may sit on at once, and one address — sids are
+// client-chosen, so the IP cap is what stops a griefer rotating them. Paid
+// (confirmed) spots never count.
+export const MAX_HOLDS_PER_SID = 3;
+export const MAX_HOLDS_PER_IP = 6;
 export const CHAT_MAX = 60;
 export const VIEWER_WINDOW_MS = 60 * 1000;
+export const VIEWERS_PER_IP = 3;   // distinct sids one address can add to the public viewer count
 const VIEWERS_MAX = 2000;
 
 function uid() {
@@ -127,11 +136,16 @@ export async function addChat(env, { user, text, sys = false }) {
   return message;
 }
 
+// Live heartbeats as {sid: {t, ip}}. Accepts the older {sid: ms} shape too.
 async function readViewers(env, now = Date.now()) {
   const map = await getJSON(env.KV, VIEWERS, {});
   const out = {};
   if (map && typeof map === 'object') {
-    for (const [sid, ts] of Object.entries(map)) if (Number(ts) > now - VIEWER_WINDOW_MS) out[sid] = Number(ts);
+    for (const [sid, val] of Object.entries(map)) {
+      const obj = val && typeof val === 'object';
+      const t = Number(obj ? val.t : val);
+      if (t > now - VIEWER_WINDOW_MS) out[sid] = { t, ip: obj && val.ip ? String(val.ip) : '' };
+    }
   }
   return out;
 }
@@ -165,7 +179,7 @@ export function register(r) {
   });
 
   r.post('/live/spots/claim', async ({ env, req, ip }) => {
-    await rateLimit(env, `spot:${ip}`, { limit: 30, windowSec: 60 });
+    await rateLimit(env, `spot:${ip}`, { limit: 10, windowSec: 60 });
     const body = await readJson(req, 4096);
     const { total, price } = await liveConfig(env);
     const spot = spotNum(body.spot, total);
@@ -178,9 +192,19 @@ export function register(r) {
       if (name && !held.name) { held.name = name; await saveClaims(env, claims); }
       return { ok: true, spot, exp: held.confirmed ? null : held.exp, name: held.name || '', ...spotView(claims, sid, total, price) };
     }
+    // Cap unpaid holds so nobody can sit on the whole board for six hours.
+    const unpaid = nums(claims).map(n => claims[n]).filter(c => !c.confirmed);
+    const bySid = unpaid.filter(c => c.sid === sid).length;
+    const byIp = unpaid.filter(c => c.ip && c.ip === ip).length;
+    if (bySid >= MAX_HOLDS_PER_SID || byIp >= MAX_HOLDS_PER_IP) {
+      const why = bySid >= MAX_HOLDS_PER_SID
+        ? `you can hold up to ${MAX_HOLDS_PER_SID} unpaid spots at once — pay for one first`
+        : 'too many unpaid spots are held from this connection — pay for one first';
+      throw new HttpError(409, why, { reason: 'limit', limit: MAX_HOLDS_PER_SID, spot, ...spotView(claims, sid, total, price) });
+    }
     const now = Date.now();
     const exp = new Date(now + CLAIM_TTL_MS).toISOString();
-    const claim = { spot, name, sid, at: new Date(now).toISOString(), exp, expires: exp, confirmed: false };
+    const claim = { spot, name, sid, ip, at: new Date(now).toISOString(), exp, expires: exp, confirmed: false };
     claims[spot] = claim;
     await saveClaims(env, claims);
     // Re-check: with two writers the last put wins, so make sure it was ours.
@@ -193,7 +217,7 @@ export function register(r) {
   r.post('/live/spots/release', async ({ env, req, auth }) => {
     const body = await readJson(req, 4096);
     const { total, price } = await liveConfig(env);
-    const spot = spotNum(body.spot, 200);
+    const spot = spotNum(body.spot, total);
     const staff = !!auth;
     const sid = sidOf(body.sid, { required: !staff });
     const { claims } = await loadClaims(env);
@@ -247,15 +271,23 @@ export function register(r) {
     return { ok: true, message };
   });
 
-  r.post('/live/viewers', async ({ env, req }) => {
+  r.post('/live/viewers', async ({ env, req, ip }) => {
+    // The site heartbeats every 20 s, so 12 / min leaves room for a few tabs.
+    await rateLimit(env, `viewers:${ip}`, { limit: 12, windowSec: 60 });
     const body = await readJson(req, 2048);
     const sid = sidOf(body.sid);
     const now = Date.now();
     const map = await readViewers(env, now);
-    map[sid] = now;
+    if (!map[sid]) {
+      // A new sid from an address already at the cap replaces that address's
+      // oldest one, so rotating sids never inflates the count.
+      const own = Object.keys(map).filter(k => map[k].ip === ip).sort((a, b) => map[a].t - map[b].t);
+      while (own.length >= VIEWERS_PER_IP) delete map[own.shift()];
+    }
+    map[sid] = { t: now, ip };
     const keys = Object.keys(map);
     if (keys.length > VIEWERS_MAX) {
-      keys.sort((a, b) => map[a] - map[b]).slice(0, keys.length - VIEWERS_MAX).forEach(k => { delete map[k]; });
+      keys.sort((a, b) => map[a].t - map[b].t).slice(0, keys.length - VIEWERS_MAX).forEach(k => { delete map[k]; });
     }
     await putJSON(env.KV, VIEWERS, map);
     return { viewers: Object.keys(map).length };

@@ -11,9 +11,14 @@
      the DOM event 'tl:cart-changed'; [data-add] clicks also dispatch 'tl:cart-add'
      {id, sourceEl, item} for the fly-to-cart motion. A removed 'live-spot-*' id shows up in
      `removed` so the live page can release the claim (reason 'checkout' means it was bought).
-     Checkout: POST /checkout {lines, fulfillment, email, note} → {url} redirects to Square;
-     {mock} shows the in-drawer confirmation; offline (or an API without the route yet) shows
-     the same confirmation labelled demo. Any other error becomes a retry state.
+     Checkout: POST /checkout {lines, fulfillment, email, note} → {url} redirects to Square
+     (only http(s) links are followed); {mock} shows the in-drawer confirmation; offline (or an
+     API without the route yet) shows the same confirmation labelled demo. Any other error
+     becomes a retry state. The button/note only promise Square when GET /health reports
+     integrations.square — fetched once on 'api:ready' and kept on TL.api.integrations.
+     Cross-tab: a checkout writes TL.store "cart-order" {orderId, at, ids} before emptying the
+     cart, so the storage listener in other tabs re-emits those ids with reason 'checkout'
+     (not 'sync') and the live page keeps the paid spot claims.
      Kept for other modules: var cart, renderCart(), openCart(), closeCart(), cartQty(). */
   var cart = {}; // id -> {qty, item}
   var lastCartQty = 0;
@@ -295,7 +300,20 @@
       prev = li;
     });
   }
-  function cartCheckoutLabel(){ return TL.api.online ? "Checkout with Square" : "Checkout · demo"; }
+  /* Square is only promised when the API is up AND /health says Square is configured; until
+     that answer arrives (or when it says no) the drawer tells the demo truth up front. */
+  function cartSquareLive(){
+    var ints = TL.api.integrations || (TL.api.health && TL.api.health.integrations) || null;
+    return !!(TL.api.online && ints && ints.square === true);
+  }
+  function cartCheckoutLabel(){ return cartSquareLive() ? "Checkout with Square" : "Checkout · demo"; }
+  var CART_ORDER_TTL = 10 * 60 * 1000;
+  function cartOrderMarker(){
+    var m = TL.store.get("cart-order", null);
+    if(!m || typeof m !== "object" || !Array.isArray(m.ids)) return null;
+    if(!isFinite(Number(m.at)) || Date.now() - Number(m.at) > CART_ORDER_TTL) return null;
+    return m;
+  }
   function cartRenderSums(lines){
     var sub = cartSubtotal(), ship = cartShipping(), tot = Math.round((sub + ship) * 100) / 100;
     var shipping = cartOpts.fulfillment === "ship", quote = cartShipQuote(lines);
@@ -460,8 +478,11 @@
     $("#cartBody").hidden = true; $("#cartForm").hidden = true;
     cartDoneShown = true; drawer.classList.add("done");
     cartRecordOrder(o);
+    var boughtIds = o.lines.map(function(l){ return l.item.id; });
+    /* written BEFORE the cart empties so other tabs see the marker when their storage event fires */
+    TL.store.set("cart-order", {orderId: o.orderId, at: Date.now(), ids: boughtIds});
     cart = {};
-    cartCommit("checkout", {removed: o.lines.map(function(l){ return l.item.id; })});
+    cartCommit("checkout", {removed: boughtIds});
     if(!drawer.classList.contains("open")) openCart();
     var h = $("#cartDoneTitle"); if(h) try { h.focus({preventScroll: true}); } catch(e){}
     cartAnnounce("Order " + o.orderId + " placed. Total " + money(o.total) + ".");
@@ -492,8 +513,8 @@
     };
     if(email) body.email = email;
     if(note) body.note = note;
-    var online = !!TL.api.online;
-    cartSetBusy(true, online ? "Taking you to Square…" : "Placing demo order…");
+    var square = cartSquareLive();
+    cartSetBusy(true, square ? "Taking you to Square…" : "Placing demo order…");
     function done(extra){
       cartShowDone({
         orderId: (extra && extra.orderId) || cartDemoId(),
@@ -508,9 +529,16 @@
     } catch(e){ p = Promise.reject({status: 0, error: "error"}); }
     p.then(function(d){
       if(d && d.url){
-        TL.store.set("cart-pending", {orderId: d.orderId || null, at: Date.now(), url: String(d.url)});
+        var link = cartCheckoutLink(d.url);
+        if(!link){
+          cartSetBusy(false);
+          toast("Unexpected checkout link — nothing was charged");
+          cartError("The checkout sent a link that isn't a web address — nothing was charged.", true);
+          return;
+        }
+        TL.store.set("cart-pending", {orderId: d.orderId || null, at: Date.now(), url: link});
         cartSetBusy(true, "Taking you to Square…");
-        setTimeout(function(){ window.location.href = String(d.url); }, 350);
+        setTimeout(function(){ window.location.href = link; }, 350);
         setTimeout(function(){ if(cartBusy) cartSetBusy(false); }, 6000);
         return;
       }
@@ -547,10 +575,28 @@
       cartError(msg, true);
     });
   }
+  /* Only http(s) links leave the site; anything else (javascript:, data:, a bare path) is refused. */
+  function cartCheckoutLink(u){
+    var s = String(u || "").trim();
+    if(!/^https?:\/\//i.test(s)) return null;
+    try { var p = new URL(s); if(p.protocol !== "http:" && p.protocol !== "https:") return null; return p.href; } catch(e){ return null; }
+  }
   function cartUpdateMode(){
     if(!cartBusy){ var b = $("#checkoutBtn"); if(b) b.textContent = cartCheckoutLabel(); }
     var n = $("#cartNoteLine");
-    if(n) n.textContent = TL.api.online ? "Pickup in store or ship · secure payment through Square" : "Demo mode — Square Checkout goes live with the API keys";
+    if(!n) return;
+    if(cartSquareLive()) n.textContent = "Pickup in store or ship · secure payment through Square";
+    else if(TL.api.online) n.textContent = "Demo mode — Square checkout goes live once the shop connects Square";
+    else n.textContent = "Demo mode — Square Checkout goes live with the API keys";
+  }
+  /* GET /health once after the API answers; another module may already have stashed it. */
+  function cartLoadIntegrations(){
+    var known = TL.api.integrations || (TL.api.health && TL.api.health.integrations) || null;
+    if(known && typeof known === "object"){ TL.api.integrations = known; cartUpdateMode(); return; }
+    TL.api.get("/health", {noAuth: true, timeout: 4000}).then(function(h){
+      TL.api.integrations = (h && h.integrations && typeof h.integrations === "object") ? h.integrations : {};
+      cartUpdateMode();
+    }).catch(function(){ /* unknown stays "demo" — the honest default */ });
   }
   function cartSyncOptsUI(){
     $$('#cartForm input[name="fulfillment"]').forEach(function(r){
@@ -634,7 +680,14 @@
   })();
   window.addEventListener("storage", function(e){
     if(e && e.key !== null && e.key !== "tl-cart") return;
-    cartLoad(); renderCart(); cartEmit("sync", {});
+    var before = Object.keys(cart);
+    cartLoad(); renderCart();
+    var removed = before.filter(function(id){ return !cart[id]; });
+    var added = Object.keys(cart).filter(function(id){ return before.indexOf(id) < 0; });
+    /* ids the other tab just bought arrive as 'checkout', so 50-live keeps the paid claims */
+    var marker = removed.length ? cartOrderMarker() : null;
+    var bought = marker ? removed.filter(function(id){ return marker.ids.indexOf(id) > -1; }) : [];
+    cartEmit(bought.length ? "checkout" : "sync", {removed: removed, added: added});
   });
 
   /* Re-validate against the loaded inventory: refresh snapshots, clamp to stock, drop sold-out. */
@@ -686,7 +739,7 @@
     if(TL.inventory && TL.inventory.loaded) cartRevalidate();
   });
   TL.on("inventory:loaded", cartRevalidate);
-  TL.on("api:ready", cartUpdateMode);
+  TL.on("api:ready", function(d){ cartUpdateMode(); if(d && d.online) cartLoadIntegrations(); });
   TL.on("view:change", function(d){
     if(d && d.paramsOnly) return;
     if(!drawer.classList.contains("open")) return;
