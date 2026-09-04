@@ -31,7 +31,7 @@
   --show-sun:none; --show-moon:none; --show-tl:block; --logo-dark:block; --logo-light:none;
   --bg:#0C0E12; --bg2:#11141A; --surface:#161A22; --surface2:#1C212B;
   --line:#262C38; --line2:#333B4A;
-  --ink:#EEF0F4; --ink2:#A6ADBB; --ink3:#7E8798;
+  --ink:#EEF0F4; --ink2:#A6ADBB; --ink3:#8A93A4;
   --accent:#57D9C4; --accent-ink:#08110F; --accent-dim:#2E7A6E;
   --good:#5BD98A; --warn:#E8B44D; --crit:#F26D6D;
   --good-bg:rgba(91,217,138,.12); --warn-bg:rgba(232,180,77,.12); --crit-bg:rgba(242,109,109,.12);
@@ -167,7 +167,7 @@ html.scrolled .topbar::after{opacity:1}
   font-family:var(--mono); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink2);
 }
 .mainnav button:hover{color:var(--ink); background:var(--surface)}
-.mainnav button[aria-current="true"]{color:var(--accent)}
+.mainnav [aria-current]{color:var(--accent)}
 /* one logo <img>; src chosen by theme (00-header.html bootstrap + 15-ticker.js swap) */
 .brand-logo{height:50px; width:auto; display:none; transform-origin:left center; transition:transform .25s ease}
 html:not(.no-logo) .brand-logo{display:block}
@@ -1560,6 +1560,9 @@ html.hidden .drawer .cart-empty::before{animation-play-state:paused}
 @media (prefers-reduced-motion: reduce){
   .login-modal:not([hidden]){animation:none}
 }
+.login-error{margin:8px 0 0; font-family:var(--mono); font-size:.74rem; letter-spacing:.04em; color:var(--crit)}
+.login-error[hidden]{display:none}
+#loginPin[aria-invalid="true"]{border-color:var(--crit)}
 
 /* ============ EVENT SIGNUPS + shared form states ============ */
 .signup-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
@@ -2528,7 +2531,7 @@ footer::before{
     flex:0 0 auto; white-space:nowrap; min-height:40px;
     border:1px solid var(--line); border-radius:99px; padding:9px 14px;
   }
-  .mainnav button[aria-current="true"]{border-color:var(--accent)}
+  .mainnav [aria-current]{border-color:var(--accent)}
   .cart-btn{margin-left:auto}
   .grid{grid-template-columns:repeat(3,1fr)}
   .stat-row{grid-template-columns:repeat(2,1fr)}
@@ -2557,7 +2560,7 @@ footer::before{
     flex:0 0 auto; white-space:nowrap; min-height:40px;
     border:1px solid var(--line); border-radius:99px; padding:9px 14px;
   }
-  .mainnav button[aria-current="true"]{border-color:var(--accent)}
+  .mainnav [aria-current]{border-color:var(--accent)}
   .foot-grid{grid-template-columns:1fr}
   .stat-row{grid-template-columns:1fr 1fr}
   select,input,textarea{font-size:16px}
@@ -2579,15 +2582,16 @@ footer::before{
   .hero .wrap{padding-top:40px; padding-bottom:48px}
 }
 
-/* ============ TOUCH TARGETS ============ */
+/* ============ TOUCH TARGETS (44px on coarse pointers) ============ */
 @media (pointer:coarse){
-  .qty button{width:36px; height:36px}
+  .qty button{width:44px; height:44px}
   .qty{gap:8px}
-  .stock-edit button{width:32px; height:32px}
-  .drawer-close{width:40px; height:40px}
-  .chip{padding:9px 16px}
-  .spot{padding:13px 0}
-  .cart-btn{min-height:40px}
+  .stock-edit button{width:40px; height:40px}
+  .drawer-close,.theme-btn{width:44px; height:44px}
+  .chip{padding:11px 16px; min-height:44px}
+  .spot{padding:13px 0; min-height:44px}
+  .cart-btn,.btn,.add,.mainnav [data-go],.linklike,.adminlink{min-height:44px}
+  .linklike,.adminlink{display:inline-flex; align-items:center}
   .stage-caption{display:none}
 }
 
@@ -3779,12 +3783,13 @@ footer::before{
     <div class="field" style="margin-top:12px">
       <label for="loginPin">Passcode</label>
       <div class="pin-wrap">
-        <input id="loginPin" type="password" autocomplete="current-password" inputmode="text" spellcheck="false">
+        <input id="loginPin" type="password" autocomplete="current-password" inputmode="text" spellcheck="false" required aria-describedby="loginError">
         <button class="pin-eye" type="button" id="loginShow" aria-label="Show passcode" aria-pressed="false" title="Show passcode">
           <svg class="eye-on" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
           <svg class="eye-off" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 3l18 18M10.6 10.6A2.9 2.9 0 0 0 12 15a3 3 0 0 0 2.4-1.2M6.7 6.8C3.8 8.6 2 12 2 12s3.5 6.5 10 6.5c1.9 0 3.5-.5 4.9-1.3M9.8 5.8C10.5 5.6 11.2 5.5 12 5.5c6.5 0 10 6.5 10 6.5s-.9 1.7-2.6 3.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
+      <p class="login-error" id="loginError" role="alert" hidden></p>
     </div>
     <div style="display:flex; gap:10px; margin-top:16px">
       <button class="btn" type="submit">Log in</button>
@@ -4021,8 +4026,14 @@ footer::before{
   var fmtInt = function(n){ return String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ","); };
   var motionMQ = window.matchMedia("(prefers-reduced-motion: reduce)");
   var reduceMotion = motionMQ.matches;
-  if(motionMQ.addEventListener) motionMQ.addEventListener("change", function(e){ reduceMotion = e.matches; TL.reduceMotion = e.matches; TL.emit("motion:change", {reduce: e.matches}); });
-  TL.$ = $; TL.$$ = $$; TL.money = money; TL.fmtInt = fmtInt; TL.reduceMotion = reduceMotion; TL.GAMES = GAMES; TL.ITEMS = ITEMS;
+  /* TL.reduceMotion reads/writes the closure flag every module checks; setting it emits motion:change */
+  Object.defineProperty(TL, "reduceMotion", {
+    configurable: true,
+    get: function(){ return reduceMotion; },
+    set: function(v){ v = !!v; if(v === reduceMotion) return; reduceMotion = v; TL.emit("motion:change", {reduce: v}); }
+  });
+  if(motionMQ.addEventListener) motionMQ.addEventListener("change", function(e){ TL.reduceMotion = e.matches; });
+  TL.$ = $; TL.$$ = $$; TL.money = money; TL.fmtInt = fmtInt; TL.GAMES = GAMES; TL.ITEMS = ITEMS;
 
   /* ---------- api client ----------
      Discovers the API base URL, first match wins:
@@ -4135,7 +4146,9 @@ footer::before{
   TL.saveConfig = function(patch){
     TL.config = deepMerge(TL.config, patch);
     TL.config.updatedAt = new Date().toISOString();
-    TL.store.set("config", deepMerge(TL.store.get("config", {}) || {}, patch));
+    var localCopy = deepMerge(TL.store.get("config", {}) || {}, patch);
+    localCopy.updatedAt = TL.config.updatedAt;
+    TL.store.set("config", localCopy);
     TL.emit("config:change", {config: TL.config, patch: patch});
     if(patch && patch.live) TL.emit("live:change", {live: TL.config.live});
     if(TL.api.online && TL.api.role === "admin"){
@@ -4250,6 +4263,7 @@ footer::before{
     if(TL.auth && typeof TL.auth.can === "function") return TL.auth.can(name);
     try { return sessionStorage.getItem("tl-staff") === "1"; } catch(e){ return false; }
   }
+  function dec(s){ try { return decodeURIComponent(s); } catch(e){ return s; } }
   function parseHash(h){
     h = h || location.hash || "";
     if(h.indexOf("#/") !== 0) return null;
@@ -4257,11 +4271,11 @@ footer::before{
     if(q > -1){
       body.slice(q + 1).split("&").forEach(function(kv){
         if(!kv) return;
-        var i = kv.indexOf("="), k = decodeURIComponent(i > -1 ? kv.slice(0, i) : kv), v = i > -1 ? decodeURIComponent(kv.slice(i + 1).replace(/\+/g, " ")) : "";
+        var i = kv.indexOf("="), k = dec(i > -1 ? kv.slice(0, i) : kv), v = i > -1 ? dec(kv.slice(i + 1).replace(/\+/g, " ")) : "";
         params[k] = v;
       });
     }
-    return {name: name || "home", params: params};
+    return {name: dec(name) || "home", params: params};
   }
   function buildHash(name, params){
     var qs = Object.keys(params || {}).filter(function(k){ return params[k] !== undefined && params[k] !== null && params[k] !== ""; })
@@ -4286,7 +4300,7 @@ footer::before{
       if(!paramsOnly){
         TL.emit("view:leave", {name: prev});
         Object.keys(views).forEach(function(k){ var el = $(views[k]); if(el) el.classList.toggle("active", k === name); });
-        $$(".mainnav button").forEach(function(b){ b.setAttribute("aria-current", String(b.dataset.go === name)); });
+        $$(".mainnav [data-go]").forEach(function(b){ if(b.dataset.go === name) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
         document.title = (VIEW_TITLES[name] ? VIEW_TITLES[name] + " · " : "") + BASE_TITLE;
         if(!opts.keepScroll) window.scrollTo({top: 0, behavior: "auto"});
         var v = $(views[name]), h1 = v && v.querySelector("h1");
@@ -4330,6 +4344,11 @@ footer::before{
   document.addEventListener("click", function(e){
     var t = e.target.closest("[data-go]");
     if(!t) return;
+    /* real links (<a href="#/shop">) navigate on their own — keeps middle-click / open-in-new-tab working */
+    if(t.tagName === "A" && (t.getAttribute("href") || "").indexOf("#/") === 0 && !t.dataset.params){
+      if(e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+      e.preventDefault(); go(t.dataset.go, {}); return;
+    }
     var params = {};
     if(t.dataset.params){ t.dataset.params.split("&").forEach(function(kv){ var i = kv.indexOf("="); if(i > -1) params[kv.slice(0, i)] = kv.slice(i + 1); }); }
     go(t.dataset.go, params);
@@ -10124,6 +10143,7 @@ footer::before{
       m.hidden = false;
       $("#loginOverlay").classList.add("open");
       $("#loginPin").value = "";
+      loginError("");
       if(releaseLoginTrap) releaseLoginTrap();
       releaseLoginTrap = TL.trapFocus(m, {initial: $("#loginPin")});
     },
@@ -10153,15 +10173,24 @@ footer::before{
       });
     },
     logout: function(){
+      if(TL.api.online && TL.api.token) TL.api.post("/auth/logout", {}).catch(function(){});
       TL.api.setAuth(null, null);
       if(TL.current === "admin" || TL.current === "staff") go("home");
     }
   };
+  function loginError(msg){
+    var el = $("#loginError");
+    if(el){ el.textContent = msg; el.hidden = !msg; }
+    else if(msg) toast(msg);
+    $("#loginPin").setAttribute("aria-invalid", msg ? "true" : "false");
+  }
   function openLogin(t){ TL.auth.openLogin(t); }
   function closeLogin(){ TL.auth.closeLogin(); }
   $("#loginForm").addEventListener("submit", function(e){
     e.preventDefault();
     var btn = $("#loginForm button[type=submit]"), pin = $("#loginPin").value;
+    if(!pin){ loginError("Enter your passcode"); $("#loginPin").focus(); return; }
+    loginError("");
     if(btn) btn.disabled = true;
     TL.auth.login(pin).then(function(role){
       if(btn) btn.disabled = false;
@@ -10172,13 +10201,13 @@ footer::before{
         go(t);
         toast(role === "admin" ? "Logged in — admin unlocked" : "Logged in — staff desk unlocked");
       } else {
-        toast("Wrong passcode — ask a manager");
+        loginError("Wrong passcode — ask a manager");
         $("#loginPin").value = "";
         $("#loginPin").focus();
       }
     }, function(err){
       if(btn) btn.disabled = false;
-      toast(err && err.status === 429 ? "Too many tries — wait a few minutes" : "Login failed — try again");
+      loginError(err && err.status === 429 ? "Too many tries — wait a few minutes" : "Login failed — try again");
     });
   });
   $("#loginCancel").addEventListener("click", closeLogin);

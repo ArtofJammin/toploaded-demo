@@ -26,6 +26,7 @@
     if(TL.auth && typeof TL.auth.can === "function") return TL.auth.can(name);
     try { return sessionStorage.getItem("tl-staff") === "1"; } catch(e){ return false; }
   }
+  function dec(s){ try { return decodeURIComponent(s); } catch(e){ return s; } }
   function parseHash(h){
     h = h || location.hash || "";
     if(h.indexOf("#/") !== 0) return null;
@@ -33,11 +34,11 @@
     if(q > -1){
       body.slice(q + 1).split("&").forEach(function(kv){
         if(!kv) return;
-        var i = kv.indexOf("="), k = decodeURIComponent(i > -1 ? kv.slice(0, i) : kv), v = i > -1 ? decodeURIComponent(kv.slice(i + 1).replace(/\+/g, " ")) : "";
+        var i = kv.indexOf("="), k = dec(i > -1 ? kv.slice(0, i) : kv), v = i > -1 ? dec(kv.slice(i + 1).replace(/\+/g, " ")) : "";
         params[k] = v;
       });
     }
-    return {name: name || "home", params: params};
+    return {name: dec(name) || "home", params: params};
   }
   function buildHash(name, params){
     var qs = Object.keys(params || {}).filter(function(k){ return params[k] !== undefined && params[k] !== null && params[k] !== ""; })
@@ -62,7 +63,7 @@
       if(!paramsOnly){
         TL.emit("view:leave", {name: prev});
         Object.keys(views).forEach(function(k){ var el = $(views[k]); if(el) el.classList.toggle("active", k === name); });
-        $$(".mainnav button").forEach(function(b){ b.setAttribute("aria-current", String(b.dataset.go === name)); });
+        $$(".mainnav [data-go]").forEach(function(b){ if(b.dataset.go === name) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
         document.title = (VIEW_TITLES[name] ? VIEW_TITLES[name] + " · " : "") + BASE_TITLE;
         if(!opts.keepScroll) window.scrollTo({top: 0, behavior: "auto"});
         var v = $(views[name]), h1 = v && v.querySelector("h1");
@@ -106,6 +107,11 @@
   document.addEventListener("click", function(e){
     var t = e.target.closest("[data-go]");
     if(!t) return;
+    /* real links (<a href="#/shop">) navigate on their own — keeps middle-click / open-in-new-tab working */
+    if(t.tagName === "A" && (t.getAttribute("href") || "").indexOf("#/") === 0 && !t.dataset.params){
+      if(e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+      e.preventDefault(); go(t.dataset.go, {}); return;
+    }
     var params = {};
     if(t.dataset.params){ t.dataset.params.split("&").forEach(function(kv){ var i = kv.indexOf("="); if(i > -1) params[kv.slice(0, i)] = kv.slice(i + 1); }); }
     go(t.dataset.go, params);

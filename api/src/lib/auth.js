@@ -39,6 +39,7 @@ export async function verifyToken(env, token) {
   const [payload, sig] = token.split('.');
   if (!payload || !sig) return null;
   try {
+    if (env.KV && await env.KV.get('revoked:' + sig)) return null;
     const sigBytes = Uint8Array.from(unb64url(sig), c => c.charCodeAt(0));
     const ok = await crypto.subtle.verify('HMAC', await hmacKey(env.TOKEN_SECRET), sigBytes, enc.encode(payload));
     if (!ok) return null;
@@ -47,6 +48,18 @@ export async function verifyToken(env, token) {
     if (data.role !== 'staff' && data.role !== 'admin') return null;
     return data;
   } catch { return null; }
+}
+
+// Logout: remember the token's signature until it would have expired anyway.
+export async function revokeToken(env, token) {
+  if (!token || !env.KV) return false;
+  const [payload, sig] = token.split('.');
+  if (!payload || !sig) return false;
+  let exp = 0;
+  try { exp = Number(JSON.parse(unb64url(payload)).exp) || 0; } catch { return false; }
+  const ttl = Math.max(60, exp - Math.floor(Date.now() / 1000));
+  await env.KV.put('revoked:' + sig, '1', { expirationTtl: ttl });
+  return true;
 }
 
 function timingSafeEqual(a, b) {

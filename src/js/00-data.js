@@ -33,5 +33,11 @@
   var fmtInt = function(n){ return String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ","); };
   var motionMQ = window.matchMedia("(prefers-reduced-motion: reduce)");
   var reduceMotion = motionMQ.matches;
-  if(motionMQ.addEventListener) motionMQ.addEventListener("change", function(e){ reduceMotion = e.matches; TL.reduceMotion = e.matches; TL.emit("motion:change", {reduce: e.matches}); });
-  TL.$ = $; TL.$$ = $$; TL.money = money; TL.fmtInt = fmtInt; TL.reduceMotion = reduceMotion; TL.GAMES = GAMES; TL.ITEMS = ITEMS;
+  /* TL.reduceMotion reads/writes the closure flag every module checks; setting it emits motion:change */
+  Object.defineProperty(TL, "reduceMotion", {
+    configurable: true,
+    get: function(){ return reduceMotion; },
+    set: function(v){ v = !!v; if(v === reduceMotion) return; reduceMotion = v; TL.emit("motion:change", {reduce: v}); }
+  });
+  if(motionMQ.addEventListener) motionMQ.addEventListener("change", function(e){ TL.reduceMotion = e.matches; });
+  TL.$ = $; TL.$$ = $$; TL.money = money; TL.fmtInt = fmtInt; TL.GAMES = GAMES; TL.ITEMS = ITEMS;

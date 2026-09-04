@@ -45,6 +45,7 @@
       m.hidden = false;
       $("#loginOverlay").classList.add("open");
       $("#loginPin").value = "";
+      loginError("");
       if(releaseLoginTrap) releaseLoginTrap();
       releaseLoginTrap = TL.trapFocus(m, {initial: $("#loginPin")});
     },
@@ -74,15 +75,24 @@
       });
     },
     logout: function(){
+      if(TL.api.online && TL.api.token) TL.api.post("/auth/logout", {}).catch(function(){});
       TL.api.setAuth(null, null);
       if(TL.current === "admin" || TL.current === "staff") go("home");
     }
   };
+  function loginError(msg){
+    var el = $("#loginError");
+    if(el){ el.textContent = msg; el.hidden = !msg; }
+    else if(msg) toast(msg);
+    $("#loginPin").setAttribute("aria-invalid", msg ? "true" : "false");
+  }
   function openLogin(t){ TL.auth.openLogin(t); }
   function closeLogin(){ TL.auth.closeLogin(); }
   $("#loginForm").addEventListener("submit", function(e){
     e.preventDefault();
     var btn = $("#loginForm button[type=submit]"), pin = $("#loginPin").value;
+    if(!pin){ loginError("Enter your passcode"); $("#loginPin").focus(); return; }
+    loginError("");
     if(btn) btn.disabled = true;
     TL.auth.login(pin).then(function(role){
       if(btn) btn.disabled = false;
@@ -93,13 +103,13 @@
         go(t);
         toast(role === "admin" ? "Logged in — admin unlocked" : "Logged in — staff desk unlocked");
       } else {
-        toast("Wrong passcode — ask a manager");
+        loginError("Wrong passcode — ask a manager");
         $("#loginPin").value = "";
         $("#loginPin").focus();
       }
     }, function(err){
       if(btn) btn.disabled = false;
-      toast(err && err.status === 429 ? "Too many tries — wait a few minutes" : "Login failed — try again");
+      loginError(err && err.status === 429 ? "Too many tries — wait a few minutes" : "Login failed — try again");
     });
   });
   $("#loginCancel").addEventListener("click", closeLogin);

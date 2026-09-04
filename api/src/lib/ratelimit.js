@@ -7,6 +7,11 @@ export async function rateLimit(env, key, { limit = 10, windowSec = 600 } = {}) 
   const k = `rl:${key}:${bucket}`;
   const n = Number((await env.KV.get(k)) || 0) + 1;
   await env.KV.put(k, String(n), { expirationTtl: windowSec + 60 });
-  if (n > limit) throw new HttpError(429, 'slow down — try again in a few minutes');
+  if (n > limit) {
+    const retryAfter = windowSec - (Math.floor(Date.now() / 1000) % windowSec);
+    const err = new HttpError(429, 'slow down — try again in a few minutes', { retryAfter });
+    err.retryAfter = retryAfter;
+    throw err;
+  }
   return n;
 }

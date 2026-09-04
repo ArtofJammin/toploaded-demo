@@ -36,7 +36,9 @@ export async function handle(req, env, exec) {
     if (status >= 500) console.error('[api]', req.method, url.pathname, e && e.stack || e);
     const body = { error: e instanceof HttpError ? e.message : 'internal error' };
     if (e instanceof HttpError && e.extra) Object.assign(body, e.extra);
-    return json(body, status, cors);
+    const headers = { ...cors };
+    if (e && e.retryAfter) headers['retry-after'] = String(e.retryAfter);
+    return json(body, status, headers);
   }
 }
 

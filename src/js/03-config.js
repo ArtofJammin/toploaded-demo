@@ -25,7 +25,9 @@
   TL.saveConfig = function(patch){
     TL.config = deepMerge(TL.config, patch);
     TL.config.updatedAt = new Date().toISOString();
-    TL.store.set("config", deepMerge(TL.store.get("config", {}) || {}, patch));
+    var localCopy = deepMerge(TL.store.get("config", {}) || {}, patch);
+    localCopy.updatedAt = TL.config.updatedAt;
+    TL.store.set("config", localCopy);
     TL.emit("config:change", {config: TL.config, patch: patch});
     if(patch && patch.live) TL.emit("live:change", {live: TL.config.live});
     if(TL.api.online && TL.api.role === "admin"){

@@ -25,7 +25,10 @@ export class Router {
       pathMatched = true;
       if (r.method !== ctx.req.method) continue;
       ctx.params = {};
-      r.keys.forEach((k, i) => { ctx.params[k] = decodeURIComponent(m[i + 1]); });
+      r.keys.forEach((k, i) => {
+        try { ctx.params[k] = decodeURIComponent(m[i + 1]); }
+        catch { throw new HttpError(400, 'bad path encoding'); }
+      });
       let result;
       for (const h of r.handlers) {
         result = await h(ctx);

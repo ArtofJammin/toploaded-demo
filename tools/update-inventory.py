@@ -200,13 +200,15 @@ def main():
     if not items or (total and len(items) < total * 0.5):
         print("only %d of %d products returned - refusing to overwrite %s" % (len(items), total or 0, OUT))
         return 2
-    with open(OUT, "w", encoding="utf-8") as f:
+    with open(OUT + ".tmp", "w", encoding="utf-8") as f:
         json.dump(out, f, separators=(",", ":"), ensure_ascii=False)
+    os.replace(OUT + ".tmp", OUT)
     print("wrote %s: %d products, %d listings, %d units" %
           (OUT, out["products"], out["listings"], out["units"]))
     summary = build_summary(items, out["generated"])
-    with open(SUMMARY_OUT, "w", encoding="utf-8") as f:
+    with open(SUMMARY_OUT + ".tmp", "w", encoding="utf-8") as f:
         json.dump(summary, f, separators=(",", ":"), ensure_ascii=False)
+    os.replace(SUMMARY_OUT + ".tmp", SUMMARY_OUT)
     print("wrote %s: %d top, %d wall" % (SUMMARY_OUT, len(summary["top"]), len(summary["wall"])))
 
 

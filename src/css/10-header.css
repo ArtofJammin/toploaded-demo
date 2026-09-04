@@ -37,7 +37,7 @@ html.scrolled .topbar::after{opacity:1}
   font-family:var(--mono); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink2);
 }
 .mainnav button:hover{color:var(--ink); background:var(--surface)}
-.mainnav button[aria-current="true"]{color:var(--accent)}
+.mainnav [aria-current]{color:var(--accent)}
 /* one logo <img>; src chosen by theme (00-header.html bootstrap + 15-ticker.js swap) */
 .brand-logo{height:50px; width:auto; display:none; transform-origin:left center; transition:transform .25s ease}
 html:not(.no-logo) .brand-logo{display:block}

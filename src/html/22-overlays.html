@@ -9,12 +9,13 @@
     <div class="field" style="margin-top:12px">
       <label for="loginPin">Passcode</label>
       <div class="pin-wrap">
-        <input id="loginPin" type="password" autocomplete="current-password" inputmode="text" spellcheck="false">
+        <input id="loginPin" type="password" autocomplete="current-password" inputmode="text" spellcheck="false" required aria-describedby="loginError">
         <button class="pin-eye" type="button" id="loginShow" aria-label="Show passcode" aria-pressed="false" title="Show passcode">
           <svg class="eye-on" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
           <svg class="eye-off" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 3l18 18M10.6 10.6A2.9 2.9 0 0 0 12 15a3 3 0 0 0 2.4-1.2M6.7 6.8C3.8 8.6 2 12 2 12s3.5 6.5 10 6.5c1.9 0 3.5-.5 4.9-1.3M9.8 5.8C10.5 5.6 11.2 5.5 12 5.5c6.5 0 10 6.5 10 6.5s-.9 1.7-2.6 3.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
+      <p class="login-error" id="loginError" role="alert" hidden></p>
     </div>
     <div style="display:flex; gap:10px; margin-top:16px">
       <button class="btn" type="submit">Log in</button>

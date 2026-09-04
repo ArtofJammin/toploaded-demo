@@ -74,3 +74,42 @@ test('unknown routes 404, wrong method 405, bad JSON 400', async () => {
   const admin = await c.login('admin');
   assert.equal((await c.call('PUT', '/config', undefined, { token: admin, raw: '{bad' })).status, 400);
 });
+
+test('logout revokes the bearer token', async () => {
+  const c = client(makeEnv());
+  const admin = await c.login('admin');
+  assert.equal((await c.get('/auth/me', { token: admin })).status, 200);
+  const out = await c.post('/auth/logout', {}, { token: admin });
+  assert.equal(out.data.revoked, true);
+  assert.equal((await c.get('/auth/me', { token: admin })).status, 401);
+});
+
+test('429 carries Retry-After and the login limit is 5', async () => {
+  const c = client(makeEnv());
+  let last;
+  for (let i = 0; i < 6; i++) last = await c.post('/auth/login', { pin: 'wrong' });
+  assert.equal(last.status, 429);
+  assert.ok(Number(last.headers.get('retry-after')) > 0);
+});
+
+test('null / array JSON bodies and bad percent-encoding are 400, not 500', async () => {
+  const c = client(makeEnv());
+  const admin = await c.login('admin');
+  assert.equal((await c.call('PUT', '/config', undefined, { token: admin, raw: 'null' })).status, 400);
+  assert.equal((await c.call('PUT', '/config', undefined, { token: admin, raw: '[1]' })).status, 400);
+  const bad = await c.call('PUT', '/forms/contact/%ZZ', { status: 'done' }, { token: admin });
+  assert.equal(bad.status, 400);
+});
+
+test('config patches are shape-checked', async () => {
+  const c = client(makeEnv());
+  const admin = await c.login('admin');
+  assert.equal((await c.put('/config', { events: 'nope' }, { token: admin })).status, 400);
+  assert.equal((await c.put('/config', { logo: 5 }, { token: admin })).status, 400);
+  assert.equal((await c.put('/config', { links: { tcgplus: 'javascript:alert(1)' } }, { token: admin })).status, 400);
+  assert.equal((await c.put('/config', { live: { embed: 'https://evil.example/x' } }, { token: admin })).status, 400);
+  assert.equal((await c.put('/config', { live: { embed: 'https://www.youtube.com/watch?v=abc' } }, { token: admin })).status, 200);
+  assert.equal((await c.put('/config', { hours: { mon: ['9', '17'] } }, { token: admin })).status, 400);
+  assert.equal((await c.put('/config', { hours: { mon: ['09:00', '17:00'] } }, { token: admin })).status, 200);
+  assert.equal((await c.put('/config', { ticker: [['Charizard', '$85']] }, { token: admin })).status, 200);
+});

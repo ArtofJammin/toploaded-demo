@@ -37,7 +37,10 @@ export async function readJson(req, maxBytes = 64 * 1024) {
   const text = await req.text();
   if (text.length > maxBytes) throw new HttpError(413, 'body too large');
   if (!text.trim()) return {};
-  try { return JSON.parse(text); } catch { throw new HttpError(400, 'invalid JSON'); }
+  let parsed;
+  try { parsed = JSON.parse(text); } catch { throw new HttpError(400, 'invalid JSON'); }
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) throw new HttpError(400, 'JSON body must be an object');
+  return parsed;
 }
 
 export function clientIp(req) {
@@ -49,7 +52,7 @@ export const v = {
   str(x, { max = 500, min = 0, name = 'field' } = {}) {
     if (typeof x !== 'string') throw new HttpError(400, `${name} must be a string`);
     const s = x.trim();
-    if (s.length < min) throw new HttpError(400, `${name} is required`);
+    if (s.length < min) throw new HttpError(400, s.length ? `${name} must be at least ${min} characters` : `${name} is required`);
     if (s.length > max) throw new HttpError(400, `${name} too long`);
     return s;
   },

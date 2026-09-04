@@ -68,11 +68,16 @@ const exec = { waitUntil: (p) => Promise.resolve(p).catch(e => console.error('[w
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.webp': 'image/webp', '.txt': 'text/plain; charset=utf-8', '.ics': 'text/calendar' };
+// Only files a visitor of the real site can fetch: top-level assets of the repo root.
+const STATIC_EXT = new Set(['.html', '.json', '.png', '.jpg', '.jpeg', '.svg', '.ico', '.webp', '.txt', '.ics', '.xml']);
 function serveStatic(pathname, res) {
-  let p = decodeURIComponent(pathname);
+  let p = pathname;
   if (p === '/' || p === '') p = '/index.html';
-  const file = normalize(join(repo, p));
-  if (!file.startsWith(repo) || file.includes(join(repo, '.git')) || !existsSync(file) || statSync(file).isDirectory()) {
+  const rel = p.replace(/^\/+/, '');
+  const file = normalize(join(repo, rel));
+  const ok = /^[A-Za-z0-9._-]+$/.test(rel) && !rel.startsWith('.') && STATIC_EXT.has(extname(rel).toLowerCase()) &&
+    file.startsWith(repo) && existsSync(file) && !statSync(file).isDirectory();
+  if (!ok) {
     res.writeHead(404, { 'content-type': 'text/plain' }); res.end('not found'); return;
   }
   res.writeHead(200, { 'content-type': MIME[extname(file).toLowerCase()] || 'application/octet-stream', 'cache-control': 'no-store' });
@@ -119,7 +124,9 @@ if (!flag('--no-watch')) {
 }
 
 createServer(async (req, res) => {
-  const pathname = new URL(req.url, 'http://x').pathname;
+  let pathname;
+  try { pathname = decodeURIComponent(new URL(req.url, 'http://x').pathname); }
+  catch { res.writeHead(400, { 'content-type': 'text/plain' }); res.end('bad request'); return; }
   try {
     if (pathname === '/api' || pathname.startsWith('/api/')) await serveApi(req, res, pathname.slice(4) || '/');
     else serveStatic(pathname, res);

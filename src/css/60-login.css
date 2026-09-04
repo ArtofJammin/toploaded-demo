@@ -27,3 +27,6 @@
 @media (prefers-reduced-motion: reduce){
   .login-modal:not([hidden]){animation:none}
 }
+.login-error{margin:8px 0 0; font-family:var(--mono); font-size:.74rem; letter-spacing:.04em; color:var(--crit)}
+.login-error[hidden]{display:none}
+#loginPin[aria-invalid="true"]{border-color:var(--crit)}
