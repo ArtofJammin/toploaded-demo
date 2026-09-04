@@ -2,7 +2,7 @@
      Two roles. With the API online the worker decides (POST /auth/login → HMAC token);
      offline/demo the passcode is hashed in the browser and compared to the two
      placeholder hashes below. Both placeholders MUST be changed before the owner
-     sees the site (see CLAUDE.md): today admin = "toploaded", staff = "counter".
+     sees the site; the current values are noted in CLAUDE.md (kept out of git).
        TL.auth.role()        'admin' | 'staff' | null
        TL.auth.can(view)     may the current role open this view
        TL.auth.openLogin(target)  show the modal; on success navigates to target
