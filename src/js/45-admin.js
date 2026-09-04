@@ -59,3 +59,4 @@
   });
   $("#locSel").addEventListener("change", function(e){ toast("Location switched \u2014 " + e.target.value.split(" \u2014 ")[0] + " (demo)"); });
   $("#syncInterval").addEventListener("change", function(e){ toast("Auto-sync set to " + e.target.value.toLowerCase() + " (demo)"); });
+  TL.on("view:change", function(d){ if(d && d.name === "admin" && !d.paramsOnly) renderAdmin(); });

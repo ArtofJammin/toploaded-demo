@@ -14,3 +14,11 @@
   content:""; width:26px; height:2px; flex:0 0 auto; border-radius:1px;
   background:linear-gradient(90deg, var(--foilA), var(--foilB), var(--foilC), var(--foilD));
 }
+/* View Transitions API (Chrome/Safari): cross-fade + slight lift between views;
+   the .view.active keyframe still covers browsers without it. */
+@view-transition{navigation:auto}
+::view-transition-old(root){animation:vtOut .18s ease both}
+::view-transition-new(root){animation:vtIn .3s cubic-bezier(.2,.7,.2,1) both}
+@keyframes vtOut{to{opacity:0; transform:translateY(-6px)}}
+@keyframes vtIn{from{opacity:0; transform:translateY(10px)}}
+html.vt .view.active{animation:none}
