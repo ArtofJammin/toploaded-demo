@@ -309,7 +309,9 @@ main:focus{outline:none}
 .view{display:none}
 .view.active{display:block}
 @keyframes viewIn{from{opacity:0; transform:translateY(12px)}to{opacity:1; transform:none}}
-.view.active{animation:viewIn .32s cubic-bezier(.2,.7,.2,1) both}
+/* fill:backwards, not both — a filled transform (even an identity matrix) makes the
+   section a containing block and a stacking context for position:fixed children */
+.view.active{animation:viewIn .32s cubic-bezier(.2,.7,.2,1) backwards}
 .view-head{padding:56px 0 28px}
 .view-head h1{
   font-family:var(--disp); font-weight:800; text-transform:uppercase; letter-spacing:.02em;
@@ -1534,18 +1536,21 @@ html.page-hidden .drawer .cart-empty::before{animation-play-state:paused}
   transition:border-color .15s ease, color .15s ease;
 }
 .cal-btn:hover,.cal-btn[aria-expanded="true"]{border-color:var(--accent); color:var(--accent)}
+/* Anchored to the viewport (JS sets top/left in calPlace) so cards with
+   overflow:hidden — the show card, admin cards, the schedule list — cannot clip it. */
 .cal-pop{
-  position:absolute; right:0; top:calc(100% + 6px); z-index:30; min-width:200px; display:grid;
+  position:fixed; top:0; left:0; z-index:90; min-width:200px; max-width:min(280px, calc(100vw - 16px)); display:grid;
   background:var(--surface); border:1px solid var(--line2); border-radius:6px; padding:6px; box-shadow:var(--shadow);
   animation:calIn .16s cubic-bezier(.2,.7,.2,1) both;
 }
+.cal-pop.cal-up{animation-name:calInUp}
 .cal-pop[hidden]{display:none}
 @keyframes calIn{from{opacity:0; transform:translateY(-4px)}to{opacity:1; transform:none}}
+@keyframes calInUp{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
 .cal-item{
   display:block; padding:9px 12px; border-radius:4px; color:var(--ink); text-decoration:none; font-size:.86rem;
 }
 .cal-item:hover,.cal-item:focus-visible{background:var(--surface2); color:var(--accent); outline:none}
-.next-up .cal-pop{right:auto; left:0}
 @media (max-width:640px){
   .sched-row{grid-template-columns:64px minmax(0,1fr); gap:6px 14px; padding:14px 16px}
   .sched-day{font-size:1.1rem}
@@ -1556,7 +1561,6 @@ html.page-hidden .drawer .cart-empty::before{animation-play-state:paused}
   .sched-name .next-tag{display:block; margin:6px 0 0; width:max-content; max-width:100%}
   .next-up{padding:12px 16px}
   .next-up .cal-menu{margin-left:0; width:100%}
-  .cal-pop{left:0; right:auto}
 }
 @media (pointer:coarse){ .cal-btn{min-height:44px; padding:10px 14px} .cal-item{padding:12px 14px} }
 @media (prefers-reduced-motion: reduce){ .cal-pop{animation:none} }
@@ -1770,7 +1774,7 @@ form.is-done > :not(.form-done){display:none !important}
 .admin-bar .eyebrow{color:var(--accent)}
 .stat-row{display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
 .stat-row-6{grid-template-columns:repeat(6,1fr)}
-.stat{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:18px 20px; min-width:0}
+.stat{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:18px 20px; min-width:0; position:relative}
 .stat .lab{font-family:var(--mono); font-size:.66rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ink3); display:flex; gap:6px; align-items:center; flex-wrap:wrap}
 .stat .lab .demo-tag{letter-spacing:.06em; font-size:.6rem; padding:0 4px}
 .stat .val{font-family:var(--disp); font-weight:800; font-size:2.1rem; line-height:1.1; margin-top:6px; font-variant-numeric:tabular-nums; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
@@ -1927,13 +1931,18 @@ form.is-done > :not(.form-done){display:none !important}
 .rows-empty{font-family:var(--mono); font-size:.7rem; color:var(--ink3); letter-spacing:.06em; padding:4px 0}
 /* play nights editor */
 .ev-editor{display:flex; flex-direction:column; gap:4px; margin-top:4px}
-.ev-row{display:grid; grid-template-columns:78px minmax(0,1.4fr) 104px 64px 96px 96px 30px; gap:8px; align-items:center; padding:8px 0; border-bottom:1px solid var(--line)}
+/* Day + name + delete on the first line, the four small controls on the second.
+   The old single-line 7-column grid needed 516px inside a ~575px card, which
+   squeezed the event name down to 20px. */
+.ev-row{display:grid; grid-template-columns:78px minmax(0,1fr) 30px; gap:8px; align-items:center; padding:10px 0; border-bottom:1px solid var(--line)}
 .ev-row:last-child{border-bottom:0}
 .ev-row input,.ev-row select{padding:7px 9px; font-size:.84rem; width:100%; min-width:0}
-.ev-row .ev-small{grid-column:1 / -2}
+.ev-row .ev-meta{grid-column:1 / -1; display:grid; grid-template-columns:104px 64px minmax(0,1fr) minmax(0,1fr); gap:8px}
+.ev-row .ev-meta-head{grid-column:1 / -1; display:grid; grid-template-columns:104px 64px minmax(0,1fr) minmax(0,1fr); gap:8px; margin-top:2px;
+  font-family:var(--mono); font-size:.58rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3)}
+.ev-row .ev-small{grid-column:1 / -1}
 .ev-row .ev-small input{width:100%}
-.ev-row .row-del{grid-column:7}
-.ev-head{display:grid; grid-template-columns:78px minmax(0,1.4fr) 104px 64px 96px 96px 30px; gap:8px; font-family:var(--mono); font-size:.6rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); padding:0 0 4px}
+.ev-head{display:grid; grid-template-columns:78px minmax(0,1fr) 30px; gap:8px; font-family:var(--mono); font-size:.6rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); padding:0 0 4px}
 /* logo */
 .logo-row{display:flex; gap:14px; align-items:flex-start}
 .logo-preview{
@@ -2041,9 +2050,10 @@ td a:hover{color:var(--accent); text-decoration:underline}
 @media (max-width:960px){
   .rates-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
   .ev-head{display:none}
-  .ev-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 30px}
-  .ev-row .ev-small{grid-column:1 / 3}
-  .ev-row .row-del{grid-column:3; grid-row:1}
+  .ev-row{grid-template-columns:minmax(0,1fr) 30px}
+  .ev-row [data-f="dow"]{grid-column:1}
+  .ev-row .row-del{grid-column:2; grid-row:1}
+  .ev-row .ev-meta,.ev-row .ev-meta-head{grid-template-columns:repeat(2, minmax(0,1fr))}
 }
 @media (max-width:640px){
   .stat-row-6{grid-template-columns:repeat(2,1fr)}
@@ -2054,7 +2064,8 @@ td a:hover{color:var(--accent); text-decoration:underline}
   .inbox-item .ia{grid-column:1; grid-row:auto; flex-direction:row; align-items:center}
   .ev-row{grid-template-columns:minmax(0,1fr) 44px}
   .ev-row > *{grid-column:1}
-  .ev-row .ev-small{grid-column:1 / 2}
+  .ev-row .ev-meta,.ev-row .ev-meta-head{grid-column:1 / -1; grid-template-columns:repeat(2, minmax(0,1fr))}
+  .ev-row .ev-small{grid-column:1 / -1}
   .ev-row .row-del{grid-column:2; grid-row:1}
   .logo-row{flex-wrap:wrap}
   /* staff credit table: drop the Phone column (it shows under the name) so name + balance fit 280px */
@@ -8605,8 +8616,8 @@ footer::before{
   function icsEnd(o, dur){ var t = Date.UTC(o.y, o.m - 1, o.d, o.h, o.mi) + dur * 60000, d = new Date(t); return {y: d.getUTCFullYear(), m: d.getUTCMonth() + 1, d: d.getUTCDate(), h: d.getUTCHours(), mi: d.getUTCMinutes()}; }
   function vtimezone(tz){
     if(tz !== "America/New_York") return "";
-    return ["BEGIN:VTIMEZONE", "TZID:America/New_York", "BEGIN:STANDARD", "DTSTART:19701101T020000", "RRULE:FREQ=YEARLY;BYMONTH=11;EV_BYDAY=1SU", "TZOFFSETFROM:-0400", "TZOFFSETTO:-0500", "TZNAME:EST", "END:STANDARD",
-      "BEGIN:DAYLIGHT", "DTSTART:19700308T020000", "RRULE:FREQ=YEARLY;BYMONTH=3;EV_BYDAY=2SU", "TZOFFSETFROM:-0500", "TZOFFSETTO:-0400", "TZNAME:EDT", "END:DAYLIGHT", "END:VTIMEZONE"].join("\r\n") + "\r\n";
+    return ["BEGIN:VTIMEZONE", "TZID:America/New_York", "BEGIN:STANDARD", "DTSTART:19701101T020000", "RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU", "TZOFFSETFROM:-0400", "TZOFFSETTO:-0500", "TZNAME:EST", "END:STANDARD",
+      "BEGIN:DAYLIGHT", "DTSTART:19700308T020000", "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU", "TZOFFSETFROM:-0500", "TZOFFSETTO:-0400", "TZNAME:EDT", "END:DAYLIGHT", "END:VTIMEZONE"].join("\r\n") + "\r\n";
   }
   function buildIcs(evt){
     var tz = evShopTz(), now = new Date();
@@ -8650,7 +8661,7 @@ footer::before{
     var occ = evNextOcc(ev); if(!occ) return null;
     return {uid: (ev.id || evSlug(ev.name)) + "@toploadedtcg", title: ev.name + " · Top Loaded", desc: (ev.small ? ev.small + ". " : "") + "Weekly at Top Loaded Trading Cards" + (ev.fee && !/tbd/i.test(ev.fee) ? " · entry " + ev.fee : "") + ".",
       location: shopLocation(), start: {y: occ.date.y, m: occ.date.m, d: occ.date.d, h: Math.floor(occ.startMin / 60), mi: occ.startMin % 60},
-      durationMin: EV_DUR_MIN, rrule: "FREQ=WEEKLY;EV_BYDAY=" + EV_BYDAY[eventDow(ev)], url: siteUrl("events")};
+      durationMin: EV_DUR_MIN, rrule: "FREQ=WEEKLY;BYDAY=" + EV_BYDAY[eventDow(ev)], url: siteUrl("events")};
   }
   function calForShow(){
     var s = TL.config.show || {}, d = TL.nextShow(); if(!d || isNaN(d)) return null;
@@ -8661,36 +8672,109 @@ footer::before{
       durationMin: Math.max(60, en - st), rrule: null, alarm: "-P1D", url: siteUrl("show")};
   }
   TL.calendar = {ics: buildIcs, icsUrl: icsDataUrl, google: googleUrl, menu: calMenu, forEvent: calForEvent, forShow: calForShow, nextOccurrence: evNextOcc};
+  TL.on("view:change", function(){ closeCalMenus(); });
   /* calendar menu behaviour: delegated so re-rendered menus keep working */
+  /* The popup is position:fixed, so place it against the button in viewport
+     coordinates: below by default, flipped above when the bottom is tight, and
+     clamped into the viewport horizontally. Re-runs while open on scroll/resize. */
+  var calOpenPop = null;
+  function calBtnOf(pop){ var m = pop._menu; return m ? m.querySelector("[aria-haspopup]") : null; }
+  function calPlace(pop){
+    var btn = calBtnOf(pop);
+    if(!btn || !btn.isConnected){ closeCalMenus(); return; }
+    var b = btn.getBoundingClientRect(), gap = 6, pad = 8;
+    pop.style.maxHeight = ""; pop.style.overflowY = "";
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    var vw = window.innerWidth || document.documentElement.clientWidth;
+    var h = pop.offsetHeight, w = pop.offsetWidth;
+    var below = vh - b.bottom - gap - pad, above = b.top - gap - pad;
+    var up = h > below && above > below;
+    var room = up ? above : below;
+    /* clamp the height FIRST, so the flipped position is computed from the height
+       the popup will actually have and can never cover its own button */
+    if(h > room && room > 0){ h = room; pop.style.maxHeight = h + "px"; pop.style.overflowY = "auto"; }
+    pop.classList.toggle("cal-up", up);
+    var top = up ? (b.top - gap - h) : (b.bottom + gap);
+    top = Math.max(pad, Math.min(top, vh - pad - h));
+    var left = b.right - w;
+    if(left + w > vw - pad) left = vw - pad - w;
+    if(left < pad) left = pad;
+    pop.style.top = Math.round(top) + "px";
+    pop.style.left = Math.round(left) + "px";
+  }
+  function calTrack(){
+    if(!calOpenPop || calOpenPop.hidden){ calOpenPop = null; return; }
+    var btn = calBtnOf(calOpenPop);
+    if(!btn || !btn.isConnected){ closeCalMenus(); return; }
+    var r = btn.getBoundingClientRect(), vh = window.innerHeight || document.documentElement.clientHeight;
+    if(r.bottom < 0 || r.top > vh){ closeCalMenus(); return; } /* trigger scrolled away */
+    calPlace(calOpenPop);
+  }
+  window.addEventListener("scroll", calTrack, true);
+  window.addEventListener("resize", calTrack);
+  /* While open the popup lives on <body>: a position:fixed element is trapped by any
+     ancestor that has a transform (the view's own entry animation, .sr reveals, the
+     signup success panel), which both offsets it and buries it under the sticky header. */
+  function calOpen(pop){
+    if(!pop._menu) pop._menu = pop.parentNode;
+    if(pop.parentNode !== document.body) document.body.appendChild(pop);
+    pop.hidden = false; calOpenPop = pop; calPlace(pop);
+  }
+  function calReturn(pop){
+    var m = pop._menu;
+    if(!m || pop.parentNode === m) return;
+    if(m.isConnected) m.appendChild(pop);
+    else if(pop.parentNode) pop.parentNode.removeChild(pop); /* menu was re-rendered — drop the orphan */
+  }
   function closeCalMenus(except){
-    $$(".cal-menu .cal-pop:not([hidden])").forEach(function(p){
-      if(p.parentNode === except) return;
-      p.hidden = true; var b = p.parentNode.querySelector("[aria-haspopup]"); if(b) b.setAttribute("aria-expanded", "false");
+    $$(".cal-pop:not([hidden])").forEach(function(p){
+      var menu = p._menu || p.parentNode;
+      if(menu === except) return;
+      p.hidden = true; if(p === calOpenPop) calOpenPop = null;
+      var b = menu && menu.querySelector ? menu.querySelector("[aria-haspopup]") : null;
+      if(b) b.setAttribute("aria-expanded", "false");
+      calReturn(p);
     });
   }
   document.addEventListener("click", function(e){
     var btn = e.target.closest(".cal-menu [aria-haspopup]");
     if(btn){
-      var menu = btn.parentNode, pop = menu.querySelector(".cal-pop"), open = !pop.hidden;
+      var menu = btn.parentNode, pop = menu.querySelector(".cal-pop") || menu._pop;
+      if(!pop) return;
+      menu._pop = pop; pop._menu = menu;
+      var open = !pop.hidden;
       closeCalMenus(menu);
-      pop.hidden = open; btn.setAttribute("aria-expanded", String(!open));
+      if(open){ pop.hidden = true; calOpenPop = null; calReturn(pop); }
+      else calOpen(pop);
+      btn.setAttribute("aria-expanded", String(!open));
       if(!open){ var first = pop.querySelector(".cal-item"); if(first && e.detail === 0) first.focus(); }
       return;
     }
     if(e.target.closest(".cal-item")){ var m = e.target.closest(".cal-menu"); setTimeout(function(){ closeCalMenus(); }, 0); if(m) return; }
-    if(!e.target.closest(".cal-menu")) closeCalMenus();
+    if(!e.target.closest(".cal-menu") && !e.target.closest(".cal-pop")) closeCalMenus();
   });
   document.addEventListener("keydown", function(e){
-    var menu = e.target.closest && e.target.closest(".cal-menu"); if(!menu) return;
-    var btn = menu.querySelector("[aria-haspopup]"), pop = menu.querySelector(".cal-pop"), items = $$(".cal-item", pop);
-    if(e.key === "Escape"){ if(!pop.hidden){ pop.hidden = true; btn.setAttribute("aria-expanded", "false"); btn.focus(); e.preventDefault(); } return; }
+    /* Escape must close the menu even when the click never moved focus into it
+       (Safari and Firefox do not focus a button on click) */
+    if(e.key === "Escape" && calOpenPop && !calOpenPop.hidden){
+      var ob = calBtnOf(calOpenPop);
+      closeCalMenus();
+      if(ob){ try { ob.focus(); } catch(err){} e.preventDefault(); return; }
+    }
+    var inPop = e.target.closest && e.target.closest(".cal-pop");
+    var menu = (e.target.closest && e.target.closest(".cal-menu")) || (inPop && inPop._menu); if(!menu) return;
+    var btn = menu.querySelector("[aria-haspopup]"), pop = menu.querySelector(".cal-pop") || menu._pop; if(!pop) return;
+    var items = $$(".cal-item", pop);
+    if(e.key === "Escape"){ if(!pop.hidden){ pop.hidden = true; calOpenPop = null; calReturn(pop); btn.setAttribute("aria-expanded", "false"); btn.focus(); e.preventDefault(); } return; }
     if(e.key === "ArrowDown" || e.key === "ArrowUp"){
       e.preventDefault();
-      if(pop.hidden){ closeCalMenus(menu); pop.hidden = false; btn.setAttribute("aria-expanded", "true"); items[e.key === "ArrowDown" ? 0 : items.length - 1].focus(); return; }
+      if(pop.hidden){ closeCalMenus(menu); calOpen(pop); btn.setAttribute("aria-expanded", "true"); items[e.key === "ArrowDown" ? 0 : items.length - 1].focus(); return; }
       var i = items.indexOf(document.activeElement), n = e.key === "ArrowDown" ? (i + 1) % items.length : (i - 1 + items.length) % items.length;
       items[n].focus();
     }
-    if(e.key === "Tab" && !pop.hidden && document.activeElement === items[items.length - 1] && !e.shiftKey){ pop.hidden = true; btn.setAttribute("aria-expanded", "false"); }
+    if(e.key === "Tab" && !pop.hidden && document.activeElement === items[items.length - 1] && !e.shiftKey){
+      pop.hidden = true; calOpenPop = null; calReturn(pop); btn.setAttribute("aria-expanded", "false");
+    }
   });
 
   /* ---- play nights ---- */
@@ -8698,6 +8782,7 @@ footer::before{
   function nextOpenAfter(dow){ var h = TL.config.hours || {}; for(var i = 1; i <= 7; i++){ var d = (dow + i) % 7; if(h[EV_DOWS[d]]) return {dow: d, open: evHmMin(h[EV_DOWS[d]][0])}; } return null; }
   function renderSched(){
     var list = $("#schedList"); if(!list) return;
+    closeCalMenus();
     var up = evUpcoming(), nextId = up.length ? up[0].ev : null;
     var rows = [];
     evClosedDays().forEach(function(d){
@@ -9937,27 +10022,31 @@ footer::before{
   });
 
   /* ---- play nights editor (working copy kept in sync on every keystroke) ---- */
-  var evWork = [];
+  var evWork = [], evReady = false;
+  var evUid = 0;
   function evFromConfig(){
     return (TL.config.events || []).map(function(e){
-      return {id: e.id || "", day: e.day || DOW_NAMES[e.dow || 0], dow: typeof e.dow === "number" ? e.dow : (DOW_NAMES.indexOf(e.day) > -1 ? DOW_NAMES.indexOf(e.day) : 3),
+      return {uid: e.__uid || (e.__uid = "u" + (++evUid)), id: e.id || "", day: e.day || DOW_NAMES[e.dow || 0], dow: typeof e.dow === "number" ? e.dow : (DOW_NAMES.indexOf(e.day) > -1 ? DOW_NAMES.indexOf(e.day) : 3),
         name: e.name || "", small: e.small || "", time: e.time || "", start: e.start || "", fee: e.fee || "", game: e.game || "op", signup: e.signup || "tcgplus"};
     });
   }
   function renderEvEditor(){
     var el = $("#evEditor"); if(!el) return;
     if(!evWork.length){ el.innerHTML = '<p class="rows-empty">No play nights — add one below.</p>'; return; }
-    el.innerHTML = '<div class="ev-head" aria-hidden="true"><span>Day</span><span>Event</span><span>Start</span><span>Fee</span><span>Game</span><span>Signup</span><span></span></div>' +
+    el.innerHTML = '<div class="ev-head" aria-hidden="true"><span>Day</span><span>Event</span><span></span></div>' +
       evWork.map(function(ev, i){
         var n = i + 1;
         return '<div class="ev-row" data-r="' + i + '">' +
           '<select data-f="dow" aria-label="Day for event ' + n + '">' + opts(DOW_NAMES.map(function(d, di){ return [di, d]; }), ev.dow) + '</select>' +
           '<input data-f="name" value="' + esc(ev.name) + '" placeholder="One Piece Locals" aria-label="Name of event ' + n + '">' +
-          '<input data-f="start" type="time" value="' + esc(ev.start) + '" aria-label="Start time of event ' + n + '">' +
-          '<input data-f="fee" value="' + esc(ev.fee) + '" placeholder="$5" aria-label="Entry fee of event ' + n + '">' +
-          '<select data-f="game" aria-label="Game for event ' + n + '">' + opts(GAME_OPTS, ev.game) + '</select>' +
-          '<select data-f="signup" aria-label="Signup type for event ' + n + '">' + opts(SIGNUP_OPTS, ev.signup) + '</select>' +
           '<button type="button" class="row-del" data-evdel="' + i + '" aria-label="Remove ' + esc(ev.name || "event " + n) + '">&times;</button>' +
+          '<div class="ev-meta-head" aria-hidden="true"><span>Start</span><span>Fee</span><span>Game</span><span>Signup</span></div>' +
+          '<div class="ev-meta">' +
+            '<input data-f="start" type="time" value="' + esc(ev.start) + '" aria-label="Start time of event ' + n + '">' +
+            '<input data-f="fee" value="' + esc(ev.fee) + '" placeholder="$5" aria-label="Entry fee of event ' + n + '">' +
+            '<select data-f="game" aria-label="Game for event ' + n + '">' + opts(GAME_OPTS, ev.game) + '</select>' +
+            '<select data-f="signup" aria-label="Signup type for event ' + n + '">' + opts(SIGNUP_OPTS, ev.signup) + '</select>' +
+          '</div>' +
           '<div class="ev-small"><input data-f="small" value="' + esc(ev.small) + '" placeholder="One line under the name — prizing, format, who it\'s for" aria-label="Description of event ' + n + '"></div>' +
         '</div>';
       }).join("");
@@ -9966,6 +10055,7 @@ footer::before{
     var inp = e.target.closest("[data-f]"), row = inp && inp.closest(".ev-row"); if(!row) return;
     var ev = evWork[parseInt(row.dataset.r, 10)]; if(!ev) return;
     var f = inp.dataset.f, v = inp.value;
+    if(inp.getAttribute("aria-invalid")) inp.removeAttribute("aria-invalid");
     if(f === "dow"){ ev.dow = parseInt(v, 10); ev.day = DOW_NAMES[ev.dow]; }
     else if(f === "start"){ ev.start = v; ev.time = fmt12(v); }
     else ev[f] = v;
@@ -9980,19 +10070,59 @@ footer::before{
     toast("Night removed — publish to make it stick");
   });
   $("#evAdd").addEventListener("click", function(){
-    evWork.push({id: "", day: "Fri", dow: 5, name: "", small: "", time: "6:00 PM", start: "18:00", fee: "TBD", game: "op", signup: "tcgplus"});
+    evWork.push({uid: "new" + (++evUid), id: "", day: "Fri", dow: 5, name: "", small: "", time: "6:00 PM", start: "18:00", fee: "TBD", game: "op", signup: "tcgplus"});
     renderEvEditor();
     var rows = $$("#evEditor .ev-row"), last = rows[rows.length - 1], inp = last && last.querySelector('[data-f="name"]');
     if(inp) inp.focus();
   });
   $("#evApply").addEventListener("click", function(){
     var used = {};
-    var events = evWork.filter(function(ev){ return ev.name; }).map(function(ev){
+    /* never publish a working copy that was never filled in from the config — that
+       used to replace the whole schedule with whatever happened to be on screen.
+       Keyed on "did the editor ever load", so deliberately clearing every night still works. */
+    if(!evReady){
+      evWork = evFromConfig(); evReady = true; renderEvEditor();
+      toast("Schedule reloaded — check it, then publish");
+      return;
+    }
+    /* a nameless row used to vanish on publish with no warning — stop and point at it */
+    var blank = -1;
+    for(var b = 0; b < evWork.length; b++){ if(!String(evWork[b].name || "").trim()){ blank = b; break; } }
+    if(blank > -1){
+      var brow = $('#evEditor .ev-row[data-r="' + blank + '"]'), binp = brow && brow.querySelector('[data-f="name"]');
+      if(binp){ binp.focus(); binp.setAttribute("aria-invalid", "true"); }
+      toast("Night " + (blank + 1) + " needs a name before you publish");
+      return;
+    }
+    /* a night with no start time renders as 12:00 AM and loses its calendar link */
+    var noTime = -1;
+    for(var t2 = 0; t2 < evWork.length; t2++){ if(!String(evWork[t2].start || "").trim()){ noTime = t2; break; } }
+    if(noTime > -1){
+      var trow = $('#evEditor .ev-row[data-r="' + noTime + '"]'), tinp = trow && trow.querySelector('[data-f="start"]');
+      if(tinp){ tinp.focus(); tinp.setAttribute("aria-invalid", "true"); }
+      toast("Give " + (evWork[noTime].name || "night " + (noTime + 1)) + " a start time before you publish");
+      return;
+    }
+    var events = evWork.map(function(ev){
       var id = ev.id || ((ev.game || "ev") + "-" + DOW_NAMES[ev.dow].toLowerCase());
       var base = id, n = 2; while(used[id]){ id = base + "-" + (n++); } used[id] = true;
-      return {id: id, day: DOW_NAMES[ev.dow], dow: ev.dow, name: ev.name, small: ev.small, time: ev.time || fmt12(ev.start), start: ev.start, fee: ev.fee, game: ev.game, signup: ev.signup};
+      var out = {id: id, day: DOW_NAMES[ev.dow], dow: ev.dow, name: ev.name, small: ev.small, time: ev.time || fmt12(ev.start), start: ev.start, fee: ev.fee, game: ev.game, signup: ev.signup};
+      try { Object.defineProperty(out, "__uid", {value: ev.uid, enumerable: false, writable: true}); } catch(e2){}
+      return out;
     });
-    if(!events.length && evWork.length){ toast("Give the night a name first"); return; }
+    /* dropping nights is destructive and easy to do by accident — say so out loud.
+       Compare identities, not counts: deleting one night while adding another nets to
+       zero and used to slip through silently. */
+    var keep = {}; evWork.forEach(function(ev){ if(ev.uid) keep[ev.uid] = 1; });
+    var gone = (TL.config.events || []).filter(function(e){ return e.__uid && !keep[e.__uid]; });
+    if(gone.length){
+      var names = gone.map(function(e){ return e.name || "an unnamed night"; }).join(", ");
+      if(!window.confirm("Publishing removes " + gone.length + " play night" + (gone.length === 1 ? "" : "s") + " from the site: " + names + ". Continue?")){
+        evWork = evFromConfig(); renderEvEditor();
+        toast("Nothing published — the schedule is back as it was");
+        return;
+      }
+    }
     saveCard("cardEvents", {events: events}, "Schedule published").then(function(){ evWork = evFromConfig(); renderEvEditor(); });
   });
 
@@ -10038,7 +10168,7 @@ footer::before{
 
   function renderEditors(){
     renderSite(); renderHours(); renderBannerCard(); renderLinks(); renderShowCard(); renderLiveCard();
-    evWork = evFromConfig(); renderEvEditor(); renderTickerCard(); renderCfgUpdated();
+    evWork = evFromConfig(); evReady = true; renderEvEditor(); renderTickerCard(); renderCfgUpdated();
   }
   var editorsStale = true;
   TL.on("config:change", function(){
@@ -10952,7 +11082,13 @@ footer::before{
     function clear(){ if(lit){ lit.classList.remove("spot-lit"); lit.style.removeProperty("--sx"); lit.style.removeProperty("--sy"); lit = null; } }
     function frame(){
       raf = 0; var e = ev; if(!e) return;
-      var t = (e.target && e.target.closest) ? e.target.closest(".panel, .prod, .stat, .admin-card") : null;
+      /* .busy-host paints a progress bar in its own ::before; stand aside only while
+         that is actually on screen, so the card is not dead to the spotlight forever */
+      var busy = ":not(.busy):not(.busy-ok):not(.busy-err)";
+      var t = (e.target && e.target.closest) ? e.target.closest(".panel" + busy + ", .prod" + busy + ", .stat" + busy + ", .admin-card" + busy) : null;
+      /* the glow is an inset:0 pseudo-element, so it needs its own containing block;
+         a statically positioned card would stretch it across the nearest positioned ancestor */
+      if(t && getComputedStyle(t).position === "static") t = null;
       if(t !== lit){ clear(); lit = t; if(t) t.classList.add("spot-lit"); }
       if(t){ var r = t.getBoundingClientRect(); t.style.setProperty("--sx", Math.round(e.clientX - r.left) + "px"); t.style.setProperty("--sy", Math.round(e.clientY - r.top) + "px"); }
     }
@@ -10962,6 +11098,7 @@ footer::before{
     }, {passive: true});
     document.addEventListener("pointerleave", clear);
     TL.on("motion:change", function(d){ if(d && d.reduce) clear(); });
+    TL.on("view:change", clear);
   })();
 
   /* ---------- boot ----------

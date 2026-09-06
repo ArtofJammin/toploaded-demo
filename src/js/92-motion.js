@@ -214,7 +214,13 @@
     function clear(){ if(lit){ lit.classList.remove("spot-lit"); lit.style.removeProperty("--sx"); lit.style.removeProperty("--sy"); lit = null; } }
     function frame(){
       raf = 0; var e = ev; if(!e) return;
-      var t = (e.target && e.target.closest) ? e.target.closest(".panel, .prod, .stat, .admin-card") : null;
+      /* .busy-host paints a progress bar in its own ::before; stand aside only while
+         that is actually on screen, so the card is not dead to the spotlight forever */
+      var busy = ":not(.busy):not(.busy-ok):not(.busy-err)";
+      var t = (e.target && e.target.closest) ? e.target.closest(".panel" + busy + ", .prod" + busy + ", .stat" + busy + ", .admin-card" + busy) : null;
+      /* the glow is an inset:0 pseudo-element, so it needs its own containing block;
+         a statically positioned card would stretch it across the nearest positioned ancestor */
+      if(t && getComputedStyle(t).position === "static") t = null;
       if(t !== lit){ clear(); lit = t; if(t) t.classList.add("spot-lit"); }
       if(t){ var r = t.getBoundingClientRect(); t.style.setProperty("--sx", Math.round(e.clientX - r.left) + "px"); t.style.setProperty("--sy", Math.round(e.clientY - r.top) + "px"); }
     }
@@ -224,4 +230,5 @@
     }, {passive: true});
     document.addEventListener("pointerleave", clear);
     TL.on("motion:change", function(d){ if(d && d.reduce) clear(); });
+    TL.on("view:change", clear);
   })();

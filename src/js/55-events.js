@@ -73,8 +73,8 @@
   function icsEnd(o, dur){ var t = Date.UTC(o.y, o.m - 1, o.d, o.h, o.mi) + dur * 60000, d = new Date(t); return {y: d.getUTCFullYear(), m: d.getUTCMonth() + 1, d: d.getUTCDate(), h: d.getUTCHours(), mi: d.getUTCMinutes()}; }
   function vtimezone(tz){
     if(tz !== "America/New_York") return "";
-    return ["BEGIN:VTIMEZONE", "TZID:America/New_York", "BEGIN:STANDARD", "DTSTART:19701101T020000", "RRULE:FREQ=YEARLY;BYMONTH=11;EV_BYDAY=1SU", "TZOFFSETFROM:-0400", "TZOFFSETTO:-0500", "TZNAME:EST", "END:STANDARD",
-      "BEGIN:DAYLIGHT", "DTSTART:19700308T020000", "RRULE:FREQ=YEARLY;BYMONTH=3;EV_BYDAY=2SU", "TZOFFSETFROM:-0500", "TZOFFSETTO:-0400", "TZNAME:EDT", "END:DAYLIGHT", "END:VTIMEZONE"].join("\r\n") + "\r\n";
+    return ["BEGIN:VTIMEZONE", "TZID:America/New_York", "BEGIN:STANDARD", "DTSTART:19701101T020000", "RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU", "TZOFFSETFROM:-0400", "TZOFFSETTO:-0500", "TZNAME:EST", "END:STANDARD",
+      "BEGIN:DAYLIGHT", "DTSTART:19700308T020000", "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU", "TZOFFSETFROM:-0500", "TZOFFSETTO:-0400", "TZNAME:EDT", "END:DAYLIGHT", "END:VTIMEZONE"].join("\r\n") + "\r\n";
   }
   function buildIcs(evt){
     var tz = evShopTz(), now = new Date();
@@ -118,7 +118,7 @@
     var occ = evNextOcc(ev); if(!occ) return null;
     return {uid: (ev.id || evSlug(ev.name)) + "@toploadedtcg", title: ev.name + " · Top Loaded", desc: (ev.small ? ev.small + ". " : "") + "Weekly at Top Loaded Trading Cards" + (ev.fee && !/tbd/i.test(ev.fee) ? " · entry " + ev.fee : "") + ".",
       location: shopLocation(), start: {y: occ.date.y, m: occ.date.m, d: occ.date.d, h: Math.floor(occ.startMin / 60), mi: occ.startMin % 60},
-      durationMin: EV_DUR_MIN, rrule: "FREQ=WEEKLY;EV_BYDAY=" + EV_BYDAY[eventDow(ev)], url: siteUrl("events")};
+      durationMin: EV_DUR_MIN, rrule: "FREQ=WEEKLY;BYDAY=" + EV_BYDAY[eventDow(ev)], url: siteUrl("events")};
   }
   function calForShow(){
     var s = TL.config.show || {}, d = TL.nextShow(); if(!d || isNaN(d)) return null;
@@ -129,36 +129,109 @@
       durationMin: Math.max(60, en - st), rrule: null, alarm: "-P1D", url: siteUrl("show")};
   }
   TL.calendar = {ics: buildIcs, icsUrl: icsDataUrl, google: googleUrl, menu: calMenu, forEvent: calForEvent, forShow: calForShow, nextOccurrence: evNextOcc};
+  TL.on("view:change", function(){ closeCalMenus(); });
   /* calendar menu behaviour: delegated so re-rendered menus keep working */
+  /* The popup is position:fixed, so place it against the button in viewport
+     coordinates: below by default, flipped above when the bottom is tight, and
+     clamped into the viewport horizontally. Re-runs while open on scroll/resize. */
+  var calOpenPop = null;
+  function calBtnOf(pop){ var m = pop._menu; return m ? m.querySelector("[aria-haspopup]") : null; }
+  function calPlace(pop){
+    var btn = calBtnOf(pop);
+    if(!btn || !btn.isConnected){ closeCalMenus(); return; }
+    var b = btn.getBoundingClientRect(), gap = 6, pad = 8;
+    pop.style.maxHeight = ""; pop.style.overflowY = "";
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    var vw = window.innerWidth || document.documentElement.clientWidth;
+    var h = pop.offsetHeight, w = pop.offsetWidth;
+    var below = vh - b.bottom - gap - pad, above = b.top - gap - pad;
+    var up = h > below && above > below;
+    var room = up ? above : below;
+    /* clamp the height FIRST, so the flipped position is computed from the height
+       the popup will actually have and can never cover its own button */
+    if(h > room && room > 0){ h = room; pop.style.maxHeight = h + "px"; pop.style.overflowY = "auto"; }
+    pop.classList.toggle("cal-up", up);
+    var top = up ? (b.top - gap - h) : (b.bottom + gap);
+    top = Math.max(pad, Math.min(top, vh - pad - h));
+    var left = b.right - w;
+    if(left + w > vw - pad) left = vw - pad - w;
+    if(left < pad) left = pad;
+    pop.style.top = Math.round(top) + "px";
+    pop.style.left = Math.round(left) + "px";
+  }
+  function calTrack(){
+    if(!calOpenPop || calOpenPop.hidden){ calOpenPop = null; return; }
+    var btn = calBtnOf(calOpenPop);
+    if(!btn || !btn.isConnected){ closeCalMenus(); return; }
+    var r = btn.getBoundingClientRect(), vh = window.innerHeight || document.documentElement.clientHeight;
+    if(r.bottom < 0 || r.top > vh){ closeCalMenus(); return; } /* trigger scrolled away */
+    calPlace(calOpenPop);
+  }
+  window.addEventListener("scroll", calTrack, true);
+  window.addEventListener("resize", calTrack);
+  /* While open the popup lives on <body>: a position:fixed element is trapped by any
+     ancestor that has a transform (the view's own entry animation, .sr reveals, the
+     signup success panel), which both offsets it and buries it under the sticky header. */
+  function calOpen(pop){
+    if(!pop._menu) pop._menu = pop.parentNode;
+    if(pop.parentNode !== document.body) document.body.appendChild(pop);
+    pop.hidden = false; calOpenPop = pop; calPlace(pop);
+  }
+  function calReturn(pop){
+    var m = pop._menu;
+    if(!m || pop.parentNode === m) return;
+    if(m.isConnected) m.appendChild(pop);
+    else if(pop.parentNode) pop.parentNode.removeChild(pop); /* menu was re-rendered — drop the orphan */
+  }
   function closeCalMenus(except){
-    $$(".cal-menu .cal-pop:not([hidden])").forEach(function(p){
-      if(p.parentNode === except) return;
-      p.hidden = true; var b = p.parentNode.querySelector("[aria-haspopup]"); if(b) b.setAttribute("aria-expanded", "false");
+    $$(".cal-pop:not([hidden])").forEach(function(p){
+      var menu = p._menu || p.parentNode;
+      if(menu === except) return;
+      p.hidden = true; if(p === calOpenPop) calOpenPop = null;
+      var b = menu && menu.querySelector ? menu.querySelector("[aria-haspopup]") : null;
+      if(b) b.setAttribute("aria-expanded", "false");
+      calReturn(p);
     });
   }
   document.addEventListener("click", function(e){
     var btn = e.target.closest(".cal-menu [aria-haspopup]");
     if(btn){
-      var menu = btn.parentNode, pop = menu.querySelector(".cal-pop"), open = !pop.hidden;
+      var menu = btn.parentNode, pop = menu.querySelector(".cal-pop") || menu._pop;
+      if(!pop) return;
+      menu._pop = pop; pop._menu = menu;
+      var open = !pop.hidden;
       closeCalMenus(menu);
-      pop.hidden = open; btn.setAttribute("aria-expanded", String(!open));
+      if(open){ pop.hidden = true; calOpenPop = null; calReturn(pop); }
+      else calOpen(pop);
+      btn.setAttribute("aria-expanded", String(!open));
       if(!open){ var first = pop.querySelector(".cal-item"); if(first && e.detail === 0) first.focus(); }
       return;
     }
     if(e.target.closest(".cal-item")){ var m = e.target.closest(".cal-menu"); setTimeout(function(){ closeCalMenus(); }, 0); if(m) return; }
-    if(!e.target.closest(".cal-menu")) closeCalMenus();
+    if(!e.target.closest(".cal-menu") && !e.target.closest(".cal-pop")) closeCalMenus();
   });
   document.addEventListener("keydown", function(e){
-    var menu = e.target.closest && e.target.closest(".cal-menu"); if(!menu) return;
-    var btn = menu.querySelector("[aria-haspopup]"), pop = menu.querySelector(".cal-pop"), items = $$(".cal-item", pop);
-    if(e.key === "Escape"){ if(!pop.hidden){ pop.hidden = true; btn.setAttribute("aria-expanded", "false"); btn.focus(); e.preventDefault(); } return; }
+    /* Escape must close the menu even when the click never moved focus into it
+       (Safari and Firefox do not focus a button on click) */
+    if(e.key === "Escape" && calOpenPop && !calOpenPop.hidden){
+      var ob = calBtnOf(calOpenPop);
+      closeCalMenus();
+      if(ob){ try { ob.focus(); } catch(err){} e.preventDefault(); return; }
+    }
+    var inPop = e.target.closest && e.target.closest(".cal-pop");
+    var menu = (e.target.closest && e.target.closest(".cal-menu")) || (inPop && inPop._menu); if(!menu) return;
+    var btn = menu.querySelector("[aria-haspopup]"), pop = menu.querySelector(".cal-pop") || menu._pop; if(!pop) return;
+    var items = $$(".cal-item", pop);
+    if(e.key === "Escape"){ if(!pop.hidden){ pop.hidden = true; calOpenPop = null; calReturn(pop); btn.setAttribute("aria-expanded", "false"); btn.focus(); e.preventDefault(); } return; }
     if(e.key === "ArrowDown" || e.key === "ArrowUp"){
       e.preventDefault();
-      if(pop.hidden){ closeCalMenus(menu); pop.hidden = false; btn.setAttribute("aria-expanded", "true"); items[e.key === "ArrowDown" ? 0 : items.length - 1].focus(); return; }
+      if(pop.hidden){ closeCalMenus(menu); calOpen(pop); btn.setAttribute("aria-expanded", "true"); items[e.key === "ArrowDown" ? 0 : items.length - 1].focus(); return; }
       var i = items.indexOf(document.activeElement), n = e.key === "ArrowDown" ? (i + 1) % items.length : (i - 1 + items.length) % items.length;
       items[n].focus();
     }
-    if(e.key === "Tab" && !pop.hidden && document.activeElement === items[items.length - 1] && !e.shiftKey){ pop.hidden = true; btn.setAttribute("aria-expanded", "false"); }
+    if(e.key === "Tab" && !pop.hidden && document.activeElement === items[items.length - 1] && !e.shiftKey){
+      pop.hidden = true; calOpenPop = null; calReturn(pop); btn.setAttribute("aria-expanded", "false");
+    }
   });
 
   /* ---- play nights ---- */
@@ -166,6 +239,7 @@
   function nextOpenAfter(dow){ var h = TL.config.hours || {}; for(var i = 1; i <= 7; i++){ var d = (dow + i) % 7; if(h[EV_DOWS[d]]) return {dow: d, open: evHmMin(h[EV_DOWS[d]][0])}; } return null; }
   function renderSched(){
     var list = $("#schedList"); if(!list) return;
+    closeCalMenus();
     var up = evUpcoming(), nextId = up.length ? up[0].ev : null;
     var rows = [];
     evClosedDays().forEach(function(d){

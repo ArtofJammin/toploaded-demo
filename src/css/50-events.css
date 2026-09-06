@@ -44,18 +44,21 @@
   transition:border-color .15s ease, color .15s ease;
 }
 .cal-btn:hover,.cal-btn[aria-expanded="true"]{border-color:var(--accent); color:var(--accent)}
+/* Anchored to the viewport (JS sets top/left in calPlace) so cards with
+   overflow:hidden — the show card, admin cards, the schedule list — cannot clip it. */
 .cal-pop{
-  position:absolute; right:0; top:calc(100% + 6px); z-index:30; min-width:200px; display:grid;
+  position:fixed; top:0; left:0; z-index:90; min-width:200px; max-width:min(280px, calc(100vw - 16px)); display:grid;
   background:var(--surface); border:1px solid var(--line2); border-radius:6px; padding:6px; box-shadow:var(--shadow);
   animation:calIn .16s cubic-bezier(.2,.7,.2,1) both;
 }
+.cal-pop.cal-up{animation-name:calInUp}
 .cal-pop[hidden]{display:none}
 @keyframes calIn{from{opacity:0; transform:translateY(-4px)}to{opacity:1; transform:none}}
+@keyframes calInUp{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
 .cal-item{
   display:block; padding:9px 12px; border-radius:4px; color:var(--ink); text-decoration:none; font-size:.86rem;
 }
 .cal-item:hover,.cal-item:focus-visible{background:var(--surface2); color:var(--accent); outline:none}
-.next-up .cal-pop{right:auto; left:0}
 @media (max-width:640px){
   .sched-row{grid-template-columns:64px minmax(0,1fr); gap:6px 14px; padding:14px 16px}
   .sched-day{font-size:1.1rem}
@@ -66,7 +69,6 @@
   .sched-name .next-tag{display:block; margin:6px 0 0; width:max-content; max-width:100%}
   .next-up{padding:12px 16px}
   .next-up .cal-menu{margin-left:0; width:100%}
-  .cal-pop{left:0; right:auto}
 }
 @media (pointer:coarse){ .cal-btn{min-height:44px; padding:10px 14px} .cal-item{padding:12px 14px} }
 @media (prefers-reduced-motion: reduce){ .cal-pop{animation:none} }

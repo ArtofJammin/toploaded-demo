@@ -320,27 +320,31 @@
   });
 
   /* ---- play nights editor (working copy kept in sync on every keystroke) ---- */
-  var evWork = [];
+  var evWork = [], evReady = false;
+  var evUid = 0;
   function evFromConfig(){
     return (TL.config.events || []).map(function(e){
-      return {id: e.id || "", day: e.day || DOW_NAMES[e.dow || 0], dow: typeof e.dow === "number" ? e.dow : (DOW_NAMES.indexOf(e.day) > -1 ? DOW_NAMES.indexOf(e.day) : 3),
+      return {uid: e.__uid || (e.__uid = "u" + (++evUid)), id: e.id || "", day: e.day || DOW_NAMES[e.dow || 0], dow: typeof e.dow === "number" ? e.dow : (DOW_NAMES.indexOf(e.day) > -1 ? DOW_NAMES.indexOf(e.day) : 3),
         name: e.name || "", small: e.small || "", time: e.time || "", start: e.start || "", fee: e.fee || "", game: e.game || "op", signup: e.signup || "tcgplus"};
     });
   }
   function renderEvEditor(){
     var el = $("#evEditor"); if(!el) return;
     if(!evWork.length){ el.innerHTML = '<p class="rows-empty">No play nights — add one below.</p>'; return; }
-    el.innerHTML = '<div class="ev-head" aria-hidden="true"><span>Day</span><span>Event</span><span>Start</span><span>Fee</span><span>Game</span><span>Signup</span><span></span></div>' +
+    el.innerHTML = '<div class="ev-head" aria-hidden="true"><span>Day</span><span>Event</span><span></span></div>' +
       evWork.map(function(ev, i){
         var n = i + 1;
         return '<div class="ev-row" data-r="' + i + '">' +
           '<select data-f="dow" aria-label="Day for event ' + n + '">' + opts(DOW_NAMES.map(function(d, di){ return [di, d]; }), ev.dow) + '</select>' +
           '<input data-f="name" value="' + esc(ev.name) + '" placeholder="One Piece Locals" aria-label="Name of event ' + n + '">' +
-          '<input data-f="start" type="time" value="' + esc(ev.start) + '" aria-label="Start time of event ' + n + '">' +
-          '<input data-f="fee" value="' + esc(ev.fee) + '" placeholder="$5" aria-label="Entry fee of event ' + n + '">' +
-          '<select data-f="game" aria-label="Game for event ' + n + '">' + opts(GAME_OPTS, ev.game) + '</select>' +
-          '<select data-f="signup" aria-label="Signup type for event ' + n + '">' + opts(SIGNUP_OPTS, ev.signup) + '</select>' +
           '<button type="button" class="row-del" data-evdel="' + i + '" aria-label="Remove ' + esc(ev.name || "event " + n) + '">&times;</button>' +
+          '<div class="ev-meta-head" aria-hidden="true"><span>Start</span><span>Fee</span><span>Game</span><span>Signup</span></div>' +
+          '<div class="ev-meta">' +
+            '<input data-f="start" type="time" value="' + esc(ev.start) + '" aria-label="Start time of event ' + n + '">' +
+            '<input data-f="fee" value="' + esc(ev.fee) + '" placeholder="$5" aria-label="Entry fee of event ' + n + '">' +
+            '<select data-f="game" aria-label="Game for event ' + n + '">' + opts(GAME_OPTS, ev.game) + '</select>' +
+            '<select data-f="signup" aria-label="Signup type for event ' + n + '">' + opts(SIGNUP_OPTS, ev.signup) + '</select>' +
+          '</div>' +
           '<div class="ev-small"><input data-f="small" value="' + esc(ev.small) + '" placeholder="One line under the name — prizing, format, who it\'s for" aria-label="Description of event ' + n + '"></div>' +
         '</div>';
       }).join("");
@@ -349,6 +353,7 @@
     var inp = e.target.closest("[data-f]"), row = inp && inp.closest(".ev-row"); if(!row) return;
     var ev = evWork[parseInt(row.dataset.r, 10)]; if(!ev) return;
     var f = inp.dataset.f, v = inp.value;
+    if(inp.getAttribute("aria-invalid")) inp.removeAttribute("aria-invalid");
     if(f === "dow"){ ev.dow = parseInt(v, 10); ev.day = DOW_NAMES[ev.dow]; }
     else if(f === "start"){ ev.start = v; ev.time = fmt12(v); }
     else ev[f] = v;
@@ -363,19 +368,59 @@
     toast("Night removed — publish to make it stick");
   });
   $("#evAdd").addEventListener("click", function(){
-    evWork.push({id: "", day: "Fri", dow: 5, name: "", small: "", time: "6:00 PM", start: "18:00", fee: "TBD", game: "op", signup: "tcgplus"});
+    evWork.push({uid: "new" + (++evUid), id: "", day: "Fri", dow: 5, name: "", small: "", time: "6:00 PM", start: "18:00", fee: "TBD", game: "op", signup: "tcgplus"});
     renderEvEditor();
     var rows = $$("#evEditor .ev-row"), last = rows[rows.length - 1], inp = last && last.querySelector('[data-f="name"]');
     if(inp) inp.focus();
   });
   $("#evApply").addEventListener("click", function(){
     var used = {};
-    var events = evWork.filter(function(ev){ return ev.name; }).map(function(ev){
+    /* never publish a working copy that was never filled in from the config — that
+       used to replace the whole schedule with whatever happened to be on screen.
+       Keyed on "did the editor ever load", so deliberately clearing every night still works. */
+    if(!evReady){
+      evWork = evFromConfig(); evReady = true; renderEvEditor();
+      toast("Schedule reloaded — check it, then publish");
+      return;
+    }
+    /* a nameless row used to vanish on publish with no warning — stop and point at it */
+    var blank = -1;
+    for(var b = 0; b < evWork.length; b++){ if(!String(evWork[b].name || "").trim()){ blank = b; break; } }
+    if(blank > -1){
+      var brow = $('#evEditor .ev-row[data-r="' + blank + '"]'), binp = brow && brow.querySelector('[data-f="name"]');
+      if(binp){ binp.focus(); binp.setAttribute("aria-invalid", "true"); }
+      toast("Night " + (blank + 1) + " needs a name before you publish");
+      return;
+    }
+    /* a night with no start time renders as 12:00 AM and loses its calendar link */
+    var noTime = -1;
+    for(var t2 = 0; t2 < evWork.length; t2++){ if(!String(evWork[t2].start || "").trim()){ noTime = t2; break; } }
+    if(noTime > -1){
+      var trow = $('#evEditor .ev-row[data-r="' + noTime + '"]'), tinp = trow && trow.querySelector('[data-f="start"]');
+      if(tinp){ tinp.focus(); tinp.setAttribute("aria-invalid", "true"); }
+      toast("Give " + (evWork[noTime].name || "night " + (noTime + 1)) + " a start time before you publish");
+      return;
+    }
+    var events = evWork.map(function(ev){
       var id = ev.id || ((ev.game || "ev") + "-" + DOW_NAMES[ev.dow].toLowerCase());
       var base = id, n = 2; while(used[id]){ id = base + "-" + (n++); } used[id] = true;
-      return {id: id, day: DOW_NAMES[ev.dow], dow: ev.dow, name: ev.name, small: ev.small, time: ev.time || fmt12(ev.start), start: ev.start, fee: ev.fee, game: ev.game, signup: ev.signup};
+      var out = {id: id, day: DOW_NAMES[ev.dow], dow: ev.dow, name: ev.name, small: ev.small, time: ev.time || fmt12(ev.start), start: ev.start, fee: ev.fee, game: ev.game, signup: ev.signup};
+      try { Object.defineProperty(out, "__uid", {value: ev.uid, enumerable: false, writable: true}); } catch(e2){}
+      return out;
     });
-    if(!events.length && evWork.length){ toast("Give the night a name first"); return; }
+    /* dropping nights is destructive and easy to do by accident — say so out loud.
+       Compare identities, not counts: deleting one night while adding another nets to
+       zero and used to slip through silently. */
+    var keep = {}; evWork.forEach(function(ev){ if(ev.uid) keep[ev.uid] = 1; });
+    var gone = (TL.config.events || []).filter(function(e){ return e.__uid && !keep[e.__uid]; });
+    if(gone.length){
+      var names = gone.map(function(e){ return e.name || "an unnamed night"; }).join(", ");
+      if(!window.confirm("Publishing removes " + gone.length + " play night" + (gone.length === 1 ? "" : "s") + " from the site: " + names + ". Continue?")){
+        evWork = evFromConfig(); renderEvEditor();
+        toast("Nothing published — the schedule is back as it was");
+        return;
+      }
+    }
     saveCard("cardEvents", {events: events}, "Schedule published").then(function(){ evWork = evFromConfig(); renderEvEditor(); });
   });
 
@@ -421,7 +466,7 @@
 
   function renderEditors(){
     renderSite(); renderHours(); renderBannerCard(); renderLinks(); renderShowCard(); renderLiveCard();
-    evWork = evFromConfig(); renderEvEditor(); renderTickerCard(); renderCfgUpdated();
+    evWork = evFromConfig(); evReady = true; renderEvEditor(); renderTickerCard(); renderCfgUpdated();
   }
   var editorsStale = true;
   TL.on("config:change", function(){
