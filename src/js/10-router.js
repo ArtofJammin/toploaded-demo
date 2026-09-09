@@ -15,7 +15,7 @@
   $$("section.view[id^='view-']").forEach(function(s){ views[s.id.slice(5)] = "#" + s.id; });
   var current = "home";
   var pendingView = null;
-  var VIEW_TITLES = {home:"", shop:"Shop", live:"Live breaks", show:"Card show", events:"Play nights", buylist:"Sell to us", visit:"Visit", staff:"Staff desk", admin:"Admin", rip:"Pack rip"};
+  var VIEW_TITLES = {home:"", shop:"Shop", live:"Live breaks", show:"Card show", events:"Play nights", buylist:"Sell to us", visit:"Visit", staff:"Staff desk", admin:"Admin", rip:"Pack rip", account:"My account"};
   var BASE_TITLE = document.title;
   function isAuthed(){
     if(TL.auth && typeof TL.auth.can === "function") return TL.auth.can(current);
@@ -57,12 +57,18 @@
       return;
     }
     var prev = current, paramsOnly = (prev === name && lastRoute.name === name);
+    var useTransition = !paramsOnly && !reduceMotion && document.startViewTransition && !opts.noTransition && !document.hidden;
     current = name;
     lastRoute = {name: name, params: params || {}};
     function swap(){
       if(!paramsOnly){
         TL.emit("view:leave", {name: prev});
-        Object.keys(views).forEach(function(k){ var el = $(views[k]); if(el) el.classList.toggle("active", k === name); });
+        Object.keys(views).forEach(function(k){
+          var el = $(views[k]); if(!el) return;
+          el.classList.toggle("active", k === name);
+          el.classList.toggle("route-enter", k === name && !useTransition && !opts.noTransition && !reduceMotion);
+        });
+        document.documentElement.removeAttribute("data-boot-view");
         $$(".mainnav [data-go]").forEach(function(b){ if(b.dataset.go === name) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
         document.title = (VIEW_TITLES[name] ? VIEW_TITLES[name] + " · " : "") + BASE_TITLE;
         if(!opts.keepScroll) window.scrollTo({top: 0, behavior: "auto"});
@@ -71,7 +77,7 @@
       }
       TL.emit("view:change", {name: name, params: params || {}, prev: prev, paramsOnly: paramsOnly});
     }
-    if(!paramsOnly && !reduceMotion && document.startViewTransition && !opts.noTransition && !document.hidden){
+    if(useTransition){
       document.documentElement.classList.add("vt");
       var t = document.startViewTransition(swap), noop = function(){};
       /* every promise on the transition can reject when navigations overlap; none of that is an error for us */

@@ -6,6 +6,25 @@ checkout, Square webhooks → cross-channel alerts, a store-credit ledger, live-
 spots and chat, and an on-demand inventory refresh. The site works without it
 (demo mode with localStorage), and lights features up when it can reach `/health`.
 
+## Customer accounts (preview implementation)
+
+The `#/account` page uses a separate customer session, never a staff token or a local demo balance.
+
+| Method | Route | Purpose |
+| --- | --- | --- |
+| GET | `/account/status` | Whether KV, RESEND_API_KEY and EMAIL_FROM are configured |
+| POST | `/account/code` | `{email}`: emails a random 128-bit code, returns a challenge ID, never the code; identical flow for known and unknown emails |
+| POST | `/account/verify` | `{challenge,code}`: 10-minute hashed code, up to five attempts; returns an opaque 12-hour customer session |
+| GET | `/account/me` | Customer bearer token only; reads the single ledger matching the verified email. Ambiguous/unlinked emails get no balance. Excludes staff notes, phone numbers and customer IDs |
+| POST | `/account/logout` | Deletes the customer session |
+| PUT | `/credit/:id/email` | Admin only, `{email,confirmed:true}` after identity verification at the counter; rejects a duplicate linked email |
+
+Set a verified `EMAIL_FROM` and `RESEND_API_KEY` to enable code delivery. No dry-run code is returned or logged. The client stores its customer session in sessionStorage, isolated from staff auth. Email/code endpoints have IP and email rate limits. Balances are private/no-store; customers cannot create credit, redeem it or choose a customer ID.
+
+The old `/credit/lookup?phone=` endpoint now returns 410 to prevent bypassing account sign-in. Staff desk has a linking form for existing customers; device-local demo ledgers are not imported.
+
+Operational limitation: the current KV implementation is eventually consistent, including code consumption and session revocation. Use a strongly consistent session/challenge store if globally immediate single-use/revocation guarantees are required. Ledger writes are also non-transactional; do not enable concurrent or online redemption without transactional storage and idempotency. See [launch checklist](../LAUNCH-CHECKLIST.md). Email delivery is mocked in automated tests and must be validated against the real sender before launch.
+
 ## Run locally (no install)
 
 ```bash
@@ -72,7 +91,7 @@ commit. Optional secrets: `SQUARE_ACCESS_TOKEN`, `SQUARE_LOCATION_ID`,
 | POST | `/credit` | staff | `{name, phone}` → create customer |
 | POST | `/credit/:id/add` | staff | `{cash, note?}` → adds `cash × (1 + config.buy.creditBonus)`; `{redeem:true, amount}` subtracts. Returns `{customer, entry}`; log under `credit:log:<id>` |
 | GET | `/credit/:id` | staff | customer + last 50 ledger entries |
-| GET | `/credit/lookup?phone=` | – | public balance check: returns `{found, balance}` only when the phone matches exactly (last 4 digits masked name); rate limited 10 / 10 min |
+| GET | `/credit/lookup?phone=` | – | retired: 410, directs customers to verified account sign-in; never reveals balances |
 | GET | `/live` | – | `{live:config.live, spots:{taken:[n…], price, total}, viewers}` |
 | POST | `/live/spots/claim` | – | `{spot, name?}` → claims spot n if free (atomic-ish via KV read-modify-write + re-check), returns `{ok, spot, taken:[…]}`; 409 when taken, 409 `{reason:"limit"}` once a sid holds 3 unpaid spots (an IP 6); 10 / min per IP. Claims expire after 6 h unless `POST /live/spots/:n/confirm` (staff) |
 | POST | `/live/spots/reset` | staff | clear all claims |

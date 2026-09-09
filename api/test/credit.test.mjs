@@ -10,13 +10,13 @@ async function setup() {
   return { env, c, staff, admin };
 }
 
-test('credit: staff only for everything but the public lookup', async () => {
+test('credit: staff only; the former public phone lookup is retired', async () => {
   const { c } = await setup();
   assert.equal((await c.get('/credit?q=al')).status, 401);
   assert.equal((await c.post('/credit', { name: 'Alex Rivera', phone: '8595550142' })).status, 401);
   assert.equal((await c.get('/credit/abc')).status, 401);
   assert.equal((await c.post('/credit/abc/add', { cash: 10 })).status, 401);
-  assert.equal((await c.get('/credit/lookup?phone=8595550142')).status, 200, 'lookup is public');
+  assert.equal((await c.get('/credit/lookup?phone=8595550142')).status, 410, 'use authenticated customer account');
 });
 
 test('credit: create customers, normalize phones, reject duplicates, search', async () => {
@@ -112,22 +112,17 @@ test('credit: trades add the config bonus, redeems cannot overdraw, ledger is ne
   assert.equal(search.data.customers[0].balance, 40, 'index balance stays in sync');
 });
 
-test('credit: public lookup masks the name, matches the exact phone, and is rate limited', async () => {
+test('credit: legacy lookup reveals neither existence nor balances', async () => {
   const { c, staff } = await setup();
   const alex = (await c.post('/credit', { name: 'alex rivera', phone: '8595550142' }, { token: staff })).data.customer;
   await c.post(`/credit/${alex.id}/add`, { cash: 20 }, { token: staff });
   const hit = await c.get('/credit/lookup?phone=' + encodeURIComponent('(859) 555-0142'));
-  assert.equal(hit.status, 200);
-  assert.deepEqual(hit.data, { found: true, balance: 22, name: 'A••• R.' });
+  assert.equal(hit.status, 410);
+  assert.equal('balance' in hit.data, false);
   assert.equal(JSON.stringify(hit.data).includes(alex.id), false, 'no id leaks');
   const miss = await c.get('/credit/lookup?phone=8595550143');
-  assert.deepEqual(miss.data, { found: false });
+  assert.deepEqual(miss.data, hit.data);
   const partial = await c.get('/credit/lookup?phone=5550142');
-  assert.deepEqual(partial.data, { found: false }, 'exact match only');
-  assert.equal((await c.get('/credit/lookup?phone=12')).status, 400);
-  assert.equal((await c.get('/credit/lookup')).status, 400);
-  let last;
-  for (let i = 0; i < 7; i++) last = await c.get('/credit/lookup?phone=8595550142');
-  assert.equal(last.status, 429, '10 per 10 min per IP');
-  assert.equal((await c.get('/credit/lookup?phone=8595550142', { headers: { 'cf-connecting-ip': '9.9.9.9' } })).status, 200);
+  assert.deepEqual(partial.data, hit.data);
+  assert.equal((await c.get('/credit/lookup')).status, 410);
 });

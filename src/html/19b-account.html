@@ -1,0 +1,27 @@
+  <section class="view" id="view-account" aria-label="Customer account">
+    <div class="wrap">
+      <div class="view-head"><p class="eyebrow">Your corner of the card shop</p><h1>My account</h1><p class="lede">Check your store credit, review recent trades, and find your way back to the cards you saved.</p></div>
+      <div class="account-layout">
+        <div class="account-panel">
+          <div id="accountGuest">
+            <h2>Sign in with your email</h2><p>No password to remember. We will email a private sign-in code that expires in 10 minutes.</p>
+            <form id="accountEmailForm"><label for="accountEmail">Email address</label><input id="accountEmail" type="email" autocomplete="email" maxlength="200" placeholder="you@example.com" required><button class="btn" id="accountSend" type="submit" disabled>Email me a sign-in code</button></form>
+            <form id="accountCodeForm" hidden><label for="accountCode">Paste the code from your email</label><input id="accountCode" type="text" autocomplete="one-time-code" autocapitalize="none" spellcheck="false" maxlength="64" required aria-describedby="accountCodeHint"><p id="accountCodeHint">Use the full 32-character code. Never share it with anyone.</p><button class="btn" id="accountVerify" type="submit">Sign in</button><button class="linklike" id="accountRestart" type="button">Use another email or request a new code</button></form>
+          </div>
+          <div id="accountMember" hidden>
+            <div class="account-member-head"><div><p class="account-kicker">SIGNED IN</p><h2 id="accountWho"></h2></div><button class="linklike" id="accountLogout" type="button">Sign out</button></div>
+            <div class="account-balance"><span>Available store credit</span><strong id="accountBalance">&mdash;</strong><p id="accountUpdated"></p></div>
+            <p id="accountLinkNote" hidden>Ask the counter to link this email to your credit record. You do not need to create another balance.</p>
+            <div class="account-history-head"><h3>Recent credit activity</h3><button class="linklike" id="accountRefresh" type="button">Refresh balance</button></div>
+            <div id="accountHistory"></div><p class="account-footnote">Up to 50 recent entries. Credit is redeemed by staff at the counter; it is not applied automatically to online checkout.</p>
+          </div>
+          <p id="accountStatus" role="status" class="account-status">Checking customer sign-in availability&hellip;</p>
+        </div>
+        <aside class="account-panel account-benefits" aria-label="Account information">
+          <p class="account-kicker">KEEP THE GOOD STUFF CLOSE</p><h2>Your collection.<br>Your next chapter.</h2>
+          <ul><li><b>Store credit, clearly.</b><span>Balances and trade history come from the shop's ledger, not sample numbers.</span></li><li><b>A private way to sign in.</b><span>Access belongs to the email linked by the shop. Staff/admin accounts stay separate.</span></li><li><b>Your saved cards.</b><span>Wishlists and recently viewed cards currently stay on this browser.</span></li></ul>
+          <a class="btn btn-ghost" href="#/shop?wish=1">Open my wishlist &rarr;</a><a class="linklike" href="#/visit" data-go="visit">Need help? Contact the shop &rarr;</a>
+        </aside>
+      </div>
+    </div>
+  </section>

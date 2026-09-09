@@ -1,7 +1,7 @@
 // Store-credit ledger for the staff desk.
 //   GET  /credit?q=            staff  → {customers:[{id,name,phone,balance,updatedAt}]} (≤ 50; name or phone digits)
 //   POST /credit               staff  → {name, phone, email?} → {ok, customer}   (409 when the phone exists)
-//   GET  /credit/lookup?phone= public → {found, balance, name:"A••• R."} exact phone only; 10 / 10 min per IP
+//   GET  /credit/lookup       retired (410): use verified customer account sign-in
 //   GET  /credit/:id           staff  → {customer, entries:[last 50, newest first]}
 //   POST /credit/:id/add       staff  → {cash, note?}             trade: credits cash × (1 + config.buy.creditBonus)
 //                                       {redeem:true, amount}     subtracts; 409 if it would go below 0
@@ -13,7 +13,6 @@
 import { getJSON, putJSON, pushList } from '../lib/kv.js';
 import { HttpError, readJson, v } from '../lib/http.js';
 import { requireRole } from '../lib/auth.js';
-import { rateLimit } from '../lib/ratelimit.js';
 import { loadConfig } from './config.js';
 
 const INDEX = 'credit:index';
@@ -65,7 +64,7 @@ async function readIndex(env) {
   const list = await getJSON(env.KV, INDEX, []);
   return Array.isArray(list) ? list : [];
 }
-function summary(c) { return { id: c.id, name: c.name, phone: c.phone, balance: c.balance, updatedAt: c.updatedAt }; }
+function summary(c) { return { id: c.id, name: c.name, phone: c.phone, email: c.email || '', balance: c.balance, updatedAt: c.updatedAt }; }
 async function saveCustomer(env, c) {
   await putJSON(env.KV, custKey(c.id), c);
   const idx = await readIndex(env);
@@ -86,14 +85,23 @@ export async function creditBonus(env) {
 }
 
 export function register(r) {
-  r.get('/credit/lookup', async ({ env, url, ip }) => {
-    await rateLimit(env, `credit-lookup:${ip}`, { limit: 10, windowSec: 600 });
-    const phone = requirePhone(url.searchParams.get('phone'));
-    const hit = (await readIndex(env)).find(e => e.phone === phone);
-    if (!hit) return { found: false };
-    const c = await getJSON(env.KV, custKey(hit.id), null);
-    if (!c) return { found: false };
-    return { found: true, balance: round2(c.balance), name: maskName(c.name) };
+  r.get('/credit/lookup', async () => {
+    throw new HttpError(410, 'Please sign in to your customer account to view store credit.');
+  });
+
+  r.put('/credit/:id/email', requireRole('admin'), async ({ env, req, params }) => {
+    const body = await readJson(req, 2048), email = v.email(body.email);
+    if (body.confirmed !== true) throw new HttpError(400, 'Confirm the customer identity at the counter first.');
+    const customer = await loadCustomer(env, idParam(params.id));
+    for (const row of await readIndex(env)) {
+      if (row.id === customer.id) continue;
+      const other = await getJSON(env.KV, custKey(row.id));
+      if (other && String(other.email || '').toLowerCase() === email) throw new HttpError(409, 'That email is already linked to another customer.');
+    }
+    customer.email = email;
+    customer.updatedAt = new Date().toISOString();
+    await saveCustomer(env, customer);
+    return { ok: true };
   });
 
   r.get('/credit', requireRole('staff'), async ({ env, url }) => {

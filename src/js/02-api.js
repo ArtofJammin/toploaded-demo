@@ -41,7 +41,8 @@
       var headers = {"Accept":"application/json"};
       var hasBody = body !== undefined && body !== null;
       if(hasBody) headers["Content-Type"] = "application/json";
-      if(api.token && !opts.noAuth) headers["Authorization"] = "Bearer " + api.token;
+      if(opts.token) headers["Authorization"] = "Bearer " + opts.token;
+      else if(api.token && !opts.noAuth) headers["Authorization"] = "Bearer " + api.token;
       return fetch(api.base + path, {
         method: method, headers: headers,
         body: hasBody ? JSON.stringify(body) : undefined,
@@ -52,7 +53,7 @@
           var d = null;
           try { d = t ? JSON.parse(t) : null; } catch(e){ d = {raw: t}; }
           if(!r.ok){
-            if(r.status === 401 && api.token && !opts.noAuth) api.setAuth(null, null);
+            if(r.status === 401 && api.token && !opts.noAuth && !opts.token) api.setAuth(null, null);
             throw {status: r.status, error: (d && d.error) || r.statusText || "error", data: d};
           }
           return d;

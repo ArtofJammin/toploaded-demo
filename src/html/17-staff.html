@@ -47,6 +47,13 @@
               <div class="field full"><button class="btn btn-ghost" id="credNew" type="button">Create customer</button></div>
             </div>
           </details>
+          <details class="cred-more">
+            <summary>Link customer sign-in email (admin)</summary>
+            <p class="drawer-note">For the selected customer only. Confirm their identity at the counter before linking an email. Requires the server ledger and an admin login.</p>
+            <div class="field"><label for="credLinkEmail">Customer's email</label><input id="credLinkEmail" type="email" autocomplete="off" maxlength="200" placeholder="you@example.com"></div>
+            <label><input id="credLinkConfirm" type="checkbox"> I confirmed this customer's identity and email.</label>
+            <button class="btn btn-ghost" id="credLinkSave" type="button">Link email to selected customer</button>
+          </details>
           <div class="cred-history" id="credHistory" hidden>
             <div class="cred-history-head">
               <b id="credHistName">History</b>

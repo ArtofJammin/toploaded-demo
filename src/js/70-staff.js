@@ -88,6 +88,7 @@
   function selectCustomer(id, openHistory){
     var c = credKnown[id]; if(!c) return;
     credSelected = c;
+    $("#credLinkConfirm").checked = false; $("#credLinkEmail").value = "";
     var sel = $("#credWho");
     if(!sel.querySelector('option[value="' + id.replace(/"/g, "") + '"]')){ /* found by search but outside the recent list */
       var o = document.createElement("option"); o.value = c.id; o.textContent = c.name + (c.phone ? " · " + c.phone : ""); sel.appendChild(o);
@@ -210,6 +211,17 @@
       toast(cu.name + " added — pick a trade amount to start their credit");
       refreshCredit("").then(function(){ selectCustomer(cu.id, false); $("#credAmt").focus(); });
     });
+  });
+  $("#credLinkSave").addEventListener("click", async function(){
+    if(!credServer || TL.api.role !== "admin"){ toast("Linking customer accounts requires an admin login and the server ledger."); return; }
+    if(!credSelected){ toast("Select the customer's credit record first."); return; }
+    var field = $("#credLinkEmail");
+    if(!field.value.trim() || !field.reportValidity() || !$("#credLinkConfirm").checked){ toast("Enter an email and confirm the customer's identity."); return; }
+    if(!window.confirm("Link " + field.value.trim() + " to " + credSelected.name + "? This email will be able to view their credit history.")) return;
+    var btn = this; btn.disabled = true;
+    try { await TL.api.put("/credit/" + encodeURIComponent(credSelected.id) + "/email",{email:field.value.trim(),confirmed:true}); toast("Customer sign-in email linked."); field.value = ""; $("#credLinkConfirm").checked = false; }
+    catch(e){ toast(e.error || "Could not link the email."); }
+    finally { btn.disabled = false; }
   });
   $("#credSearch").addEventListener("input", TL.debounce(function(){ refreshCredit($("#credSearch").value); }, 200));
   $("#credWho").addEventListener("change", function(e){ selectCustomer(e.target.value, true); });

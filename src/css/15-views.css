@@ -1,10 +1,15 @@
 /* ============ VIEWS ============ */
 .view{display:none}
 .view.active{display:block}
+html[data-boot-view] .view.active{display:none}
+html[data-boot-view="shop"] #view-shop,html[data-boot-view="live"] #view-live,
+html[data-boot-view="show"] #view-show,html[data-boot-view="events"] #view-events,
+html[data-boot-view="buylist"] #view-buylist,html[data-boot-view="visit"] #view-visit,
+html[data-boot-view="rip"] #view-rip,html[data-boot-view="account"] #view-account{display:block}
 @keyframes viewIn{from{opacity:0; transform:translateY(12px)}to{opacity:1; transform:none}}
 /* fill:backwards, not both — a filled transform (even an identity matrix) makes the
    section a containing block and a stacking context for position:fixed children */
-.view.active{animation:viewIn .32s cubic-bezier(.2,.7,.2,1) backwards}
+.view.active.route-enter{animation:viewIn .32s cubic-bezier(.2,.7,.2,1) backwards}
 .view-head{padding:56px 0 28px}
 .view-head h1{
   font-family:var(--disp); font-weight:800; text-transform:uppercase; letter-spacing:.02em;
@@ -16,11 +21,11 @@
   content:""; width:26px; height:2px; flex:0 0 auto; border-radius:1px;
   background:linear-gradient(90deg, var(--foilA), var(--foilB), var(--foilC), var(--foilD));
 }
-/* View Transitions API (Chrome/Safari): cross-fade + slight lift between views;
-   the .view.active keyframe still covers browsers without it. */
-@view-transition{navigation:auto}
-::view-transition-old(root){animation:vtOut .18s ease both}
-::view-transition-new(root){animation:vtIn .3s cubic-bezier(.2,.7,.2,1) both}
+/* Animate only the content, not two overlapping copies of the sticky navigation.
+   Fallback entry is explicitly assigned by the router; removing html.vt must never restart it. */
+#main{view-transition-name:page}
+::view-transition-old(root),::view-transition-new(root){animation:none}
+::view-transition-old(page){animation:vtOut .18s ease both}
+::view-transition-new(page){animation:vtIn .3s cubic-bezier(.2,.7,.2,1) both}
 @keyframes vtOut{to{opacity:0; transform:translateY(-6px)}}
 @keyframes vtIn{from{opacity:0; transform:translateY(10px)}}
-html.vt .view.active{animation:none}

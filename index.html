@@ -6,6 +6,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="tl-storage-prefix" content="tl-collector-preview-">
+<!-- Render a public deep link directly, before the bottom-of-page app script loads. -->
+<script>(function(){var v=(location.hash.match(/^#\/(shop|live|show|events|buylist|visit|rip|account)(?:\?|$)/)||[])[1];if(v)document.documentElement.setAttribute("data-boot-view",v)})()</script>
 <meta name="description" content="Top Loaded Trading Cards — Northern Kentucky's card shop for Pokemon, One Piece, Magic, and Gundam in Crescent Springs, KY. Buy, sell, and trade singles and sealed. Weekly play nights, live rip-and-ship breaks, and a monthly card show at the Hilton on Turfway Rd.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Top Loaded Trading Cards">
@@ -148,9 +150,10 @@ button{font-family:inherit; color:inherit; cursor:pointer}
   box-shadow:0 10px 30px -18px rgba(0,0,0,.6); opacity:0; transition:opacity .25s ease;
 }
 html.scrolled .topbar::after{opacity:1}
-.topbar .wrap{display:flex; align-items:center; gap:16px; height:64px}
-/* the brand row wrapper only becomes a box on phones (see the 640px block); elsewhere its children sit in the .wrap flex row */
+.topbar .wrap{display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:clamp(16px,2vw,40px); width:94%; max-width:none; min-height:72px; margin:0 auto; padding:0}
 .topbar-row{display:contents}
+.header-actions{grid-column:3; grid-row:1; display:flex; align-items:center; gap:10px; flex-shrink:0}
+.topbar .brand{grid-column:1; grid-row:1; flex-shrink:0}
 .brand{
   display:flex; align-items:center; gap:11px; background:none; border:0; padding:0;
   color:inherit; text-decoration:none;
@@ -166,17 +169,22 @@ html.scrolled .topbar::after{opacity:1}
   line-height:1;
 }
 .brand-name small{display:block; font-family:var(--mono); font-weight:400; font-size:.58rem; letter-spacing:.3em; color:var(--ink3); margin-top:3px}
-.mainnav{display:flex; gap:2px; margin-left:auto; flex-wrap:wrap}
+.mainnav{grid-column:2; grid-row:1; display:flex; align-items:center; justify-content:space-evenly; gap:4px; min-width:0; margin:0; flex-wrap:nowrap}
 /* nav items are real links (#/shop …): the router intercepts plain clicks, modified clicks open a new tab */
 .mainnav a{
   display:inline-flex; align-items:center; text-decoration:none;
-  background:none; border:0; padding:8px 10px; border-radius:4px; white-space:nowrap;
-  font-family:var(--mono); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink2);
+  background:none; border:1px solid transparent; min-height:44px; padding:8px; border-radius:6px; white-space:nowrap;
+  font-family:var(--mono); font-size:.75rem; letter-spacing:.05em; text-transform:uppercase; color:var(--ink2);
   transition:transform .12s ease, background .15s ease, color .15s ease, border-color .15s ease;
 }
 .mainnav a:hover{color:var(--ink); background:var(--surface)}
 .mainnav a:active{transform:scale(.94)}
-.mainnav [aria-current]{color:var(--accent)}
+.mainnav [aria-current]{color:var(--accent); background:var(--surface); border-color:var(--line)}
+.menu-toggle{display:none; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:0 12px; border:1px solid var(--line); background:var(--surface); border-radius:6px; color:var(--ink); font:11px var(--mono); text-transform:uppercase}
+.menu-toggle path{stroke:currentColor; stroke-width:1.6; stroke-linecap:round; transform-origin:center; transition:transform .18s ease,opacity .18s ease}
+.menu-toggle[aria-expanded="true"] .menu-line-top{transform:translateY(5px) rotate(45deg); transform-origin:10px 5px}
+.menu-toggle[aria-expanded="true"] .menu-line-mid{opacity:0}
+.menu-toggle[aria-expanded="true"] .menu-line-bottom{transform:translateY(-5px) rotate(-45deg); transform-origin:10px 15px}
 /* one logo <img>; src chosen by theme (00-header.html bootstrap + 15-ticker.js swap) */
 .brand-logo{height:50px; width:auto; display:none; transform-origin:left center; transition:transform .25s ease}
 html:not(.no-logo) .brand-logo{display:block}
@@ -187,11 +195,8 @@ html:not(.no-logo) .foot-logo{display:block}
 html:not(.no-logo) .foot-logo.logo-d{display:var(--logo-dark)}
 html:not(.no-logo) .foot-logo.logo-l{display:var(--logo-light)}
 html:not(.no-logo) .foot-brand{display:none}
-@media (min-width:961px){ html.scrolled .brand-logo{transform:scale(.88)} }
-@media (min-width:961px) and (max-width:1220px){
+@media (max-width:1480px){
   .open-pill .open-sub{display:none}
-  .mainnav a{padding:8px 7px; letter-spacing:.06em}
-  .topbar .wrap{gap:12px}
 }
 
 /* live nav dot: static when the shop is not on air, pulses only under html.is-live */
@@ -251,50 +256,28 @@ html.is-live .mainnav .live-dot,html.is-live .hero-ctas .live-dot{
 main{position:relative}
 main:focus{outline:none}
 
-/* mobile: scrolling nav gets a right-edge fade cue + snap; pill goes compact; cheaper header */
-@media (max-width:960px){
-  .mainnav{scroll-snap-type:x proximity; scroll-padding:0 20px}
-  .mainnav a{scroll-snap-align:start}
-  .mainnav.can-scroll:not(.at-end){
-    -webkit-mask-image:linear-gradient(90deg, #000 0, #000 calc(100% - 56px), transparent);
-    mask-image:linear-gradient(90deg, #000 0, #000 calc(100% - 56px), transparent);
-  }
-  .topbar{-webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px)}
-  .open-pill{order:2}
+/* Collapse before the seven links can wrap. The disclosure is not a modal: Tab can leave it. */
+@media (max-width:1180px){
+  .topbar{background:var(--bg); -webkit-backdrop-filter:none; backdrop-filter:none}
+  .topbar .wrap{grid-template-columns:auto 1fr; min-height:64px; gap:12px}
+  .header-actions{grid-column:2; justify-self:end}
+  .menu-toggle{display:inline-flex}
+  .mainnav{display:none; position:absolute; top:100%; left:0; right:0; padding:16px 3%; background:var(--bg); border-bottom:1px solid var(--line2); box-shadow:0 18px 28px #0003; max-height:calc(100dvh - 80px); overflow-y:auto; overscroll-behavior:contain}
+  .topbar.nav-open .mainnav{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px}
+  .mainnav a{padding:12px 16px; min-height:48px; border-color:var(--line)}
+  .brand-logo{height:42px}
 }
-@media (max-width:640px){
-  /* Phones: the header box stays sticky but paints nothing itself; the brand row is the only
-     chrome that stays on screen. Once you scroll down, 15-ticker.js adds html.nav-tuck and the nav
-     row fades out (its in-flow space is kept, so the page never jumps) — scrolling up brings it back. */
-  .topbar{-webkit-backdrop-filter:none; backdrop-filter:none; background:transparent; border-bottom:0; pointer-events:none}
-  .topbar::after{display:none}
-  body::after{display:none}
-  header.topbar .wrap{gap:8px; min-height:0; padding-top:0; padding-bottom:0; row-gap:0} /* beats 95-responsive's .topbar .wrap padding */
-  .topbar-row{
-    display:flex; align-items:center; gap:8px; flex:1 1 100%; min-height:52px; position:relative;
-    margin:0 -24px; padding:6px 24px 4px; background:var(--bg); border-bottom:1px solid var(--line); pointer-events:auto;
-  }
-  .topbar-row::after{
-    content:""; position:absolute; inset:0; pointer-events:none; z-index:-1;
-    box-shadow:0 10px 30px -18px rgba(0,0,0,.6); opacity:0; transition:opacity .25s ease;
-  }
-  html.scrolled .topbar-row::after{opacity:1}
-  .mainnav{
-    padding:6px 20px 8px; background:var(--bg); border-bottom:1px solid var(--line); pointer-events:auto;
-    transition:opacity .18s ease, visibility 0s linear 0s;
-  }
-  html.nav-tuck .mainnav{opacity:0; visibility:hidden; pointer-events:none; transition:opacity .18s ease, visibility 0s linear .18s}
-  .brand-logo{height:36px}
-  .open-pill{padding:5px 10px 5px 8px; min-height:28px}
-  .open-pill .open-sub,.open-pill .open-now{display:none}
+@media (max-width:600px){
+  .header-actions{gap:8px}
+  .header-actions .open-pill{display:none}
+  .brand-logo{height:38px}
+  .theme-btn{width:44px; height:44px}
+  .cart-btn{padding:8px 10px; min-height:44px}
+  .menu-toggle{width:44px; padding:0}
+  .menu-toggle span{display:none}
+  .topbar.nav-open .mainnav{grid-template-columns:1fr}
 }
-@media (max-width:360px){
-  .open-pill{display:none}
-}
-/* the 7-item nav needs the whole row at the narrow end of desktop; the hero pill carries the status there */
-@media (min-width:961px) and (max-width:1010px){
-  .open-pill{display:none}
-}
+@media (max-width:360px){.header-actions{gap:5px}.brand-logo{height:34px}.cart-btn{padding:8px}}
 @media (pointer:coarse){
   .theme-btn{width:44px; height:44px}
   .cart-btn{min-height:44px}
@@ -302,7 +285,7 @@ main:focus{outline:none}
 @media (prefers-reduced-motion: reduce){
   .open-pill.is-open .dot::after{animation:none; display:none}
   html.is-live .mainnav .live-dot,html.is-live .hero-ctas .live-dot{animation:none}
-  .brand-logo,.topbar::after,.topbar-row::after,.mainnav,.mainnav a{transition:none}
+  .brand-logo,.topbar::after,.mainnav,.mainnav a,.menu-toggle path{transition:none}
   .mainnav a:active{transform:none}
   html.scrolled .brand-logo{transform:none}
 }
@@ -310,10 +293,15 @@ main:focus{outline:none}
 /* ============ VIEWS ============ */
 .view{display:none}
 .view.active{display:block}
+html[data-boot-view] .view.active{display:none}
+html[data-boot-view="shop"] #view-shop,html[data-boot-view="live"] #view-live,
+html[data-boot-view="show"] #view-show,html[data-boot-view="events"] #view-events,
+html[data-boot-view="buylist"] #view-buylist,html[data-boot-view="visit"] #view-visit,
+html[data-boot-view="rip"] #view-rip,html[data-boot-view="account"] #view-account{display:block}
 @keyframes viewIn{from{opacity:0; transform:translateY(12px)}to{opacity:1; transform:none}}
 /* fill:backwards, not both — a filled transform (even an identity matrix) makes the
    section a containing block and a stacking context for position:fixed children */
-.view.active{animation:viewIn .32s cubic-bezier(.2,.7,.2,1) backwards}
+.view.active.route-enter{animation:viewIn .32s cubic-bezier(.2,.7,.2,1) backwards}
 .view-head{padding:56px 0 28px}
 .view-head h1{
   font-family:var(--disp); font-weight:800; text-transform:uppercase; letter-spacing:.02em;
@@ -325,14 +313,14 @@ main:focus{outline:none}
   content:""; width:26px; height:2px; flex:0 0 auto; border-radius:1px;
   background:linear-gradient(90deg, var(--foilA), var(--foilB), var(--foilC), var(--foilD));
 }
-/* View Transitions API (Chrome/Safari): cross-fade + slight lift between views;
-   the .view.active keyframe still covers browsers without it. */
-@view-transition{navigation:auto}
-::view-transition-old(root){animation:vtOut .18s ease both}
-::view-transition-new(root){animation:vtIn .3s cubic-bezier(.2,.7,.2,1) both}
+/* Animate only the content, not two overlapping copies of the sticky navigation.
+   Fallback entry is explicitly assigned by the router; removing html.vt must never restart it. */
+#main{view-transition-name:page}
+::view-transition-old(root),::view-transition-new(root){animation:none}
+::view-transition-old(page){animation:vtOut .18s ease both}
+::view-transition-new(page){animation:vtIn .3s cubic-bezier(.2,.7,.2,1) both}
 @keyframes vtOut{to{opacity:0; transform:translateY(-6px)}}
 @keyframes vtIn{from{opacity:0; transform:translateY(10px)}}
-html.vt .view.active{animation:none}
 
 /* ============ HERO ============ */
 .hero{position:relative; overflow:hidden; background:var(--bg)}
@@ -1692,6 +1680,37 @@ form.is-done > :not(.form-done){display:none !important}
 @media (max-width:880px){ .signup-grid{grid-template-columns:1fr} }
 @media (prefers-reduced-motion: reduce){ .form-done,.form-done-ic{animation:none} }
 
+/* Customer account: semantic tokens follow all three storefront themes. */
+.account-layout{display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr); gap:24px; padding-bottom:72px; align-items:start}
+.account-panel{min-width:0; border:1px solid var(--line2); border-radius:14px; background:var(--surface); padding:clamp(22px,3vw,36px)}
+.account-panel h2{font:700 32px/1.05 var(--disp); text-transform:uppercase; margin-bottom:16px}
+.account-panel p{font-size:13px; line-height:1.7; color:var(--ink2)}
+.account-panel form{display:grid; gap:12px; margin-top:24px}
+.account-panel label{font:11px var(--mono); color:var(--ink2)}
+.account-panel input{width:100%; min-width:0; font-size:16px; min-height:48px}
+.account-panel form .btn{min-height:48px; justify-content:center}
+.account-panel .btn:disabled{opacity:.55; cursor:not-allowed; box-shadow:none}
+.account-panel [hidden]{display:none!important}
+.account-panel .account-status{margin-top:24px; padding:14px 16px; background:var(--bg2); border:1px solid var(--line); border-radius:6px; overflow-wrap:anywhere}
+.account-panel .account-status:empty{display:none}
+.account-panel .account-kicker{font:10px var(--mono); letter-spacing:.12em; color:var(--accent); margin-bottom:12px}
+.account-member-head,.account-history-head{display:flex; justify-content:space-between; align-items:center; gap:18px}
+.account-member-head>div{min-width:0}.account-member-head h2{font-size:22px; overflow-wrap:anywhere; text-transform:none}
+.account-balance{padding:24px; background:var(--bg2); border:1px solid var(--line2); border-radius:10px; margin:16px 0 24px}
+.account-balance>span{font:11px var(--mono); color:var(--ink2)}
+.account-balance strong{display:block; font:800 60px/1.2 var(--disp); color:var(--accent); margin:10px 0}
+.account-panel .account-footnote{font-size:11px; margin-top:20px}
+.account-history-head h3{font:600 22px var(--disp)}
+.account-entry{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:6px 16px; border-bottom:1px solid var(--line); padding:16px 0; font-size:13px}
+.account-entry small{display:block; color:var(--ink2); margin-top:5px; font-size:11px}
+.account-entry strong{text-align:right; color:var(--ink)}
+.account-benefits{background:radial-gradient(ellipse at top right,color-mix(in srgb,var(--accent) 10%,transparent),transparent 75%),var(--bg2)}
+.account-benefits ul{list-style:none; padding:0; margin:24px 0}
+.account-benefits li{padding:18px 0; border-bottom:1px solid var(--line)}
+.account-benefits b{display:block; font-size:14px; margin-bottom:9px}.account-benefits li span{font-size:13px; color:var(--ink2); line-height:1.7}
+.account-benefits>a{display:flex; margin-top:16px; min-height:44px; align-items:center; text-decoration:none}
+@media(max-width:760px){.account-layout{grid-template-columns:1fr}.account-panel{padding:24px}.account-member-head{align-items:flex-start}}
+
 /* ============ BUYLIST ============ */
 .buy-grid{display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:32px; align-items:start}
 .buy-col{display:grid; gap:20px; min-width:0}
@@ -2655,19 +2674,6 @@ footer::before{
 
 /* ============ RESPONSIVE ============ */
 @media (max-width:960px){
-  .topbar .wrap{height:auto; min-height:64px; padding-top:10px; padding-bottom:10px; row-gap:6px; flex-wrap:wrap}
-  .mainnav{
-    order:3; width:calc(100% + 48px); margin:0 -24px;
-    flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
-    padding:4px 20px 8px; scrollbar-width:none;
-  }
-  .mainnav::-webkit-scrollbar{display:none}
-  .mainnav a{
-    flex:0 0 auto; white-space:nowrap; min-height:40px;
-    border:1px solid var(--line); border-radius:99px; padding:9px 14px;
-  }
-  .mainnav [aria-current]{border-color:var(--accent)}
-  .cart-btn{margin-left:auto}
   .grid{grid-template-columns:repeat(3,1fr)}
   .stat-row{grid-template-columns:repeat(2,1fr)}
   .admin-grid{grid-template-columns:1fr}
@@ -2684,18 +2690,6 @@ footer::before{
   .sched-row{grid-template-columns:72px 1fr; row-gap:4px}
   .sched-time{grid-column:2}
   .sched-fee{grid-column:2}
-  .topbar .wrap{height:auto; padding-top:10px; padding-bottom:10px; row-gap:6px; flex-wrap:wrap}
-  .mainnav{
-    order:3; width:calc(100% + 48px); margin:0 -24px;
-    flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
-    padding:4px 20px 8px; scrollbar-width:none;
-  }
-  .mainnav::-webkit-scrollbar{display:none}
-  .mainnav a{
-    flex:0 0 auto; white-space:nowrap; min-height:40px;
-    border:1px solid var(--line); border-radius:99px; padding:9px 14px;
-  }
-  .mainnav [aria-current]{border-color:var(--accent)}
   .foot-grid{grid-template-columns:1fr}
   .stat-row{grid-template-columns:1fr 1fr}
   select,input,textarea{font-size:16px}
@@ -2731,7 +2725,9 @@ footer::before{
 }
 
 /* Collector preview: deliberately scoped so the operational pages retain their layouts. */
-.collector-home{--collect-yellow:#f5d438; --collect-purple:#c6b7f3; --collect-black:#121310}
+.collector-home{--collect-yellow:var(--accent); --collect-purple:#c6b7f3; --collect-black:var(--accent-ink); --collect-play-bg:#252137; --collect-play-ink:#e5dcff; --collect-mystery-ink:#c6b7f3}
+:root[data-theme="light"] .collector-home{--collect-play-bg:#e0d6f7; --collect-play-ink:#2e2050; --collect-mystery-ink:#5c3d85}
+:root[data-theme="tl"] .collector-home{--collect-play-bg:#c6b7f3; --collect-play-ink:#211835}
 .collector-home .wrap{max-width:1320px}
 .design-preview{background:var(--surface); border-bottom:1px solid var(--line); color:var(--ink2); font:10px var(--mono); letter-spacing:.12em}
 .design-preview .wrap{display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:34px}
@@ -2811,7 +2807,7 @@ footer::before{
 #discoveryBtn:disabled{opacity:.7; cursor:wait}
 .discovery-copy .discovery-status{font-size:10px; margin:12px 0 0; min-height:32px; color:var(--ink3); max-width:44ch}
 .discovery-display{position:relative; display:flex; justify-content:center; align-items:center; min-height:210px; margin-top:20px}
-.mystery-card{height:195px; width:139px; flex-shrink:0; border:1px solid #c6b7f366; border-radius:9px; background:repeating-linear-gradient(45deg,#c6b7f30a 0 1px,transparent 1px 9px),#1c1924; color:var(--collect-purple); transform:rotate(9deg); display:flex; flex-direction:column; align-items:center; justify-content:space-around; box-shadow:-12px 12px 0 -2px #282332,-12px 12px 0 -1px #c6b7f344}
+.mystery-card{height:195px; width:139px; flex-shrink:0; border:1px solid color-mix(in srgb,var(--collect-mystery-ink) 55%,transparent); border-radius:9px; background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--collect-mystery-ink) 8%,transparent) 0 1px,transparent 1px 9px),var(--bg2); color:var(--collect-mystery-ink); transform:rotate(9deg); display:flex; flex-direction:column; align-items:center; justify-content:space-around; box-shadow:-12px 12px 0 -2px var(--surface2),-12px 12px 0 -1px var(--line2)}
 .mystery-card span,.mystery-card small{font:8px var(--mono); letter-spacing:.15em}
 .mystery-card b{font:90px/1 var(--disp)}
 .discovery-orbit{position:absolute; right:12%; bottom:18%; color:var(--collect-purple); font-size:70px; transform:rotate(-13deg); opacity:.7; pointer-events:none}
@@ -2821,7 +2817,7 @@ footer::before{
 .discovery-pick h4{font:600 22px/1.1 var(--disp); margin:7px 0; text-wrap:balance}
 .discovery-pick p{font-size:12px; color:var(--ink2); margin:10px 0}
 .discovery-pick .linklike{font-size:10px; min-height:36px}
-.play-tile{display:flex; flex-direction:column; min-height:345px; padding:28px; background:var(--collect-purple); color:#211835; border-radius:14px; text-decoration:none; overflow:hidden; position:relative}
+.play-tile{display:flex; flex-direction:column; min-height:345px; padding:28px; background:var(--collect-play-bg); color:var(--collect-play-ink); border:1px solid color-mix(in srgb,var(--collect-play-ink) 18%,transparent); border-radius:14px; text-decoration:none; overflow:hidden; position:relative}
 .pack-stack{height:200px; position:relative; perspective:800px}
 .pack-stack i{position:absolute; top:18px; left:50%; width:120px; height:168px; border:1px solid #211835; background:#ddcef9; transform:translateX(-50%) rotate(-18deg); transition:transform .45s cubic-bezier(.2,.7,.2,1); border-radius:2px; box-shadow:0 12px 22px #21183520}
 .pack-stack i:nth-child(1){transform:translateX(-98%) translateY(4px) rotate(-22deg); background:#9e8ac6}
@@ -2839,7 +2835,7 @@ footer::before{
 a:hover .round-arrow{transform:rotate(45deg)}
 .trade-tile{padding:28px; border-radius:14px; background:var(--collect-yellow); color:var(--collect-black); text-decoration:none; display:block}
 .trade-tile > div{display:flex; justify-content:space-between; align-items:center; gap:20px; margin-top:22px}
-.trade-stamp{border:1px solid #12131080; border-radius:50%; width:85px; height:85px; display:grid; place-content:center; text-align:center; font:700 17px/.95 var(--disp); transform:rotate(14deg); flex-shrink:0}
+.trade-stamp{border:1px solid currentColor; border-radius:50%; width:85px; height:85px; display:grid; place-content:center; text-align:center; font:700 17px/.95 var(--disp); transform:rotate(14deg); flex-shrink:0}
 .trade-tile p{display:flex; align-items:center; justify-content:space-between; gap:16px; max-width:none; margin-top:22px}
 .collector-source{font:10px/1.6 var(--mono); color:var(--ink3); margin-top:16px}
 .collector-home #featuredGrid{grid-template-columns:repeat(4,minmax(0,1fr)); gap:18px}
@@ -2936,7 +2932,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
 
 <header class="topbar">
   <div class="wrap">
-    <!-- .topbar-row is display:contents except on phones, where it is the one row that stays sticky (10-header.css) -->
+    <!-- Brand, navigation and actions each get their own desktop grid column. -->
     <div class="topbar-row" id="topbarRow">
       <a class="brand" href="#/" data-go="home" aria-label="Top Loaded TCG home">
         <img class="brand-logo" id="brandLogo" width="118" height="50" alt="" aria-hidden="true" decoding="async" fetchpriority="high" onerror="document.documentElement.classList.add('no-logo')">
@@ -2944,6 +2940,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
         <span class="brand-mark" aria-hidden="true">TL</span>
         <span class="brand-name" id="brandName">Top Loaded<small id="brandTag">Trading Cards &middot; NKY</small></span>
       </a>
+      <div class="header-actions">
       <span class="open-pill" id="openPill" role="status" hidden></span>
       <button class="theme-btn" id="themeBtn" aria-label="Switch theme: Top Loaded, light, or dark" title="Switch theme (Top Loaded / light / dark)">
         <svg class="ic-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v3M12 18.5v3M21.5 12h-3M5.5 12h-3M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1M18.7 18.7l-2.1-2.1M7.4 7.4L5.3 5.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -2953,6 +2950,10 @@ a:hover .round-arrow{transform:rotate(45deg)}
       <button class="cart-btn" id="cartBtn" aria-haspopup="dialog" aria-controls="drawer">
         Cart <span class="cart-count" id="cartCount">0</span>
       </button>
+      <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="mainnav" aria-label="Open navigation menu">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path class="menu-line-top" d="M3 5h14"/><path class="menu-line-mid" d="M3 10h14"/><path class="menu-line-bottom" d="M3 15h14"/></svg><span>Menu</span>
+      </button>
+      </div>
     </div>
     <nav class="mainnav" id="mainnav" aria-label="Main">
       <a href="#/shop" data-go="shop">Shop</a>
@@ -2962,6 +2963,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
       <a href="#/rip" data-go="rip">Rip a Pack</a>
       <a href="#/buylist" data-go="buylist">Sell to Us</a>
       <a href="#/visit" data-go="visit">Visit</a>
+      <a href="#/account" data-go="account">My Account</a>
     </nav>
   </div>
 </header>
@@ -3633,6 +3635,13 @@ a:hover .round-arrow{transform:rotate(45deg)}
               <div class="field full"><button class="btn btn-ghost" id="credNew" type="button">Create customer</button></div>
             </div>
           </details>
+          <details class="cred-more">
+            <summary>Link customer sign-in email (admin)</summary>
+            <p class="drawer-note">For the selected customer only. Confirm their identity at the counter before linking an email. Requires the server ledger and an admin login.</p>
+            <div class="field"><label for="credLinkEmail">Customer's email</label><input id="credLinkEmail" type="email" autocomplete="off" maxlength="200" placeholder="you@example.com"></div>
+            <label><input id="credLinkConfirm" type="checkbox"> I confirmed this customer's identity and email.</label>
+            <button class="btn btn-ghost" id="credLinkSave" type="button">Link email to selected customer</button>
+          </details>
           <div class="cred-history" id="credHistory" hidden>
             <div class="cred-history-head">
               <b id="credHistName">History</b>
@@ -3967,6 +3976,34 @@ a:hover .round-arrow{transform:rotate(45deg)}
       </div>
       <div id="ripApp" class="rip-app" data-stage="setup"></div>
       <p class="rip-sr" id="ripLive" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="view" id="view-account" aria-label="Customer account">
+    <div class="wrap">
+      <div class="view-head"><p class="eyebrow">Your corner of the card shop</p><h1>My account</h1><p class="lede">Check your store credit, review recent trades, and find your way back to the cards you saved.</p></div>
+      <div class="account-layout">
+        <div class="account-panel">
+          <div id="accountGuest">
+            <h2>Sign in with your email</h2><p>No password to remember. We will email a private sign-in code that expires in 10 minutes.</p>
+            <form id="accountEmailForm"><label for="accountEmail">Email address</label><input id="accountEmail" type="email" autocomplete="email" maxlength="200" placeholder="you@example.com" required><button class="btn" id="accountSend" type="submit" disabled>Email me a sign-in code</button></form>
+            <form id="accountCodeForm" hidden><label for="accountCode">Paste the code from your email</label><input id="accountCode" type="text" autocomplete="one-time-code" autocapitalize="none" spellcheck="false" maxlength="64" required aria-describedby="accountCodeHint"><p id="accountCodeHint">Use the full 32-character code. Never share it with anyone.</p><button class="btn" id="accountVerify" type="submit">Sign in</button><button class="linklike" id="accountRestart" type="button">Use another email or request a new code</button></form>
+          </div>
+          <div id="accountMember" hidden>
+            <div class="account-member-head"><div><p class="account-kicker">SIGNED IN</p><h2 id="accountWho"></h2></div><button class="linklike" id="accountLogout" type="button">Sign out</button></div>
+            <div class="account-balance"><span>Available store credit</span><strong id="accountBalance">&mdash;</strong><p id="accountUpdated"></p></div>
+            <p id="accountLinkNote" hidden>Ask the counter to link this email to your credit record. You do not need to create another balance.</p>
+            <div class="account-history-head"><h3>Recent credit activity</h3><button class="linklike" id="accountRefresh" type="button">Refresh balance</button></div>
+            <div id="accountHistory"></div><p class="account-footnote">Up to 50 recent entries. Credit is redeemed by staff at the counter; it is not applied automatically to online checkout.</p>
+          </div>
+          <p id="accountStatus" role="status" class="account-status">Checking customer sign-in availability&hellip;</p>
+        </div>
+        <aside class="account-panel account-benefits" aria-label="Account information">
+          <p class="account-kicker">KEEP THE GOOD STUFF CLOSE</p><h2>Your collection.<br>Your next chapter.</h2>
+          <ul><li><b>Store credit, clearly.</b><span>Balances and trade history come from the shop's ledger, not sample numbers.</span></li><li><b>A private way to sign in.</b><span>Access belongs to the email linked by the shop. Staff/admin accounts stay separate.</span></li><li><b>Your saved cards.</b><span>Wishlists and recently viewed cards currently stay on this browser.</span></li></ul>
+          <a class="btn btn-ghost" href="#/shop?wish=1">Open my wishlist &rarr;</a><a class="linklike" href="#/visit" data-go="visit">Need help? Contact the shop &rarr;</a>
+        </aside>
+      </div>
     </div>
   </section>
 
@@ -4406,7 +4443,8 @@ a:hover .round-arrow{transform:rotate(45deg)}
       var headers = {"Accept":"application/json"};
       var hasBody = body !== undefined && body !== null;
       if(hasBody) headers["Content-Type"] = "application/json";
-      if(api.token && !opts.noAuth) headers["Authorization"] = "Bearer " + api.token;
+      if(opts.token) headers["Authorization"] = "Bearer " + opts.token;
+      else if(api.token && !opts.noAuth) headers["Authorization"] = "Bearer " + api.token;
       return fetch(api.base + path, {
         method: method, headers: headers,
         body: hasBody ? JSON.stringify(body) : undefined,
@@ -4417,7 +4455,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
           var d = null;
           try { d = t ? JSON.parse(t) : null; } catch(e){ d = {raw: t}; }
           if(!r.ok){
-            if(r.status === 401 && api.token && !opts.noAuth) api.setAuth(null, null);
+            if(r.status === 401 && api.token && !opts.noAuth && !opts.token) api.setAuth(null, null);
             throw {status: r.status, error: (d && d.error) || r.statusText || "error", data: d};
           }
           return d;
@@ -4580,7 +4618,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
   $$("section.view[id^='view-']").forEach(function(s){ views[s.id.slice(5)] = "#" + s.id; });
   var current = "home";
   var pendingView = null;
-  var VIEW_TITLES = {home:"", shop:"Shop", live:"Live breaks", show:"Card show", events:"Play nights", buylist:"Sell to us", visit:"Visit", staff:"Staff desk", admin:"Admin", rip:"Pack rip"};
+  var VIEW_TITLES = {home:"", shop:"Shop", live:"Live breaks", show:"Card show", events:"Play nights", buylist:"Sell to us", visit:"Visit", staff:"Staff desk", admin:"Admin", rip:"Pack rip", account:"My account"};
   var BASE_TITLE = document.title;
   function isAuthed(){
     if(TL.auth && typeof TL.auth.can === "function") return TL.auth.can(current);
@@ -4622,12 +4660,18 @@ a:hover .round-arrow{transform:rotate(45deg)}
       return;
     }
     var prev = current, paramsOnly = (prev === name && lastRoute.name === name);
+    var useTransition = !paramsOnly && !reduceMotion && document.startViewTransition && !opts.noTransition && !document.hidden;
     current = name;
     lastRoute = {name: name, params: params || {}};
     function swap(){
       if(!paramsOnly){
         TL.emit("view:leave", {name: prev});
-        Object.keys(views).forEach(function(k){ var el = $(views[k]); if(el) el.classList.toggle("active", k === name); });
+        Object.keys(views).forEach(function(k){
+          var el = $(views[k]); if(!el) return;
+          el.classList.toggle("active", k === name);
+          el.classList.toggle("route-enter", k === name && !useTransition && !opts.noTransition && !reduceMotion);
+        });
+        document.documentElement.removeAttribute("data-boot-view");
         $$(".mainnav [data-go]").forEach(function(b){ if(b.dataset.go === name) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
         document.title = (VIEW_TITLES[name] ? VIEW_TITLES[name] + " · " : "") + BASE_TITLE;
         if(!opts.keepScroll) window.scrollTo({top: 0, behavior: "auto"});
@@ -4636,7 +4680,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
       }
       TL.emit("view:change", {name: name, params: params || {}, prev: prev, paramsOnly: paramsOnly});
     }
-    if(!paramsOnly && !reduceMotion && document.startViewTransition && !opts.noTransition && !document.hidden){
+    if(useTransition){
       document.documentElement.classList.add("vt");
       var t = document.startViewTransition(swap), noop = function(){};
       /* every promise on the transition can reject when navigations overlap; none of that is an error for us */
@@ -4692,8 +4736,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
      and an sr-only list for assistive tech. "sample offers" tag shows while the list still
      equals the built-in defaults (TL_DEFAULT_CONFIG.ticker), whatever else the shop has saved.
      Header: open/closed pill (TL.shopStatus, every 60 s + config:change), logo/title from
-     TL.config, live nav dot only under html.is-live, mobile nav edge cue, scrolled shadow,
-     and on phones html.nav-tuck (nav row hides on scroll-down, returns on scroll-up). */
+     TL.config, live nav dot only under html.is-live, responsive navigation and scrolled shadow. */
   function sameAsDefault(key){
     var def = (window.TL_DEFAULT_CONFIG || {})[key], cur = TL.config && TL.config[key];
     try { return JSON.stringify(cur) === JSON.stringify(def); } catch(e){ return false; }
@@ -4807,28 +4850,36 @@ a:hover .round-arrow{transform:rotate(45deg)}
   TL.on("config:change", applyLiveDot);
   TL.on("live:change", applyLiveDot);
 
-  /* ---- mobile nav: right-edge fade cue + keep the active item in view ---- */
+  /* ---- responsive navigation disclosure: keyboard, outside click and resize safe ---- */
   (function(){
-    var nav = $("#mainnav");
-    if(!nav) return;
-    function edge(){
-      var can = nav.scrollWidth > nav.clientWidth + 2;
-      nav.classList.toggle("can-scroll", can);
-      nav.classList.toggle("at-end", !can || nav.scrollLeft + nav.clientWidth >= nav.scrollWidth - 2);
+    var nav = $("#mainnav"), button = $("#menuToggle"), header = $(".topbar");
+    if(!nav || !button || !header) return;
+    var mq = window.matchMedia("(max-width:1180px)");
+    function setOpen(open, restoreFocus){
+      open = !!open && mq.matches;
+      header.classList.toggle("nav-open", open);
+      button.setAttribute("aria-expanded", String(open));
+      button.setAttribute("aria-label", open ? "Close navigation menu" : "Open navigation menu");
+      if(restoreFocus && mq.matches) button.focus();
     }
-    nav.addEventListener("scroll", edge, {passive: true});
-    window.addEventListener("resize", TL.debounce(edge, 120));
-    if(document.fonts && document.fonts.ready) document.fonts.ready.then(edge, function(){});
-    TL.on("init", edge);
-    TL.on("view:change", function(d){
-      edge();
-      if(!(d && d.name) || d.paramsOnly) return;
-      if(nav.scrollWidth <= nav.clientWidth + 2) return;
-      var b = nav.querySelector('[data-go="' + d.name + '"]');
-      if(!b) return;
-      var left = Math.max(0, b.offsetLeft - 20);
-      try { nav.scrollTo({left: left, behavior: reduceMotion ? "auto" : "smooth"}); } catch(e){ nav.scrollLeft = left; }
+    button.addEventListener("click", function(){ setOpen(button.getAttribute("aria-expanded") !== "true"); });
+    document.addEventListener("keydown", function(e){
+      if(e.key === "Escape" && button.getAttribute("aria-expanded") === "true"){
+        e.preventDefault(); setOpen(false, true);
+      }
     });
+    document.addEventListener("click", function(e){ if(!header.contains(e.target)) setOpen(false); });
+    header.addEventListener("focusout", function(e){ if(e.relatedTarget && !header.contains(e.relatedTarget)) setOpen(false); });
+    nav.addEventListener("click", function(e){
+      if(e.target.closest("a") && !e.ctrlKey && !e.metaKey && !e.shiftKey) setOpen(false, true);
+    });
+    TL.on("view:change", function(){ setOpen(false); });
+    function resized(){
+      var focusWasHidden = mq.matches ? nav.contains(document.activeElement) : document.activeElement === button;
+      setOpen(false);
+      if(focusWasHidden) (mq.matches ? button : nav.querySelector('[aria-current]') || nav.querySelector("a")).focus();
+    }
+    if(mq.addEventListener) mq.addEventListener("change", resized); else mq.addListener(resized);
   })();
 
   /* ---- scrolled header (shadow + logo condense) via a sentinel, no scroll handler ---- */
@@ -4838,37 +4889,6 @@ a:hover .round-arrow{transform:rotate(45deg)}
     new IntersectionObserver(function(entries){
       document.documentElement.classList.toggle("scrolled", !entries[0].isIntersecting);
     }, {threshold: 0}).observe(s);
-  })();
-
-  /* ---- phones: only the brand row stays on screen. Scrolling down tucks the nav row
-     (html.nav-tuck → 10-header.css fades it, keeps its space), scrolling up, changing view,
-     or tabbing into the nav brings it back. Bound only while the 640px query matches. ---- */
-  (function(){
-    var nav = $("#mainnav"), mq = window.matchMedia ? window.matchMedia("(max-width:640px)") : null;
-    if(!nav || !mq) return;
-    var lastY = 0, bound = false, tucked = false;
-    function y(){ return window.scrollY || window.pageYOffset || 0; }
-    function set(t){
-      if(t === tucked) return;
-      tucked = t; document.documentElement.classList.toggle("nav-tuck", t);
-    }
-    /* cheap enough to run inline (one scrollY read, one class toggle) — no layout reads, no rAF */
-    function onScroll(){
-      var cur = y(), dy = cur - lastY;
-      if(cur < 96) set(false);
-      else if(dy > 6) set(true);
-      else if(dy < -6) set(false);
-      lastY = cur;
-    }
-    function sync(){
-      var want = mq.matches;
-      if(want && !bound){ bound = true; lastY = y(); window.addEventListener("scroll", onScroll, {passive: true}); }
-      else if(!want && bound){ bound = false; window.removeEventListener("scroll", onScroll); set(false); }
-    }
-    if(mq.addEventListener) mq.addEventListener("change", sync); else if(mq.addListener) mq.addListener(sync);
-    sync();
-    nav.addEventListener("focusin", function(){ set(false); });
-    TL.on("view:change", function(d){ if(d && d.paramsOnly) return; set(false); lastY = y(); });
   })();
 
   /* ---------- hero + home ----------
@@ -5487,6 +5507,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
     if(!shopGrid) return;
     var INV = TL.inventory;
     if(INV && INV.loading && !INV.loaded){
+      if(shopGrid.getAttribute("aria-busy") === "true") return;
       shopGrid.innerHTML = skeletons(8); shopBusy(true);
       if(shopStatus) shopStatus.textContent = "Loading the case\u2026";
       if(shopMore) shopMore.hidden = true;
@@ -10639,6 +10660,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
   function selectCustomer(id, openHistory){
     var c = credKnown[id]; if(!c) return;
     credSelected = c;
+    $("#credLinkConfirm").checked = false; $("#credLinkEmail").value = "";
     var sel = $("#credWho");
     if(!sel.querySelector('option[value="' + id.replace(/"/g, "") + '"]')){ /* found by search but outside the recent list */
       var o = document.createElement("option"); o.value = c.id; o.textContent = c.name + (c.phone ? " · " + c.phone : ""); sel.appendChild(o);
@@ -10762,6 +10784,17 @@ a:hover .round-arrow{transform:rotate(45deg)}
       refreshCredit("").then(function(){ selectCustomer(cu.id, false); $("#credAmt").focus(); });
     });
   });
+  $("#credLinkSave").addEventListener("click", async function(){
+    if(!credServer || TL.api.role !== "admin"){ toast("Linking customer accounts requires an admin login and the server ledger."); return; }
+    if(!credSelected){ toast("Select the customer's credit record first."); return; }
+    var field = $("#credLinkEmail");
+    if(!field.value.trim() || !field.reportValidity() || !$("#credLinkConfirm").checked){ toast("Enter an email and confirm the customer's identity."); return; }
+    if(!window.confirm("Link " + field.value.trim() + " to " + credSelected.name + "? This email will be able to view their credit history.")) return;
+    var btn = this; btn.disabled = true;
+    try { await TL.api.put("/credit/" + encodeURIComponent(credSelected.id) + "/email",{email:field.value.trim(),confirmed:true}); toast("Customer sign-in email linked."); field.value = ""; $("#credLinkConfirm").checked = false; }
+    catch(e){ toast(e.error || "Could not link the email."); }
+    finally { btn.disabled = false; }
+  });
   $("#credSearch").addEventListener("input", TL.debounce(function(){ refreshCredit($("#credSearch").value); }, 200));
   $("#credWho").addEventListener("change", function(e){ selectCustomer(e.target.value, true); });
   $("#credBody").addEventListener("click", function(e){ var tr = e.target.closest("tr[data-cust]"); if(tr) selectCustomer(tr.dataset.cust, true); });
@@ -10843,6 +10876,87 @@ a:hover .round-arrow{transform:rotate(45deg)}
   TL.on("api:ready", function(d){ if(d && d.online && TL.current === "staff") openStaff(); });
   TL.on("auth:change", function(d){ if(d && d.role && TL.current === "staff") openStaff(); });
   TL.on("init", function(){ renderRates(); if(!TL.api.base){ renderCredTable(localSearch("")); renderCredWho(localSearch("")); } });
+
+  /* Customer read-only portal. Never falls back to sample balances or a simulated login. */
+  (function(){
+    var guest = $("#accountGuest"), member = $("#accountMember"), status = $("#accountStatus");
+    if(!guest) return;
+    var saved = TL.session.get("customer-session", null), token = saved && saved.exp > Date.now() ? saved.token : null;
+    var challenge = null, enabled = false, generation = 0;
+    function call(method, path, body, override){ return TL.api.request(method, path, body, {noAuth:true, token:override || token}); }
+    function error(e){ return e && e.error ? e.error : "Could not reach the shop. Please try again."; }
+    function reset(){
+      token = null; generation++; TL.session.del("customer-session");
+      member.hidden = true; guest.hidden = false;
+      $("#accountHistory").textContent = ""; $("#accountBalance").textContent = "—"; $("#accountWho").textContent = "";
+    }
+    function stamp(iso){
+      var d = new Date(iso); return isNaN(d.getTime()) ? "Date unavailable" : d.toLocaleString(undefined,{dateStyle:"medium",timeStyle:"short"});
+    }
+    async function refresh(){
+      var version = generation, button = $("#accountRefresh");
+      button.disabled = true; status.textContent = "Checking your latest balance…";
+      try {
+        var data = await call("GET", "/account/me");
+        if(version !== generation) return;
+        guest.hidden = true; member.hidden = false; $("#accountWho").textContent = data.email;
+        $("#accountLinkNote").hidden = data.linked;
+        $("#accountBalance").textContent = data.linked ? TL.money(data.customer.balance) : "—";
+        $("#accountUpdated").textContent = data.linked ? "Ledger updated " + stamp(data.customer.updatedAt) : "No verified credit record linked yet.";
+        $("#accountHistory").innerHTML = data.linked && data.entries.length ? data.entries.map(function(e){
+          return '<div class="account-entry"><div>' + TL.esc(e.kind === "redeem" ? "Credit redeemed" : e.kind === "adjust" ? "Balance adjustment" : "Trade-in credit") + '<small>' + TL.esc(stamp(e.at)) + '</small></div><strong>' + (e.amount < 0 ? "−" : "+") + TL.money(Math.abs(e.amount)) + '<small>Balance ' + TL.money(e.balanceAfter) + '</small></strong></div>';
+        }).join("") : '<p>No credit activity to display.</p>';
+        status.textContent = data.needsReview ? "The shop needs to review the email link before displaying your balance. Please contact the counter." : data.linked ? "Balance checked just now. Only shop staff can change it." : "Signed in. Ask the shop to link the same email to your credit record.";
+      } catch(e){
+        if(version !== generation) return;
+        if(e.status === 401) reset();
+        status.textContent = error(e);
+      } finally { button.disabled = false; }
+    }
+    async function enter(){
+      await TL.api.ready;
+      enabled = false;
+      try { if(TL.api.online) enabled = !!(await call("GET","/account/status")).enabled; } catch(e){}
+      $("#accountSend").disabled = !enabled;
+      if(token){ await refresh(); return; }
+      status.textContent = enabled ? "Use the email the shop has on your credit record. New here? You can sign in, then ask the counter to link your credit." : "Customer sign-in is not connected on this preview. The shop's API and verified email sender are needed; no real credit data is shown here.";
+    }
+    $("#accountEmailForm").addEventListener("submit", async function(e){
+      e.preventDefault(); if(!enabled) return;
+      var button = $("#accountSend"); if(button.disabled) return;
+      button.disabled = true; status.textContent = "Sending your private sign-in code…";
+      try {
+        var data = await call("POST","/account/code", {email:$("#accountEmail").value.trim()});
+        challenge = data.challenge; $("#accountEmailForm").hidden = true; $("#accountCodeForm").hidden = false;
+        $("#accountCode").value = ""; $("#accountCode").focus(); status.textContent = "Check your email and paste the full code. It expires in 10 minutes.";
+      } catch(err){ status.textContent = error(err); }
+      finally { button.disabled = !enabled; }
+    });
+    $("#accountCodeForm").addEventListener("submit", async function(e){
+      e.preventDefault(); if(!challenge) return;
+      var button = $("#accountVerify"); if(button.disabled) return;
+      button.disabled = true; status.textContent = "Verifying your code…";
+      try {
+        var data = await call("POST","/account/verify", {challenge:challenge, code:$("#accountCode").value.trim()});
+        token = data.token; generation++; TL.session.set("customer-session",data); challenge = null;
+        $("#accountCode").value = ""; $("#accountCodeForm").hidden = true; $("#accountEmailForm").hidden = false;
+        await refresh(); if(token) $("#accountLogout").focus();
+      } catch(err){ status.textContent = error(err); }
+      finally { button.disabled = false; }
+    });
+    $("#accountRestart").addEventListener("click",function(){
+      challenge = null; $("#accountCode").value = ""; $("#accountCodeForm").hidden = true; $("#accountEmailForm").hidden = false; $("#accountEmail").focus();
+      status.textContent = "Request a fresh code. Only the code from the email for this request will work here.";
+    });
+    $("#accountRefresh").addEventListener("click",refresh);
+    $("#accountLogout").addEventListener("click",async function(){
+      var old = token; reset(); status.textContent = "Signing out…";
+      try { await call("POST","/account/logout",{},old); status.textContent = "Signed out."; }
+      catch(e){ status.textContent = e.status === 401 ? "Signed out." : "Signed out on this tab. Server sign-out could not be confirmed; the session expires within 12 hours."; }
+      $("#accountEmail").focus();
+    });
+    TL.on("view:change",function(d){ if(d.name === "account") enter(); });
+  })();
 
   /* ---------- staff/admin auth ----------
      Two roles. With the API online the worker decides (POST /auth/login → HMAC token);
@@ -11307,6 +11421,13 @@ a:hover .round-arrow{transform:rotate(45deg)}
     }
     function renderDeck(){
       var summary = TL.inventory.summary, next = [], used = {};
+      if(!summary && !TL.inventory._summaryFailed && !TL.inventory.failed){
+        deck.setAttribute("aria-busy", "true");
+        document.getElementById("deckPrev").disabled = document.getElementById("deckNext").disabled = true;
+        document.getElementById("deckIndex").textContent = "-- / --";
+        return;
+      }
+      deck.setAttribute("aria-busy", "false");
       if(summary && summary.topByGame){
         ["pk", "op", "mtg"].forEach(function(game){
           var raw = (summary.topByGame[game] || []).find(function(item){ return item && item.listings && item.listings.some(function(l){ return l.qty > 0; }); });
@@ -11400,7 +11521,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
       var trigger = e.target.closest("[data-discovery-view]");
       if(trigger && lastPick) TL.openQuickView(TL.inventory.byId(lastPick.id) || lastPick,{from:trigger});
     });
-    TL.on("init",renderDeck); TL.on("inventory:summary",renderDeck);
+    TL.on("init",renderDeck); TL.on("inventory:summary",renderDeck); TL.on("inventory:summary-failed",renderDeck);
   })();
 
   /* ---------- boot ----------

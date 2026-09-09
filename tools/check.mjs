@@ -75,6 +75,10 @@ if (!process.argv.includes('--no-tests')) {
   const summary = (r.stdout.match(/ℹ (tests|pass|fail) \d+/g) || []).join('  ');
   if (r.status !== 0) { fail('API tests failed  ' + summary); console.log(r.stdout.split('\n').filter(l => /✖|not ok|Error|error:/.test(l)).slice(0, 30).join('\n')); }
   else console.log('ok    API tests  ' + summary);
+  const ui = spawnSync(process.execPath, ['--test', 'tools/test/*.test.mjs'], { cwd: repo, encoding: 'utf8' });
+  const uiSummary = (ui.stdout.match(/ℹ (tests|pass|fail) \d+/g) || []).join('  ');
+  if (ui.status !== 0) { fail('Navigation regression tests failed  ' + uiSummary); console.log(ui.stdout); }
+  else console.log('ok    Navigation regression tests  ' + uiSummary);
 }
 
 console.log(`\n${failures} failure(s), ${warnings} warning(s)`);

@@ -11,3 +11,5 @@ The new homepage uses the existing inventory summary, product quick view, wishli
 Preview safeguards: `noindex` metadata and a separate `tl-collector-preview-` browser-storage namespace keep this experiment out of search results and away from the production cart, login, and settings. Remove the two preview meta tags and comparison strip when intentionally promoting the design to production. Without the storage meta tag, the site continues to use its original `tl-` namespace.
 
 The preview deployment contains only the static site and its public assets. No API credentials, local notes, development data, or scheduled inventory workflows are published to the preview repository.
+
+September 9 update: full-width responsive header, hamburger menu, single-pass navigation, theme-aware discovery panels and a customer account portal. Customer email sign-in and private credit history have backend implementations, but stay disabled on the static preview until the Worker and email sender are connected. See [launch checklist](https://github.com/ArtofJammin/toploaded-demo/blob/codex/collector-preview/LAUNCH-CHECKLIST.md) for the explicit go-live requirements.

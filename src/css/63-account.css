@@ -1,0 +1,30 @@
+/* Customer account: semantic tokens follow all three storefront themes. */
+.account-layout{display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr); gap:24px; padding-bottom:72px; align-items:start}
+.account-panel{min-width:0; border:1px solid var(--line2); border-radius:14px; background:var(--surface); padding:clamp(22px,3vw,36px)}
+.account-panel h2{font:700 32px/1.05 var(--disp); text-transform:uppercase; margin-bottom:16px}
+.account-panel p{font-size:13px; line-height:1.7; color:var(--ink2)}
+.account-panel form{display:grid; gap:12px; margin-top:24px}
+.account-panel label{font:11px var(--mono); color:var(--ink2)}
+.account-panel input{width:100%; min-width:0; font-size:16px; min-height:48px}
+.account-panel form .btn{min-height:48px; justify-content:center}
+.account-panel .btn:disabled{opacity:.55; cursor:not-allowed; box-shadow:none}
+.account-panel [hidden]{display:none!important}
+.account-panel .account-status{margin-top:24px; padding:14px 16px; background:var(--bg2); border:1px solid var(--line); border-radius:6px; overflow-wrap:anywhere}
+.account-panel .account-status:empty{display:none}
+.account-panel .account-kicker{font:10px var(--mono); letter-spacing:.12em; color:var(--accent); margin-bottom:12px}
+.account-member-head,.account-history-head{display:flex; justify-content:space-between; align-items:center; gap:18px}
+.account-member-head>div{min-width:0}.account-member-head h2{font-size:22px; overflow-wrap:anywhere; text-transform:none}
+.account-balance{padding:24px; background:var(--bg2); border:1px solid var(--line2); border-radius:10px; margin:16px 0 24px}
+.account-balance>span{font:11px var(--mono); color:var(--ink2)}
+.account-balance strong{display:block; font:800 60px/1.2 var(--disp); color:var(--accent); margin:10px 0}
+.account-panel .account-footnote{font-size:11px; margin-top:20px}
+.account-history-head h3{font:600 22px var(--disp)}
+.account-entry{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:6px 16px; border-bottom:1px solid var(--line); padding:16px 0; font-size:13px}
+.account-entry small{display:block; color:var(--ink2); margin-top:5px; font-size:11px}
+.account-entry strong{text-align:right; color:var(--ink)}
+.account-benefits{background:radial-gradient(ellipse at top right,color-mix(in srgb,var(--accent) 10%,transparent),transparent 75%),var(--bg2)}
+.account-benefits ul{list-style:none; padding:0; margin:24px 0}
+.account-benefits li{padding:18px 0; border-bottom:1px solid var(--line)}
+.account-benefits b{display:block; font-size:14px; margin-bottom:9px}.account-benefits li span{font-size:13px; color:var(--ink2); line-height:1.7}
+.account-benefits>a{display:flex; margin-top:16px; min-height:44px; align-items:center; text-decoration:none}
+@media(max-width:760px){.account-layout{grid-template-columns:1fr}.account-panel{padding:24px}.account-member-head{align-items:flex-start}}

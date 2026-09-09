@@ -15,9 +15,10 @@ import * as credit from './routes/credit.js';
 import * as live from './routes/live.js';
 import * as inventory from './routes/inventory.js';
 import * as price from './routes/price.js';
+import * as account from './routes/account.js';
 
 export const router = new Router();
-for (const m of [health, config, auth, forms, checkout, square, alerts, credit, live, inventory, price]) {
+for (const m of [health, config, auth, forms, checkout, square, alerts, credit, live, inventory, price, account]) {
   if (typeof m.register === 'function') m.register(router);
 }
 

@@ -23,6 +23,13 @@
     }
     function renderDeck(){
       var summary = TL.inventory.summary, next = [], used = {};
+      if(!summary && !TL.inventory._summaryFailed && !TL.inventory.failed){
+        deck.setAttribute("aria-busy", "true");
+        document.getElementById("deckPrev").disabled = document.getElementById("deckNext").disabled = true;
+        document.getElementById("deckIndex").textContent = "-- / --";
+        return;
+      }
+      deck.setAttribute("aria-busy", "false");
       if(summary && summary.topByGame){
         ["pk", "op", "mtg"].forEach(function(game){
           var raw = (summary.topByGame[game] || []).find(function(item){ return item && item.listings && item.listings.some(function(l){ return l.qty > 0; }); });
@@ -116,5 +123,5 @@
       var trigger = e.target.closest("[data-discovery-view]");
       if(trigger && lastPick) TL.openQuickView(TL.inventory.byId(lastPick.id) || lastPick,{from:trigger});
     });
-    TL.on("init",renderDeck); TL.on("inventory:summary",renderDeck);
+    TL.on("init",renderDeck); TL.on("inventory:summary",renderDeck); TL.on("inventory:summary-failed",renderDeck);
   })();

@@ -16,9 +16,10 @@
   box-shadow:0 10px 30px -18px rgba(0,0,0,.6); opacity:0; transition:opacity .25s ease;
 }
 html.scrolled .topbar::after{opacity:1}
-.topbar .wrap{display:flex; align-items:center; gap:16px; height:64px}
-/* the brand row wrapper only becomes a box on phones (see the 640px block); elsewhere its children sit in the .wrap flex row */
+.topbar .wrap{display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:clamp(16px,2vw,40px); width:94%; max-width:none; min-height:72px; margin:0 auto; padding:0}
 .topbar-row{display:contents}
+.header-actions{grid-column:3; grid-row:1; display:flex; align-items:center; gap:10px; flex-shrink:0}
+.topbar .brand{grid-column:1; grid-row:1; flex-shrink:0}
 .brand{
   display:flex; align-items:center; gap:11px; background:none; border:0; padding:0;
   color:inherit; text-decoration:none;
@@ -34,17 +35,22 @@ html.scrolled .topbar::after{opacity:1}
   line-height:1;
 }
 .brand-name small{display:block; font-family:var(--mono); font-weight:400; font-size:.58rem; letter-spacing:.3em; color:var(--ink3); margin-top:3px}
-.mainnav{display:flex; gap:2px; margin-left:auto; flex-wrap:wrap}
+.mainnav{grid-column:2; grid-row:1; display:flex; align-items:center; justify-content:space-evenly; gap:4px; min-width:0; margin:0; flex-wrap:nowrap}
 /* nav items are real links (#/shop …): the router intercepts plain clicks, modified clicks open a new tab */
 .mainnav a{
   display:inline-flex; align-items:center; text-decoration:none;
-  background:none; border:0; padding:8px 10px; border-radius:4px; white-space:nowrap;
-  font-family:var(--mono); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink2);
+  background:none; border:1px solid transparent; min-height:44px; padding:8px; border-radius:6px; white-space:nowrap;
+  font-family:var(--mono); font-size:.75rem; letter-spacing:.05em; text-transform:uppercase; color:var(--ink2);
   transition:transform .12s ease, background .15s ease, color .15s ease, border-color .15s ease;
 }
 .mainnav a:hover{color:var(--ink); background:var(--surface)}
 .mainnav a:active{transform:scale(.94)}
-.mainnav [aria-current]{color:var(--accent)}
+.mainnav [aria-current]{color:var(--accent); background:var(--surface); border-color:var(--line)}
+.menu-toggle{display:none; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:0 12px; border:1px solid var(--line); background:var(--surface); border-radius:6px; color:var(--ink); font:11px var(--mono); text-transform:uppercase}
+.menu-toggle path{stroke:currentColor; stroke-width:1.6; stroke-linecap:round; transform-origin:center; transition:transform .18s ease,opacity .18s ease}
+.menu-toggle[aria-expanded="true"] .menu-line-top{transform:translateY(5px) rotate(45deg); transform-origin:10px 5px}
+.menu-toggle[aria-expanded="true"] .menu-line-mid{opacity:0}
+.menu-toggle[aria-expanded="true"] .menu-line-bottom{transform:translateY(-5px) rotate(-45deg); transform-origin:10px 15px}
 /* one logo <img>; src chosen by theme (00-header.html bootstrap + 15-ticker.js swap) */
 .brand-logo{height:50px; width:auto; display:none; transform-origin:left center; transition:transform .25s ease}
 html:not(.no-logo) .brand-logo{display:block}
@@ -55,11 +61,8 @@ html:not(.no-logo) .foot-logo{display:block}
 html:not(.no-logo) .foot-logo.logo-d{display:var(--logo-dark)}
 html:not(.no-logo) .foot-logo.logo-l{display:var(--logo-light)}
 html:not(.no-logo) .foot-brand{display:none}
-@media (min-width:961px){ html.scrolled .brand-logo{transform:scale(.88)} }
-@media (min-width:961px) and (max-width:1220px){
+@media (max-width:1480px){
   .open-pill .open-sub{display:none}
-  .mainnav a{padding:8px 7px; letter-spacing:.06em}
-  .topbar .wrap{gap:12px}
 }
 
 /* live nav dot: static when the shop is not on air, pulses only under html.is-live */
@@ -119,50 +122,28 @@ html.is-live .mainnav .live-dot,html.is-live .hero-ctas .live-dot{
 main{position:relative}
 main:focus{outline:none}
 
-/* mobile: scrolling nav gets a right-edge fade cue + snap; pill goes compact; cheaper header */
-@media (max-width:960px){
-  .mainnav{scroll-snap-type:x proximity; scroll-padding:0 20px}
-  .mainnav a{scroll-snap-align:start}
-  .mainnav.can-scroll:not(.at-end){
-    -webkit-mask-image:linear-gradient(90deg, #000 0, #000 calc(100% - 56px), transparent);
-    mask-image:linear-gradient(90deg, #000 0, #000 calc(100% - 56px), transparent);
-  }
-  .topbar{-webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px)}
-  .open-pill{order:2}
+/* Collapse before the seven links can wrap. The disclosure is not a modal: Tab can leave it. */
+@media (max-width:1180px){
+  .topbar{background:var(--bg); -webkit-backdrop-filter:none; backdrop-filter:none}
+  .topbar .wrap{grid-template-columns:auto 1fr; min-height:64px; gap:12px}
+  .header-actions{grid-column:2; justify-self:end}
+  .menu-toggle{display:inline-flex}
+  .mainnav{display:none; position:absolute; top:100%; left:0; right:0; padding:16px 3%; background:var(--bg); border-bottom:1px solid var(--line2); box-shadow:0 18px 28px #0003; max-height:calc(100dvh - 80px); overflow-y:auto; overscroll-behavior:contain}
+  .topbar.nav-open .mainnav{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px}
+  .mainnav a{padding:12px 16px; min-height:48px; border-color:var(--line)}
+  .brand-logo{height:42px}
 }
-@media (max-width:640px){
-  /* Phones: the header box stays sticky but paints nothing itself; the brand row is the only
-     chrome that stays on screen. Once you scroll down, 15-ticker.js adds html.nav-tuck and the nav
-     row fades out (its in-flow space is kept, so the page never jumps) — scrolling up brings it back. */
-  .topbar{-webkit-backdrop-filter:none; backdrop-filter:none; background:transparent; border-bottom:0; pointer-events:none}
-  .topbar::after{display:none}
-  body::after{display:none}
-  header.topbar .wrap{gap:8px; min-height:0; padding-top:0; padding-bottom:0; row-gap:0} /* beats 95-responsive's .topbar .wrap padding */
-  .topbar-row{
-    display:flex; align-items:center; gap:8px; flex:1 1 100%; min-height:52px; position:relative;
-    margin:0 -24px; padding:6px 24px 4px; background:var(--bg); border-bottom:1px solid var(--line); pointer-events:auto;
-  }
-  .topbar-row::after{
-    content:""; position:absolute; inset:0; pointer-events:none; z-index:-1;
-    box-shadow:0 10px 30px -18px rgba(0,0,0,.6); opacity:0; transition:opacity .25s ease;
-  }
-  html.scrolled .topbar-row::after{opacity:1}
-  .mainnav{
-    padding:6px 20px 8px; background:var(--bg); border-bottom:1px solid var(--line); pointer-events:auto;
-    transition:opacity .18s ease, visibility 0s linear 0s;
-  }
-  html.nav-tuck .mainnav{opacity:0; visibility:hidden; pointer-events:none; transition:opacity .18s ease, visibility 0s linear .18s}
-  .brand-logo{height:36px}
-  .open-pill{padding:5px 10px 5px 8px; min-height:28px}
-  .open-pill .open-sub,.open-pill .open-now{display:none}
+@media (max-width:600px){
+  .header-actions{gap:8px}
+  .header-actions .open-pill{display:none}
+  .brand-logo{height:38px}
+  .theme-btn{width:44px; height:44px}
+  .cart-btn{padding:8px 10px; min-height:44px}
+  .menu-toggle{width:44px; padding:0}
+  .menu-toggle span{display:none}
+  .topbar.nav-open .mainnav{grid-template-columns:1fr}
 }
-@media (max-width:360px){
-  .open-pill{display:none}
-}
-/* the 7-item nav needs the whole row at the narrow end of desktop; the hero pill carries the status there */
-@media (min-width:961px) and (max-width:1010px){
-  .open-pill{display:none}
-}
+@media (max-width:360px){.header-actions{gap:5px}.brand-logo{height:34px}.cart-btn{padding:8px}}
 @media (pointer:coarse){
   .theme-btn{width:44px; height:44px}
   .cart-btn{min-height:44px}
@@ -170,7 +151,7 @@ main:focus{outline:none}
 @media (prefers-reduced-motion: reduce){
   .open-pill.is-open .dot::after{animation:none; display:none}
   html.is-live .mainnav .live-dot,html.is-live .hero-ctas .live-dot{animation:none}
-  .brand-logo,.topbar::after,.topbar-row::after,.mainnav,.mainnav a{transition:none}
+  .brand-logo,.topbar::after,.mainnav,.mainnav a,.menu-toggle path{transition:none}
   .mainnav a:active{transform:none}
   html.scrolled .brand-logo{transform:none}
 }

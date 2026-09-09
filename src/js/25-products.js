@@ -360,6 +360,7 @@
     if(!shopGrid) return;
     var INV = TL.inventory;
     if(INV && INV.loading && !INV.loaded){
+      if(shopGrid.getAttribute("aria-busy") === "true") return;
       shopGrid.innerHTML = skeletons(8); shopBusy(true);
       if(shopStatus) shopStatus.textContent = "Loading the case\u2026";
       if(shopMore) shopMore.hidden = true;

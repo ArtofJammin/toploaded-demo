@@ -1,5 +1,7 @@
 /* Collector preview: deliberately scoped so the operational pages retain their layouts. */
-.collector-home{--collect-yellow:#f5d438; --collect-purple:#c6b7f3; --collect-black:#121310}
+.collector-home{--collect-yellow:var(--accent); --collect-purple:#c6b7f3; --collect-black:var(--accent-ink); --collect-play-bg:#252137; --collect-play-ink:#e5dcff; --collect-mystery-ink:#c6b7f3}
+:root[data-theme="light"] .collector-home{--collect-play-bg:#e0d6f7; --collect-play-ink:#2e2050; --collect-mystery-ink:#5c3d85}
+:root[data-theme="tl"] .collector-home{--collect-play-bg:#c6b7f3; --collect-play-ink:#211835}
 .collector-home .wrap{max-width:1320px}
 .design-preview{background:var(--surface); border-bottom:1px solid var(--line); color:var(--ink2); font:10px var(--mono); letter-spacing:.12em}
 .design-preview .wrap{display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:34px}
@@ -79,7 +81,7 @@
 #discoveryBtn:disabled{opacity:.7; cursor:wait}
 .discovery-copy .discovery-status{font-size:10px; margin:12px 0 0; min-height:32px; color:var(--ink3); max-width:44ch}
 .discovery-display{position:relative; display:flex; justify-content:center; align-items:center; min-height:210px; margin-top:20px}
-.mystery-card{height:195px; width:139px; flex-shrink:0; border:1px solid #c6b7f366; border-radius:9px; background:repeating-linear-gradient(45deg,#c6b7f30a 0 1px,transparent 1px 9px),#1c1924; color:var(--collect-purple); transform:rotate(9deg); display:flex; flex-direction:column; align-items:center; justify-content:space-around; box-shadow:-12px 12px 0 -2px #282332,-12px 12px 0 -1px #c6b7f344}
+.mystery-card{height:195px; width:139px; flex-shrink:0; border:1px solid color-mix(in srgb,var(--collect-mystery-ink) 55%,transparent); border-radius:9px; background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--collect-mystery-ink) 8%,transparent) 0 1px,transparent 1px 9px),var(--bg2); color:var(--collect-mystery-ink); transform:rotate(9deg); display:flex; flex-direction:column; align-items:center; justify-content:space-around; box-shadow:-12px 12px 0 -2px var(--surface2),-12px 12px 0 -1px var(--line2)}
 .mystery-card span,.mystery-card small{font:8px var(--mono); letter-spacing:.15em}
 .mystery-card b{font:90px/1 var(--disp)}
 .discovery-orbit{position:absolute; right:12%; bottom:18%; color:var(--collect-purple); font-size:70px; transform:rotate(-13deg); opacity:.7; pointer-events:none}
@@ -89,7 +91,7 @@
 .discovery-pick h4{font:600 22px/1.1 var(--disp); margin:7px 0; text-wrap:balance}
 .discovery-pick p{font-size:12px; color:var(--ink2); margin:10px 0}
 .discovery-pick .linklike{font-size:10px; min-height:36px}
-.play-tile{display:flex; flex-direction:column; min-height:345px; padding:28px; background:var(--collect-purple); color:#211835; border-radius:14px; text-decoration:none; overflow:hidden; position:relative}
+.play-tile{display:flex; flex-direction:column; min-height:345px; padding:28px; background:var(--collect-play-bg); color:var(--collect-play-ink); border:1px solid color-mix(in srgb,var(--collect-play-ink) 18%,transparent); border-radius:14px; text-decoration:none; overflow:hidden; position:relative}
 .pack-stack{height:200px; position:relative; perspective:800px}
 .pack-stack i{position:absolute; top:18px; left:50%; width:120px; height:168px; border:1px solid #211835; background:#ddcef9; transform:translateX(-50%) rotate(-18deg); transition:transform .45s cubic-bezier(.2,.7,.2,1); border-radius:2px; box-shadow:0 12px 22px #21183520}
 .pack-stack i:nth-child(1){transform:translateX(-98%) translateY(4px) rotate(-22deg); background:#9e8ac6}
@@ -107,7 +109,7 @@
 a:hover .round-arrow{transform:rotate(45deg)}
 .trade-tile{padding:28px; border-radius:14px; background:var(--collect-yellow); color:var(--collect-black); text-decoration:none; display:block}
 .trade-tile > div{display:flex; justify-content:space-between; align-items:center; gap:20px; margin-top:22px}
-.trade-stamp{border:1px solid #12131080; border-radius:50%; width:85px; height:85px; display:grid; place-content:center; text-align:center; font:700 17px/.95 var(--disp); transform:rotate(14deg); flex-shrink:0}
+.trade-stamp{border:1px solid currentColor; border-radius:50%; width:85px; height:85px; display:grid; place-content:center; text-align:center; font:700 17px/.95 var(--disp); transform:rotate(14deg); flex-shrink:0}
 .trade-tile p{display:flex; align-items:center; justify-content:space-between; gap:16px; max-width:none; margin-top:22px}
 .collector-source{font:10px/1.6 var(--mono); color:var(--ink3); margin-top:16px}
 .collector-home #featuredGrid{grid-template-columns:repeat(4,minmax(0,1fr)); gap:18px}

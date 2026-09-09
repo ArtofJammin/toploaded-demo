@@ -1,18 +1,5 @@
 /* ============ RESPONSIVE ============ */
 @media (max-width:960px){
-  .topbar .wrap{height:auto; min-height:64px; padding-top:10px; padding-bottom:10px; row-gap:6px; flex-wrap:wrap}
-  .mainnav{
-    order:3; width:calc(100% + 48px); margin:0 -24px;
-    flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
-    padding:4px 20px 8px; scrollbar-width:none;
-  }
-  .mainnav::-webkit-scrollbar{display:none}
-  .mainnav a{
-    flex:0 0 auto; white-space:nowrap; min-height:40px;
-    border:1px solid var(--line); border-radius:99px; padding:9px 14px;
-  }
-  .mainnav [aria-current]{border-color:var(--accent)}
-  .cart-btn{margin-left:auto}
   .grid{grid-template-columns:repeat(3,1fr)}
   .stat-row{grid-template-columns:repeat(2,1fr)}
   .admin-grid{grid-template-columns:1fr}
@@ -29,18 +16,6 @@
   .sched-row{grid-template-columns:72px 1fr; row-gap:4px}
   .sched-time{grid-column:2}
   .sched-fee{grid-column:2}
-  .topbar .wrap{height:auto; padding-top:10px; padding-bottom:10px; row-gap:6px; flex-wrap:wrap}
-  .mainnav{
-    order:3; width:calc(100% + 48px); margin:0 -24px;
-    flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
-    padding:4px 20px 8px; scrollbar-width:none;
-  }
-  .mainnav::-webkit-scrollbar{display:none}
-  .mainnav a{
-    flex:0 0 auto; white-space:nowrap; min-height:40px;
-    border:1px solid var(--line); border-radius:99px; padding:9px 14px;
-  }
-  .mainnav [aria-current]{border-color:var(--accent)}
   .foot-grid{grid-template-columns:1fr}
   .stat-row{grid-template-columns:1fr 1fr}
   select,input,textarea{font-size:16px}

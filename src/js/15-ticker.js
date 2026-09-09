@@ -3,8 +3,7 @@
      and an sr-only list for assistive tech. "sample offers" tag shows while the list still
      equals the built-in defaults (TL_DEFAULT_CONFIG.ticker), whatever else the shop has saved.
      Header: open/closed pill (TL.shopStatus, every 60 s + config:change), logo/title from
-     TL.config, live nav dot only under html.is-live, mobile nav edge cue, scrolled shadow,
-     and on phones html.nav-tuck (nav row hides on scroll-down, returns on scroll-up). */
+     TL.config, live nav dot only under html.is-live, responsive navigation and scrolled shadow. */
   function sameAsDefault(key){
     var def = (window.TL_DEFAULT_CONFIG || {})[key], cur = TL.config && TL.config[key];
     try { return JSON.stringify(cur) === JSON.stringify(def); } catch(e){ return false; }
@@ -118,28 +117,36 @@
   TL.on("config:change", applyLiveDot);
   TL.on("live:change", applyLiveDot);
 
-  /* ---- mobile nav: right-edge fade cue + keep the active item in view ---- */
+  /* ---- responsive navigation disclosure: keyboard, outside click and resize safe ---- */
   (function(){
-    var nav = $("#mainnav");
-    if(!nav) return;
-    function edge(){
-      var can = nav.scrollWidth > nav.clientWidth + 2;
-      nav.classList.toggle("can-scroll", can);
-      nav.classList.toggle("at-end", !can || nav.scrollLeft + nav.clientWidth >= nav.scrollWidth - 2);
+    var nav = $("#mainnav"), button = $("#menuToggle"), header = $(".topbar");
+    if(!nav || !button || !header) return;
+    var mq = window.matchMedia("(max-width:1180px)");
+    function setOpen(open, restoreFocus){
+      open = !!open && mq.matches;
+      header.classList.toggle("nav-open", open);
+      button.setAttribute("aria-expanded", String(open));
+      button.setAttribute("aria-label", open ? "Close navigation menu" : "Open navigation menu");
+      if(restoreFocus && mq.matches) button.focus();
     }
-    nav.addEventListener("scroll", edge, {passive: true});
-    window.addEventListener("resize", TL.debounce(edge, 120));
-    if(document.fonts && document.fonts.ready) document.fonts.ready.then(edge, function(){});
-    TL.on("init", edge);
-    TL.on("view:change", function(d){
-      edge();
-      if(!(d && d.name) || d.paramsOnly) return;
-      if(nav.scrollWidth <= nav.clientWidth + 2) return;
-      var b = nav.querySelector('[data-go="' + d.name + '"]');
-      if(!b) return;
-      var left = Math.max(0, b.offsetLeft - 20);
-      try { nav.scrollTo({left: left, behavior: reduceMotion ? "auto" : "smooth"}); } catch(e){ nav.scrollLeft = left; }
+    button.addEventListener("click", function(){ setOpen(button.getAttribute("aria-expanded") !== "true"); });
+    document.addEventListener("keydown", function(e){
+      if(e.key === "Escape" && button.getAttribute("aria-expanded") === "true"){
+        e.preventDefault(); setOpen(false, true);
+      }
     });
+    document.addEventListener("click", function(e){ if(!header.contains(e.target)) setOpen(false); });
+    header.addEventListener("focusout", function(e){ if(e.relatedTarget && !header.contains(e.relatedTarget)) setOpen(false); });
+    nav.addEventListener("click", function(e){
+      if(e.target.closest("a") && !e.ctrlKey && !e.metaKey && !e.shiftKey) setOpen(false, true);
+    });
+    TL.on("view:change", function(){ setOpen(false); });
+    function resized(){
+      var focusWasHidden = mq.matches ? nav.contains(document.activeElement) : document.activeElement === button;
+      setOpen(false);
+      if(focusWasHidden) (mq.matches ? button : nav.querySelector('[aria-current]') || nav.querySelector("a")).focus();
+    }
+    if(mq.addEventListener) mq.addEventListener("change", resized); else mq.addListener(resized);
   })();
 
   /* ---- scrolled header (shadow + logo condense) via a sentinel, no scroll handler ---- */
@@ -149,35 +156,4 @@
     new IntersectionObserver(function(entries){
       document.documentElement.classList.toggle("scrolled", !entries[0].isIntersecting);
     }, {threshold: 0}).observe(s);
-  })();
-
-  /* ---- phones: only the brand row stays on screen. Scrolling down tucks the nav row
-     (html.nav-tuck → 10-header.css fades it, keeps its space), scrolling up, changing view,
-     or tabbing into the nav brings it back. Bound only while the 640px query matches. ---- */
-  (function(){
-    var nav = $("#mainnav"), mq = window.matchMedia ? window.matchMedia("(max-width:640px)") : null;
-    if(!nav || !mq) return;
-    var lastY = 0, bound = false, tucked = false;
-    function y(){ return window.scrollY || window.pageYOffset || 0; }
-    function set(t){
-      if(t === tucked) return;
-      tucked = t; document.documentElement.classList.toggle("nav-tuck", t);
-    }
-    /* cheap enough to run inline (one scrollY read, one class toggle) — no layout reads, no rAF */
-    function onScroll(){
-      var cur = y(), dy = cur - lastY;
-      if(cur < 96) set(false);
-      else if(dy > 6) set(true);
-      else if(dy < -6) set(false);
-      lastY = cur;
-    }
-    function sync(){
-      var want = mq.matches;
-      if(want && !bound){ bound = true; lastY = y(); window.addEventListener("scroll", onScroll, {passive: true}); }
-      else if(!want && bound){ bound = false; window.removeEventListener("scroll", onScroll); set(false); }
-    }
-    if(mq.addEventListener) mq.addEventListener("change", sync); else if(mq.addListener) mq.addListener(sync);
-    sync();
-    nav.addEventListener("focusin", function(){ set(false); });
-    TL.on("view:change", function(d){ if(d && d.paramsOnly) return; set(false); lastY = y(); });
   })();
