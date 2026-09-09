@@ -679,7 +679,7 @@
     pill.addEventListener("focusout", function(){ if(!pill.hidden) cartAddedArm(1500); });
   })();
   window.addEventListener("storage", function(e){
-    if(e && e.key !== null && e.key !== "tl-cart") return;
+    if(e && e.key !== null && e.key !== TL.storagePrefix + "cart") return;
     var before = Object.keys(cart);
     cartLoad(); renderCart();
     var removed = before.filter(function(id){ return !cart[id]; });

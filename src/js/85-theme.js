@@ -15,7 +15,7 @@
   TL.setTheme = function(next){
     if(!THEME_NAMES[next]) return;
     document.documentElement.setAttribute("data-theme", next);
-    try { localStorage.setItem("tl-theme", next); } catch(e){}
+    try { localStorage.setItem(TL.storagePrefix + "theme", next); } catch(e){}
     applyThemeMeta(next);
     TL.emit("theme:change", {theme: next});
   };

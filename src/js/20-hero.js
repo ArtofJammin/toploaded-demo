@@ -7,6 +7,7 @@
   var heroTiltOff = null, heroInView = true, homeActive = false, parallaxOn = false, pRaf = 0;
   function bindHeroTilt(){
     if(heroTiltOff){ heroTiltOff(); heroTiltOff = null; }
+    if(heroEl && heroEl.classList.contains("collector-hero")) return;
     if(heroHolo && heroStage && !reduceMotion) heroTiltOff = TL.tilt(heroHolo, {max: 14, area: heroStage, sheen: false});
   }
   function parallaxFrame(){

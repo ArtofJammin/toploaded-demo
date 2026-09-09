@@ -4,6 +4,8 @@
 <title>Top Loaded Trading Cards</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="tl-storage-prefix" content="tl-collector-preview-">
 <meta name="description" content="Top Loaded Trading Cards — Northern Kentucky's card shop for Pokemon, One Piece, Magic, and Gundam in Crescent Springs, KY. Buy, sell, and trade singles and sealed. Weekly play nights, live rip-and-ship breaks, and a monthly card show at the Hilton on Turfway Rd.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Top Loaded Trading Cards">
@@ -18,7 +20,7 @@
 <meta name="tl-api" content="">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#EFF1F4">
 <meta name="theme-color" content="#0C0A06">
-<script>(function(){var t="tl";try{var s=localStorage.getItem("tl-theme");if(s==="light"||s==="dark"||s==="tl")t=s}catch(e){}document.documentElement.setAttribute("data-theme",t)})()</script>
+<script>(function(){var p=document.querySelector('meta[name="tl-storage-prefix"]');window.TL_STORAGE_PREFIX=p?p.content:"tl-";var t="tl";try{var s=localStorage.getItem(window.TL_STORAGE_PREFIX+"theme");if(s==="light"||s==="dark"||s==="tl")t=s}catch(e){}document.documentElement.setAttribute("data-theme",t)})()</script>
 <link rel="canonical" href="https://artofjammin.github.io/toploaded-demo/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2728,6 +2730,190 @@ footer::before{
   .stage-caption{display:none}
 }
 
+/* Collector preview: deliberately scoped so the operational pages retain their layouts. */
+.collector-home{--collect-yellow:#f5d438; --collect-purple:#c6b7f3; --collect-black:#121310}
+.collector-home .wrap{max-width:1320px}
+.design-preview{background:var(--surface); border-bottom:1px solid var(--line); color:var(--ink2); font:10px var(--mono); letter-spacing:.12em}
+.design-preview .wrap{display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:34px}
+.design-preview i{display:inline-block; width:5px; height:5px; background:var(--accent); border-radius:50%; margin-right:8px}
+.design-preview a{color:var(--ink2); text-decoration:none; letter-spacing:0}
+.collector-hero{isolation:isolate; border-bottom:1px solid var(--line)}
+.collector-hero::before{background:radial-gradient(ellipse at 78% 42%,color-mix(in srgb,var(--collect-yellow) 9%,transparent),transparent 52%); animation:none; translate:none}
+.collector-hero::after{background-size:72px 72px; opacity:.35}
+.collector-hero .wrap{grid-template-columns:1fr 1fr; gap:12px; padding-top:68px; padding-bottom:56px; min-height:650px}
+.collector-hero .eyebrow{display:flex; flex-wrap:wrap; align-items:center; gap:9px; font-size:10px; letter-spacing:.12em; color:var(--ink2); margin-bottom:26px}
+.collector-hero .eyebrow > span:last-child{width:100%; margin-left:25px; font-size:9px; color:var(--ink3)}
+.hero-cross{font-size:20px; color:var(--accent); line-height:1}
+.collector-hero h1{font-size:clamp(64px,7.1vw,104px); line-height:.94; letter-spacing:-.035em; text-wrap:initial}
+.collector-hero h1 .collector-outline{color:transparent; -webkit-text-stroke:1px var(--ink)}
+.collector-hero h1 .collector-yellow{color:var(--accent); -webkit-text-stroke:0}
+.collector-hero .sub{font-size:15px; max-width:37ch; line-height:1.8; margin-top:24px}
+.collector-hero .hero-ctas{gap:24px; align-items:center; margin-top:26px}
+.collector-hero .btn{border-radius:7px; font-size:11px; padding:16px 20px; letter-spacing:.07em; gap:28px}
+.hero-secondary{color:var(--ink); text-decoration:none; font-size:12px; border-bottom:1px solid var(--line2); padding-bottom:4px}
+.hero-secondary:hover{color:var(--accent)}
+.collector-hero .sync-pill{border:0; padding:0; border-radius:0; background:none; font-size:10px; max-width:45ch; line-height:1.6; margin-top:26px}
+.collector-stage{position:relative; min-height:500px; padding:0; margin:0; perspective:none; translate:none!important; display:flex; flex-direction:column; justify-content:center; align-items:stretch; min-width:0}
+.case-edition{position:absolute; top:0; right:20px; font:9px var(--mono); letter-spacing:.17em; color:var(--ink3)}
+.case-orbit{position:absolute; width:96%; height:65%; top:10%; left:2%; border:1px solid color-mix(in srgb,var(--accent) 16%,transparent); border-radius:50%; transform:rotate(-26deg); pointer-events:none}
+.case-orbit::before,.case-orbit::after{content:""; position:absolute; inset:30px -12px; border:1px solid color-mix(in srgb,var(--accent) 9%,transparent); border-radius:50%}
+.case-orbit::after{inset:60px -24px}
+.collector-deck{position:relative; height:375px; perspective:1000px; touch-action:pan-y}
+.deck-card{--dx:0px; --angle:0deg; --lift:0px; --size:1; position:absolute; top:22px; left:50%; width:214px; padding:0; border:0; border-radius:12px; background:var(--surface); text-align:left; transform:translateX(calc(-50% + var(--dx))) translateY(var(--lift)) rotate(var(--angle)) scale(var(--size)); transition:transform .6s cubic-bezier(.22,.7,.15,1),filter .4s; box-shadow:0 24px 50px #0006; z-index:1}
+.deck-card[data-position="left"]{--dx:-135px; --angle:-16deg; --lift:29px; --size:.88; filter:brightness(.74)}
+.deck-card[data-position="right"]{--dx:135px; --angle:16deg; --lift:29px; --size:.88; filter:brightness(.74)}
+.deck-card[data-position="front"]{z-index:3; --angle:-3deg}
+.deck-face{position:relative; display:block; border:1px solid #ffffff30; border-radius:12px; overflow:hidden; aspect-ratio:5/7; background:#151714; transform:rotateX(var(--deck-rx,0deg)) rotateY(var(--deck-ry,0deg)); transition:transform .16s ease-out}
+.deck-face img,.deck-face svg{width:100%; height:100%; object-fit:contain; display:block}
+.deck-face::after{content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(115deg,transparent 20%,#fff0 30%,#fdf5bd55 48%,#bbedff44 55%,transparent 70%); background-size:250% 100%; background-position:var(--deck-shine,100%) 50%; opacity:0; transition:opacity .25s}
+.deck-card:hover{filter:brightness(1.05)}
+.deck-card:hover .deck-face::after,.deck-card:focus-visible .deck-face::after{opacity:.8}
+.deck-tag{position:absolute; right:-14px; bottom:-14px; display:flex; align-items:center; gap:8px; border-radius:4px; padding:9px 12px; background:var(--collect-yellow); color:var(--collect-black); font:12px var(--mono); box-shadow:0 4px 20px #0003; transform:rotate(3deg)}
+.deck-tag small{font-size:8px; letter-spacing:.1em}
+.deck-card:not([data-position="front"]) .deck-tag{visibility:hidden}
+.case-caption{display:flex; justify-content:space-between; align-items:center; gap:12px; margin:24px 15px 0; border-top:1px solid var(--line2); padding-top:18px}
+.case-label{color:var(--accent); font:9px var(--mono); letter-spacing:.15em}
+#deckName{font-size:13px; max-width:30ch; margin-top:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.deck-controls{display:flex; gap:10px; align-items:center; flex-shrink:0}
+.deck-controls button{width:36px; height:36px; border:1px solid var(--line2); border-radius:50%; background:none; font-size:17px}
+.deck-controls button:hover{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+#deckIndex{font:9px var(--mono); color:var(--ink2)}
+.deck-loading{position:absolute; inset:40% 0; text-align:center; font:12px var(--mono); color:var(--ink3)}
+.game-shelf{display:grid; grid-template-columns:140px repeat(4,minmax(0,1fr)); padding-top:24px; padding-bottom:24px; gap:0}
+.game-shelf-label{font:9px/1.7 var(--mono); letter-spacing:.12em; color:var(--ink3); align-self:center}
+.game-shelf-label > span{margin-left:12px; font-size:16px}
+.game-door{display:flex; gap:12px; padding:14px 16px; align-items:center; border-left:1px solid var(--line); text-decoration:none; color:var(--ink); font-family:var(--disp); font-size:24px; line-height:1.2; transition:background .2s}
+.game-door:hover{background:var(--surface)}
+.game-door small{display:block; font:10px var(--body); color:var(--ink3); margin-top:5px}
+.game-mark{font:26px var(--body); color:var(--accent)}
+.game-arrow{margin-left:auto; color:var(--ink3); font:16px var(--body); transition:transform .2s}
+.game-door:hover .game-arrow{transform:translate(2px,-2px); color:var(--accent)}
+.collector-home .ticker{border-top:1px solid var(--line); font-size:11px}
+.collector-home .nextup{background:var(--bg2)}
+.collector-home .nextup-btn{padding-top:22px; padding-bottom:22px}
+.collector-home .nextup-name{font-size:23px; margin:4px 0}
+.collector-home .nextup-cd{font-size:20px}
+.collector-home .section{padding-top:68px; padding-bottom:68px}
+.collector-home .section-head h2{font-size:clamp(32px,3.5vw,48px); letter-spacing:-.015em; text-transform:uppercase; line-height:1.04}
+.collector-kicker{font:10px var(--mono); color:var(--accent); letter-spacing:.13em; margin-bottom:14px}
+.collector-note{font:12px var(--body); color:var(--ink3)}
+.collector-mosaic{display:grid; grid-template-columns:1.12fr 1fr; grid-template-rows:auto auto; gap:16px}
+.tile-number{font:9px var(--mono); letter-spacing:.12em}
+.discovery-tile{grid-row:span 2; padding:32px; border:1px solid var(--line2); border-radius:14px; background:radial-gradient(ellipse at 95% 90%,color-mix(in srgb,var(--collect-purple) 12%,transparent),transparent 60%),var(--surface); display:flex; flex-direction:column; position:relative; overflow:hidden}
+.discovery-tile .tile-number{color:var(--ink3)}
+.discovery-tile h3{font:700 clamp(36px,4vw,54px)/1 var(--disp); text-transform:uppercase; letter-spacing:-.015em; margin-top:24px}
+.discovery-copy{position:relative; z-index:2}
+.discovery-copy > p{font-size:13px; line-height:1.7; color:var(--ink2); margin:16px 0 20px}
+.discovery-fields{display:flex; gap:12px; flex-wrap:wrap}
+.discovery-fields label{display:flex; flex-direction:column; flex:1; gap:8px; font-size:9px; color:var(--ink2); min-width:100px}
+.discovery-fields select{font-size:12px; padding:10px; width:100%; background:var(--bg2); border-radius:5px; letter-spacing:0}
+#discoveryBtn{font-size:11px; margin-top:16px; border-radius:5px; display:flex; justify-content:space-between; width:100%; padding:14px 18px}
+#discoveryBtn:disabled{opacity:.7; cursor:wait}
+.discovery-copy .discovery-status{font-size:10px; margin:12px 0 0; min-height:32px; color:var(--ink3); max-width:44ch}
+.discovery-display{position:relative; display:flex; justify-content:center; align-items:center; min-height:210px; margin-top:20px}
+.mystery-card{height:195px; width:139px; flex-shrink:0; border:1px solid #c6b7f366; border-radius:9px; background:repeating-linear-gradient(45deg,#c6b7f30a 0 1px,transparent 1px 9px),#1c1924; color:var(--collect-purple); transform:rotate(9deg); display:flex; flex-direction:column; align-items:center; justify-content:space-around; box-shadow:-12px 12px 0 -2px #282332,-12px 12px 0 -1px #c6b7f344}
+.mystery-card span,.mystery-card small{font:8px var(--mono); letter-spacing:.15em}
+.mystery-card b{font:90px/1 var(--disp)}
+.discovery-orbit{position:absolute; right:12%; bottom:18%; color:var(--collect-purple); font-size:70px; transform:rotate(-13deg); opacity:.7; pointer-events:none}
+.discovery-pick{display:flex; gap:24px; align-items:center; width:100%; animation:discoveryReveal .55s cubic-bezier(.2,.7,.2,1) backwards}
+.discovery-art{flex:0 0 120px; width:120px; border:0; border-radius:7px; padding:0; background:var(--bg); overflow:hidden; transform:rotate(-5deg); box-shadow:0 14px 24px #0004}
+.discovery-art img,.discovery-art svg{display:block; width:100%; height:auto; aspect-ratio:5/7; object-fit:contain}
+.discovery-pick h4{font:600 22px/1.1 var(--disp); margin:7px 0; text-wrap:balance}
+.discovery-pick p{font-size:12px; color:var(--ink2); margin:10px 0}
+.discovery-pick .linklike{font-size:10px; min-height:36px}
+.play-tile{display:flex; flex-direction:column; min-height:345px; padding:28px; background:var(--collect-purple); color:#211835; border-radius:14px; text-decoration:none; overflow:hidden; position:relative}
+.pack-stack{height:200px; position:relative; perspective:800px}
+.pack-stack i{position:absolute; top:18px; left:50%; width:120px; height:168px; border:1px solid #211835; background:#ddcef9; transform:translateX(-50%) rotate(-18deg); transition:transform .45s cubic-bezier(.2,.7,.2,1); border-radius:2px; box-shadow:0 12px 22px #21183520}
+.pack-stack i:nth-child(1){transform:translateX(-98%) translateY(4px) rotate(-22deg); background:#9e8ac6}
+.pack-stack i:nth-child(2){transform:translateX(-8%) translateY(4px) rotate(17deg); background:#bdaaeb}
+.pack-stack i:nth-child(3){transform:translateX(-50%) rotate(-5deg); display:flex; flex-direction:column; padding:16px 12px; justify-content:space-between; background:repeating-linear-gradient(0deg,#21183520 0 1px,transparent 1px 3px) top / 100% 8px no-repeat,#211835; color:#ddcef9}
+.pack-stack span,.pack-stack small{font:7px var(--mono); letter-spacing:.07em}
+.pack-stack b{font:800 50px/.82 var(--disp); letter-spacing:-.02em}
+.play-tile:hover .pack-stack i:nth-child(1){transform:translateX(-112%) rotate(-28deg)}
+.play-tile:hover .pack-stack i:nth-child(2){transform:translateX(3%) rotate(25deg)}
+.play-tile:hover .pack-stack i:nth-child(3){transform:translateX(-50%) translateY(-8px) rotate(0deg)}
+.play-tile-bottom{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:auto}
+.play-tile h3,.trade-tile h3{font:700 34px/1 var(--disp); letter-spacing:-.01em; text-transform:uppercase}
+.play-tile p,.trade-tile p{font-size:12px; margin-top:10px; max-width:36ch}
+.round-arrow{display:grid; place-items:center; border:1px solid currentColor; border-radius:50%; width:40px; height:40px; flex:0 0 auto; font:22px var(--body); transition:transform .2s}
+a:hover .round-arrow{transform:rotate(45deg)}
+.trade-tile{padding:28px; border-radius:14px; background:var(--collect-yellow); color:var(--collect-black); text-decoration:none; display:block}
+.trade-tile > div{display:flex; justify-content:space-between; align-items:center; gap:20px; margin-top:22px}
+.trade-stamp{border:1px solid #12131080; border-radius:50%; width:85px; height:85px; display:grid; place-content:center; text-align:center; font:700 17px/.95 var(--disp); transform:rotate(14deg); flex-shrink:0}
+.trade-tile p{display:flex; align-items:center; justify-content:space-between; gap:16px; max-width:none; margin-top:22px}
+.collector-source{font:10px/1.6 var(--mono); color:var(--ink3); margin-top:16px}
+.collector-home #featuredGrid{grid-template-columns:repeat(4,minmax(0,1fr)); gap:18px}
+.collector-home .prod{border-radius:12px; box-shadow:none}
+.collector-home .thumb{padding:30px 0; background:radial-gradient(ellipse at 50% 65%,color-mix(in srgb,var(--accent) 8%,var(--bg2)),var(--bg2))}
+.collector-home .p-meta{padding:18px}
+.collector-home .p-meta h3{font-size:15px}
+.collector-home .wall{border-radius:0; background:var(--surface)}
+.collector-home .promo-rip{display:none}
+.collector-home .section:has(> .wrap > .promo-rip){display:none}
+.collector-home .tri .panel{border-radius:12px; background:var(--bg2); padding:28px}
+.collector-home .faq{max-width:none; grid-template-columns:1fr 1fr; align-items:start}
+.collector-home .faq details.panel{border-radius:8px}
+@keyframes discoveryReveal{from{opacity:0; transform:translateY(14px) rotate(-2deg)}to{opacity:1; transform:none}}
+@media (max-width:1100px){
+  .collector-hero .wrap{padding-top:50px; min-height:620px}
+  .collector-hero h1{font-size:76px}
+  .deck-card{width:182px}
+  .deck-card[data-position="left"]{--dx:-107px}.deck-card[data-position="right"]{--dx:107px}
+  .collector-deck{height:325px}.collector-stage{min-height:420px}
+  .game-shelf{grid-template-columns:repeat(4,1fr)}.game-shelf-label{display:none}
+  .game-door{font-size:21px;padding:12px}.game-door small{font-size:9px}
+}
+@media (max-width:760px){
+  .collector-hero .wrap{grid-template-columns:1fr; padding-top:38px; padding-bottom:32px; gap:40px}
+  .collector-hero h1{font-size:clamp(64px,13vw,94px); max-width:550px}
+  .collector-hero .sub{max-width:42ch;font-size:14px}
+  .collector-hero .eyebrow{margin-bottom:20px}
+  .collector-stage{width:100%; max-width:500px; justify-self:center; min-height:430px}
+  .collector-deck{height:335px}.deck-card{width:195px;top:22px}
+  .deck-card[data-position="left"]{--dx:-115px}.deck-card[data-position="right"]{--dx:115px}
+  .case-caption{margin-top:10px}.case-edition{right:5px;top:-14px}
+  .collector-mosaic{grid-template-columns:1fr 1fr}
+  .discovery-tile{grid-column:1/-1;grid-row:auto;display:grid;grid-template-columns:1.2fr 1fr;gap:18px}
+  .discovery-tile h3{font-size:42px}.discovery-display{margin:0;min-width:0}
+  .discovery-pick{flex-direction:column;gap:14px}.discovery-orbit{right:0;bottom:12%}
+  .play-tile,.trade-tile{padding:22px}
+  .play-tile h3,.trade-tile h3{font-size:28px}
+  .trade-tile > div{flex-direction:column;align-items:flex-start;gap:24px}
+  .trade-stamp{width:70px;height:70px}
+  .collector-home #featuredGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .game-shelf{grid-template-columns:1fr 1fr;row-gap:12px;padding-top:20px;padding-bottom:20px}
+  .game-door:nth-child(even){border-left:0}
+  .collector-home .section{padding-top:48px;padding-bottom:48px}
+}
+@media (max-width:460px){
+  .preview-detail{display:none}.design-preview{font-size:8px}.design-preview .wrap{padding:0 18px}
+  .collector-home .wrap{padding-left:20px;padding-right:20px}
+  .collector-hero .hero-ctas{gap:18px}.collector-hero .hero-ctas .btn{flex:none}
+  .collector-hero .btn{font-size:10px;gap:18px;padding:15px 16px}.hero-secondary{font-size:11px}
+  .collector-hero .eyebrow{font-size:9px}.collector-hero .eyebrow > span:last-child{font-size:8px}
+  .deck-card{width:166px}.deck-card[data-position="left"]{--dx:-92px}.deck-card[data-position="right"]{--dx:92px}
+  .collector-deck{height:290px}.collector-stage{min-height:360px}.case-caption{margin-left:0;margin-right:0}
+  #deckName{max-width:21ch;font-size:11px}.deck-controls{gap:5px}.deck-controls button{width:38px;height:38px}
+  .game-door{font-size:23px;padding:10px}.game-door small{font-size:9px}.game-mark{font-size:24px}
+  .collector-home .nextup-list{grid-template-columns:1fr}
+  .collector-home .nextup-cell + .nextup-cell{border-left:0;border-top:1px solid var(--line)}
+  .collector-home .nextup-cell .nextup-btn{padding:18px 0}
+  .collector-mosaic{grid-template-columns:1fr}.discovery-tile{grid-template-columns:1fr;padding:24px;gap:0}
+  .discovery-display{margin-top:20px}.discovery-pick{flex-direction:row;gap:20px}
+  .discovery-tile h3{font-size:45px}.discovery-pick h4{font-size:22px}
+  .play-tile{min-height:350px}.trade-tile > div{flex-direction:row;align-items:center}
+  .collector-home #featuredGrid{gap:12px}.collector-home .p-meta{padding:12px}
+  .collector-home .p-meta h3{font-size:13px}.collector-home .p-set{font-size:10px}
+  .collector-home .prod .thumb{padding:25px 0 18px}.collector-home .mini{width:112px}
+  .collector-home .p-row{flex-wrap:wrap;gap:6px}.collector-home .prod .price{font-size:19px}
+  .collector-home .faq{grid-template-columns:1fr}.collector-home .section-head{gap:12px}
+}
+@media (prefers-reduced-motion:reduce){
+  .deck-card,.deck-face,.game-arrow,.pack-stack i,.round-arrow{transition:none}
+  .discovery-pick{animation:none}.deck-face{transform:none}
+}
+@media (pointer:coarse){.deck-controls button{min-width:44px;min-height:44px}.discovery-pick .linklike{min-height:44px}}
+
 /* ============ REDUCED MOTION ============ */
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important}
@@ -2789,36 +2975,34 @@ footer::before{
 <div class="scroll-sentinel" id="scrollSentinel" aria-hidden="true"></div>
 
   <!-- ================= HOME ================= -->
-  <section class="view active" id="view-home" aria-label="Home">
-    <div class="hero" id="hero">
+  <section class="view active collector-home" id="view-home" aria-label="Home">
+    <div class="design-preview"><div class="wrap"><span><i></i> THE COLLECTOR EDIT <span class="preview-detail"> / DESIGN PREVIEW</span></span><a href="https://artofjammin.github.io/toploaded-demo/" target="_blank" rel="noopener">Compare current site <span aria-hidden="true">↗</span></a></div></div>
+    <div class="hero collector-hero" id="hero">
       <div class="wrap">
         <div class="reveal">
-          <p class="eyebrow">Crescent Springs, KY &middot; Off I-71/75, just south of Cincinnati</p>
-          <h1 aria-label="Buy. Sell. Trade.">
-            <span class="w" aria-hidden="true"><i>B</i><i>u</i><i>y</i><i>.</i></span>
-            <span class="w" aria-hidden="true"><i>S</i><i>e</i><i>l</i><i>l</i><i>.</i></span>
-            <span class="foil-text" aria-hidden="true">Trade.</span>
-          </h1>
-          <p class="sub">Northern Kentucky's card shop for Pokemon, One Piece, Magic, and Gundam. Singles and sealed straight from the case, cash for your collection, and a seat at the table whenever the door's open.</p>
+          <p class="eyebrow"><span class="hero-cross" aria-hidden="true">✳</span> YOUR LOCAL CARD OBSESSION. <span>CRESCENT SPRINGS, KY / ALL COLLECTORS WELCOME</span></p>
+          <h1><span>GOOD CARDS.</span><span class="collector-outline">GREAT</span><span class="collector-yellow">COMPANY.</span></h1>
+          <p class="sub">The next piece of your collection. The next seat at the table. Find both at Northern Kentucky’s home for trading cards.</p>
           <div class="hero-ctas">
-            <a class="btn" href="#/shop" data-go="shop">Shop live inventory</a>
-            <a class="btn btn-ghost" href="#/buylist" data-go="buylist">Sell us your collection</a>
-            <a class="btn btn-ghost" href="#/live" data-go="live"><span class="live-dot" aria-hidden="true"></span>Watch the break</a>
+            <a class="btn" href="#/shop" data-go="shop">Explore the case <span aria-hidden="true">↗</span></a>
+            <a class="hero-secondary" href="#/buylist" data-go="buylist">Got cards to sell? <span aria-hidden="true">→</span></a>
           </div>
-          <span class="sync-pill" id="heroInv"><span class="dot"></span><span id="heroInvTxt">Live inventory from our TCGplayer store &middot; refreshed every morning</span></span>
+          <span class="sync-pill" id="heroInv"><span class="dot"></span><span id="heroInvTxt">From the shop’s TCGplayer inventory. Refreshed daily.</span></span>
         </div>
-        <div class="stage" id="stage">
-          <div class="holo" id="holo" aria-hidden="true">
-            <div class="holo-frame">
-              <div class="holo-top">Top Loaded</div>
-              <div class="holo-art"></div>
-              <div class="holo-bottom">Crescent Springs &middot; KY &middot; Buy Sell Trade</div>
-            </div>
-            <div class="sheen" id="sheen"></div>
-          </div>
-          <span class="stage-caption" id="stageCaption">Holofoil &middot; move your cursor</span>
+        <div class="stage collector-stage" id="stage" role="region" aria-label="Cards from the case">
+          <div class="case-orbit" aria-hidden="true"></div><span class="case-edition" aria-hidden="true">THE CASE / SELECTED SINGLES</span>
+          <div class="collector-deck" id="holo"><p class="deck-loading">Opening the case…</p></div>
+          <div class="case-caption"><div><span class="case-label" id="stageCaption">A CLOSER LOOK</span><p id="deckName">Real cards. Ready for your collection.</p></div><div class="deck-controls"><button id="deckPrev" type="button" aria-label="Previous featured card">←</button><span id="deckIndex" aria-live="polite">01 / 03</span><button id="deckNext" type="button" aria-label="Next featured card">→</button></div></div>
         </div>
       </div>
+    </div>
+
+    <div class="game-shelf wrap" aria-label="Shop by game">
+      <span class="game-shelf-label">FIND YOUR<br>UNIVERSE <span aria-hidden="true">→</span></span>
+      <a href="#/shop?game=pk" class="game-door" data-universe="pk"><span class="game-mark" aria-hidden="true">◉</span><span>Pokémon<small>Gotta find that grail.</small></span><span class="game-arrow" aria-hidden="true">↗</span></a>
+      <a href="#/shop?game=op" class="game-door" data-universe="op"><span class="game-mark" aria-hidden="true">⚑</span><span>One Piece<small>The chase is on.</small></span><span class="game-arrow" aria-hidden="true">↗</span></a>
+      <a href="#/shop?game=mtg" class="game-door" data-universe="mtg"><span class="game-mark" aria-hidden="true">✦</span><span>Magic<small>Your next deck starts here.</small></span><span class="game-arrow" aria-hidden="true">↗</span></a>
+      <a href="#/shop?game=gundam" class="game-door" data-universe="gundam"><span class="game-mark" aria-hidden="true">⌁</span><span>Gundam<small>Build your squad.</small></span><span class="game-arrow" aria-hidden="true">↗</span></a>
     </div>
 
     <div class="ticker" id="ticker">
@@ -2857,32 +3041,27 @@ footer::before{
       </div>
     </div>
 
-    <div class="section">
+    <div class="section collector-playground">
       <div class="wrap">
-        <div class="tri">
-          <div class="panel">
-            <span class="num">01 / BUY</span>
-            <h3>Singles &amp; sealed, priced live</h3>
-            <p>Every card on this site is a real listing from our TCGplayer store, refreshed every morning &mdash; <span id="triFresh">last pulled today</span>. What you see is what's in the glass case.</p>
-          </div>
-          <div class="panel">
-            <span class="num">02 / SELL</span>
-            <h3>We buy collections</h3>
-            <p>Cash on the spot or a store-credit bonus. Bulk, binders, graded, sealed &mdash; bring it in or start a quote from your couch.</p>
-          </div>
-          <div class="panel">
-            <span class="num">03 / TRADE</span>
-            <h3>The play space is always on</h3>
-            <p>Locals every week, a monthly show at the Hilton on Turfway, and open tables whenever the door is open.</p>
-          </div>
+        <div class="section-head"><div><p class="collector-kicker">MORE THAN A CHECKOUT</p><h2>Come for the cards.<br>Stay for the good stuff.</h2></div><span class="collector-note">A little luck. A lot of community.</span></div>
+        <div class="collector-mosaic">
+          <section class="discovery-tile" aria-labelledby="discoveryTitle">
+            <div class="discovery-copy"><span class="tile-number">01 / HAPPY ACCIDENTS</span><h3 id="discoveryTitle">Meet your<br>next favorite.</h3><p>Pick a game. Set your budget.<br>Let the case surprise you.</p>
+              <form id="discoveryForm"><div class="discovery-fields"><label>YOUR GAME<select id="discoveryGame"><option value="all">Any universe</option><option value="pk">Pokémon</option><option value="op">One Piece</option><option value="mtg">Magic</option><option value="gundam">Gundam</option><option value="lorcana">Lorcana</option></select></label><label>YOUR BUDGET<select id="discoveryBudget"><option value="10">Under $10</option><option value="25" selected>Under $25</option><option value="50">Under $50</option><option value="100">Under $100</option></select></label></div><button class="btn" id="discoveryBtn" type="submit">Find my next card <span aria-hidden="true">✦</span></button></form>
+              <p id="discoveryStatus" class="discovery-status" role="status">A free discovery. No purchase, just possibilities.</p>
+            </div><div class="discovery-display" id="discoveryResult"><div class="mystery-card" aria-hidden="true"><span>TOP LOADED</span><b>?</b><small>YOUR NEXT FAVORITE</small></div><span class="discovery-orbit" aria-hidden="true">✳</span></div>
+          </section>
+          <a class="play-tile" href="#/rip" data-go="rip"><span class="tile-number">02 / THAT NEW-PACK FEELING</span><div class="pack-stack" aria-hidden="true"><i></i><i></i><i><span>TOP LOADED</span><b>RIP<br>IT.</b><small>VIRTUAL PACK / REAL CARDS</small></i></div><div class="play-tile-bottom"><div><h3>Chase the feeling.</h3><p>Free virtual packs. Real inventory. All the suspense.</p></div><span class="round-arrow" aria-hidden="true">↗</span></div></a>
+          <a class="trade-tile" href="#/buylist" data-go="buylist"><span class="tile-number">03 / MAKE ROOM FOR WHAT’S NEXT</span><div><h3>Old binder.<br>New possibilities.</h3><span class="trade-stamp" aria-hidden="true">BUY<br>SELL<br>TRADE</span></div><p>Turn your collection into cash or store credit.<span class="round-arrow" aria-hidden="true">↗</span></p></a>
         </div>
+        <p class="collector-source">The case is sourced from our TCGplayer listings · <span id="triFresh">refreshed daily</span>. Availability is confirmed at checkout.</p>
       </div>
     </div>
 
     <div class="section" style="padding-top:0">
       <div class="wrap">
         <div class="section-head">
-          <h2>Chase cards in the case right now</h2>
+          <div><p class="collector-kicker">SLEEVED. TOP LOADED. READY.</p><h2>The good stuff, in stock.</h2></div>
           <a class="linklike" href="#/shop" data-go="shop">Browse all inventory &rarr;</a>
         </div>
         <div class="freshness" id="homeFresh"><span class="dot"></span>Live from our TCGplayer store <span class="demo-tag">demo data</span></div>
@@ -4094,11 +4273,12 @@ footer::before{
       try { l[i](data); } catch(e){ if(window.console) console.error("[TL:" + ev + "]", e); }
     }
   };
+  TL.storagePrefix = window.TL_STORAGE_PREFIX || "tl-";
   function mkStore(area){
     return {
-      get: function(k, fb){ try { var v = window[area].getItem("tl-" + k); return v === null ? fb : JSON.parse(v); } catch(e){ return fb; } },
-      set: function(k, v){ try { window[area].setItem("tl-" + k, JSON.stringify(v)); return true; } catch(e){ return false; } },
-      del: function(k){ try { window[area].removeItem("tl-" + k); } catch(e){} }
+      get: function(k, fb){ try { var v = window[area].getItem(TL.storagePrefix + k); return v === null ? fb : JSON.parse(v); } catch(e){ return fb; } },
+      set: function(k, v){ try { window[area].setItem(TL.storagePrefix + k, JSON.stringify(v)); return true; } catch(e){ return false; } },
+      del: function(k){ try { window[area].removeItem(TL.storagePrefix + k); } catch(e){} }
     };
   }
   TL.store = mkStore("localStorage");
@@ -4404,12 +4584,12 @@ footer::before{
   var BASE_TITLE = document.title;
   function isAuthed(){
     if(TL.auth && typeof TL.auth.can === "function") return TL.auth.can(current);
-    try { return sessionStorage.getItem("tl-staff") === "1"; } catch(e){ return false; }
+    try { return sessionStorage.getItem(TL.storagePrefix + "staff") === "1"; } catch(e){ return false; }
   }
   function canView(name){
     if(name !== "admin" && name !== "staff") return true;
     if(TL.auth && typeof TL.auth.can === "function") return TL.auth.can(name);
-    try { return sessionStorage.getItem("tl-staff") === "1"; } catch(e){ return false; }
+    try { return sessionStorage.getItem(TL.storagePrefix + "staff") === "1"; } catch(e){ return false; }
   }
   function dec(s){ try { return decodeURIComponent(s); } catch(e){ return s; } }
   function parseHash(h){
@@ -4700,6 +4880,7 @@ footer::before{
   var heroTiltOff = null, heroInView = true, homeActive = false, parallaxOn = false, pRaf = 0;
   function bindHeroTilt(){
     if(heroTiltOff){ heroTiltOff(); heroTiltOff = null; }
+    if(heroEl && heroEl.classList.contains("collector-hero")) return;
     if(heroHolo && heroStage && !reduceMotion) heroTiltOff = TL.tilt(heroHolo, {max: 14, area: heroStage, sheen: false});
   }
   function parallaxFrame(){
@@ -6959,7 +7140,7 @@ footer::before{
     pill.addEventListener("focusout", function(){ if(!pill.hidden) cartAddedArm(1500); });
   })();
   window.addEventListener("storage", function(e){
-    if(e && e.key !== null && e.key !== "tl-cart") return;
+    if(e && e.key !== null && e.key !== TL.storagePrefix + "cart") return;
     var before = Object.keys(cart);
     cartLoad(); renderCart();
     var removed = before.filter(function(id){ return !cart[id]; });
@@ -10811,7 +10992,7 @@ footer::before{
   TL.setTheme = function(next){
     if(!THEME_NAMES[next]) return;
     document.documentElement.setAttribute("data-theme", next);
-    try { localStorage.setItem("tl-theme", next); } catch(e){}
+    try { localStorage.setItem(TL.storagePrefix + "theme", next); } catch(e){}
     applyThemeMeta(next);
     TL.emit("theme:change", {theme: next});
   };
@@ -11099,6 +11280,127 @@ footer::before{
     document.addEventListener("pointerleave", clear);
     TL.on("motion:change", function(d){ if(d && d.reduce) clear(); });
     TL.on("view:change", clear);
+  })();
+
+  /* Collector preview. User-driven motion; summary-first showcase and lazy discovery. */
+  (function(){
+    var deck = document.getElementById("holo"), form = document.getElementById("discoveryForm");
+    if(!form || !deck) return;
+    var cards = [], selected = 0, lastPick = null, pointerFrame = 0, gesture = null;
+    function art(item, large){
+      if(item.tcg && item.img){
+        var src = large ? item.img.replace("200x200", "400x400") : item.img;
+        return '<img class="card-img" src="' + TL.esc(src) + '" alt="" width="250" height="350" decoding="async">';
+      }
+      return cardArt(item);
+    }
+    function updateDeck(){
+      var nodes = deck.querySelectorAll(".deck-card");
+      Array.prototype.forEach.call(nodes, function(node, i){
+        var position = i === selected ? "front" : i === (selected + 1) % cards.length ? "right" : "left";
+        node.dataset.position = position;
+        node.setAttribute("aria-label", (position === "front" ? "View " : "Bring forward: ") + cards[i].name + ", " + TL.money(cards[i].price));
+      });
+      document.getElementById("deckName").textContent = cards[selected] ? cards[selected].name : "The case is being refreshed.";
+      document.getElementById("deckIndex").textContent = TL.pad2(selected + 1) + " / " + TL.pad2(cards.length);
+      document.getElementById("deckPrev").disabled = document.getElementById("deckNext").disabled = cards.length < 2;
+    }
+    function renderDeck(){
+      var summary = TL.inventory.summary, next = [], used = {};
+      if(summary && summary.topByGame){
+        ["pk", "op", "mtg"].forEach(function(game){
+          var raw = (summary.topByGame[game] || []).find(function(item){ return item && item.listings && item.listings.some(function(l){ return l.qty > 0; }); });
+          if(raw){ var item = TL.inventory.toItem(raw); if(!used[item.id]){ used[item.id] = true; next.push(item); } }
+        });
+        (summary.top || []).forEach(function(raw){
+          if(next.length >= 3) return;
+          var item = TL.inventory.toItem(raw);
+          if(item.stock > 0 && !used[item.id]){ used[item.id] = true; next.push(item); }
+        });
+      }
+      if(!next.length) next = TL.ITEMS.filter(function(item){ return !item.live && item.type === "single" && item.stock > 0; }).slice(0,3);
+      cards = next; selected = 0;
+      deck.innerHTML = cards.map(function(item,i){
+        return '<button type="button" class="deck-card" data-deck="' + i + '" data-id="' + TL.esc(item.id) + '"><span class="deck-face">' + art(item,true) + '</span><span class="deck-tag"><small>' + (item.tcg ? 'IN THE CASE' : 'SAMPLE CARD') + '</small>' + TL.money(item.price) + '</span></button>';
+      }).join("");
+      document.getElementById("stageCaption").textContent = summary ? "SELECT A CARD / TAKE A CLOSER LOOK" : "SAMPLE SHOWCASE / TAKE A CLOSER LOOK";
+      updateDeck();
+    }
+    function step(direction){ selected = (selected + direction + cards.length) % cards.length; updateDeck(); }
+    document.getElementById("deckPrev").addEventListener("click", function(){ if(cards.length) step(-1); });
+    document.getElementById("deckNext").addEventListener("click", function(){ if(cards.length) step(1); });
+    deck.addEventListener("click", function(e){
+      var button = e.target.closest("[data-deck]"); if(!button || deck.dataset.swiping === "true") return;
+      var i = Number(button.dataset.deck);
+      if(i !== selected){ selected = i; updateDeck(); }
+      else TL.openQuickView(TL.inventory.byId(cards[i].id) || cards[i], {list:cards, from:button});
+    });
+    deck.addEventListener("keydown", function(e){
+      deck.dataset.swiping = "false";
+      if(!cards.length || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+      e.preventDefault(); step(e.key === "ArrowRight" ? 1 : -1);
+      deck.querySelector('[data-position="front"]').focus();
+    });
+    deck.addEventListener("pointerdown", function(e){
+      deck.dataset.swiping = "false";
+      if(e.pointerType === "touch") gesture = {x:e.clientX,y:e.clientY};
+    }, {passive:true});
+    deck.addEventListener("pointerup", function(e){
+      if(!gesture) return;
+      var x = e.clientX - gesture.x, y = e.clientY - gesture.y; gesture = null;
+      if(Math.abs(x) > 40 && Math.abs(x) > Math.abs(y) * 1.5 && cards.length){ deck.dataset.swiping = "true"; step(x < 0 ? 1 : -1); }
+    }, {passive:true});
+    deck.addEventListener("pointercancel", function(){ gesture = null; });
+    function resetTilt(){
+      if(pointerFrame) cancelAnimationFrame(pointerFrame); pointerFrame = 0;
+      ["--deck-rx","--deck-ry","--deck-shine"].forEach(function(key){ deck.style.removeProperty(key); });
+    }
+    deck.addEventListener("pointermove", function(e){
+      if(e.pointerType === "touch" || TL.reduceMotion || document.hidden || pointerFrame) return;
+      var x = e.clientX, y = e.clientY;
+      pointerFrame = requestAnimationFrame(function(){
+        pointerFrame = 0; var rect = deck.getBoundingClientRect(); if(!rect.width || !rect.height) return;
+        var px = TL.clamp((x-rect.left)/rect.width,0,1), py = TL.clamp((y-rect.top)/rect.height,0,1);
+        deck.style.setProperty("--deck-rx", ((.5-py)*8).toFixed(1)+"deg");
+        deck.style.setProperty("--deck-ry", ((px-.5)*10).toFixed(1)+"deg");
+        deck.style.setProperty("--deck-shine", (100-px*100).toFixed(1)+"%");
+      });
+    }, {passive:true});
+    deck.addEventListener("pointerleave", resetTilt);
+    TL.on("motion:change",resetTilt); TL.on("view:leave",resetTilt);
+    document.addEventListener("visibilitychange",function(){ if(document.hidden) resetTilt(); });
+
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
+      var button = document.getElementById("discoveryBtn"), status = document.getElementById("discoveryStatus");
+      if(button.disabled) return;
+      var game = document.getElementById("discoveryGame").value, budget = Number(document.getElementById("discoveryBudget").value);
+      button.disabled = true; button.textContent = "Opening the case…";
+      status.textContent = "Finding an in-stock single in your budget…";
+      TL.inventory.load().then(function(){
+        if(!TL.inventory.loaded) throw new Error("The inventory is unavailable right now. Try again in a moment.");
+        var choices = TL.inventory.catalog().filter(function(item){
+          return item.type === "single" && item.stock > 0 && item.price > 0 && item.price < budget && (game === "all" || item.game === game);
+        });
+        if(!choices.length){
+          lastPick = null;
+          document.getElementById("discoveryResult").innerHTML = '<p class="collector-note">A different game or budget might hold your next favorite.</p>';
+          status.textContent = "No singles under " + TL.money(budget) + " in this game right now. Try another game or budget.";
+          return;
+        }
+        var pool = choices.length > 1 ? choices.filter(function(item){ return !lastPick || item.id !== lastPick.id; }) : choices;
+        var item = pool[Math.floor(Math.random()*pool.length)]; lastPick = item;
+        document.getElementById("discoveryResult").innerHTML = '<div class="discovery-pick" data-id="' + TL.esc(item.id) + '"><button type="button" class="discovery-art" data-discovery-view aria-label="View ' + TL.esc(item.name) + '">' + art(item,true) + '</button><div><span class="case-label">A LITTLE DISCOVERY</span><h4>' + TL.esc(item.name) + '</h4><p>' + TL.money(item.price) + ' · ' + TL.esc(TL.gameLabel(item.game)) + '</p><button type="button" class="linklike" data-discovery-view>Take a closer look ↗</button></div></div>';
+        status.textContent = item.name + " — " + TL.money(item.price) + ". One of " + TL.fmtInt(choices.length) + " matches. Try again for another find.";
+      }).catch(function(err){ status.textContent = err.message || "Could not open the case. Please try again."; }).finally(function(){
+        button.disabled = false; button.innerHTML = (lastPick ? "Find another card" : "Find my next card") + ' <span aria-hidden="true">✦</span>';
+      });
+    });
+    document.getElementById("discoveryResult").addEventListener("click",function(e){
+      var trigger = e.target.closest("[data-discovery-view]");
+      if(trigger && lastPick) TL.openQuickView(TL.inventory.byId(lastPick.id) || lastPick,{from:trigger});
+    });
+    TL.on("init",renderDeck); TL.on("inventory:summary",renderDeck);
   })();
 
   /* ---------- boot ----------

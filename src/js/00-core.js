@@ -51,11 +51,12 @@
       try { l[i](data); } catch(e){ if(window.console) console.error("[TL:" + ev + "]", e); }
     }
   };
+  TL.storagePrefix = window.TL_STORAGE_PREFIX || "tl-";
   function mkStore(area){
     return {
-      get: function(k, fb){ try { var v = window[area].getItem("tl-" + k); return v === null ? fb : JSON.parse(v); } catch(e){ return fb; } },
-      set: function(k, v){ try { window[area].setItem("tl-" + k, JSON.stringify(v)); return true; } catch(e){ return false; } },
-      del: function(k){ try { window[area].removeItem("tl-" + k); } catch(e){} }
+      get: function(k, fb){ try { var v = window[area].getItem(TL.storagePrefix + k); return v === null ? fb : JSON.parse(v); } catch(e){ return fb; } },
+      set: function(k, v){ try { window[area].setItem(TL.storagePrefix + k, JSON.stringify(v)); return true; } catch(e){ return false; } },
+      del: function(k){ try { window[area].removeItem(TL.storagePrefix + k); } catch(e){} }
     };
   }
   TL.store = mkStore("localStorage");

@@ -1,0 +1,13 @@
+# Collector preview
+
+Design experiment on `codex/collector-preview`. The production `main` branch and its GitHub Pages configuration are unchanged.
+
+Source: [collector-preview branch](https://github.com/ArtofJammin/toploaded-demo/tree/codex/collector-preview). The separate `toploaded-design-preview` repository hosts a static copy for comparison; it is not a replacement production deployment. Its inventory is a snapshot, not a scheduled live refresh.
+
+Run `node tools/dev-server.mjs --port 8790` to preview locally. Build with `node tools/build.mjs`; verify with `node tools/check.mjs`.
+
+The new homepage uses the existing inventory summary, product quick view, wishlist, calendar, and pack-opening features. The full inventory is fetched only when a feature needs it.
+
+Preview safeguards: `noindex` metadata and a separate `tl-collector-preview-` browser-storage namespace keep this experiment out of search results and away from the production cart, login, and settings. Remove the two preview meta tags and comparison strip when intentionally promoting the design to production. Without the storage meta tag, the site continues to use its original `tl-` namespace.
+
+The preview deployment contains only the static site and its public assets. No API credentials, local notes, development data, or scheduled inventory workflows are published to the preview repository.

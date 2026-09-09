@@ -19,12 +19,12 @@
   var BASE_TITLE = document.title;
   function isAuthed(){
     if(TL.auth && typeof TL.auth.can === "function") return TL.auth.can(current);
-    try { return sessionStorage.getItem("tl-staff") === "1"; } catch(e){ return false; }
+    try { return sessionStorage.getItem(TL.storagePrefix + "staff") === "1"; } catch(e){ return false; }
   }
   function canView(name){
     if(name !== "admin" && name !== "staff") return true;
     if(TL.auth && typeof TL.auth.can === "function") return TL.auth.can(name);
-    try { return sessionStorage.getItem("tl-staff") === "1"; } catch(e){ return false; }
+    try { return sessionStorage.getItem(TL.storagePrefix + "staff") === "1"; } catch(e){ return false; }
   }
   function dec(s){ try { return decodeURIComponent(s); } catch(e){ return s; } }
   function parseHash(h){

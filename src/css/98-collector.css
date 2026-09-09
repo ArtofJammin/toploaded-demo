@@ -1,0 +1,183 @@
+/* Collector preview: deliberately scoped so the operational pages retain their layouts. */
+.collector-home{--collect-yellow:#f5d438; --collect-purple:#c6b7f3; --collect-black:#121310}
+.collector-home .wrap{max-width:1320px}
+.design-preview{background:var(--surface); border-bottom:1px solid var(--line); color:var(--ink2); font:10px var(--mono); letter-spacing:.12em}
+.design-preview .wrap{display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:34px}
+.design-preview i{display:inline-block; width:5px; height:5px; background:var(--accent); border-radius:50%; margin-right:8px}
+.design-preview a{color:var(--ink2); text-decoration:none; letter-spacing:0}
+.collector-hero{isolation:isolate; border-bottom:1px solid var(--line)}
+.collector-hero::before{background:radial-gradient(ellipse at 78% 42%,color-mix(in srgb,var(--collect-yellow) 9%,transparent),transparent 52%); animation:none; translate:none}
+.collector-hero::after{background-size:72px 72px; opacity:.35}
+.collector-hero .wrap{grid-template-columns:1fr 1fr; gap:12px; padding-top:68px; padding-bottom:56px; min-height:650px}
+.collector-hero .eyebrow{display:flex; flex-wrap:wrap; align-items:center; gap:9px; font-size:10px; letter-spacing:.12em; color:var(--ink2); margin-bottom:26px}
+.collector-hero .eyebrow > span:last-child{width:100%; margin-left:25px; font-size:9px; color:var(--ink3)}
+.hero-cross{font-size:20px; color:var(--accent); line-height:1}
+.collector-hero h1{font-size:clamp(64px,7.1vw,104px); line-height:.94; letter-spacing:-.035em; text-wrap:initial}
+.collector-hero h1 .collector-outline{color:transparent; -webkit-text-stroke:1px var(--ink)}
+.collector-hero h1 .collector-yellow{color:var(--accent); -webkit-text-stroke:0}
+.collector-hero .sub{font-size:15px; max-width:37ch; line-height:1.8; margin-top:24px}
+.collector-hero .hero-ctas{gap:24px; align-items:center; margin-top:26px}
+.collector-hero .btn{border-radius:7px; font-size:11px; padding:16px 20px; letter-spacing:.07em; gap:28px}
+.hero-secondary{color:var(--ink); text-decoration:none; font-size:12px; border-bottom:1px solid var(--line2); padding-bottom:4px}
+.hero-secondary:hover{color:var(--accent)}
+.collector-hero .sync-pill{border:0; padding:0; border-radius:0; background:none; font-size:10px; max-width:45ch; line-height:1.6; margin-top:26px}
+.collector-stage{position:relative; min-height:500px; padding:0; margin:0; perspective:none; translate:none!important; display:flex; flex-direction:column; justify-content:center; align-items:stretch; min-width:0}
+.case-edition{position:absolute; top:0; right:20px; font:9px var(--mono); letter-spacing:.17em; color:var(--ink3)}
+.case-orbit{position:absolute; width:96%; height:65%; top:10%; left:2%; border:1px solid color-mix(in srgb,var(--accent) 16%,transparent); border-radius:50%; transform:rotate(-26deg); pointer-events:none}
+.case-orbit::before,.case-orbit::after{content:""; position:absolute; inset:30px -12px; border:1px solid color-mix(in srgb,var(--accent) 9%,transparent); border-radius:50%}
+.case-orbit::after{inset:60px -24px}
+.collector-deck{position:relative; height:375px; perspective:1000px; touch-action:pan-y}
+.deck-card{--dx:0px; --angle:0deg; --lift:0px; --size:1; position:absolute; top:22px; left:50%; width:214px; padding:0; border:0; border-radius:12px; background:var(--surface); text-align:left; transform:translateX(calc(-50% + var(--dx))) translateY(var(--lift)) rotate(var(--angle)) scale(var(--size)); transition:transform .6s cubic-bezier(.22,.7,.15,1),filter .4s; box-shadow:0 24px 50px #0006; z-index:1}
+.deck-card[data-position="left"]{--dx:-135px; --angle:-16deg; --lift:29px; --size:.88; filter:brightness(.74)}
+.deck-card[data-position="right"]{--dx:135px; --angle:16deg; --lift:29px; --size:.88; filter:brightness(.74)}
+.deck-card[data-position="front"]{z-index:3; --angle:-3deg}
+.deck-face{position:relative; display:block; border:1px solid #ffffff30; border-radius:12px; overflow:hidden; aspect-ratio:5/7; background:#151714; transform:rotateX(var(--deck-rx,0deg)) rotateY(var(--deck-ry,0deg)); transition:transform .16s ease-out}
+.deck-face img,.deck-face svg{width:100%; height:100%; object-fit:contain; display:block}
+.deck-face::after{content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(115deg,transparent 20%,#fff0 30%,#fdf5bd55 48%,#bbedff44 55%,transparent 70%); background-size:250% 100%; background-position:var(--deck-shine,100%) 50%; opacity:0; transition:opacity .25s}
+.deck-card:hover{filter:brightness(1.05)}
+.deck-card:hover .deck-face::after,.deck-card:focus-visible .deck-face::after{opacity:.8}
+.deck-tag{position:absolute; right:-14px; bottom:-14px; display:flex; align-items:center; gap:8px; border-radius:4px; padding:9px 12px; background:var(--collect-yellow); color:var(--collect-black); font:12px var(--mono); box-shadow:0 4px 20px #0003; transform:rotate(3deg)}
+.deck-tag small{font-size:8px; letter-spacing:.1em}
+.deck-card:not([data-position="front"]) .deck-tag{visibility:hidden}
+.case-caption{display:flex; justify-content:space-between; align-items:center; gap:12px; margin:24px 15px 0; border-top:1px solid var(--line2); padding-top:18px}
+.case-label{color:var(--accent); font:9px var(--mono); letter-spacing:.15em}
+#deckName{font-size:13px; max-width:30ch; margin-top:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.deck-controls{display:flex; gap:10px; align-items:center; flex-shrink:0}
+.deck-controls button{width:36px; height:36px; border:1px solid var(--line2); border-radius:50%; background:none; font-size:17px}
+.deck-controls button:hover{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+#deckIndex{font:9px var(--mono); color:var(--ink2)}
+.deck-loading{position:absolute; inset:40% 0; text-align:center; font:12px var(--mono); color:var(--ink3)}
+.game-shelf{display:grid; grid-template-columns:140px repeat(4,minmax(0,1fr)); padding-top:24px; padding-bottom:24px; gap:0}
+.game-shelf-label{font:9px/1.7 var(--mono); letter-spacing:.12em; color:var(--ink3); align-self:center}
+.game-shelf-label > span{margin-left:12px; font-size:16px}
+.game-door{display:flex; gap:12px; padding:14px 16px; align-items:center; border-left:1px solid var(--line); text-decoration:none; color:var(--ink); font-family:var(--disp); font-size:24px; line-height:1.2; transition:background .2s}
+.game-door:hover{background:var(--surface)}
+.game-door small{display:block; font:10px var(--body); color:var(--ink3); margin-top:5px}
+.game-mark{font:26px var(--body); color:var(--accent)}
+.game-arrow{margin-left:auto; color:var(--ink3); font:16px var(--body); transition:transform .2s}
+.game-door:hover .game-arrow{transform:translate(2px,-2px); color:var(--accent)}
+.collector-home .ticker{border-top:1px solid var(--line); font-size:11px}
+.collector-home .nextup{background:var(--bg2)}
+.collector-home .nextup-btn{padding-top:22px; padding-bottom:22px}
+.collector-home .nextup-name{font-size:23px; margin:4px 0}
+.collector-home .nextup-cd{font-size:20px}
+.collector-home .section{padding-top:68px; padding-bottom:68px}
+.collector-home .section-head h2{font-size:clamp(32px,3.5vw,48px); letter-spacing:-.015em; text-transform:uppercase; line-height:1.04}
+.collector-kicker{font:10px var(--mono); color:var(--accent); letter-spacing:.13em; margin-bottom:14px}
+.collector-note{font:12px var(--body); color:var(--ink3)}
+.collector-mosaic{display:grid; grid-template-columns:1.12fr 1fr; grid-template-rows:auto auto; gap:16px}
+.tile-number{font:9px var(--mono); letter-spacing:.12em}
+.discovery-tile{grid-row:span 2; padding:32px; border:1px solid var(--line2); border-radius:14px; background:radial-gradient(ellipse at 95% 90%,color-mix(in srgb,var(--collect-purple) 12%,transparent),transparent 60%),var(--surface); display:flex; flex-direction:column; position:relative; overflow:hidden}
+.discovery-tile .tile-number{color:var(--ink3)}
+.discovery-tile h3{font:700 clamp(36px,4vw,54px)/1 var(--disp); text-transform:uppercase; letter-spacing:-.015em; margin-top:24px}
+.discovery-copy{position:relative; z-index:2}
+.discovery-copy > p{font-size:13px; line-height:1.7; color:var(--ink2); margin:16px 0 20px}
+.discovery-fields{display:flex; gap:12px; flex-wrap:wrap}
+.discovery-fields label{display:flex; flex-direction:column; flex:1; gap:8px; font-size:9px; color:var(--ink2); min-width:100px}
+.discovery-fields select{font-size:12px; padding:10px; width:100%; background:var(--bg2); border-radius:5px; letter-spacing:0}
+#discoveryBtn{font-size:11px; margin-top:16px; border-radius:5px; display:flex; justify-content:space-between; width:100%; padding:14px 18px}
+#discoveryBtn:disabled{opacity:.7; cursor:wait}
+.discovery-copy .discovery-status{font-size:10px; margin:12px 0 0; min-height:32px; color:var(--ink3); max-width:44ch}
+.discovery-display{position:relative; display:flex; justify-content:center; align-items:center; min-height:210px; margin-top:20px}
+.mystery-card{height:195px; width:139px; flex-shrink:0; border:1px solid #c6b7f366; border-radius:9px; background:repeating-linear-gradient(45deg,#c6b7f30a 0 1px,transparent 1px 9px),#1c1924; color:var(--collect-purple); transform:rotate(9deg); display:flex; flex-direction:column; align-items:center; justify-content:space-around; box-shadow:-12px 12px 0 -2px #282332,-12px 12px 0 -1px #c6b7f344}
+.mystery-card span,.mystery-card small{font:8px var(--mono); letter-spacing:.15em}
+.mystery-card b{font:90px/1 var(--disp)}
+.discovery-orbit{position:absolute; right:12%; bottom:18%; color:var(--collect-purple); font-size:70px; transform:rotate(-13deg); opacity:.7; pointer-events:none}
+.discovery-pick{display:flex; gap:24px; align-items:center; width:100%; animation:discoveryReveal .55s cubic-bezier(.2,.7,.2,1) backwards}
+.discovery-art{flex:0 0 120px; width:120px; border:0; border-radius:7px; padding:0; background:var(--bg); overflow:hidden; transform:rotate(-5deg); box-shadow:0 14px 24px #0004}
+.discovery-art img,.discovery-art svg{display:block; width:100%; height:auto; aspect-ratio:5/7; object-fit:contain}
+.discovery-pick h4{font:600 22px/1.1 var(--disp); margin:7px 0; text-wrap:balance}
+.discovery-pick p{font-size:12px; color:var(--ink2); margin:10px 0}
+.discovery-pick .linklike{font-size:10px; min-height:36px}
+.play-tile{display:flex; flex-direction:column; min-height:345px; padding:28px; background:var(--collect-purple); color:#211835; border-radius:14px; text-decoration:none; overflow:hidden; position:relative}
+.pack-stack{height:200px; position:relative; perspective:800px}
+.pack-stack i{position:absolute; top:18px; left:50%; width:120px; height:168px; border:1px solid #211835; background:#ddcef9; transform:translateX(-50%) rotate(-18deg); transition:transform .45s cubic-bezier(.2,.7,.2,1); border-radius:2px; box-shadow:0 12px 22px #21183520}
+.pack-stack i:nth-child(1){transform:translateX(-98%) translateY(4px) rotate(-22deg); background:#9e8ac6}
+.pack-stack i:nth-child(2){transform:translateX(-8%) translateY(4px) rotate(17deg); background:#bdaaeb}
+.pack-stack i:nth-child(3){transform:translateX(-50%) rotate(-5deg); display:flex; flex-direction:column; padding:16px 12px; justify-content:space-between; background:repeating-linear-gradient(0deg,#21183520 0 1px,transparent 1px 3px) top / 100% 8px no-repeat,#211835; color:#ddcef9}
+.pack-stack span,.pack-stack small{font:7px var(--mono); letter-spacing:.07em}
+.pack-stack b{font:800 50px/.82 var(--disp); letter-spacing:-.02em}
+.play-tile:hover .pack-stack i:nth-child(1){transform:translateX(-112%) rotate(-28deg)}
+.play-tile:hover .pack-stack i:nth-child(2){transform:translateX(3%) rotate(25deg)}
+.play-tile:hover .pack-stack i:nth-child(3){transform:translateX(-50%) translateY(-8px) rotate(0deg)}
+.play-tile-bottom{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:auto}
+.play-tile h3,.trade-tile h3{font:700 34px/1 var(--disp); letter-spacing:-.01em; text-transform:uppercase}
+.play-tile p,.trade-tile p{font-size:12px; margin-top:10px; max-width:36ch}
+.round-arrow{display:grid; place-items:center; border:1px solid currentColor; border-radius:50%; width:40px; height:40px; flex:0 0 auto; font:22px var(--body); transition:transform .2s}
+a:hover .round-arrow{transform:rotate(45deg)}
+.trade-tile{padding:28px; border-radius:14px; background:var(--collect-yellow); color:var(--collect-black); text-decoration:none; display:block}
+.trade-tile > div{display:flex; justify-content:space-between; align-items:center; gap:20px; margin-top:22px}
+.trade-stamp{border:1px solid #12131080; border-radius:50%; width:85px; height:85px; display:grid; place-content:center; text-align:center; font:700 17px/.95 var(--disp); transform:rotate(14deg); flex-shrink:0}
+.trade-tile p{display:flex; align-items:center; justify-content:space-between; gap:16px; max-width:none; margin-top:22px}
+.collector-source{font:10px/1.6 var(--mono); color:var(--ink3); margin-top:16px}
+.collector-home #featuredGrid{grid-template-columns:repeat(4,minmax(0,1fr)); gap:18px}
+.collector-home .prod{border-radius:12px; box-shadow:none}
+.collector-home .thumb{padding:30px 0; background:radial-gradient(ellipse at 50% 65%,color-mix(in srgb,var(--accent) 8%,var(--bg2)),var(--bg2))}
+.collector-home .p-meta{padding:18px}
+.collector-home .p-meta h3{font-size:15px}
+.collector-home .wall{border-radius:0; background:var(--surface)}
+.collector-home .promo-rip{display:none}
+.collector-home .section:has(> .wrap > .promo-rip){display:none}
+.collector-home .tri .panel{border-radius:12px; background:var(--bg2); padding:28px}
+.collector-home .faq{max-width:none; grid-template-columns:1fr 1fr; align-items:start}
+.collector-home .faq details.panel{border-radius:8px}
+@keyframes discoveryReveal{from{opacity:0; transform:translateY(14px) rotate(-2deg)}to{opacity:1; transform:none}}
+@media (max-width:1100px){
+  .collector-hero .wrap{padding-top:50px; min-height:620px}
+  .collector-hero h1{font-size:76px}
+  .deck-card{width:182px}
+  .deck-card[data-position="left"]{--dx:-107px}.deck-card[data-position="right"]{--dx:107px}
+  .collector-deck{height:325px}.collector-stage{min-height:420px}
+  .game-shelf{grid-template-columns:repeat(4,1fr)}.game-shelf-label{display:none}
+  .game-door{font-size:21px;padding:12px}.game-door small{font-size:9px}
+}
+@media (max-width:760px){
+  .collector-hero .wrap{grid-template-columns:1fr; padding-top:38px; padding-bottom:32px; gap:40px}
+  .collector-hero h1{font-size:clamp(64px,13vw,94px); max-width:550px}
+  .collector-hero .sub{max-width:42ch;font-size:14px}
+  .collector-hero .eyebrow{margin-bottom:20px}
+  .collector-stage{width:100%; max-width:500px; justify-self:center; min-height:430px}
+  .collector-deck{height:335px}.deck-card{width:195px;top:22px}
+  .deck-card[data-position="left"]{--dx:-115px}.deck-card[data-position="right"]{--dx:115px}
+  .case-caption{margin-top:10px}.case-edition{right:5px;top:-14px}
+  .collector-mosaic{grid-template-columns:1fr 1fr}
+  .discovery-tile{grid-column:1/-1;grid-row:auto;display:grid;grid-template-columns:1.2fr 1fr;gap:18px}
+  .discovery-tile h3{font-size:42px}.discovery-display{margin:0;min-width:0}
+  .discovery-pick{flex-direction:column;gap:14px}.discovery-orbit{right:0;bottom:12%}
+  .play-tile,.trade-tile{padding:22px}
+  .play-tile h3,.trade-tile h3{font-size:28px}
+  .trade-tile > div{flex-direction:column;align-items:flex-start;gap:24px}
+  .trade-stamp{width:70px;height:70px}
+  .collector-home #featuredGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .game-shelf{grid-template-columns:1fr 1fr;row-gap:12px;padding-top:20px;padding-bottom:20px}
+  .game-door:nth-child(even){border-left:0}
+  .collector-home .section{padding-top:48px;padding-bottom:48px}
+}
+@media (max-width:460px){
+  .preview-detail{display:none}.design-preview{font-size:8px}.design-preview .wrap{padding:0 18px}
+  .collector-home .wrap{padding-left:20px;padding-right:20px}
+  .collector-hero .hero-ctas{gap:18px}.collector-hero .hero-ctas .btn{flex:none}
+  .collector-hero .btn{font-size:10px;gap:18px;padding:15px 16px}.hero-secondary{font-size:11px}
+  .collector-hero .eyebrow{font-size:9px}.collector-hero .eyebrow > span:last-child{font-size:8px}
+  .deck-card{width:166px}.deck-card[data-position="left"]{--dx:-92px}.deck-card[data-position="right"]{--dx:92px}
+  .collector-deck{height:290px}.collector-stage{min-height:360px}.case-caption{margin-left:0;margin-right:0}
+  #deckName{max-width:21ch;font-size:11px}.deck-controls{gap:5px}.deck-controls button{width:38px;height:38px}
+  .game-door{font-size:23px;padding:10px}.game-door small{font-size:9px}.game-mark{font-size:24px}
+  .collector-home .nextup-list{grid-template-columns:1fr}
+  .collector-home .nextup-cell + .nextup-cell{border-left:0;border-top:1px solid var(--line)}
+  .collector-home .nextup-cell .nextup-btn{padding:18px 0}
+  .collector-mosaic{grid-template-columns:1fr}.discovery-tile{grid-template-columns:1fr;padding:24px;gap:0}
+  .discovery-display{margin-top:20px}.discovery-pick{flex-direction:row;gap:20px}
+  .discovery-tile h3{font-size:45px}.discovery-pick h4{font-size:22px}
+  .play-tile{min-height:350px}.trade-tile > div{flex-direction:row;align-items:center}
+  .collector-home #featuredGrid{gap:12px}.collector-home .p-meta{padding:12px}
+  .collector-home .p-meta h3{font-size:13px}.collector-home .p-set{font-size:10px}
+  .collector-home .prod .thumb{padding:25px 0 18px}.collector-home .mini{width:112px}
+  .collector-home .p-row{flex-wrap:wrap;gap:6px}.collector-home .prod .price{font-size:19px}
+  .collector-home .faq{grid-template-columns:1fr}.collector-home .section-head{gap:12px}
+}
+@media (prefers-reduced-motion:reduce){
+  .deck-card,.deck-face,.game-arrow,.pack-stack i,.round-arrow{transition:none}
+  .discovery-pick{animation:none}.deck-face{transform:none}
+}
+@media (pointer:coarse){.deck-controls button{min-width:44px;min-height:44px}.discovery-pick .linklike{min-height:44px}}

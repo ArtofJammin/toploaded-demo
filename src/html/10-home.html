@@ -1,34 +1,32 @@
   <!-- ================= HOME ================= -->
-  <section class="view active" id="view-home" aria-label="Home">
-    <div class="hero" id="hero">
+  <section class="view active collector-home" id="view-home" aria-label="Home">
+    <div class="design-preview"><div class="wrap"><span><i></i> THE COLLECTOR EDIT <span class="preview-detail"> / DESIGN PREVIEW</span></span><a href="https://artofjammin.github.io/toploaded-demo/" target="_blank" rel="noopener">Compare current site <span aria-hidden="true">↗</span></a></div></div>
+    <div class="hero collector-hero" id="hero">
       <div class="wrap">
         <div class="reveal">
-          <p class="eyebrow">Crescent Springs, KY &middot; Off I-71/75, just south of Cincinnati</p>
-          <h1 aria-label="Buy. Sell. Trade.">
-            <span class="w" aria-hidden="true"><i>B</i><i>u</i><i>y</i><i>.</i></span>
-            <span class="w" aria-hidden="true"><i>S</i><i>e</i><i>l</i><i>l</i><i>.</i></span>
-            <span class="foil-text" aria-hidden="true">Trade.</span>
-          </h1>
-          <p class="sub">Northern Kentucky's card shop for Pokemon, One Piece, Magic, and Gundam. Singles and sealed straight from the case, cash for your collection, and a seat at the table whenever the door's open.</p>
+          <p class="eyebrow"><span class="hero-cross" aria-hidden="true">✳</span> YOUR LOCAL CARD OBSESSION. <span>CRESCENT SPRINGS, KY / ALL COLLECTORS WELCOME</span></p>
+          <h1><span>GOOD CARDS.</span><span class="collector-outline">GREAT</span><span class="collector-yellow">COMPANY.</span></h1>
+          <p class="sub">The next piece of your collection. The next seat at the table. Find both at Northern Kentucky’s home for trading cards.</p>
           <div class="hero-ctas">
-            <a class="btn" href="#/shop" data-go="shop">Shop live inventory</a>
-            <a class="btn btn-ghost" href="#/buylist" data-go="buylist">Sell us your collection</a>
-            <a class="btn btn-ghost" href="#/live" data-go="live"><span class="live-dot" aria-hidden="true"></span>Watch the break</a>
+            <a class="btn" href="#/shop" data-go="shop">Explore the case <span aria-hidden="true">↗</span></a>
+            <a class="hero-secondary" href="#/buylist" data-go="buylist">Got cards to sell? <span aria-hidden="true">→</span></a>
           </div>
-          <span class="sync-pill" id="heroInv"><span class="dot"></span><span id="heroInvTxt">Live inventory from our TCGplayer store &middot; refreshed every morning</span></span>
+          <span class="sync-pill" id="heroInv"><span class="dot"></span><span id="heroInvTxt">From the shop’s TCGplayer inventory. Refreshed daily.</span></span>
         </div>
-        <div class="stage" id="stage">
-          <div class="holo" id="holo" aria-hidden="true">
-            <div class="holo-frame">
-              <div class="holo-top">Top Loaded</div>
-              <div class="holo-art"></div>
-              <div class="holo-bottom">Crescent Springs &middot; KY &middot; Buy Sell Trade</div>
-            </div>
-            <div class="sheen" id="sheen"></div>
-          </div>
-          <span class="stage-caption" id="stageCaption">Holofoil &middot; move your cursor</span>
+        <div class="stage collector-stage" id="stage" role="region" aria-label="Cards from the case">
+          <div class="case-orbit" aria-hidden="true"></div><span class="case-edition" aria-hidden="true">THE CASE / SELECTED SINGLES</span>
+          <div class="collector-deck" id="holo"><p class="deck-loading">Opening the case…</p></div>
+          <div class="case-caption"><div><span class="case-label" id="stageCaption">A CLOSER LOOK</span><p id="deckName">Real cards. Ready for your collection.</p></div><div class="deck-controls"><button id="deckPrev" type="button" aria-label="Previous featured card">←</button><span id="deckIndex" aria-live="polite">01 / 03</span><button id="deckNext" type="button" aria-label="Next featured card">→</button></div></div>
         </div>
       </div>
+    </div>
+
+    <div class="game-shelf wrap" aria-label="Shop by game">
+      <span class="game-shelf-label">FIND YOUR<br>UNIVERSE <span aria-hidden="true">→</span></span>
+      <a href="#/shop?game=pk" class="game-door" data-universe="pk"><span class="game-mark" aria-hidden="true">◉</span><span>Pokémon<small>Gotta find that grail.</small></span><span class="game-arrow" aria-hidden="true">↗</span></a>
+      <a href="#/shop?game=op" class="game-door" data-universe="op"><span class="game-mark" aria-hidden="true">⚑</span><span>One Piece<small>The chase is on.</small></span><span class="game-arrow" aria-hidden="true">↗</span></a>
+      <a href="#/shop?game=mtg" class="game-door" data-universe="mtg"><span class="game-mark" aria-hidden="true">✦</span><span>Magic<small>Your next deck starts here.</small></span><span class="game-arrow" aria-hidden="true">↗</span></a>
+      <a href="#/shop?game=gundam" class="game-door" data-universe="gundam"><span class="game-mark" aria-hidden="true">⌁</span><span>Gundam<small>Build your squad.</small></span><span class="game-arrow" aria-hidden="true">↗</span></a>
     </div>
 
     <div class="ticker" id="ticker">
@@ -67,32 +65,27 @@
       </div>
     </div>
 
-    <div class="section">
+    <div class="section collector-playground">
       <div class="wrap">
-        <div class="tri">
-          <div class="panel">
-            <span class="num">01 / BUY</span>
-            <h3>Singles &amp; sealed, priced live</h3>
-            <p>Every card on this site is a real listing from our TCGplayer store, refreshed every morning &mdash; <span id="triFresh">last pulled today</span>. What you see is what's in the glass case.</p>
-          </div>
-          <div class="panel">
-            <span class="num">02 / SELL</span>
-            <h3>We buy collections</h3>
-            <p>Cash on the spot or a store-credit bonus. Bulk, binders, graded, sealed &mdash; bring it in or start a quote from your couch.</p>
-          </div>
-          <div class="panel">
-            <span class="num">03 / TRADE</span>
-            <h3>The play space is always on</h3>
-            <p>Locals every week, a monthly show at the Hilton on Turfway, and open tables whenever the door is open.</p>
-          </div>
+        <div class="section-head"><div><p class="collector-kicker">MORE THAN A CHECKOUT</p><h2>Come for the cards.<br>Stay for the good stuff.</h2></div><span class="collector-note">A little luck. A lot of community.</span></div>
+        <div class="collector-mosaic">
+          <section class="discovery-tile" aria-labelledby="discoveryTitle">
+            <div class="discovery-copy"><span class="tile-number">01 / HAPPY ACCIDENTS</span><h3 id="discoveryTitle">Meet your<br>next favorite.</h3><p>Pick a game. Set your budget.<br>Let the case surprise you.</p>
+              <form id="discoveryForm"><div class="discovery-fields"><label>YOUR GAME<select id="discoveryGame"><option value="all">Any universe</option><option value="pk">Pokémon</option><option value="op">One Piece</option><option value="mtg">Magic</option><option value="gundam">Gundam</option><option value="lorcana">Lorcana</option></select></label><label>YOUR BUDGET<select id="discoveryBudget"><option value="10">Under $10</option><option value="25" selected>Under $25</option><option value="50">Under $50</option><option value="100">Under $100</option></select></label></div><button class="btn" id="discoveryBtn" type="submit">Find my next card <span aria-hidden="true">✦</span></button></form>
+              <p id="discoveryStatus" class="discovery-status" role="status">A free discovery. No purchase, just possibilities.</p>
+            </div><div class="discovery-display" id="discoveryResult"><div class="mystery-card" aria-hidden="true"><span>TOP LOADED</span><b>?</b><small>YOUR NEXT FAVORITE</small></div><span class="discovery-orbit" aria-hidden="true">✳</span></div>
+          </section>
+          <a class="play-tile" href="#/rip" data-go="rip"><span class="tile-number">02 / THAT NEW-PACK FEELING</span><div class="pack-stack" aria-hidden="true"><i></i><i></i><i><span>TOP LOADED</span><b>RIP<br>IT.</b><small>VIRTUAL PACK / REAL CARDS</small></i></div><div class="play-tile-bottom"><div><h3>Chase the feeling.</h3><p>Free virtual packs. Real inventory. All the suspense.</p></div><span class="round-arrow" aria-hidden="true">↗</span></div></a>
+          <a class="trade-tile" href="#/buylist" data-go="buylist"><span class="tile-number">03 / MAKE ROOM FOR WHAT’S NEXT</span><div><h3>Old binder.<br>New possibilities.</h3><span class="trade-stamp" aria-hidden="true">BUY<br>SELL<br>TRADE</span></div><p>Turn your collection into cash or store credit.<span class="round-arrow" aria-hidden="true">↗</span></p></a>
         </div>
+        <p class="collector-source">The case is sourced from our TCGplayer listings · <span id="triFresh">refreshed daily</span>. Availability is confirmed at checkout.</p>
       </div>
     </div>
 
     <div class="section" style="padding-top:0">
       <div class="wrap">
         <div class="section-head">
-          <h2>Chase cards in the case right now</h2>
+          <div><p class="collector-kicker">SLEEVED. TOP LOADED. READY.</p><h2>The good stuff, in stock.</h2></div>
           <a class="linklike" href="#/shop" data-go="shop">Browse all inventory &rarr;</a>
         </div>
         <div class="freshness" id="homeFresh"><span class="dot"></span>Live from our TCGplayer store <span class="demo-tag">demo data</span></div>
