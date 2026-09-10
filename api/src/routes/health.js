@@ -9,6 +9,7 @@ export function register(r) {
       auth: !!(env.TOKEN_SECRET && (env.STAFF_PIN_HASH || env.ADMIN_PIN_HASH)),
       square: !!(env.SQUARE_ACCESS_TOKEN && env.SQUARE_LOCATION_ID),
       squareWebhook: !!env.SQUARE_WEBHOOK_SIGNATURE_KEY,
+      saleChecks: !!(env.SALE_CHECK_QUEUE && env.SQUARE_WEBHOOK_SIGNATURE_KEY && env.SQUARE_ACCESS_TOKEN),
       email: !!env.RESEND_API_KEY,
       github: !!env.GITHUB_TOKEN,
       pokemontcg: !!env.POKEMONTCG_API_KEY,

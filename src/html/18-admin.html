@@ -100,10 +100,11 @@
         </div>
 
         <div class="admin-card" id="tcgCard">
-          <h3>TCGplayer nightly import <span class="pill ok"><span class="dot"></span>GitHub Action</span></h3>
+          <h3>TCGplayer inventory import <span class="pill"><span class="dot"></span>GitHub Action</span></h3>
           <dl class="kv">
             <dt>Job</dt><dd><code class="mono">.github/workflows/inventory.yml</code></dd>
-            <dt>Schedule</dt><dd>Daily at 10:00 UTC (6 AM Eastern in summer, 5 AM in winter) &middot; plus <b>Sync now</b> above</dd>
+            <dt>Schedule</dt><dd>Three times daily: approximately 6:17 AM, 2:17 PM and 10:17 PM Eastern in summer (one hour earlier in winter). GitHub may delay queued runs.</dd>
+            <dt>On demand</dt><dd><b>Run import now</b> starts it through the connected API, or opens GitHub when disconnected. On GitHub, sign in with repository access, choose <b>Run workflow</b> and select <b>main</b>.</dd>
             <dt>Pulls</dt><dd>Every listing from the <code class="mono">Top Loaded TCG</code> seller page into <code class="mono">inventory.json</code> and <code class="mono">inventory-summary.json</code>, commits only when something changed</dd>
             <dt>Last file</dt><dd class="mono" id="tcgGenerated">&mdash;</dd>
             <dt>In file</dt><dd class="mono" id="tcgCounts">&mdash;</dd>

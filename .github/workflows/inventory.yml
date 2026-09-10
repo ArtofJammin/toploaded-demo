@@ -1,12 +1,12 @@
-# Nightly inventory refresh. Pulls the shop's live TCGplayer listings into
+# Three daily inventory refreshes. Pull the shop's live TCGplayer listings into
 # inventory.json + inventory-summary.json and commits them when anything changed,
-# which redeploys GitHub Pages. Also runs on demand (the admin "Sync now" button
+# then pages.yml publishes the successful result. Also runs on demand (Admin
 # calls workflow_dispatch through the API, or use the Actions tab).
 name: Refresh inventory
 
 on:
   schedule:
-    - cron: "0 10 * * *"   # 6 AM Eastern (EDT); 5 AM in winter
+    - cron: "17 2,10,18 * * *" # EDT: 10:17 PM, 6:17 AM, 2:17 PM; EST: one hour earlier
   workflow_dispatch:
 
 permissions:
@@ -18,6 +18,7 @@ concurrency:
 
 jobs:
   refresh:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -35,6 +36,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No inventory changes."
           else
-            git commit -m "Nightly inventory update $(date -u +%Y-%m-%d)"
+            git commit -m "Inventory update $(date -u +%Y-%m-%dT%H:%MZ)"
+            git pull --rebase origin main
             git push
           fi

@@ -16,6 +16,7 @@ import * as live from './routes/live.js';
 import * as inventory from './routes/inventory.js';
 import * as price from './routes/price.js';
 import * as account from './routes/account.js';
+import { consumeSaleChecks } from './lib/sale-checks.js';
 
 export const router = new Router();
 for (const m of [health, config, auth, forms, checkout, square, alerts, credit, live, inventory, price, account]) {
@@ -45,6 +46,7 @@ export async function handle(req, env, exec) {
 
 export default {
   fetch: (req, env, exec) => handle(req, env, exec),
+  queue: (batch, env) => consumeSaleChecks(batch, env),
   // Daily housekeeping. Inventory sync itself runs as a GitHub Action (see
   // .github/workflows/inventory.yml); this only prunes and warms caches.
   async scheduled(event, env, exec) {

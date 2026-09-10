@@ -68,6 +68,19 @@ test('GET /inventory/status tolerates an unreachable site (stale cache or zeros)
   } finally { s.restore(); }
 });
 
+test('manual sync status bypasses an old cache and only completes for newer published inventory', async () => {
+  const env = makeEnv(), c = client(env), now = Date.now();
+  await env.KV.put('inventory:lastRun', JSON.stringify({ at: new Date(now - 30000).toISOString(), dispatched: true }));
+  await env.KV.put('inventory:status', JSON.stringify({ ...SUMMARY, fetchedAt: new Date(now - 20000).toISOString() }));
+  const s = stubFetch({ summary: { ...SUMMARY, generated: new Date(now).toISOString() } });
+  try {
+    const result = await c.get('/inventory/status');
+    assert.equal(s.calls.length, 1);
+    assert.equal(result.data.generated, new Date(now).toISOString());
+    assert.equal(result.data.syncing, false);
+  } finally { s.restore(); }
+});
+
 test('POST /inventory/sync: admin only, honest without a token, dispatches the workflow, 10 min cooldown', async () => {
   const env = makeEnv();
   const c = client(env);

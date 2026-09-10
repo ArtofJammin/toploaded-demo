@@ -4,8 +4,6 @@
 <title>Top Loaded Trading Cards</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex, nofollow">
-<meta name="tl-storage-prefix" content="tl-collector-preview-">
 <!-- Render a public deep link directly, before the bottom-of-page app script loads. -->
 <script>(function(){var v=(location.hash.match(/^#\/(shop|live|show|events|buylist|visit|rip|account)(?:\?|$)/)||[])[1];if(v)document.documentElement.setAttribute("data-boot-view",v)})()</script>
 <meta name="description" content="Top Loaded Trading Cards — Northern Kentucky's card shop for Pokemon, One Piece, Magic, and Gundam in Crescent Springs, KY. Buy, sell, and trade singles and sealed. Weekly play nights, live rip-and-ship breaks, and a monthly card show at the Hilton on Turfway Rd.">
@@ -3060,7 +3058,6 @@ a:hover .round-arrow{transform:rotate(45deg)}
 
   <!-- ================= HOME ================= -->
   <section class="view active collector-home" id="view-home" aria-label="Home">
-    <div class="design-preview"><div class="wrap"><span><i></i> THE COLLECTOR EDIT <span class="preview-detail"> / DESIGN PREVIEW</span></span><a href="https://artofjammin.github.io/toploaded-demo/" target="_blank" rel="noopener">Compare current site <span aria-hidden="true">↗</span></a></div></div>
     <div class="hero collector-hero" id="hero">
       <div class="wrap">
         <div class="reveal">
@@ -3855,10 +3852,11 @@ a:hover .round-arrow{transform:rotate(45deg)}
         </div>
 
         <div class="admin-card" id="tcgCard">
-          <h3>TCGplayer nightly import <span class="pill ok"><span class="dot"></span>GitHub Action</span></h3>
+          <h3>TCGplayer inventory import <span class="pill"><span class="dot"></span>GitHub Action</span></h3>
           <dl class="kv">
             <dt>Job</dt><dd><code class="mono">.github/workflows/inventory.yml</code></dd>
-            <dt>Schedule</dt><dd>Daily at 10:00 UTC (6 AM Eastern in summer, 5 AM in winter) &middot; plus <b>Sync now</b> above</dd>
+            <dt>Schedule</dt><dd>Three times daily: approximately 6:17 AM, 2:17 PM and 10:17 PM Eastern in summer (one hour earlier in winter). GitHub may delay queued runs.</dd>
+            <dt>On demand</dt><dd><b>Run import now</b> starts it through the connected API, or opens GitHub when disconnected. On GitHub, sign in with repository access, choose <b>Run workflow</b> and select <b>main</b>.</dd>
             <dt>Pulls</dt><dd>Every listing from the <code class="mono">Top Loaded TCG</code> seller page into <code class="mono">inventory.json</code> and <code class="mono">inventory-summary.json</code>, commits only when something changed</dd>
             <dt>Last file</dt><dd class="mono" id="tcgGenerated">&mdash;</dd>
             <dt>In file</dt><dd class="mono" id="tcgCounts">&mdash;</dd>
@@ -7870,6 +7868,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
     ["auth", "Staff / admin passcodes", "Hashed on the worker · 12 h tokens"],
     ["square", "Square", "Checkout links + catalog · needs SQUARE_ACCESS_TOKEN"],
     ["squareWebhook", "Square webhooks", "Register sales → sync alerts · needs signature key"],
+    ["saleChecks", "After-sale TCGplayer checks", "Five-minute delayed listing checks · needs Square and a connected queue"],
     ["email", "Email (Resend)", "Form notifications to the shop"],
     ["github", "GitHub sync token", "Lets Sync now dispatch the inventory workflow"]
   ];
@@ -7961,10 +7960,12 @@ a:hover .round-arrow{transform:rotate(45deg)}
     cardBusy(card, "on");
     setState($("#syncStatus"), "", "Working…");
     if(!TL.api.online){
-      logLine(logEl, "warn", "Demo mode — nothing dispatched. The real job is the GitHub Action .github/workflows/inventory.yml (daily 10:00 UTC); Sync now dispatches it through the worker once GITHUB_TOKEN is set.");
-      setTimeout(function(){ done("warn", "Demo mode · no job dispatched"); toast("Demo mode — the nightly import runs on GitHub Actions"); }, 500);
+      window.open("https://github.com/ArtofJammin/toploaded-demo/actions/workflows/inventory.yml", "_blank", "noopener,noreferrer");
+      logLine(logEl, "warn", "GitHub opened — sign in with repository access, choose Run workflow and select main. Nothing is dispatched until you confirm there. If the tab was blocked, use Open the Actions tab below.");
+      done("warn", "Continue on GitHub · choose Run workflow");
       return;
     }
+    lastGenerated = invSummary && invSummary.generated || null;
     apiTry("POST", "/inventory/sync", {}).then(function(r){
       if(!r.ok){
         logLine(logEl, "err", "Sync request failed — " + errText(r));
@@ -7988,20 +7989,15 @@ a:hover .round-arrow{transform:rotate(45deg)}
           if(s.ok && s.data){
             var st = s.data;
             if(st.lastRun && st.lastRun.message && tries === 1) logLine(logEl, st.lastRun.ok === false ? "warn" : "ok", "Last run: " + st.lastRun.message);
-            if(st.generated && lastGenerated && st.generated !== lastGenerated){
+            if(st.generated && Date.parse(st.generated) > Date.parse(d.at || 0) && st.generated !== lastGenerated){
               logLine(logEl, "ok", "New inventory file · " + fmtInt(st.products || 0) + " products · " + fmtInt(st.units || 0) + " units · generated " + fmtStamp(st.generated));
               lastGenerated = st.generated;
               done("ok", "Synced · " + nowTime());
               return;
             }
             if(st.generated && !lastGenerated) lastGenerated = st.generated;
-            if(!st.syncing && tries > 3){
-              logLine(logEl, "ok", "Workflow finished; inventory unchanged (" + (st.generated ? fmtStamp(st.generated) : "no file") + ")");
-              done("ok", "Done · no changes");
-              return;
-            }
           }
-          if(tries >= 20){ logLine(logEl, "warn", "Still running after 2 minutes — check the Actions tab; the site picks the new file up on the next load."); done("warn", "Still running on GitHub"); return; }
+          if(tries >= 20){ logLine(logEl, "warn", "No new inventory file confirmed after 2 minutes — check the Actions tab for success or failure. Reload the page after Publish site finishes."); done("warn", "Not yet confirmed · check GitHub"); return; }
           syncPoll = setTimeout(poll, 6000);
         });
       }
@@ -11084,7 +11080,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
       try { if(TL.api.online) enabled = !!(await call("GET","/account/status")).enabled; } catch(e){}
       $("#accountSend").disabled = !enabled;
       if(token){ await refresh(); return; }
-      status.textContent = enabled ? "Use the email the shop has on your credit record. New here? You can sign in, then ask the counter to link your credit." : "Customer sign-in is not connected on this preview. The shop's API and verified email sender are needed; no real credit data is shown here.";
+      status.textContent = enabled ? "Use the email the shop has on your credit record. New here? You can sign in, then ask the counter to link your credit." : "Online account access is not connected yet. Please ask the shop to check your store credit; no credit balance is shown here until secure sign-in is available.";
     }
     $("#accountEmailForm").addEventListener("submit", async function(e){
       e.preventDefault(); if(!enabled) return;

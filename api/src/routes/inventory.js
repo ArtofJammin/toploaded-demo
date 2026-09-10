@@ -66,8 +66,12 @@ function isSyncing(lastRun, generated) {
 
 export function register(r) {
   r.get('/inventory/status', async ({ env }) => {
-    const summary = await summaryStatus(env);
     const lastRun = (await getJSON(env.KV, 'inventory:lastRun', null)) || { at: null, ok: null, message: 'never run from the site' };
+    let summary = await summaryStatus(env);
+    // The regular five-minute cache must not hide an on-demand import from Admin.
+    if (isSyncing(lastRun, summary.generated) && Date.now() - Date.parse(summary.fetchedAt || 0) > 15000) {
+      summary = await summaryStatus(env, { force: true });
+    }
     const hooks = (await getJSON(env.KV, 'square:hooks:last', {})) || {};
     return {
       ...summary,

@@ -4,13 +4,14 @@
 //   inventory.count.updated → "stock changed in Square, update the TCGplayer listing" (one per object per hour)
 //   order.created           → in-store / online sale alert (line items pulled from Square when a token is set)
 //   payment.updated         → COMPLETED marks our order:<id> paid + alert; FAILED/CANCELED marks it failed
-// Always 200 once the signature checks out, so Square never retries a handled event.
+// Handled events return 200; processing failures return 503 so Square can retry.
 // Alerts go through routes/alerts.js appendAlert when it exists, else a local
 // pushList to KV "alerts" with the same {id, at, ch, msg, source, ack:false} shape.
 import { HttpError } from '../lib/http.js';
 import { getJSON, putJSON, pushList } from '../lib/kv.js';
 import { verifyWebhookSignature, retrieveOrder } from '../lib/square.js';
 import * as alertsModule from './alerts.js';
+import { scheduleSaleCheck } from '../lib/sale-checks.js';
 
 const EVENT_TTL = 7 * 24 * 3600;
 const COALESCE_SEC = 3600;
@@ -78,12 +79,12 @@ async function onOrderCreated(env, event) {
   if (src && /payment link/i.test(src)) return 0;
   const lines = lineSummary(order);
   if (!lines.length) {
-    await appendAlert(env, { ch: 'TCGplayer', msg: `Sold in-store (Square): order ${sqId || '?'} — check the case against the TCGplayer listings`,
+    await appendAlert(env, { ch: 'TCGplayer', msg: `Square order created: ${sqId || '?'} — payment not confirmed here; check the case only after payment completes`,
       source: 'square:order.created', squareOrderId: sqId });
     return 1;
   }
   for (const li of lines) {
-    await appendAlert(env, { ch: 'TCGplayer', msg: `Sold in-store (Square): ${li.name}${li.qty > 1 ? ` x${li.qty}` : ''} — update the TCGplayer listing`,
+    await appendAlert(env, { ch: 'TCGplayer', msg: `Square order created: ${li.name}${li.qty > 1 ? ` x${li.qty}` : ''} — payment not confirmed here; wait for the paid-sale alert`,
       source: 'square:order.created', squareOrderId: sqId, sku: li.sku ? `tcg:${li.sku}` : null });
   }
   return lines.length;
@@ -97,6 +98,7 @@ async function onPaymentUpdated(env, event) {
   const ours = ref && ref.id ? await getJSON(env.KV, `order:${ref.id}`, null) : null;
 
   if (status === 'COMPLETED') {
+    await scheduleSaleCheck(env, p, ours);
     if (ours) {
       ours.status = 'paid';
       ours.paidAt = new Date().toISOString();
@@ -144,7 +146,6 @@ export function register(r) {
     if (eventId) {
       const key = `square:event:${eventId}`;
       if (await env.KV.get(key)) return { ok: true, type, duplicate: true };
-      await putJSON(env.KV, key, { at: new Date().toISOString(), type, event }, { expirationTtl: EVENT_TTL });
     }
 
     const handler = HANDLERS[type];
@@ -156,6 +157,9 @@ export function register(r) {
       note = 'unhandled type';
     }
     try { await markHook(env, type, ok, note); } catch {}
+    // Failed queue writes must be retried by Square, not acknowledged forever.
+    if (!ok) throw new HttpError(503, 'Webhook processing failed; retry this event');
+    if (eventId) await putJSON(env.KV, `square:event:${eventId}`, { at: new Date().toISOString(), type, event }, { expirationTtl: EVENT_TTL });
     return { ok: true, type, handled: !!handler, alerts };
   });
 }

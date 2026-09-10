@@ -2,8 +2,8 @@
 """Pulls Top Loaded TCG's live TCGplayer listings into inventory.json.
 
 Uses the same marketplace search endpoint the TCGplayer storefront itself
-calls (captured from the seller page). Run nightly; output is committed to
-the repo so GitHub Pages redeploys with fresh stock.
+calls (captured from the seller page). Runs three times daily and on demand;
+the Publish site workflow deploys the successful output to GitHub Pages.
 """
 import json
 import os
@@ -195,9 +195,10 @@ def main():
     if unmapped:
         print("product lines mapped to 'other': %s" % ", ".join(
             "%s (%d)" % kv for kv in sorted(unmapped.items(), key=lambda kv: -kv[1])))
-    if total and total >= MAX_FROM:
-        print("WARNING: seller has %d products but the search window caps at %d" % (total, MAX_FROM))
-    if not items or (total and len(items) < total * 0.5):
+    if total and total > MAX_FROM:
+        print("seller has %d products but the search window caps at %d - refusing partial import" % (total, MAX_FROM))
+        return 2
+    if not items or (total and len(items) < total * 0.95):
         print("only %d of %d products returned - refusing to overwrite %s" % (len(items), total or 0, OUT))
         return 2
     with open(OUT + ".tmp", "w", encoding="utf-8") as f:

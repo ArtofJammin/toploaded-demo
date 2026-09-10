@@ -31,3 +31,18 @@ SITE_URL = "https://artofjammin.github.io/toploaded-demo/"
 SHIPPING_CENTS = "499"
 FREE_SHIPPING_CENTS = "10000"
 GITHUB_REF = "main"
+
+# OPTIONAL: create these queues, then uncomment to activate five-minute sale checks.
+# wrangler queues create toploaded-sale-checks
+# wrangler queues create toploaded-sale-checks-failed
+# [[queues.producers]]
+# binding = "SALE_CHECK_QUEUE"
+# queue = "toploaded-sale-checks"
+# [[queues.consumers]]
+# queue = "toploaded-sale-checks"
+# max_batch_size = 1
+# max_batch_timeout = 0
+# max_concurrency = 1
+# max_retries = 3
+# retry_delay = 300
+# dead_letter_queue = "toploaded-sale-checks-failed"

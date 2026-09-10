@@ -6,7 +6,7 @@ checkout, Square webhooks → cross-channel alerts, a store-credit ledger, live-
 spots and chat, and an on-demand inventory refresh. The site works without it
 (demo mode with localStorage), and lights features up when it can reach `/health`.
 
-## Customer accounts (preview implementation)
+## Customer accounts (backend connection required)
 
 The `#/account` page uses a separate customer session, never a staff token or a local demo balance.
 
@@ -56,6 +56,18 @@ commit. Optional secrets: `SQUARE_ACCESS_TOKEN`, `SQUARE_LOCATION_ID`,
 `GITHUB_TOKEN`, `POKEMONTCG_API_KEY`. `/health` reports which are configured.
 
 ## Conventions
+
+### Optional five-minute after-sale checks
+
+`payment.updated` with status `COMPLETED` schedules a read-only TCGplayer lookup with a 300-second minimum delay using Cloudflare Queues. Unsigned, pending, failed and merely-created orders do not schedule checks. Site checkout IDs map automatically; POS items need a variation SKU or line note beginning `tcg:PRODUCT_ID` (or `tcg-PRODUCT_ID`). For POS orders, the consumer verifies the whole order is completed, so a partial tender is not treated as a fully paid order.
+
+Create `toploaded-sale-checks` and `toploaded-sale-checks-failed` queues, uncomment the producer/consumer declarations in `wrangler.toml`, and deploy the Worker with the real KV binding and Square credentials. Subscribe Square to the exact signed webhook URL. **This is not enabled by publishing GitHub Pages.** Check the account's queue limits/pricing before provisioning. `/health` and Admin show whether the queue and Square credentials are configured, not proof of successful delivery.
+
+The consumer retries transient failures three times, then leaves a staff alert for manual checking. Queue-level failures go to the dead-letter queue for operator inspection. Successful results are kept under `sale-check:result:PAYMENT_ID` for 30 days. Duplicate messages/payment events are suppressed where possible; KV is eventually consistent, so this is not an exactly-once system. No stock, listing, payment or ledger mutation happens in the consumer.
+
+The lookup verifies the product ID and seller key `5c356cdf` against the same marketplace endpoint used by the inventory importer. That endpoint is not a supported partner API contract and can change. An error is never treated as a sold-out listing. A positive result says how many units are shown, not that all conditions/printings were completely enumerated or that the quantity is wrong: the shop may still have copies. Unmapped items need staff review; the code does not guess IDs from card names.
+
+References: [Cloudflare delayed messages/retries](https://developers.cloudflare.com/queues/configuration/batching-retries/), [GitHub bot commits and Pages](https://docs.github.com/en/actions/concepts/security/github_token).
 
 - Paths have **no** `/api` prefix on the worker; the dev server strips it.
 - JSON in, JSON out. Errors: `{ "error": "message" }` with a 4xx/5xx status.

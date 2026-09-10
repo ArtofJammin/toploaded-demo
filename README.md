@@ -34,10 +34,17 @@ Check: `node tools/check.mjs` (build + syntax + ids + API tests). CI runs the sa
 
 ## Deploy
 
-- **Site**: push `main`; GitHub Pages serves the repo root.
-- **Inventory**: `.github/workflows/inventory.yml` runs daily at 10:00 UTC and on
+- **Site**: push `main`; `pages.yml` validates and publishes only the public site assets.
+  Pages publishing source must be **GitHub Actions**, not the legacy branch builder.
+  A successful inventory workflow also triggers publication (bot commits alone do not).
+- **Inventory**: `.github/workflows/inventory.yml` runs at 02:17, 10:17 and 18:17 UTC and on
   demand (Actions → Refresh inventory → Run workflow, or the admin "Sync now" button
   once the API has a `GITHUB_TOKEN`). `tools/update-inventory.ps1` is the local fallback.
+  In summer this is approximately 6:17 AM, 2:17 PM and 10:17 PM Eastern; winter is an hour earlier.
+  Scheduled runs can be delayed by GitHub. An empty, failed or incomplete pull is not published.
+  Without the API, Admin opens the authenticated GitHub workflow page for a manual run.
+- **After-sale checks**: implemented but not active until the Worker, signed Square
+  payment webhooks and the optional delayed queue are connected. See `api/README.md`.
 - **API**: `api/README.md` — `wrangler deploy`, set the secrets, then put the worker URL in
   `src/head.html` (`<meta name="tl-api">`), rebuild, commit.
 - **Passcodes**: production passcodes are Worker secrets (`STAFF_PIN_HASH`, `ADMIN_PIN_HASH`).

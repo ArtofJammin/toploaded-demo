@@ -108,7 +108,8 @@ test('order.created from the POS → one alert per line item (fetched from Squar
     const list = await alerts(env);
     assert.equal(list.length, 2);
     const ch = list.find(x => x.msg.includes('Charizard'));
-    assert.match(ch.msg, /Sold in-store \(Square\)/);
+    assert.match(ch.msg, /Square order created/);
+    assert.match(ch.msg, /payment not confirmed/);
     assert.equal(ch.sku, 'tcg:614504');
     assert.match(list.find(x => x.msg.includes('ETB')).msg, /x2/);
   } finally { globalThis.fetch = realFetch; }

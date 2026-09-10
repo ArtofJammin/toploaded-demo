@@ -129,6 +129,7 @@
     ["auth", "Staff / admin passcodes", "Hashed on the worker · 12 h tokens"],
     ["square", "Square", "Checkout links + catalog · needs SQUARE_ACCESS_TOKEN"],
     ["squareWebhook", "Square webhooks", "Register sales → sync alerts · needs signature key"],
+    ["saleChecks", "After-sale TCGplayer checks", "Five-minute delayed listing checks · needs Square and a connected queue"],
     ["email", "Email (Resend)", "Form notifications to the shop"],
     ["github", "GitHub sync token", "Lets Sync now dispatch the inventory workflow"]
   ];
@@ -220,10 +221,12 @@
     cardBusy(card, "on");
     setState($("#syncStatus"), "", "Working…");
     if(!TL.api.online){
-      logLine(logEl, "warn", "Demo mode — nothing dispatched. The real job is the GitHub Action .github/workflows/inventory.yml (daily 10:00 UTC); Sync now dispatches it through the worker once GITHUB_TOKEN is set.");
-      setTimeout(function(){ done("warn", "Demo mode · no job dispatched"); toast("Demo mode — the nightly import runs on GitHub Actions"); }, 500);
+      window.open("https://github.com/ArtofJammin/toploaded-demo/actions/workflows/inventory.yml", "_blank", "noopener,noreferrer");
+      logLine(logEl, "warn", "GitHub opened — sign in with repository access, choose Run workflow and select main. Nothing is dispatched until you confirm there. If the tab was blocked, use Open the Actions tab below.");
+      done("warn", "Continue on GitHub · choose Run workflow");
       return;
     }
+    lastGenerated = invSummary && invSummary.generated || null;
     apiTry("POST", "/inventory/sync", {}).then(function(r){
       if(!r.ok){
         logLine(logEl, "err", "Sync request failed — " + errText(r));
@@ -247,20 +250,15 @@
           if(s.ok && s.data){
             var st = s.data;
             if(st.lastRun && st.lastRun.message && tries === 1) logLine(logEl, st.lastRun.ok === false ? "warn" : "ok", "Last run: " + st.lastRun.message);
-            if(st.generated && lastGenerated && st.generated !== lastGenerated){
+            if(st.generated && Date.parse(st.generated) > Date.parse(d.at || 0) && st.generated !== lastGenerated){
               logLine(logEl, "ok", "New inventory file · " + fmtInt(st.products || 0) + " products · " + fmtInt(st.units || 0) + " units · generated " + fmtStamp(st.generated));
               lastGenerated = st.generated;
               done("ok", "Synced · " + nowTime());
               return;
             }
             if(st.generated && !lastGenerated) lastGenerated = st.generated;
-            if(!st.syncing && tries > 3){
-              logLine(logEl, "ok", "Workflow finished; inventory unchanged (" + (st.generated ? fmtStamp(st.generated) : "no file") + ")");
-              done("ok", "Done · no changes");
-              return;
-            }
           }
-          if(tries >= 20){ logLine(logEl, "warn", "Still running after 2 minutes — check the Actions tab; the site picks the new file up on the next load."); done("warn", "Still running on GitHub"); return; }
+          if(tries >= 20){ logLine(logEl, "warn", "No new inventory file confirmed after 2 minutes — check the Actions tab for success or failure. Reload the page after Publish site finishes."); done("warn", "Not yet confirmed · check GitHub"); return; }
           syncPoll = setTimeout(poll, 6000);
         });
       }

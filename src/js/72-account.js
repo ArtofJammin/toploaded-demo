@@ -40,7 +40,7 @@
       try { if(TL.api.online) enabled = !!(await call("GET","/account/status")).enabled; } catch(e){}
       $("#accountSend").disabled = !enabled;
       if(token){ await refresh(); return; }
-      status.textContent = enabled ? "Use the email the shop has on your credit record. New here? You can sign in, then ask the counter to link your credit." : "Customer sign-in is not connected on this preview. The shop's API and verified email sender are needed; no real credit data is shown here.";
+      status.textContent = enabled ? "Use the email the shop has on your credit record. New here? You can sign in, then ask the counter to link your credit." : "Online account access is not connected yet. Please ask the shop to check your store credit; no credit balance is shown here until secure sign-in is available.";
     }
     $("#accountEmailForm").addEventListener("submit", async function(e){
       e.preventDefault(); if(!enabled) return;
