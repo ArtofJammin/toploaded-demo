@@ -516,21 +516,7 @@
     if(!tiltRaf) tiltRaf = requestAnimationFrame(tiltFrame);
   }
   function bindTilt(el){ if(el && window.PointerEvent) el.addEventListener("pointermove", onTiltMove, {passive: true}); }
-  /* ---- image load / error (delegated, capture: load and error do not bubble) ---- */
-  document.addEventListener("load", function(e){
-    var img = e.target;
-    if(img && img.tagName === "IMG" && img.classList.contains("card-img")) img.classList.add("ok");
-  }, true);
-  document.addEventListener("error", function(e){
-    var img = e.target;
-    if(!img || img.tagName !== "IMG" || !img.classList.contains("card-img") || img.dataset.fallback) return;
-    img.dataset.fallback = "1";
-    var card = img.closest("[data-id]"), it = card && TL.inventory ? TL.inventory.byId(card.dataset.id) : null;
-    var host = img.parentNode; if(!host) return;
-    var wrap = document.createElement("span"); wrap.innerHTML = cardArt(it || {name: img.alt || "Card", set: "", game: "other"});
-    var svg = wrap.firstChild;
-    if(svg) host.replaceChild(svg, img); else img.style.visibility = "hidden";
-  }, true);
+  /* Product-photo load/failure handling is shared in 07-card-images.js. */
   /* ---- card flip: .flip-btn toggles .is-flipped; the back face is inert/aria-hidden until shown ---- */
   function setFlipped(card, on, focus){
     if(!card) return;

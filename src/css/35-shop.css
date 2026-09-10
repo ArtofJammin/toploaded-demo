@@ -118,7 +118,7 @@ mark{background:color-mix(in srgb, var(--accent) 28%, transparent); color:inheri
 }
 .mini.back{transform:rotateY(180deg); background:linear-gradient(170deg,#1C2130,#0F1218 70%)}
 .mini svg{display:block; width:100%; height:100%}
-.mini img.card-img{display:block; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity .3s ease}
+.mini img.card-img{display:block; width:100%; height:100%; object-fit:cover; opacity:1; transition:opacity .3s ease}
 .mini img.card-img.ok{opacity:1}
 .mini .holo-hover{
   position:absolute; inset:0; mix-blend-mode:screen; opacity:0; transition:opacity .25s ease, background-position .5s ease; pointer-events:none;

@@ -164,10 +164,17 @@
   TL.on("config:change", function(){ if(homeActive) tickNextUp(); });
 
   /* ---- the wall ---- */
-  var wallLive = false;
+  var wallLive = false, wallImagesStarted = false;
+  function wallLoadImages(){
+    wallImagesStarted = true;
+    $$("#wallRows img[data-wall-src]").forEach(function(img){
+      img.src = img.getAttribute("data-wall-src");
+      img.removeAttribute("data-wall-src");
+    });
+  }
   function wallTile(w, dup){
     var art = w.item ? cardArt(w.item)
-      : '<img src="' + esc(w.img || ("https://tcgplayer-cdn.tcgplayer.com/product/" + w.id + "_in_200x200.jpg")) + '" alt="" loading="lazy" decoding="async" width="110" height="154" onerror="this.style.visibility=\'hidden\'">';
+      : '<img class="card-img" data-wall-src="' + esc(w.img || ("https://tcgplayer-cdn.tcgplayer.com/product/" + w.id + "_in_200x200.jpg")) + '" alt="' + esc(w.name) + '" loading="eager" fetchpriority="low" decoding="async" referrerpolicy="no-referrer" width="110" height="154">';
     return '<button class="wall-card" type="button" data-wall="' + esc(w.key) + '" data-name="' + esc(w.name) + '" aria-label="' + esc(w.name) + ' · ' + money(w.price) + '"' +
       (dup ? ' tabindex="-1" aria-hidden="true"' : "") + ">" + art +
       '<span class="wc-price" aria-hidden="true">' + money(w.price) + '</span><span class="wc-sheen" aria-hidden="true"></span></button>';
@@ -192,6 +199,7 @@
     if(!list.length){ rows.innerHTML = ""; return; }
     var half = Math.ceil(list.length / 2);
     rows.innerHTML = wallRow(list.slice(0, half), "fwd", Math.max(40, half * 5)) + wallRow(list.slice(half), "rev", Math.max(48, half * 6));
+    if(wallImagesStarted) wallLoadImages();
   }
   function openWallItem(key, name){
     var inv = TL.inventory;
@@ -220,7 +228,15 @@
   });
   TL.on("init", function(){
     var wall = $("#wall");
-    if(wall) TL.motion.watch(wall, function(inView){ wall.classList.toggle("in-view", inView); });
+    if(wall){
+      TL.motion.watch(wall, function(inView){ wall.classList.toggle("in-view", inView); if(inView) wallLoadImages(); });
+      if("IntersectionObserver" in window){
+        var preload = new IntersectionObserver(function(entries){
+          if(entries.some(function(entry){ return entry.isIntersecting; })){ wallLoadImages(); preload.disconnect(); }
+        }, {rootMargin:"400px"});
+        preload.observe(wall);
+      } else wallLoadImages();
+    }
   });
   TL.on("motion:change", renderWall);
   /* pause / play for the marquee (mirrors #tickerPause); hover and focus-within pause it too via CSS */

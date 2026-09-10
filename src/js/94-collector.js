@@ -6,7 +6,7 @@
     function art(item, large){
       if(item.tcg && item.img){
         var src = large ? item.img.replace("200x200", "400x400") : item.img;
-        return '<img class="card-img" src="' + TL.esc(src) + '" alt="" width="250" height="350" decoding="async">';
+        return '<img class="card-img" src="' + TL.esc(src) + '" alt="' + TL.esc(item.name) + '" width="250" height="350" decoding="async" referrerpolicy="no-referrer">';
       }
       return cardArt(item);
     }

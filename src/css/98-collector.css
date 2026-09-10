@@ -1,7 +1,5 @@
 /* Collector preview: deliberately scoped so the operational pages retain their layouts. */
-.collector-home{--collect-yellow:var(--accent); --collect-purple:#c6b7f3; --collect-black:var(--accent-ink); --collect-play-bg:#252137; --collect-play-ink:#e5dcff; --collect-mystery-ink:#c6b7f3}
-:root[data-theme="light"] .collector-home{--collect-play-bg:#e0d6f7; --collect-play-ink:#2e2050; --collect-mystery-ink:#5c3d85}
-:root[data-theme="tl"] .collector-home{--collect-play-bg:#c6b7f3; --collect-play-ink:#211835}
+.collector-home{--collect-yellow:var(--accent); --collect-detail:var(--accent); --collect-black:var(--accent-ink); --collect-play-bg:var(--surface2); --collect-play-ink:var(--ink); --collect-mystery-ink:var(--accent)}
 .collector-home .wrap{max-width:1320px}
 .design-preview{background:var(--surface); border-bottom:1px solid var(--line); color:var(--ink2); font:10px var(--mono); letter-spacing:.12em}
 .design-preview .wrap{display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:34px}
@@ -81,7 +79,7 @@
 .collector-note{font:12px var(--body); color:var(--ink3)}
 .collector-mosaic{display:grid; grid-template-columns:1.12fr 1fr; grid-template-rows:auto auto; gap:16px}
 .tile-number{font:9px var(--mono); letter-spacing:.12em}
-.discovery-tile{grid-row:span 2; padding:32px; border:1px solid var(--line2); border-radius:14px; background:radial-gradient(ellipse at 95% 90%,color-mix(in srgb,var(--collect-purple) 12%,transparent),transparent 60%),var(--surface); display:flex; flex-direction:column; position:relative; overflow:hidden}
+.discovery-tile{grid-row:span 2; padding:32px; border:1px solid var(--line2); border-radius:14px; background:radial-gradient(ellipse at 95% 90%,color-mix(in srgb,var(--collect-detail) 12%,transparent),transparent 60%),var(--surface); display:flex; flex-direction:column; position:relative; overflow:hidden}
 .discovery-tile .tile-number{color:var(--ink3)}
 .discovery-tile h3{font:700 clamp(36px,4vw,54px)/1 var(--disp); text-transform:uppercase; letter-spacing:-.015em; margin-top:24px}
 .discovery-copy{position:relative; z-index:2}
@@ -96,19 +94,19 @@
 .mystery-card{height:195px; width:139px; flex-shrink:0; border:1px solid color-mix(in srgb,var(--collect-mystery-ink) 55%,transparent); border-radius:9px; background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--collect-mystery-ink) 8%,transparent) 0 1px,transparent 1px 9px),var(--bg2); color:var(--collect-mystery-ink); transform:rotate(9deg); display:flex; flex-direction:column; align-items:center; justify-content:space-around; box-shadow:-12px 12px 0 -2px var(--surface2),-12px 12px 0 -1px var(--line2)}
 .mystery-card span,.mystery-card small{font:8px var(--mono); letter-spacing:.15em}
 .mystery-card b{font:90px/1 var(--disp)}
-.discovery-orbit{position:absolute; right:12%; bottom:18%; color:var(--collect-purple); font-size:70px; transform:rotate(-13deg); opacity:.7; pointer-events:none}
+.discovery-orbit{position:absolute; right:12%; bottom:18%; color:var(--collect-detail); font-size:70px; transform:rotate(-13deg); opacity:.7; pointer-events:none}
 .discovery-pick{display:flex; gap:24px; align-items:center; width:100%; animation:discoveryReveal .55s cubic-bezier(.2,.7,.2,1) backwards}
 .discovery-art{flex:0 0 120px; width:120px; border:0; border-radius:7px; padding:0; background:var(--bg); overflow:hidden; transform:rotate(-5deg); box-shadow:0 14px 24px #0004}
 .discovery-art img,.discovery-art svg{display:block; width:100%; height:auto; aspect-ratio:5/7; object-fit:contain}
 .discovery-pick h4{font:600 22px/1.1 var(--disp); margin:7px 0; text-wrap:balance}
 .discovery-pick p{font-size:12px; color:var(--ink2); margin:10px 0}
 .discovery-pick .linklike{font-size:10px; min-height:36px}
-.play-tile{display:flex; flex-direction:column; min-height:345px; padding:28px; background:var(--collect-play-bg); color:var(--collect-play-ink); border:1px solid color-mix(in srgb,var(--collect-play-ink) 18%,transparent); border-radius:14px; text-decoration:none; overflow:hidden; position:relative}
+.play-tile{display:flex; flex-direction:column; min-height:345px; padding:28px; background:radial-gradient(ellipse at 50% 30%,color-mix(in srgb,var(--accent) 9%,transparent),transparent 65%),var(--collect-play-bg); color:var(--collect-play-ink); border:1px solid var(--line2); border-radius:14px; text-decoration:none; overflow:hidden; position:relative}
 .pack-stack{height:200px; position:relative; perspective:800px}
-.pack-stack i{position:absolute; top:18px; left:50%; width:120px; height:168px; border:1px solid #211835; background:#ddcef9; transform:translateX(-50%) rotate(-18deg); transition:transform .45s cubic-bezier(.2,.7,.2,1); border-radius:2px; box-shadow:0 12px 22px #21183520}
-.pack-stack i:nth-child(1){transform:translateX(-98%) translateY(4px) rotate(-22deg); background:#9e8ac6}
-.pack-stack i:nth-child(2){transform:translateX(-8%) translateY(4px) rotate(17deg); background:#bdaaeb}
-.pack-stack i:nth-child(3){transform:translateX(-50%) rotate(-5deg); display:flex; flex-direction:column; padding:16px 12px; justify-content:space-between; background:repeating-linear-gradient(0deg,#21183520 0 1px,transparent 1px 3px) top / 100% 8px no-repeat,#211835; color:#ddcef9}
+.pack-stack i{position:absolute; top:18px; left:50%; width:120px; height:168px; border:1px solid var(--accent-dim); background:var(--accent); transform:translateX(-50%) rotate(-18deg); transition:transform .45s cubic-bezier(.2,.7,.2,1); border-radius:2px; box-shadow:0 12px 22px #0003}
+.pack-stack i:nth-child(1){transform:translateX(-98%) translateY(4px) rotate(-22deg); background:color-mix(in srgb,var(--accent) 42%,var(--surface2))}
+.pack-stack i:nth-child(2){transform:translateX(-8%) translateY(4px) rotate(17deg); background:color-mix(in srgb,var(--accent) 80%,var(--surface2))}
+.pack-stack i:nth-child(3){transform:translateX(-50%) rotate(-5deg); display:flex; flex-direction:column; padding:16px 12px; justify-content:space-between; background:repeating-linear-gradient(0deg,color-mix(in srgb,var(--accent) 24%,transparent) 0 1px,transparent 1px 3px) top / 100% 8px no-repeat,var(--bg2); color:var(--accent)}
 .pack-stack span,.pack-stack small{font:7px var(--mono); letter-spacing:.07em}
 .pack-stack b{font:800 50px/.82 var(--disp); letter-spacing:-.02em}
 .play-tile:hover .pack-stack i:nth-child(1){transform:translateX(-112%) rotate(-28deg)}

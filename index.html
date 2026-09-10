@@ -27,6 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://tcgplayer-cdn.tcgplayer.com">
+<link rel="preconnect" href="https://product-images.tcgplayer.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Spline+Sans:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Store","name":"Top Loaded Trading Cards","url":"https://artofjammin.github.io/toploaded-demo/","telephone":"+15132222573","email":"toploadedtcg@gmail.com","image":"https://artofjammin.github.io/toploaded-demo/og-image.png","address":{"@type":"PostalAddress","streetAddress":"2514 Hazelwood Dr","addressLocality":"Crescent Springs","addressRegion":"KY","postalCode":"41017","addressCountry":"US"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":"Tuesday","opens":"11:00","closes":"18:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Wednesday","opens":"11:00","closes":"18:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Thursday","opens":"11:00","closes":"18:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Friday","opens":"11:00","closes":"18:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"10:00","closes":"16:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Sunday","opens":"10:00","closes":"16:00"}],"sameAs":["https://www.facebook.com/toploadedtradingcards","https://www.instagram.com/toploadedtcg","https://www.tcgplayer.com/sellers/Top-Loaded-TCG/5c356cdf"],"priceRange":"$"}</script>
 <style>
@@ -891,7 +892,7 @@ mark{background:color-mix(in srgb, var(--accent) 28%, transparent); color:inheri
 }
 .mini.back{transform:rotateY(180deg); background:linear-gradient(170deg,#1C2130,#0F1218 70%)}
 .mini svg{display:block; width:100%; height:100%}
-.mini img.card-img{display:block; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity .3s ease}
+.mini img.card-img{display:block; width:100%; height:100%; object-fit:cover; opacity:1; transition:opacity .3s ease}
 .mini img.card-img.ok{opacity:1}
 .mini .holo-hover{
   position:absolute; inset:0; mix-blend-mode:screen; opacity:0; transition:opacity .25s ease, background-position .5s ease; pointer-events:none;
@@ -1109,7 +1110,7 @@ html.qv-open,html.qv-open body{overflow:hidden}
 }
 .qv-back{transform:rotateY(180deg)}
 .qv-face img,.qv-face svg{display:block; width:100%; height:100%; object-fit:cover}
-.qv-face img.card-img{opacity:0; transition:opacity .35s ease}
+.qv-face img.card-img{opacity:1; transition:opacity .35s ease}
 .qv-face img.card-img.ok{opacity:1}
 .qv-sheen{
   position:absolute; inset:0; border-radius:14px; pointer-events:none; mix-blend-mode:screen; opacity:0; transition:opacity .25s ease;
@@ -1190,6 +1191,11 @@ html.qv-open,html.qv-open body{overflow:hidden}
   .qv-face img.card-img{opacity:1}
   .qv-card.tilting .qv-sheen{opacity:0}
 }
+
+/* A truthful fallback instead of a blank rectangle or a made-up product photo. */
+.card-image-missing{display:grid; place-items:center; width:100%; height:100%; min-height:44px; padding:8px; box-sizing:border-box; background:var(--surface2); color:var(--ink2); font:12px/1.4 var(--body); text-align:center; overflow-wrap:anywhere}
+.discovery-art .card-image-missing,.rip-best-art .card-image-missing{aspect-ratio:5/7}
+.qv-face .card-image-missing{min-height:240px}
 
 /* ============ CART DRAWER ============ */
 .overlay{
@@ -2741,9 +2747,7 @@ footer::before{
 }
 
 /* Collector preview: deliberately scoped so the operational pages retain their layouts. */
-.collector-home{--collect-yellow:var(--accent); --collect-purple:#c6b7f3; --collect-black:var(--accent-ink); --collect-play-bg:#252137; --collect-play-ink:#e5dcff; --collect-mystery-ink:#c6b7f3}
-:root[data-theme="light"] .collector-home{--collect-play-bg:#e0d6f7; --collect-play-ink:#2e2050; --collect-mystery-ink:#5c3d85}
-:root[data-theme="tl"] .collector-home{--collect-play-bg:#c6b7f3; --collect-play-ink:#211835}
+.collector-home{--collect-yellow:var(--accent); --collect-detail:var(--accent); --collect-black:var(--accent-ink); --collect-play-bg:var(--surface2); --collect-play-ink:var(--ink); --collect-mystery-ink:var(--accent)}
 .collector-home .wrap{max-width:1320px}
 .design-preview{background:var(--surface); border-bottom:1px solid var(--line); color:var(--ink2); font:10px var(--mono); letter-spacing:.12em}
 .design-preview .wrap{display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:34px}
@@ -2823,7 +2827,7 @@ footer::before{
 .collector-note{font:12px var(--body); color:var(--ink3)}
 .collector-mosaic{display:grid; grid-template-columns:1.12fr 1fr; grid-template-rows:auto auto; gap:16px}
 .tile-number{font:9px var(--mono); letter-spacing:.12em}
-.discovery-tile{grid-row:span 2; padding:32px; border:1px solid var(--line2); border-radius:14px; background:radial-gradient(ellipse at 95% 90%,color-mix(in srgb,var(--collect-purple) 12%,transparent),transparent 60%),var(--surface); display:flex; flex-direction:column; position:relative; overflow:hidden}
+.discovery-tile{grid-row:span 2; padding:32px; border:1px solid var(--line2); border-radius:14px; background:radial-gradient(ellipse at 95% 90%,color-mix(in srgb,var(--collect-detail) 12%,transparent),transparent 60%),var(--surface); display:flex; flex-direction:column; position:relative; overflow:hidden}
 .discovery-tile .tile-number{color:var(--ink3)}
 .discovery-tile h3{font:700 clamp(36px,4vw,54px)/1 var(--disp); text-transform:uppercase; letter-spacing:-.015em; margin-top:24px}
 .discovery-copy{position:relative; z-index:2}
@@ -2838,19 +2842,19 @@ footer::before{
 .mystery-card{height:195px; width:139px; flex-shrink:0; border:1px solid color-mix(in srgb,var(--collect-mystery-ink) 55%,transparent); border-radius:9px; background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--collect-mystery-ink) 8%,transparent) 0 1px,transparent 1px 9px),var(--bg2); color:var(--collect-mystery-ink); transform:rotate(9deg); display:flex; flex-direction:column; align-items:center; justify-content:space-around; box-shadow:-12px 12px 0 -2px var(--surface2),-12px 12px 0 -1px var(--line2)}
 .mystery-card span,.mystery-card small{font:8px var(--mono); letter-spacing:.15em}
 .mystery-card b{font:90px/1 var(--disp)}
-.discovery-orbit{position:absolute; right:12%; bottom:18%; color:var(--collect-purple); font-size:70px; transform:rotate(-13deg); opacity:.7; pointer-events:none}
+.discovery-orbit{position:absolute; right:12%; bottom:18%; color:var(--collect-detail); font-size:70px; transform:rotate(-13deg); opacity:.7; pointer-events:none}
 .discovery-pick{display:flex; gap:24px; align-items:center; width:100%; animation:discoveryReveal .55s cubic-bezier(.2,.7,.2,1) backwards}
 .discovery-art{flex:0 0 120px; width:120px; border:0; border-radius:7px; padding:0; background:var(--bg); overflow:hidden; transform:rotate(-5deg); box-shadow:0 14px 24px #0004}
 .discovery-art img,.discovery-art svg{display:block; width:100%; height:auto; aspect-ratio:5/7; object-fit:contain}
 .discovery-pick h4{font:600 22px/1.1 var(--disp); margin:7px 0; text-wrap:balance}
 .discovery-pick p{font-size:12px; color:var(--ink2); margin:10px 0}
 .discovery-pick .linklike{font-size:10px; min-height:36px}
-.play-tile{display:flex; flex-direction:column; min-height:345px; padding:28px; background:var(--collect-play-bg); color:var(--collect-play-ink); border:1px solid color-mix(in srgb,var(--collect-play-ink) 18%,transparent); border-radius:14px; text-decoration:none; overflow:hidden; position:relative}
+.play-tile{display:flex; flex-direction:column; min-height:345px; padding:28px; background:radial-gradient(ellipse at 50% 30%,color-mix(in srgb,var(--accent) 9%,transparent),transparent 65%),var(--collect-play-bg); color:var(--collect-play-ink); border:1px solid var(--line2); border-radius:14px; text-decoration:none; overflow:hidden; position:relative}
 .pack-stack{height:200px; position:relative; perspective:800px}
-.pack-stack i{position:absolute; top:18px; left:50%; width:120px; height:168px; border:1px solid #211835; background:#ddcef9; transform:translateX(-50%) rotate(-18deg); transition:transform .45s cubic-bezier(.2,.7,.2,1); border-radius:2px; box-shadow:0 12px 22px #21183520}
-.pack-stack i:nth-child(1){transform:translateX(-98%) translateY(4px) rotate(-22deg); background:#9e8ac6}
-.pack-stack i:nth-child(2){transform:translateX(-8%) translateY(4px) rotate(17deg); background:#bdaaeb}
-.pack-stack i:nth-child(3){transform:translateX(-50%) rotate(-5deg); display:flex; flex-direction:column; padding:16px 12px; justify-content:space-between; background:repeating-linear-gradient(0deg,#21183520 0 1px,transparent 1px 3px) top / 100% 8px no-repeat,#211835; color:#ddcef9}
+.pack-stack i{position:absolute; top:18px; left:50%; width:120px; height:168px; border:1px solid var(--accent-dim); background:var(--accent); transform:translateX(-50%) rotate(-18deg); transition:transform .45s cubic-bezier(.2,.7,.2,1); border-radius:2px; box-shadow:0 12px 22px #0003}
+.pack-stack i:nth-child(1){transform:translateX(-98%) translateY(4px) rotate(-22deg); background:color-mix(in srgb,var(--accent) 42%,var(--surface2))}
+.pack-stack i:nth-child(2){transform:translateX(-8%) translateY(4px) rotate(17deg); background:color-mix(in srgb,var(--accent) 80%,var(--surface2))}
+.pack-stack i:nth-child(3){transform:translateX(-50%) rotate(-5deg); display:flex; flex-direction:column; padding:16px 12px; justify-content:space-between; background:repeating-linear-gradient(0deg,color-mix(in srgb,var(--accent) 24%,transparent) 0 1px,transparent 1px 3px) top / 100% 8px no-repeat,var(--bg2); color:var(--accent)}
 .pack-stack span,.pack-stack small{font:7px var(--mono); letter-spacing:.07em}
 .pack-stack b{font:800 50px/.82 var(--disp); letter-spacing:-.02em}
 .play-tile:hover .pack-stack i:nth-child(1){transform:translateX(-112%) rotate(-28deg)}
@@ -4694,6 +4698,67 @@ a:hover .round-arrow{transform:rotate(45deg)}
     return '<svg class="game-icon" width="24" height="24" aria-hidden="true" focusable="false"><use href="#game-icon-' + game + '"></use></svg>';
   };
 
+  /* A failed photo gets one alternate TCGplayer image URL, never an endless retry.
+     Do not silently replace a missing product photo with invented card artwork. */
+  (function(){
+    var legacy = /^https:\/\/tcgplayer-cdn\.tcgplayer\.com\/product\/(\d+)_in_(\d+x\d+)\.jpg(?:\?.*)?$/i;
+    var modern = /^https:\/\/product-images\.tcgplayer\.com\/fit-in\/(\d+x\d+)\/(\d+)\.jpg(?:\?.*)?$/i;
+    function alternate(src){
+      var m = legacy.exec(src || "");
+      if(m) return "https://product-images.tcgplayer.com/fit-in/" + m[2] + "/" + m[1] + ".jpg";
+      m = modern.exec(src || "");
+      return m ? "https://tcgplayer-cdn.tcgplayer.com/product/" + m[2] + "_in_" + m[1] + ".jpg" : "";
+    }
+    function managed(img){ return img && img.tagName === "IMG" && (img.classList.contains("card-img") || !!alternate(img.currentSrc || img.src)); }
+    function loaded(img){
+      img.classList.add("ok");
+      img.dataset.imageState = "loaded";
+      img.style.removeProperty("visibility");
+      var cartArt = img.closest(".ct-art"); if(cartArt) cartArt.classList.remove("noimg");
+    }
+    function failed(img){
+      if(!managed(img) || img.dataset.imageState === "failed") return false;
+      var next = alternate(img.currentSrc || img.src);
+      if(next && !img.dataset.imageRetried){
+        img.dataset.imageRetried = "1";
+        img.dataset.imageState = "retrying";
+        img.removeAttribute("srcset");
+        img.referrerPolicy = "no-referrer";
+        img.src = next;
+        return true;
+      }
+      img.dataset.imageState = "failed";
+      if(!img.parentNode) return true;
+      var owner = img.closest("[data-name], [data-id], [data-qv]"), name = img.alt || (owner && owner.dataset.name) || "Card";
+      if(name === "Card" && owner && TL.inventory){
+        var item = TL.inventory.byId(owner.dataset.id || owner.dataset.qv);
+        if(item) name = item.name;
+      }
+      var placeholder = document.createElement("span");
+      placeholder.className = "card-image-missing";
+      placeholder.setAttribute("role", "img");
+      placeholder.setAttribute("aria-label", name + ": photo unavailable");
+      placeholder.textContent = "Photo unavailable";
+      placeholder.title = name + ". Product details are still available.";
+      img.parentNode.replaceChild(placeholder, img);
+      return true;
+    }
+    function scan(root){
+      (root || document).querySelectorAll("img.card-img").forEach(function(img){
+        if(!img.getAttribute("src") || !img.complete) return;
+        if(img.naturalWidth > 0) loaded(img);
+        else failed(img);
+      });
+    }
+    TL.cardImages = {alternate:alternate, failed:failed, loaded:loaded, scan:scan};
+    document.addEventListener("load", function(e){ if(managed(e.target)) loaded(e.target); }, true);
+    document.addEventListener("error", function(e){
+      if(failed(e.target)) e.stopImmediatePropagation(); /* older inline handlers must not hide a retry */
+    }, true);
+    TL.on("init", function(){ scan(document); });
+    TL.on("view:change", function(){ requestAnimationFrame(function(){ scan(document); }); });
+  })();
+
   /* ---------- router: hash routes, view lifecycle, transitions ----------
      Views are <section class="view" id="view-NAME"> discovered from the DOM, so a new
      file in src/html adding a section registers a route automatically.
@@ -5150,10 +5215,17 @@ a:hover .round-arrow{transform:rotate(45deg)}
   TL.on("config:change", function(){ if(homeActive) tickNextUp(); });
 
   /* ---- the wall ---- */
-  var wallLive = false;
+  var wallLive = false, wallImagesStarted = false;
+  function wallLoadImages(){
+    wallImagesStarted = true;
+    $$("#wallRows img[data-wall-src]").forEach(function(img){
+      img.src = img.getAttribute("data-wall-src");
+      img.removeAttribute("data-wall-src");
+    });
+  }
   function wallTile(w, dup){
     var art = w.item ? cardArt(w.item)
-      : '<img src="' + esc(w.img || ("https://tcgplayer-cdn.tcgplayer.com/product/" + w.id + "_in_200x200.jpg")) + '" alt="" loading="lazy" decoding="async" width="110" height="154" onerror="this.style.visibility=\'hidden\'">';
+      : '<img class="card-img" data-wall-src="' + esc(w.img || ("https://tcgplayer-cdn.tcgplayer.com/product/" + w.id + "_in_200x200.jpg")) + '" alt="' + esc(w.name) + '" loading="eager" fetchpriority="low" decoding="async" referrerpolicy="no-referrer" width="110" height="154">';
     return '<button class="wall-card" type="button" data-wall="' + esc(w.key) + '" data-name="' + esc(w.name) + '" aria-label="' + esc(w.name) + ' · ' + money(w.price) + '"' +
       (dup ? ' tabindex="-1" aria-hidden="true"' : "") + ">" + art +
       '<span class="wc-price" aria-hidden="true">' + money(w.price) + '</span><span class="wc-sheen" aria-hidden="true"></span></button>';
@@ -5178,6 +5250,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
     if(!list.length){ rows.innerHTML = ""; return; }
     var half = Math.ceil(list.length / 2);
     rows.innerHTML = wallRow(list.slice(0, half), "fwd", Math.max(40, half * 5)) + wallRow(list.slice(half), "rev", Math.max(48, half * 6));
+    if(wallImagesStarted) wallLoadImages();
   }
   function openWallItem(key, name){
     var inv = TL.inventory;
@@ -5206,7 +5279,15 @@ a:hover .round-arrow{transform:rotate(45deg)}
   });
   TL.on("init", function(){
     var wall = $("#wall");
-    if(wall) TL.motion.watch(wall, function(inView){ wall.classList.toggle("in-view", inView); });
+    if(wall){
+      TL.motion.watch(wall, function(inView){ wall.classList.toggle("in-view", inView); if(inView) wallLoadImages(); });
+      if("IntersectionObserver" in window){
+        var preload = new IntersectionObserver(function(entries){
+          if(entries.some(function(entry){ return entry.isIntersecting; })){ wallLoadImages(); preload.disconnect(); }
+        }, {rootMargin:"400px"});
+        preload.observe(wall);
+      } else wallLoadImages();
+    }
   });
   TL.on("motion:change", renderWall);
   /* pause / play for the marquee (mirrors #tickerPause); hover and focus-within pause it too via CSS */
@@ -5756,21 +5837,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
     if(!tiltRaf) tiltRaf = requestAnimationFrame(tiltFrame);
   }
   function bindTilt(el){ if(el && window.PointerEvent) el.addEventListener("pointermove", onTiltMove, {passive: true}); }
-  /* ---- image load / error (delegated, capture: load and error do not bubble) ---- */
-  document.addEventListener("load", function(e){
-    var img = e.target;
-    if(img && img.tagName === "IMG" && img.classList.contains("card-img")) img.classList.add("ok");
-  }, true);
-  document.addEventListener("error", function(e){
-    var img = e.target;
-    if(!img || img.tagName !== "IMG" || !img.classList.contains("card-img") || img.dataset.fallback) return;
-    img.dataset.fallback = "1";
-    var card = img.closest("[data-id]"), it = card && TL.inventory ? TL.inventory.byId(card.dataset.id) : null;
-    var host = img.parentNode; if(!host) return;
-    var wrap = document.createElement("span"); wrap.innerHTML = cardArt(it || {name: img.alt || "Card", set: "", game: "other"});
-    var svg = wrap.firstChild;
-    if(svg) host.replaceChild(svg, img); else img.style.visibility = "hidden";
-  }, true);
+  /* Product-photo load/failure handling is shared in 07-card-images.js. */
   /* ---- card flip: .flip-btn toggles .is-flipped; the back face is inert/aria-hidden until shown ---- */
   function setFlipped(card, on, focus){
     if(!card) return;
@@ -11502,7 +11569,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
     function art(item, large){
       if(item.tcg && item.img){
         var src = large ? item.img.replace("200x200", "400x400") : item.img;
-        return '<img class="card-img" src="' + TL.esc(src) + '" alt="" width="250" height="350" decoding="async">';
+        return '<img class="card-img" src="' + TL.esc(src) + '" alt="' + TL.esc(item.name) + '" width="250" height="350" decoding="async" referrerpolicy="no-referrer">';
       }
       return cardArt(item);
     }
