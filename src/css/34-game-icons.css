@@ -1,0 +1,5 @@
+/* Inline symbols have no network/font dependency and inherit the control's contrast. */
+.game-symbols{position:absolute; width:0; height:0; overflow:hidden; pointer-events:none}
+.game-icon{display:inline-block; vertical-align:middle; width:24px; height:24px; flex:0 0 auto; pointer-events:none}
+.chip .game-icon{width:20px; height:20px; --game-icon-band:var(--surface)}
+.chip[aria-pressed="true"] .game-icon{--game-icon-band:var(--accent)}

@@ -263,7 +263,7 @@
       /* a chip that can only produce an empty grid is hidden (core games included) unless it is the active filter;
          with no counts at all (nothing loaded yet) the core games stay so the row is never bare */
       if(!n && F.game !== g && (total > 0 || CORE_GAMES.indexOf(g) === -1)) return;
-      html += '<button class="chip" data-game="' + g + '" aria-pressed="' + (F.game === g) + '"' + (!n ? ' data-empty="1"' : '') + '>' + esc(gameLabel(g)) + ' <b>' + fmtInt(n) + '</b></button>';
+      html += '<button class="chip" data-game="' + g + '" aria-pressed="' + (F.game === g) + '"' + (!n ? ' data-empty="1"' : '') + '>' + TL.gameIcon(g) + esc(gameLabel(g)) + ' <b>' + fmtInt(n) + '</b></button>';
     });
     wrap.innerHTML = html;
     var INVc = INV ? INV.catalog() : [], sealed = 0, singles = 0;

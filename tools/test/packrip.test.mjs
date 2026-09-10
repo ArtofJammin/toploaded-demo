@@ -22,6 +22,7 @@ function simulator() {
       store: {get: (key, fallback) => saved.get(key) ?? fallback, set: (key, value) => saved.set(key, value)},
       cart: {add: (...args) => cart.push(args)}}};
   vm.createContext(context);
+  vm.runInContext(readFileSync(new URL('../../src/js/06-game-icons.js', import.meta.url), 'utf8'), context);
   vm.runInContext(source, context);
   context.ripItems = items;
   return {context, nodes, saved, shares, cart, items};

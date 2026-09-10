@@ -36,6 +36,11 @@ footer::before{
 .foot-bottom .adminlink{color:var(--ink3); background:none; border:0; padding:0; font:inherit; text-decoration:underline; letter-spacing:inherit}
 .foot-bottom .adminlink:hover{color:var(--accent)}
 .foot-bottom .spacer{flex:1}
+.icon-credits{padding:0 0 16px; color:var(--ink2); font-size:12px; line-height:1.6}
+.icon-credits summary{cursor:pointer; width:fit-content; padding:8px 0; min-height:44px; font-size:14px}
+.icon-credits p{max-width:90ch; margin:4px 0 0}
+.icon-credits a{color:inherit; text-underline-offset:3px}
+.icon-credits a:hover{color:var(--accent)}
 @media (max-width:960px){ .foot-grid{grid-template-columns:repeat(2,minmax(0,1fr))} .foot-about{grid-column:1/-1; max-width:none} }
 @media (max-width:640px){
   .foot-grid{grid-template-columns:1fr; gap:24px; padding:44px 0 32px}

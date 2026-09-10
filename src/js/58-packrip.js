@@ -290,7 +290,7 @@
       '<div class="rip-config panel">' +
         '<div class="rip-field"><span class="rip-label" id="ripGameL">Game</span>' +
           '<div class="chip-row" role="group" aria-labelledby="ripGameL">' + RIP_GAMES.map(function(g){
-            return '<button class="chip" type="button" data-rip-game="' + g + '" aria-pressed="' + (g === rip.game) + '">' + esc(PACKS[g].name) + '</button>';
+            return '<button class="chip" type="button" data-rip-game="' + g + '" aria-pressed="' + (g === rip.game) + '">' + TL.gameIcon(g) + esc(PACKS[g].name) + '</button>';
           }).join("") + '</div></div>' +
         '<div class="rip-field"><label class="rip-label" for="ripSet">Set</label><select id="ripSet"' + (canRip ? "" : " disabled") + '>' + setOpts + '</select></div>' +
         '<div class="rip-price"><span class="rip-label">Cost to play</span><b>Free</b><span class="rip-note">' + esc(P.size) + ' simulated card reveals &middot; ' + esc(P.name) + '</span></div>' +

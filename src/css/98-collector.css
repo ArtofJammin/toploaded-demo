@@ -49,13 +49,25 @@
 .deck-controls button:hover{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
 #deckIndex{font:9px var(--mono); color:var(--ink2)}
 .deck-loading{position:absolute; inset:40% 0; text-align:center; font:12px var(--mono); color:var(--ink3)}
-.game-shelf{display:grid; grid-template-columns:140px repeat(4,minmax(0,1fr)); padding-top:24px; padding-bottom:24px; gap:0}
-.game-shelf-label{font:9px/1.7 var(--mono); letter-spacing:.12em; color:var(--ink3); align-self:center}
+.game-shelf{display:grid; grid-template-columns:120px repeat(4,minmax(0,1fr)); padding-top:24px; padding-bottom:24px; gap:10px}
+.game-shelf-label{font:12px/1.7 var(--mono); letter-spacing:.08em; color:var(--ink2); align-self:center}
 .game-shelf-label > span{margin-left:12px; font-size:16px}
-.game-door{display:flex; gap:12px; padding:14px 16px; align-items:center; border-left:1px solid var(--line); text-decoration:none; color:var(--ink); font-family:var(--disp); font-size:24px; line-height:1.2; transition:background .2s}
-.game-door:hover{background:var(--surface)}
-.game-door small{display:block; font:10px var(--body); color:var(--ink3); margin-top:5px}
-.game-mark{font:26px var(--body); color:var(--accent)}
+.game-door{--game-tone:#e6bf54; --game-icon-band:#ac3535; display:grid; grid-template-columns:48px minmax(0,1fr) 12px; gap:10px; min-width:0; padding:16px 12px; align-items:center; border:1px solid var(--line); border-radius:12px; background:var(--surface); text-decoration:none; color:var(--ink); font-family:var(--disp); font-size:24px; line-height:1.2; transition:background .2s,border-color .2s,box-shadow .2s}
+.game-door[data-universe="op"]{--game-tone:#efa75e}
+.game-door[data-universe="mtg"]{--game-tone:#f28c69}
+.game-door[data-universe="gundam"]{--game-tone:#80b7f7}
+:root[data-theme="light"] .game-door{--game-tone:#97670b}
+:root[data-theme="light"] .game-door[data-universe="op"]{--game-tone:#a15b0c; --game-icon-band:#fff5e6}
+:root[data-theme="light"] .game-door[data-universe="mtg"]{--game-tone:#b44024}
+:root[data-theme="light"] .game-door[data-universe="gundam"]{--game-tone:#2762ab}
+.game-door:is(:hover,:focus-visible){background:color-mix(in srgb,var(--game-tone) 6%,var(--surface)); border-color:color-mix(in srgb,var(--game-tone) 60%,var(--line)); box-shadow:0 6px 20px color-mix(in srgb,var(--game-tone) 9%,transparent)}
+.game-door:focus-visible{outline:2px solid var(--accent); outline-offset:4px}
+.game-door-label{min-width:0; overflow-wrap:anywhere}
+.game-door small{display:block; font:12px/1.5 var(--body); color:var(--ink2); margin-top:5px}
+.game-mark{display:grid; place-items:center; width:48px; height:48px; border-radius:12px; background:color-mix(in srgb,var(--game-tone) 12%,var(--surface2)); border:1px solid color-mix(in srgb,var(--game-tone) 32%,var(--line)); color:var(--game-tone); transition:transform .24s var(--ease-out),background .24s}
+.game-mark .game-icon{width:34px; height:34px}
+.game-door:is(:hover,:focus-visible) .game-mark{transform:translateY(-3px) rotate(-5deg); background:color-mix(in srgb,var(--game-tone) 20%,var(--surface2))}
+.game-door[data-universe="mtg"]:is(:hover,:focus-visible) .game-mark,.game-door[data-universe="gundam"]:is(:hover,:focus-visible) .game-mark{transform:translateY(-3px)}
 .game-arrow{margin-left:auto; color:var(--ink3); font:16px var(--body); transition:transform .2s}
 .game-door:hover .game-arrow{transform:translate(2px,-2px); color:var(--accent)}
 .collector-home .ticker{border-top:1px solid var(--line); font-size:11px}
@@ -131,8 +143,10 @@ a:hover .round-arrow{transform:rotate(45deg)}
   .deck-card{width:182px}
   .deck-card[data-position="left"]{--dx:-107px}.deck-card[data-position="right"]{--dx:107px}
   .collector-deck{height:325px}.collector-stage{min-height:420px}
-  .game-shelf{grid-template-columns:repeat(4,1fr)}.game-shelf-label{display:none}
-  .game-door{font-size:21px;padding:12px}.game-door small{font-size:9px}
+  .game-shelf{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .game-shelf-label{grid-column:1/-1; margin-bottom:4px}
+  .game-shelf-label br{display:none}
+  .game-door{font-size:24px;padding:16px}
 }
 @media (max-width:760px){
   .collector-hero .wrap{grid-template-columns:1fr; padding-top:38px; padding-bottom:32px; gap:40px}
@@ -152,8 +166,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
   .trade-tile > div{flex-direction:column;align-items:flex-start;gap:24px}
   .trade-stamp{width:70px;height:70px}
   .collector-home #featuredGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .game-shelf{grid-template-columns:1fr 1fr;row-gap:12px;padding-top:20px;padding-bottom:20px}
-  .game-door:nth-child(even){border-left:0}
+  .game-shelf{row-gap:12px;padding-top:20px;padding-bottom:20px}
   .collector-home .section{padding-top:48px;padding-bottom:48px}
 }
 @media (max-width:460px){
@@ -165,7 +178,10 @@ a:hover .round-arrow{transform:rotate(45deg)}
   .deck-card{width:166px}.deck-card[data-position="left"]{--dx:-92px}.deck-card[data-position="right"]{--dx:92px}
   .collector-deck{height:290px}.collector-stage{min-height:360px}.case-caption{margin-left:0;margin-right:0}
   #deckName{max-width:21ch;font-size:11px}.deck-controls{gap:5px}.deck-controls button{width:38px;height:38px}
-  .game-door{font-size:23px;padding:10px}.game-door small{font-size:9px}.game-mark{font-size:24px}
+  .game-door{grid-template-columns:minmax(0,1fr) 16px; gap:14px 6px; font-size:24px; padding:16px}
+  .game-mark{grid-column:1; grid-row:1; width:52px; height:52px}
+  .game-door-label{grid-column:1/-1; grid-row:2}
+  .game-door .game-arrow{grid-column:2; grid-row:1; align-self:start; padding-top:4px}
   .collector-home .nextup-list{grid-template-columns:1fr}
   .collector-home .nextup-cell + .nextup-cell{border-left:0;border-top:1px solid var(--line)}
   .collector-home .nextup-cell .nextup-btn{padding:18px 0}
@@ -180,7 +196,8 @@ a:hover .round-arrow{transform:rotate(45deg)}
   .collector-home .faq{grid-template-columns:1fr}.collector-home .section-head{gap:12px}
 }
 @media (prefers-reduced-motion:reduce){
-  .deck-card,.deck-face,.game-arrow,.pack-stack i,.round-arrow{transition:none}
+  .deck-card,.deck-face,.game-arrow,.game-door,.game-mark,.pack-stack i,.round-arrow{transition:none}
+  .game-door:is(:hover,:focus-visible) .game-mark,.game-door[data-universe="mtg"]:is(:hover,:focus-visible) .game-mark,.game-door[data-universe="gundam"]:is(:hover,:focus-visible) .game-mark{transform:none}
   .discovery-pick{animation:none}.deck-face{transform:none}
 }
 @media (pointer:coarse){.deck-controls button{min-width:44px;min-height:44px}.discovery-pick .linklike{min-height:44px}}
