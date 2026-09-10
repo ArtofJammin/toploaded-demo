@@ -5,6 +5,12 @@
 .rip-note{font-family:var(--mono); font-size:.75rem; letter-spacing:.03em; color:var(--ink3); line-height:1.5}
 .rip-note .linklike{font-size:inherit}
 .rip-app h3{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.4rem; letter-spacing:.03em}
+.rip-disclaimer{margin:0 0 24px; padding:20px 24px; background:var(--surface2); border:1px solid var(--accent); border-left-width:5px; border-radius:10px; color:var(--ink)}
+.rip-disclaimer strong{display:block; font-size:1.125rem; line-height:1.4}
+.rip-disclaimer p{margin-top:8px; font-size:1rem; line-height:1.5; color:var(--ink2)}
+.rip-simulation-copy{font-size:1rem; line-height:1.5; color:var(--ink2)}
+.rip-odds-wrap .rip-simulation-copy,.rip-sum .rip-simulation-copy{margin-top:12px}
+.rip-mode{align-self:center; padding:8px 14px; border:1px solid var(--accent); border-radius:6px; background:var(--surface2); color:var(--ink); font-size:.875rem; text-align:center}
 
 /* --- setup --- */
 .rip-setup{display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,.9fr); gap:16px; align-items:start}
@@ -23,9 +29,9 @@
 .rip-odds tbody th{font-weight:500; color:var(--ink)}
 .rip-odds td{text-align:right; font-variant-numeric:tabular-nums; color:var(--ink2)}
 .rip-odds-wrap .rip-note{margin-top:12px}
-.rip-stats dl{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:14px 0 0}
+.rip-stats dl{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:14px 0 0}
 .rip-stats dl div{background:var(--surface2); border:1px solid var(--line); border-radius:6px; padding:10px 12px}
-.rip-stats dt{font-family:var(--mono); font-size:.68rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3)}
+.rip-stats dt{font-family:var(--mono); font-size:.875rem; color:var(--ink2); overflow-wrap:anywhere}
 .rip-stats dd{margin:4px 0 0; font-family:var(--mono); font-size:1rem; font-weight:500; font-variant-numeric:tabular-nums}
 .rip-best-mini{display:flex; align-items:center; gap:12px; margin-top:14px; padding-top:14px; border-top:1px dashed var(--line)}
 .rip-best-mini img,.rip-best-ph{width:48px; height:48px; border-radius:6px; object-fit:cover; background:var(--slab); border:1px solid var(--slab-line); flex:0 0 auto}
@@ -150,7 +156,6 @@
 .rip-sum h2{font-family:var(--disp); font-weight:800; text-transform:uppercase; font-size:clamp(1.7rem, 4vw, 2.6rem); line-height:1; letter-spacing:.02em}
 .rip-sum h2:focus{outline:none}
 .rip-sum h2 .rip-total{color:var(--accent)}
-.rip-sum.up h2 .rip-total{color:var(--good)}
 .rip-sum .rip-note{margin-top:10px; max-width:60ch}
 .rip-bestpull{display:grid; grid-template-columns:150px minmax(0,1fr); gap:22px; align-items:center; margin-top:24px; padding-top:22px; border-top:1px dashed var(--line)}
 .rip-best-art{aspect-ratio:5/7; border-radius:10px; overflow:hidden; border:1px solid var(--foilB); background:#fff; box-shadow:0 0 0 2px color-mix(in srgb, var(--foilB) 60%, transparent), 0 0 34px color-mix(in srgb, var(--foilA) 45%, transparent)}

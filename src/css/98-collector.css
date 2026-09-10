@@ -105,6 +105,7 @@
 .play-tile-bottom{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:auto}
 .play-tile h3,.trade-tile h3{font:700 34px/1 var(--disp); letter-spacing:-.01em; text-transform:uppercase}
 .play-tile p,.trade-tile p{font-size:12px; margin-top:10px; max-width:36ch}
+.play-tile p{font-size:1rem; line-height:1.45}
 .round-arrow{display:grid; place-items:center; border:1px solid currentColor; border-radius:50%; width:40px; height:40px; flex:0 0 auto; font:22px var(--body); transition:transform .2s}
 a:hover .round-arrow{transform:rotate(45deg)}
 .trade-tile{padding:28px; border-radius:14px; background:var(--collect-yellow); color:var(--collect-black); text-decoration:none; display:block}

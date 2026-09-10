@@ -77,8 +77,8 @@ if (!process.argv.includes('--no-tests')) {
   else console.log('ok    API tests  ' + summary);
   const ui = spawnSync(process.execPath, ['--test', 'tools/test/*.test.mjs'], { cwd: repo, encoding: 'utf8' });
   const uiSummary = (ui.stdout.match(/ℹ (tests|pass|fail) \d+/g) || []).join('  ');
-  if (ui.status !== 0) { fail('Navigation regression tests failed  ' + uiSummary); console.log(ui.stdout); }
-  else console.log('ok    Navigation regression tests  ' + uiSummary);
+  if (ui.status !== 0) { fail('Frontend regression tests failed  ' + uiSummary); console.log(ui.stdout); }
+  else console.log('ok    Frontend regression tests  ' + uiSummary);
 }
 
 console.log(`\n${failures} failure(s), ${warnings} warning(s)`);

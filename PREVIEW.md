@@ -13,3 +13,5 @@ Preview safeguards: `noindex` metadata and a separate `tl-collector-preview-` br
 The preview deployment contains only the static site and its public assets. No API credentials, local notes, development data, or scheduled inventory workflows are published to the preview repository.
 
 September 9 update: full-width responsive header, hamburger menu, single-pass navigation, theme-aware discovery panels and a customer account portal. Customer email sign-in and private credit history have backend implementations, but stay disabled on the static preview until the Worker and email sender are connected. See [launch checklist](https://github.com/ArtofJammin/toploaded-demo/blob/codex/collector-preview/LAUNCH-CHECKLIST.md) for the explicit go-live requirements.
+
+Rip a Pack is a free simulation, not a physical pack opening or a giveaway. The homepage, setup, reveal, results and shared text now state that no real pack is opened and no cards or prizes are awarded. Prices are catalog references, not winnings or store credit; physical products are sold separately through a separate checkout. The simulator does not add items to the cart automatically.

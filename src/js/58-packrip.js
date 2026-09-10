@@ -6,7 +6,7 @@
 
        TL.rip.draw(game, set, seed?)   → [{item, tier, rank, rare, rh, hit}]  pure, seedable
        TL.rip.start(game, set)         → jump to the pack screen
-       TL.rip.stats()                  → {packs, value, spent, best}
+       TL.rip.stats()                  → {packs, value, spent, best} (simulation counters only)
 
      Consumes (all guarded, all optional): TL.inventory.load()/items/summary,
      TL.cart.add(item, qty, fromEl), TL.openQuickView(item), TL.confetti(x, y, opts).
@@ -256,26 +256,26 @@
       var pct = P.hit[k] / total * 100;
       return '<tr><th scope="row">' + esc(P.labels[k]) + '</th><td>' + (pct >= 10 ? Math.round(pct) : pct.toFixed(1)) + '%</td></tr>';
     }).join("");
-    return '<table class="rip-odds"><caption class="rip-sr">Odds for the rare slot in a ' + esc(P.name) + ' pack</caption>' +
+    return '<table class="rip-odds"><caption class="rip-sr">Simulated odds for the rare slot in a ' + esc(P.name) + ' virtual pack</caption>' +
       '<thead><tr><th scope="col">Rare slot</th><th scope="col">Chance</th></tr></thead><tbody>' + rows + '</tbody></table>' +
-      '<p class="rip-note">' + esc(P.note) + ' &middot; for fun, not real pull rates</p>';
+      '<p class="rip-note">' + esc(P.note) + '</p><p class="rip-simulation-copy">For this simulator only. These are not real booster-pack odds.</p>';
   }
   function ripStatsCard(){
     var s = ripStats();
     var best = s.best ? '<div class="rip-best-mini">' +
         (s.best.img ? '<img src="' + esc(s.best.img) + '" alt="" loading="lazy" width="48" height="48">' : '<span class="rip-best-ph" aria-hidden="true"></span>') +
-        '<div><b>' + esc(s.best.name) + '</b><span>Best pull &middot; ' + money(s.best.price) + '</span></div></div>'
-      : '<p class="rip-note">No pulls yet &mdash; tear one open.</p>';
-    return '<aside class="rip-stats panel" aria-labelledby="ripStatsH"><h3 id="ripStatsH">Your stats</h3>' +
-      '<dl><div><dt>Packs</dt><dd>' + fmtInt(s.packs) + '</dd></div>' +
-      '<div><dt>Pulled</dt><dd>' + money(s.value) + '</dd></div>' +
-      '<div><dt>Spent</dt><dd>' + money(s.spent) + '</dd></div></dl>' + best +
-      '<button class="btn btn-ghost rip-cta" type="button" data-go="shop" data-params="type=sealed&game=' + esc(rip.game) + '">Buy real packs</button>' +
-      '<p class="rip-note">Stats live in this browser only.</p></aside>';
+        '<div><b>' + esc(s.best.name) + '</b><span>Simulation highlight &middot; reference price ' + money(s.best.price) + '</span></div></div>'
+      : '<p class="rip-note">No simulations yet &mdash; try one for free.</p>';
+    return '<aside class="rip-stats panel" aria-labelledby="ripStatsH"><h3 id="ripStatsH">Simulator stats</h3>' +
+      '<dl><div><dt>Simulations</dt><dd>' + fmtInt(s.packs) + '</dd></div>' +
+      '<div><dt>Cost to play</dt><dd>Free</dd></div></dl>' + best +
+      '<button class="btn btn-ghost rip-cta" type="button" data-go="shop" data-params="type=sealed&game=' + esc(rip.game) + '">Shop physical packs</button>' +
+      '<p class="rip-simulation-copy">Physical products are sold separately.</p>' +
+      '<p class="rip-note">Simulator history stays in this browser. It is not a card collection or credit balance.</p></aside>';
   }
   function ripRenderSetup(){
     rip.stage = "setup"; ripApp.dataset.stage = "setup";
-    var sets = ripSetsFor(rip.game), P = PACKS[rip.game], price = ripPackPrice(rip.game);
+    var sets = ripSetsFor(rip.game), P = PACKS[rip.game];
     var setOpts, canRip = true;
     if(sets === null){ setOpts = '<option value="">Loading sets…</option>'; canRip = false; }
     else if(!sets.length){ setOpts = '<option value="">No sets with enough singles yet</option>'; canRip = false; }
@@ -293,11 +293,11 @@
             return '<button class="chip" type="button" data-rip-game="' + g + '" aria-pressed="' + (g === rip.game) + '">' + esc(PACKS[g].name) + '</button>';
           }).join("") + '</div></div>' +
         '<div class="rip-field"><label class="rip-label" for="ripSet">Set</label><select id="ripSet"' + (canRip ? "" : " disabled") + '>' + setOpts + '</select></div>' +
-        '<div class="rip-price"><span class="rip-label">Pack price</span><b>' + money(price) + '</b><span class="rip-note">' + esc(P.size) + ' cards &middot; ' + esc(P.name) + '</span></div>' +
-        '<button class="btn rip-go" type="button" data-rip-open' + (canRip ? "" : " disabled") + '>Rip it</button>' +
-        (ripDemo ? '<p class="rip-note">Live inventory is unavailable, so this pack draws from our sample cards. <button class="linklike" type="button" data-rip-retry>Retry</button></p>' : "") +
+        '<div class="rip-price"><span class="rip-label">Cost to play</span><b>Free</b><span class="rip-note">' + esc(P.size) + ' simulated card reveals &middot; ' + esc(P.name) + '</span></div>' +
+        '<button class="btn rip-go" type="button" data-rip-open aria-describedby="ripDisclaimerH"' + (canRip ? "" : " disabled") + '>Start free simulation</button>' +
+        (ripDemo ? '<p class="rip-note">Live inventory is unavailable, so this simulation uses sample cards and prices. <button class="linklike" type="button" data-rip-retry>Retry</button></p>' : "") +
       '</div>' +
-      '<div class="rip-odds-wrap panel"><h3>Odds</h3>' + ripOddsTable(rip.game) + '</div>' +
+      '<div class="rip-odds-wrap panel"><h3>Simulated odds</h3>' + ripOddsTable(rip.game) + '</div>' +
       ripStatsCard() + '</div>';
   }
   function ripRenderPack(){
@@ -305,19 +305,20 @@
     var P = PACKS[rip.game], setLabel = rip.set === "*" ? "Sample case" : rip.set;
     ripApp.innerHTML = '<div class="rip-stage" id="ripStage" data-game="' + esc(rip.game) + '">' +
       '<div class="rip-packwrap">' +
-        '<div class="rip-pack" id="ripPack" role="button" tabindex="0" aria-label="Sealed ' + esc(P.name) + ' pack, ' + esc(setLabel) + '. Press Enter to tear it open, or drag across the tear strip.">' +
+        '<p class="rip-mode">Free simulation &middot; no real pack or card prizes</p>' +
+        '<div class="rip-pack" id="ripPack" role="button" tabindex="0" aria-label="Simulated ' + esc(P.name) + ' pack, ' + esc(setLabel) + '. No real pack is opened or cards awarded. Press Enter to play, or drag across the tear strip.">' +
           '<span class="rip-foil" aria-hidden="true"></span><span class="rip-crimp top" aria-hidden="true"></span>' +
           '<div class="rip-strip" aria-hidden="true"><span>Tear here &#9656;&#9656;&#9656;</span></div>' +
-          '<div class="rip-packart" aria-hidden="true"><span class="rip-packgame">' + esc(P.name) + '</span><b>TL</b><span class="rip-packset">' + esc(setLabel) + '</span><span class="rip-packn">' + esc(P.size) + ' cards</span></div>' +
+          '<div class="rip-packart" aria-hidden="true"><span class="rip-packgame">' + esc(P.name) + '</span><b>TL</b><span class="rip-packset">' + esc(setLabel) + '</span><span class="rip-packn">SIMULATION ONLY</span></div>' +
           '<span class="rip-crimp bottom" aria-hidden="true"></span>' +
         '</div>' +
-        '<p class="rip-hint" id="ripHint">' + (reduceMotion ? "Press Open pack to see your cards." : "Swipe across the strip to tear it, or press Enter.") + '</p>' +
-        '<div class="rip-actions"><button class="btn" type="button" data-rip-tear>Open pack</button><button class="btn btn-ghost" type="button" data-rip-back>Change set</button></div>' +
+        '<p class="rip-hint" id="ripHint">' + (reduceMotion ? "Press Open simulated pack to reveal the cards." : "Swipe across the strip or press Enter to play the simulated opening.") + '</p>' +
+        '<div class="rip-actions"><button class="btn" type="button" data-rip-tear>Open simulated pack</button><button class="btn btn-ghost" type="button" data-rip-back>Change set</button></div>' +
       '</div>' +
       '<div class="rip-cards" id="ripCards" hidden></div>' +
       '<div class="rip-results" id="ripResults" hidden></div>' +
     '</div>';
-    ripSay("Pack ready: " + P.name + ", " + setLabel + ". Press Enter or Open pack to tear it.");
+    ripSay("Free simulation ready: " + P.name + ", " + setLabel + ". No real pack is opened and no cards are awarded. Press Enter or Open simulated pack to play.");
     var pack = $("#ripPack"); if(pack) try { pack.focus({preventScroll:true}); } catch(e){}
   }
   function ripStartPack(){
@@ -339,7 +340,7 @@
     var pack = $("#ripPack"); if(!pack || rip.stage !== "pack") return;
     rip.stage = "tearing";
     pack.classList.add("torn"); pack.setAttribute("aria-disabled", "true"); pack.setAttribute("tabindex", "-1");
-    var hint = $("#ripHint"); if(hint) hint.textContent = "Ripped! Flip the cards.";
+    var hint = $("#ripHint"); if(hint) hint.textContent = "Simulated pack opened! Flip the cards.";
     var acts = $(".rip-actions", ripApp); if(acts) acts.hidden = true;
     var rect = pack.getBoundingClientRect(), cx = rect.left + rect.width / 2, cy = rect.top + rect.height * .4;
     if(!reduceMotion) TL.confetti(cx, cy, {count: 24, spread: 50});
@@ -356,7 +357,7 @@
   function ripDeal(cx, cy){
     var wrap = $("#ripCards"); if(!wrap) return;
     rip.stage = "cards"; ripApp.dataset.stage = "cards";
-    wrap.innerHTML = '<div class="rip-cardbar"><span class="rip-progress" id="ripProgress">0 of ' + rip.cards.length + ' flipped</span>' +
+    wrap.innerHTML = '<p class="rip-mode">Simulation only &middot; these cards are not awarded to you</p><div class="rip-cardbar"><span class="rip-progress" id="ripProgress">0 of ' + rip.cards.length + ' flipped</span>' +
       '<div class="rip-cardbtns"><button class="btn btn-ghost" type="button" data-rip-next>Flip next</button><button class="btn btn-ghost" type="button" data-rip-all>Flip all</button></div></div>' +
       '<div class="rip-grid" id="ripGrid">' + rip.cards.map(ripCardHtml).join("") + '</div>';
     wrap.hidden = false;
@@ -370,7 +371,7 @@
       void grid.offsetWidth;
     }
     grid.classList.add("deal");
-    ripSay(rip.cards.length + " cards on the table, face down. Flip them one at a time with Enter or Space.");
+    ripSay(rip.cards.length + " simulated card reveals, face down. No cards are awarded. Flip them one at a time with Enter or Space.");
     ripLater(function(){ var f = cards[0]; if(f) try { f.focus({preventScroll:true}); } catch(e){} }, 120);
     $$(".rip-packwrap", ripApp).forEach(function(pw){ pw.classList.add("done"); });
   }
@@ -382,11 +383,11 @@
     if(c.rare) el.classList.add("is-rare");
     if(c.hit) el.classList.add("is-hit");
     el.setAttribute("aria-pressed", "true");
-    el.setAttribute("aria-label", it.name + ", " + (P.labels[c.tier] || c.tier) + ", " + money(it.price) + ". Open details.");
+    el.setAttribute("aria-label", it.name + ", " + (P.labels[c.tier] || c.tier) + ", reference price " + money(it.price) + ". Open product details; sold separately.");
     el.dataset.ripView = i; el.removeAttribute("data-rip-flip");
     rip.flipped++;
     var prog = $("#ripProgress"); if(prog) prog.textContent = rip.flipped + " of " + rip.cards.length + " flipped";
-    if(!quiet) ripSay((c.rare ? "Hit! " : "") + "Card " + (i + 1) + " of " + rip.cards.length + ": " + it.name + ", " + (P.labels[c.tier] || c.tier) + ", " + money(it.price));
+    if(!quiet) ripSay((c.rare ? "Simulated hit! " : "") + "Card " + (i + 1) + " of " + rip.cards.length + ": " + it.name + ", " + (P.labels[c.tier] || c.tier) + ", reference price " + money(it.price));
     if(c.rare && !reduceMotion){
       var r = el.getBoundingClientRect(), big = c.hit;
       ripLater(function(){
@@ -412,31 +413,34 @@
     s.packs++; s.value = Math.round((s.value + total) * 100) / 100; s.spent = Math.round((s.spent + price) * 100) / 100;
     if(best && (!s.best || best.item.price > s.best.price)) s.best = {id: best.item.id, name: best.item.name, price: best.item.price, img: ripImg(best.item)};
     TL.store.set("ripStats", s);
-    var mult = price ? total / price : 0;
     var bi = rip.cards.indexOf(best);
     var res = $("#ripResults"); if(!res) return;
-    res.innerHTML = '<div class="rip-sum panel' + (mult >= 1 ? " up" : "") + '">' +
-      '<p class="eyebrow">Pack opened</p>' +
-      '<h2 id="ripResultH" tabindex="-1">You pulled <b class="rip-total">' + money(total) + '</b> from a ' + money(price) + ' pack</h2>' +
-      '<p class="rip-note">' + (mult >= 1 ? "That's " + mult.toFixed(1) + "x the pack price." : "Under the pack price this time — that's why we sell singles.") + ' Every card is in the case right now at these prices.</p>' +
+    res.innerHTML = '<div class="rip-sum panel">' +
+      '<p class="eyebrow">Free simulation complete</p>' +
+      '<h2 id="ripResultH" tabindex="-1">Your simulated reveal</h2>' +
+      '<p class="rip-simulation-copy"><strong>No real pack was opened. No cards or prizes were awarded.</strong> Nothing was purchased or charged, and no store credit was earned.</p>' +
+      '<p class="rip-simulation-copy">Reference singles total: <b class="rip-total">' + money(total) + '</b>. This is catalog pricing, not winnings, profit, or a balance you can spend. Prices and availability may change.</p>' +
+      (ripDemo ? '<p class="rip-simulation-copy">Sample cards and prices shown because live inventory is unavailable.</p>' : "") +
       (best ? '<div class="rip-bestpull"><div class="rip-best-art">' + (ripImg(best.item) ? '<img src="' + esc(ripImg(best.item)) + '" alt="' + esc(best.item.name) + '">' : cardArt(best.item)) + '</div>' +
-        '<div class="rip-best-meta"><span class="rip-label">Best pull</span><h3>' + esc(best.item.name) + '</h3>' +
+        '<div class="rip-best-meta"><span class="rip-label">Simulation highlight</span><h3>' + esc(best.item.name) + '</h3>' +
         '<p class="rip-note">' + esc(P.labels[best.tier] || best.tier) + ' &middot; ' + esc(ripSetName(best.item)) + (best.item.cond ? ' &middot; ' + esc(best.item.cond) : "") + '</p>' +
         '<b class="rip-price">' + money(best.item.price) + '</b>' +
-        '<div class="rip-btns"><button class="btn" type="button" data-rip-add="' + bi + '">Add to cart</button><button class="btn btn-ghost" type="button" data-rip-view="' + bi + '">See it</button></div></div></div>' : "") +
-      '<div class="rip-btns rip-again"><button class="btn" type="button" data-rip-again>Rip another</button><button class="btn btn-ghost" type="button" data-rip-share>Share</button>' +
-      '<button class="btn btn-ghost" type="button" data-go="shop" data-params="type=sealed&game=' + esc(rip.game) + '">Buy real ' + esc(P.name) + ' packs</button></div>' +
+        '<p class="rip-simulation-copy">Want the physical single? It is sold separately; adding it to your cart does not claim a prize.</p>' +
+        '<div class="rip-btns"><button class="btn" type="button" data-rip-add="' + bi + '">Add single to cart</button><button class="btn btn-ghost" type="button" data-rip-view="' + bi + '">Product details</button></div></div></div>' : "") +
+      '<div class="rip-btns rip-again"><button class="btn" type="button" data-rip-again>Simulate another &middot; free</button><button class="btn btn-ghost" type="button" data-rip-share>Share simulation</button>' +
+      '<button class="btn btn-ghost" type="button" data-go="shop" data-params="type=sealed&game=' + esc(rip.game) + '">Shop physical ' + esc(P.name) + ' packs</button></div>' +
+      '<p class="rip-simulation-copy">Optional shopping: physical singles and packs are sold separately and require a separate checkout.</p>' +
     '</div>' +
-    '<ul class="rip-list" aria-label="Every card in this pack">' + rip.cards.map(function(c, i){
+    '<ul class="rip-list" aria-label="Cards shown in the simulation; physical singles sold separately">' + rip.cards.map(function(c, i){
       var it = c.item, src = ripImg(it);
       return '<li class="rip-row' + (c.rare ? " rare" : "") + (c === best ? " best" : "") + '">' +
         '<button class="rip-row-view" type="button" data-rip-view="' + i + '" aria-label="' + esc(it.name) + ', open details">' + (src ? '<img src="' + esc(src) + '" alt="" loading="lazy" width="44" height="44">' : '<span class="rip-best-ph" aria-hidden="true"></span>') +
           '<span class="rip-row-name"><b>' + esc(it.name) + '</b><span>' + esc(P.labels[c.tier] || c.tier) + (c.rh ? " · reverse holo" : "") + (it.cond ? " · " + esc(it.cond) : "") + '</span></span></button>' +
         '<span class="rip-row-price">' + money(it.price) + '</span>' +
-        '<button class="add rip-row-add" type="button" data-rip-add="' + i + '"' + (it.stock > 0 ? "" : " disabled") + '>' + (it.stock > 0 ? "Add to cart" : "Sold out") + '</button></li>';
+        '<button class="add rip-row-add" type="button" data-rip-add="' + i + '"' + (it.stock > 0 ? "" : " disabled") + '>' + (it.stock > 0 ? "Add single to cart" : "Sold out") + '</button></li>';
     }).join("") + '</ul>';
     res.hidden = false;
-    ripSay("Pack opened. You pulled " + money(total) + " from a " + money(price) + " pack." + (best ? " Best pull: " + best.item.name + ", " + money(best.item.price) + "." : ""));
+    ripSay("Simulation complete. No real pack was opened, no cards were awarded, and nothing was charged. Reference singles total: " + money(total) + ", not winnings or store credit." + (best ? " Simulation highlight: " + best.item.name + "." : ""));
     ripLater(function(){
       try { res.scrollIntoView({behavior: reduceMotion ? "auto" : "smooth", block: "start"}); } catch(e){}
       var h = $("#ripResultH"); if(h) try { h.focus({preventScroll:true}); } catch(e){}
@@ -446,10 +450,11 @@
     var best = null, total = 0;
     rip.cards.forEach(function(c){ total += Number(c.item.price) || 0; if(!best || c.item.price > best.item.price) best = c; });
     var url = location.origin + location.pathname + "#/rip";
-    var text = best ? "I pulled a " + money(best.item.price) + " " + best.item.name + " on Top Loaded's pack rip" : "I ripped a pack on Top Loaded's pack rip";
-    text += " — " + money(total) + " from a " + money(ripPackPrice(rip.game)) + " pack.";
+    var text = "I tried Top Loaded's free pack-opening simulator!";
+    if(best) text += " Simulation highlight: " + best.item.name + ".";
+    text += " No real pack was opened and no cards or prizes were awarded. Reference singles total: " + money(total) + " (not winnings or store credit).";
     if(navigator.share){
-      navigator.share({title: "Top Loaded pack rip", text: text, url: url}).catch(function(){});
+      navigator.share({title: "Top Loaded free pack simulator", text: text, url: url}).catch(function(){});
       return;
     }
     var full = text + " " + url;
@@ -503,7 +508,7 @@
       if(e.detail === 0 || reduceMotion || rip.drag === "done"){ ripTear(); return; }
       if(rip.drag === "moved"){ rip.drag = null; return; }
       t.classList.remove("nudge"); void t.offsetWidth; t.classList.add("nudge");
-      var hint = $("#ripHint"); if(hint) hint.textContent = "Swipe across the tear strip — or press Open pack.";
+      var hint = $("#ripHint"); if(hint) hint.textContent = "Swipe across the tear strip — or press Open simulated pack.";
     }
   });
   ripApp.addEventListener("change", function(e){
