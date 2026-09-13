@@ -288,7 +288,7 @@
      Worker is deployed with a key). Nothing is ever invented: with no reviews on file
      the section invites customers to read and leave real ones instead. */
   var REVIEW_SOURCES = {
-    google: {label: "Google review", link: function(){ return (TL.config.links && TL.config.links.googleMaps) || ""; }},
+    google: {label: "Google review", link: function(){ return (TL.config.links && (TL.config.links.googleReviews || TL.config.links.googleMaps)) || ""; }},
     tcgplayer: {label: "TCGplayer feedback", link: function(){ return (TL.config.links && TL.config.links.tcgplayer) || ""; }},
     shop: {label: "In the shop", link: function(){ return ""; }}
   };
@@ -297,8 +297,9 @@
     if(!n) return "";
     return '<span class="review-stars" aria-label="' + n + ' out of 5">' + new Array(n + 1).join("★") + '</span>';
   }
-  var reviewRemote=null,reviewFetchKey="",reviewSnapshot=null;
+  var reviewRemote=null,reviewFetchKey="",reviewSnapshot=null,reviewGoogleSnapshot=null;
   TL.on('init',function(){
+    fetch('reviews-google.json',{cache:'no-cache'}).then(function(r){if(!r.ok)throw new Error('Google highlights unavailable');return r.json();}).then(function(d){if(d.fid==='0x8841b71c55b9061f:0x3e80278544b6ed21'&&Array.isArray(d.items)&&d.items.length<=3&&d.items.every(function(t){return t.rating===5&&t.source==='google';})){reviewGoogleSnapshot=d;renderTestimonials();}}).catch(function(){});
     fetch('reviews-tcgplayer.json',{cache:'no-cache'}).then(function(r){if(!r.ok)throw new Error('Review feed unavailable');return r.json();}).then(function(d){
       if(d.sellerKey==='5c356cdf'&&Array.isArray(d.items)&&d.items.length<=3){reviewSnapshot=d;renderTestimonials();}
     }).catch(function(){/* Curated reviews/source links remain available. */});
@@ -315,16 +316,17 @@
     if(!box) return;
     var cfg = (TL.config && TL.config.reviews) || {};
     var min = Number(cfg.minRating || 0);
-    var supplied = reviewRemote ? reviewRemote.items : Array.isArray(cfg.items) ? cfg.items : [];
+    var verifiedGoogle=cfg.source==='google'&&(!reviewRemote||reviewRemote.mode!=='google')&&reviewGoogleSnapshot&&Date.now()-Date.parse(reviewGoogleSnapshot.generated)<30*86400000?reviewGoogleSnapshot.items:[];
+    var supplied = verifiedGoogle.concat(reviewRemote ? reviewRemote.items : Array.isArray(cfg.items) ? cfg.items : []);
     var automatic = cfg.tcgplayerAuto!==false && reviewSnapshot && Date.now()-Date.parse(reviewSnapshot.generated)<30*86400000 ? reviewSnapshot.items : [];
     var reviewSeen={};
     var list = supplied.concat(automatic).filter(function(t){var k=t.source+'|'+t.quote+'|'+t.who;if(reviewSeen[k])return false;reviewSeen[k]=true;return true;}).map(function(t){
       return {q: t.quote || t.text || "", who: t.who || t.name || "", rating: Number(t.rating || 0),
-        source: REVIEW_SOURCES[t.source] ? t.source : "shop", url: reviewUrl(t.url),authorUrl:reviewUrl(t.authorUrl),photo:reviewUrl(t.photo),at:t.at};
-    }).filter(function(t){ return t.q && t.rating >= min; }).slice(0, 6);
+        source: REVIEW_SOURCES[t.source] ? t.source : "shop", url: reviewUrl(t.url),authorUrl:reviewUrl(t.authorUrl),photo:reviewUrl(t.photo),at:t.at,excerpt:!!t.excerpt};
+    }).filter(function(t){ return t.q && t.rating >= min && (t.source!=='google'||t.rating===5); }).slice(0, 6);
 
     if(!list.length){
-      var g = (TL.config.links && TL.config.links.googleMaps) || "", tcg = (TL.config.links && TL.config.links.tcgplayer) || "";
+      var g = REVIEW_SOURCES.google.link(), tcg = (TL.config.links && TL.config.links.tcgplayer) || "";
       box.innerHTML = '<div class="panel review-empty">' +
         '<p class="quote">Reviews from Google and TCGplayer land here.</p>' +
         '<p class="p-set quote-who">Been in lately? Telling people what you thought is the best thing you can do for a small shop.</p>' +
@@ -340,14 +342,16 @@
       var who = [t.who, src.label].filter(Boolean).join(" · ");
       return '<div class="panel review-card">' + reviewStars(t.rating) +
         (t.source==="google"&&reviewRemote&&reviewRemote.mode==="google"?'<p><span class="google-maps-attribution" translate="no">Google Maps</span></p>':'')+
-        '<p class="quote">“' + esc(t.q) + '”</p>' +
+        '<p class="quote">“' + esc(t.q) + '”</p>' + (t.excerpt?'<p class="p-set">Review excerpt</p>':'')+
         (t.authorUrl ? '<a class="review-author" href="'+esc(t.authorUrl)+'" target="_blank" rel="noopener noreferrer">'+(t.photo?'<img src="'+esc(t.photo)+'" alt="" width="32" height="32" loading="lazy">':'')+esc(t.who)+'</a>' : '')+
         '<p class="p-set quote-who">' + (href
           ? '<a href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">' + esc(who) + ' ↗</a>'
           : esc(who)) + (t.at&&Number.isFinite(Date.parse(t.at))?' · '+esc(new Date(t.at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:TL.config.timezone||'America/New_York'})):'')+'</p></div>';
     }).join("");
-    if(reviewRemote && reviewRemote.mode==="google")box.insertAdjacentHTML("beforeend",'<p class="review-attribution">Google-selected reviews ordered by relevance, filtered to '+esc(min)+'+ stars. <a href="'+esc(reviewUrl(reviewRemote.allReviews))+'" target="_blank" rel="noopener">View all reviews</a> · <a href="'+esc(reviewUrl(reviewRemote.terms))+'">Terms</a> · <a href="'+esc(reviewUrl(reviewRemote.privacy))+'">Privacy</a></p>');
-    if(tag){ tag.hidden = false;tag.textContent="Selected positive reviews · "+min+"+ stars, not an overall rating"; }
+    if(reviewRemote && reviewRemote.mode==="google")box.insertAdjacentHTML("beforeend",'<p class="review-attribution">Google-selected reviews ordered by relevance, filtered to five stars. <a href="'+esc(reviewUrl(reviewRemote.allReviews))+'" target="_blank" rel="noopener">View all reviews</a> · <a href="'+esc(reviewUrl(reviewRemote.terms))+'">Terms</a> · <a href="'+esc(reviewUrl(reviewRemote.privacy))+'">Privacy</a></p>');
+    if(verifiedGoogle.length)box.insertAdjacentHTML('beforeend','<p class="review-attribution">Selected five-star Google excerpts · verified '+esc(new Date(reviewGoogleSnapshot.generated).toLocaleDateString())+'. Saved highlights, not a live Google feed or an overall rating.</p>');
+    if(tag){ tag.hidden = false;tag.textContent=min===5?'Selected five-star highlights · not an overall rating':"Selected positive reviews · "+min+"+ stars, not an overall rating"; }
+    var googleLink=reviewUrl(REVIEW_SOURCES.google.link());if(googleLink)box.insertAdjacentHTML('beforeend','<p class="review-attribution"><a href="'+esc(googleLink)+'" target="_blank" rel="noopener noreferrer">Read &amp; leave a Google review ↗</a></p>');
     if(automatic.length)box.insertAdjacentHTML('beforeend','<p class="review-attribution">TCGplayer highlights: recent five-star feedback with short comments. Last refreshed '+esc(new Date(reviewSnapshot.generated).toLocaleDateString())+'. <a href="https://www.tcgplayer.com/sellers/Top-Loaded-TCG/5c356cdf/feedback" target="_blank" rel="noopener noreferrer">Read all feedback ↗</a></p>');
   }
   TL.on("config:change", function(){reviewRemote=null;renderTestimonials();fetchReviews();});

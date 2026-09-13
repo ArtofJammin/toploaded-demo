@@ -1495,6 +1495,7 @@ html.page-hidden .drawer .cart-empty::before{animation-play-state:paused}
   .show-clock,.floor-scroll,.fp-row,.rev-row,.claim-feed{--r:12px}
   .review-author{display:inline-flex;gap:8px;align-items:center}.review-author img{border-radius:50%}.review-attribution{grid-column:1/-1;font-size:.85rem;color:var(--ink2)}
   .claim-cols{display:block}#claimDesk{margin-top:24px}
+  #claimPaymentUrl{display:block;width:100%;min-width:0;margin:12px 0}#claimPaymentResult{margin-top:18px}#claimCatalogResults{display:grid;gap:8px;margin:12px 0}#claimCatalogResults button{text-align:left;white-space:normal;overflow-wrap:anywhere}.claim-entry>div{min-width:0;max-width:100%;overflow-wrap:anywhere}.claim-entry .btn{margin-top:8px;white-space:normal}.claim-entry select{max-width:100%;min-height:44px}
   .google-maps-attribution{display:inline-block;white-space:nowrap;font:400 14px/1.5 sans-serif;letter-spacing:normal;text-transform:none;color:#1f1f1f;background:#fff;padding:2px 7px;border-radius:4px}
   .floor-scroll{overflow:auto;max-width:100%;padding:14px;border:1px solid var(--line);border-radius:var(--r);margin:16px 0;background:var(--surface)}
   .floor-map{--fp-cell:64px;display:grid;gap:6px;width:max-content;min-width:100%;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:70px 70px}
@@ -3441,7 +3442,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
             <div class="field"><label for="vEmail">Email</label><input id="vEmail" name="email" type="email" required autocomplete="email" inputmode="email" maxlength="120"></div>
             <div class="field"><label for="vPhone">Phone <small>(optional)</small></label><input id="vPhone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="24"></div>
             <div class="field"><label for="vTables">Tables</label>
-              <select id="vTables" name="tables"><option value="1">1 table &mdash; $60</option><option value="2">2 tables &mdash; $110</option><option value="3">3 tables &mdash; $150</option></select>
+              <select id="vTables" name="tables"><option value="1">1 table &mdash; $30</option><option value="2">2 tables &mdash; $60</option><option value="3">3 tables &mdash; $90</option></select>
             </div>
             <div class="field full"><label for="vGame">Mostly selling</label>
               <select id="vGame" name="game"><option>Pokemon</option><option>One Piece</option><option>Magic: The Gathering</option><option>Gundam</option><option>Lorcana</option><option>Sports cards</option><option>Mixed / other</option></select>
@@ -3641,7 +3642,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
         <div class="section-head">
           <h2 id="spotHead">Live stream claims</h2>
         </div>
-        <p class="lede" style="max-width:64ch">Claim a card with the host during the stream. Confirmed claims appear below with your public stream handle, the card and its price. Payment and shipping are arranged with the shop.</p>
+        <p class="lede" style="max-width:64ch">Claim a card with the host during the stream. Confirmed claims appear below with your public stream handle, the card and its price. When checkout is connected, the host sends you a secure Square payment link. Only Square-confirmed payments are marked paid; shipping and applicable tax are shown at checkout.</p>
         <div class="claim-cols">
           <section class="claim-feed" aria-labelledby="claimFeedHead">
             <div class="feed-head">
@@ -3660,13 +3661,19 @@ a:hover .round-arrow{transform:rotate(45deg)}
       </div>
       <section class="admin-card" id="claimDesk" hidden aria-labelledby="claimDeskTitle">
         <h2 id="claimDeskTitle">Staff claim desk</h2>
-        <p class="card-note">Post only claims the host has confirmed. Use public handles, never email addresses or shipping information. Posting does not charge the customer or change inventory.</p>
+        <p class="card-note">Post only claims the host has confirmed. Use public handles, never email addresses or shipping information. For checkout, attach the exact Square item variation (including condition/printing) and set aside that physical card. Square tracks inventory when the catalog sale completes; a TCGplayer listing needs its authorized connector or a staff adjustment.</p>
+        <p class="card-note" id="claimCheckoutState" role="status">Payments are not activated yet.</p>
+        <div class="field"><label for="claimCatalogQuery">Find a Square card / SKU</label><input id="claimCatalogQuery" maxlength="100" placeholder="Search the connected sales catalog"><button class="btn btn-ghost" type="button" id="claimCatalogFind">Search Square</button><div id="claimCatalogResults" role="status"></div></div>
         <form id="streamClaimForm"><div class="form-grid">
           <div class="field"><label for="claimCard">Card / printing</label><input id="claimCard" required maxlength="120"></div>
           <div class="field"><label for="claimHandle">Public stream handle</label><input id="claimHandle" required maxlength="40"></div>
           <div class="field"><label for="claimPrice">Agreed price ($)</label><input id="claimPrice" type="number" min="0" max="100000" step=".01" required></div>
+          <div class="field"><label for="claimSquareId">Square variation ID (for checkout)</label><input id="claimSquareId" maxlength="100" placeholder="Exact inventory variation, not the product name"></div>
+          <div class="field"><label for="claimTcgId">TCGplayer product ID (optional check)</label><input id="claimTcgId" inputmode="numeric" pattern="[0-9]{1,12}" maxlength="12"></div>
+          <div class="field"><label for="claimFulfillment">Delivery</label><select id="claimFulfillment"><option value="ship">Ship</option><option value="pickup">Shop pickup</option></select></div>
           <div class="field"><button class="btn" type="submit">Post confirmed claim</button></div>
         </div><p id="claimDeskStatus" role="status"></p></form>
+        <div id="claimPaymentResult" class="panel" hidden><p>Send this link privately to the confirmed buyer. It is not shown on the public board.</p><a id="claimPaymentLink" target="_blank" rel="noopener noreferrer">Open Square checkout ↗</a><input id="claimPaymentUrl" readonly aria-label="Payment link to copy"><button type="button" class="btn btn-ghost" id="claimPaymentCopy">Copy payment link</button></div>
       </section>
       <div class="section" style="padding-bottom:0">
         <div class="section-head"><h2>Stream schedule</h2><span class="demo-tag" id="schedTag">Eastern time</span></div>
@@ -4393,7 +4400,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
   </div>
 </div>
 
-<script id="siteConfig">window.TL_DEFAULT_CONFIG={"title":"Top Loaded","tagline":"Trading Cards · NKY","phone":"(513) 222-2573","phoneRaw":"+15132222573","email":"toploadedtcg@gmail.com","address":{"line1":"2514 Hazelwood Dr","city":"Crescent Springs","state":"KY","zip":"41017"},"timezone":"America/New_York","hours":{"mon":null,"tue":["11:00","18:00"],"wed":["11:00","18:00"],"thu":["11:00","18:00"],"fri":["11:00","18:00"],"sat":["10:00","16:00"],"sun":["10:00","16:00"]},"hoursText":{"wk":"Tue–Fri · 11 AM – 6 PM","we":"Sat–Sun · 10 AM – 4 PM"},"banner":{"on":false,"text":""},"logo":null,"show":{"date":"2026-09-05","start":"10:00","end":"16:00","setup":"08:00","hours":"10 AM – 4 PM","venue":"Hilton Cincinnati Airport","address":"7373 Turfway Rd, Florence, KY 41042","tables":24,"booked":null,"cadence":"First Saturday or Sunday of every month","tablePrices":[{"n":1,"price":60},{"n":2,"price":110},{"n":3,"price":150}],"floorplan":{"room":"hilton-ballroom","rows":6,"cols":10,"booths":[]}},"events":[{"id":"op-wed","day":"Wed","dow":3,"name":"One Piece Locals","small":"Bandai official · winner & participation packs","time":"5:00 PM","start":"17:00","fee":"TBD","game":"op","signup":"tcgplus"},{"id":"op-sat","day":"Sat","dow":6,"name":"One Piece Locals","small":"Bandai official · winner & participation packs","time":"11:00 AM","start":"11:00","fee":"TBD","game":"op","signup":"tcgplus"},{"id":"gd-sat","day":"Sat","dow":6,"name":"Gundam Card Game","small":"Bandai official · winner & participation packs","time":"1:00 PM","start":"13:00","fee":"TBD","game":"gundam","signup":"tcgplus"},{"id":"pk-sun","day":"Sun","dow":0,"name":"Pokemon League","small":"All ages · league promo prizing","time":"11:00 AM","start":"11:00","fee":"TBD","game":"pk","signup":"form"}],"live":{"on":false,"title":"Streaming from the shop floor","platform":"","embed":"","spotPrice":24.99,"spots":12,"packsPerSpot":3,"schedule":[]},"links":{"tcgplus":"https://www.bandai-tcg-plus.com/","facebook":"https://www.facebook.com/toploadedtradingcards","instagram":"https://www.instagram.com/toploadedtcg","tcgplayer":"https://www.tcgplayer.com/sellers/Top-Loaded-TCG/5c356cdf","whatnot":"","googleMaps":"https://www.google.com/maps/search/?api=1&query=Top+Loaded+Trading+Cards+2514+Hazelwood+Dr+Crescent+Springs+KY+41017","appleMaps":"https://maps.apple.com/place?place-id=I96E3F1088FE2244C"},"buy":{"rates":{"bulk":0.55,"standard":0.6,"hot":0.7,"graded":0.8},"creditBonus":0.1},"ticker":[["Charizard ex · 151","$85"],["Umbreon VMAX Alt","$450"],["Shanks OP-09 Leader","$42"],["The One Ring","$40"],["Prismatic ETBs","$70"],["Luffy OP-05 Alt","$88"],["Ragavan MH2","$41"],["Base Set holos","ask"],["Sealed booster boxes","top rates"]],"testimonials":[],"rip":{"prices":{"pk":4.49,"op":4.49,"mtg":5.49}},"reviews":{"tcgplayerAuto":true,"source":"manual","googlePlaceId":"","minRating":4,"items":[]},"updatedAt":null};</script>
+<script id="siteConfig">window.TL_DEFAULT_CONFIG={"title":"Top Loaded","tagline":"Trading Cards · NKY","phone":"(513) 222-2573","phoneRaw":"+15132222573","email":"toploadedtcg@gmail.com","address":{"line1":"2514 Hazelwood Dr","city":"Crescent Springs","state":"KY","zip":"41017"},"timezone":"America/New_York","hours":{"mon":null,"tue":["11:00","18:00"],"wed":["11:00","18:00"],"thu":["11:00","18:00"],"fri":["11:00","18:00"],"sat":["10:00","16:00"],"sun":["10:00","16:00"]},"hoursText":{"wk":"Tue–Fri · 11 AM – 6 PM","we":"Sat–Sun · 10 AM – 4 PM"},"banner":{"on":false,"text":""},"logo":null,"show":{"date":"2026-09-05","start":"10:00","end":"16:00","setup":"08:00","hours":"10 AM – 4 PM","venue":"Hilton Cincinnati Airport","address":"7373 Turfway Rd, Florence, KY 41042","tables":24,"booked":null,"cadence":"First Saturday or Sunday of every month","tablePrices":[{"n":1,"price":30},{"n":2,"price":60},{"n":3,"price":90}],"floorplan":{"room":"hilton-ballroom","rows":6,"cols":10,"booths":[]}},"events":[{"id":"op-wed","day":"Wed","dow":3,"name":"One Piece Locals","small":"Bandai official · winner & participation packs","time":"5:00 PM","start":"17:00","fee":"TBD","game":"op","signup":"tcgplus"},{"id":"op-sat","day":"Sat","dow":6,"name":"One Piece Locals","small":"Bandai official · winner & participation packs","time":"11:00 AM","start":"11:00","fee":"TBD","game":"op","signup":"tcgplus"},{"id":"gd-sat","day":"Sat","dow":6,"name":"Gundam Card Game","small":"Bandai official · winner & participation packs","time":"1:00 PM","start":"13:00","fee":"TBD","game":"gundam","signup":"tcgplus"},{"id":"pk-sun","day":"Sun","dow":0,"name":"Pokemon League","small":"All ages · league promo prizing","time":"11:00 AM","start":"11:00","fee":"TBD","game":"pk","signup":"form"}],"live":{"on":false,"title":"Streaming from the shop floor","platform":"","embed":"","spotPrice":24.99,"spots":12,"packsPerSpot":3,"schedule":[]},"links":{"tcgplus":"https://www.bandai-tcg-plus.com/","facebook":"https://www.facebook.com/toploadedtradingcards","instagram":"https://www.instagram.com/toploadedtcg","tcgplayer":"https://www.tcgplayer.com/sellers/Top-Loaded-TCG/5c356cdf","whatnot":"","googleMaps":"https://www.google.com/maps/search/?api=1&query=Top+Loaded+Trading+Cards+2514+Hazelwood+Dr+Crescent+Springs+KY+41017","googleReviews":"https://share.google/ESpQQCzYsIL1Ffqo8","appleMaps":"https://maps.apple.com/place?place-id=I96E3F1088FE2244C"},"buy":{"rates":{"bulk":0.55,"standard":0.6,"hot":0.7,"graded":0.8},"creditBonus":0.1},"ticker":[["Charizard ex · 151","$85"],["Umbreon VMAX Alt","$450"],["Shanks OP-09 Leader","$42"],["The One Ring","$40"],["Prismatic ETBs","$70"],["Luffy OP-05 Alt","$88"],["Ragavan MH2","$41"],["Base Set holos","ask"],["Sealed booster boxes","top rates"]],"testimonials":[],"rip":{"prices":{"pk":4.49,"op":4.49,"mtg":5.49}},"reviews":{"tcgplayerAuto":true,"source":"google","googlePlaceId":"","minRating":5,"items":[]},"updatedAt":null};</script>
 <script id="cardArtData"></script>
 <script>
 (function(){
@@ -5442,7 +5449,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
      Worker is deployed with a key). Nothing is ever invented: with no reviews on file
      the section invites customers to read and leave real ones instead. */
   var REVIEW_SOURCES = {
-    google: {label: "Google review", link: function(){ return (TL.config.links && TL.config.links.googleMaps) || ""; }},
+    google: {label: "Google review", link: function(){ return (TL.config.links && (TL.config.links.googleReviews || TL.config.links.googleMaps)) || ""; }},
     tcgplayer: {label: "TCGplayer feedback", link: function(){ return (TL.config.links && TL.config.links.tcgplayer) || ""; }},
     shop: {label: "In the shop", link: function(){ return ""; }}
   };
@@ -5451,8 +5458,9 @@ a:hover .round-arrow{transform:rotate(45deg)}
     if(!n) return "";
     return '<span class="review-stars" aria-label="' + n + ' out of 5">' + new Array(n + 1).join("★") + '</span>';
   }
-  var reviewRemote=null,reviewFetchKey="",reviewSnapshot=null;
+  var reviewRemote=null,reviewFetchKey="",reviewSnapshot=null,reviewGoogleSnapshot=null;
   TL.on('init',function(){
+    fetch('reviews-google.json',{cache:'no-cache'}).then(function(r){if(!r.ok)throw new Error('Google highlights unavailable');return r.json();}).then(function(d){if(d.fid==='0x8841b71c55b9061f:0x3e80278544b6ed21'&&Array.isArray(d.items)&&d.items.length<=3&&d.items.every(function(t){return t.rating===5&&t.source==='google';})){reviewGoogleSnapshot=d;renderTestimonials();}}).catch(function(){});
     fetch('reviews-tcgplayer.json',{cache:'no-cache'}).then(function(r){if(!r.ok)throw new Error('Review feed unavailable');return r.json();}).then(function(d){
       if(d.sellerKey==='5c356cdf'&&Array.isArray(d.items)&&d.items.length<=3){reviewSnapshot=d;renderTestimonials();}
     }).catch(function(){/* Curated reviews/source links remain available. */});
@@ -5469,16 +5477,17 @@ a:hover .round-arrow{transform:rotate(45deg)}
     if(!box) return;
     var cfg = (TL.config && TL.config.reviews) || {};
     var min = Number(cfg.minRating || 0);
-    var supplied = reviewRemote ? reviewRemote.items : Array.isArray(cfg.items) ? cfg.items : [];
+    var verifiedGoogle=cfg.source==='google'&&(!reviewRemote||reviewRemote.mode!=='google')&&reviewGoogleSnapshot&&Date.now()-Date.parse(reviewGoogleSnapshot.generated)<30*86400000?reviewGoogleSnapshot.items:[];
+    var supplied = verifiedGoogle.concat(reviewRemote ? reviewRemote.items : Array.isArray(cfg.items) ? cfg.items : []);
     var automatic = cfg.tcgplayerAuto!==false && reviewSnapshot && Date.now()-Date.parse(reviewSnapshot.generated)<30*86400000 ? reviewSnapshot.items : [];
     var reviewSeen={};
     var list = supplied.concat(automatic).filter(function(t){var k=t.source+'|'+t.quote+'|'+t.who;if(reviewSeen[k])return false;reviewSeen[k]=true;return true;}).map(function(t){
       return {q: t.quote || t.text || "", who: t.who || t.name || "", rating: Number(t.rating || 0),
-        source: REVIEW_SOURCES[t.source] ? t.source : "shop", url: reviewUrl(t.url),authorUrl:reviewUrl(t.authorUrl),photo:reviewUrl(t.photo),at:t.at};
-    }).filter(function(t){ return t.q && t.rating >= min; }).slice(0, 6);
+        source: REVIEW_SOURCES[t.source] ? t.source : "shop", url: reviewUrl(t.url),authorUrl:reviewUrl(t.authorUrl),photo:reviewUrl(t.photo),at:t.at,excerpt:!!t.excerpt};
+    }).filter(function(t){ return t.q && t.rating >= min && (t.source!=='google'||t.rating===5); }).slice(0, 6);
 
     if(!list.length){
-      var g = (TL.config.links && TL.config.links.googleMaps) || "", tcg = (TL.config.links && TL.config.links.tcgplayer) || "";
+      var g = REVIEW_SOURCES.google.link(), tcg = (TL.config.links && TL.config.links.tcgplayer) || "";
       box.innerHTML = '<div class="panel review-empty">' +
         '<p class="quote">Reviews from Google and TCGplayer land here.</p>' +
         '<p class="p-set quote-who">Been in lately? Telling people what you thought is the best thing you can do for a small shop.</p>' +
@@ -5494,14 +5503,16 @@ a:hover .round-arrow{transform:rotate(45deg)}
       var who = [t.who, src.label].filter(Boolean).join(" · ");
       return '<div class="panel review-card">' + reviewStars(t.rating) +
         (t.source==="google"&&reviewRemote&&reviewRemote.mode==="google"?'<p><span class="google-maps-attribution" translate="no">Google Maps</span></p>':'')+
-        '<p class="quote">“' + esc(t.q) + '”</p>' +
+        '<p class="quote">“' + esc(t.q) + '”</p>' + (t.excerpt?'<p class="p-set">Review excerpt</p>':'')+
         (t.authorUrl ? '<a class="review-author" href="'+esc(t.authorUrl)+'" target="_blank" rel="noopener noreferrer">'+(t.photo?'<img src="'+esc(t.photo)+'" alt="" width="32" height="32" loading="lazy">':'')+esc(t.who)+'</a>' : '')+
         '<p class="p-set quote-who">' + (href
           ? '<a href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">' + esc(who) + ' ↗</a>'
           : esc(who)) + (t.at&&Number.isFinite(Date.parse(t.at))?' · '+esc(new Date(t.at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:TL.config.timezone||'America/New_York'})):'')+'</p></div>';
     }).join("");
-    if(reviewRemote && reviewRemote.mode==="google")box.insertAdjacentHTML("beforeend",'<p class="review-attribution">Google-selected reviews ordered by relevance, filtered to '+esc(min)+'+ stars. <a href="'+esc(reviewUrl(reviewRemote.allReviews))+'" target="_blank" rel="noopener">View all reviews</a> · <a href="'+esc(reviewUrl(reviewRemote.terms))+'">Terms</a> · <a href="'+esc(reviewUrl(reviewRemote.privacy))+'">Privacy</a></p>');
-    if(tag){ tag.hidden = false;tag.textContent="Selected positive reviews · "+min+"+ stars, not an overall rating"; }
+    if(reviewRemote && reviewRemote.mode==="google")box.insertAdjacentHTML("beforeend",'<p class="review-attribution">Google-selected reviews ordered by relevance, filtered to five stars. <a href="'+esc(reviewUrl(reviewRemote.allReviews))+'" target="_blank" rel="noopener">View all reviews</a> · <a href="'+esc(reviewUrl(reviewRemote.terms))+'">Terms</a> · <a href="'+esc(reviewUrl(reviewRemote.privacy))+'">Privacy</a></p>');
+    if(verifiedGoogle.length)box.insertAdjacentHTML('beforeend','<p class="review-attribution">Selected five-star Google excerpts · verified '+esc(new Date(reviewGoogleSnapshot.generated).toLocaleDateString())+'. Saved highlights, not a live Google feed or an overall rating.</p>');
+    if(tag){ tag.hidden = false;tag.textContent=min===5?'Selected five-star highlights · not an overall rating':"Selected positive reviews · "+min+"+ stars, not an overall rating"; }
+    var googleLink=reviewUrl(REVIEW_SOURCES.google.link());if(googleLink)box.insertAdjacentHTML('beforeend','<p class="review-attribution"><a href="'+esc(googleLink)+'" target="_blank" rel="noopener noreferrer">Read &amp; leave a Google review ↗</a></p>');
     if(automatic.length)box.insertAdjacentHTML('beforeend','<p class="review-attribution">TCGplayer highlights: recent five-star feedback with short comments. Last refreshed '+esc(new Date(reviewSnapshot.generated).toLocaleDateString())+'. <a href="https://www.tcgplayer.com/sellers/Top-Loaded-TCG/5c356cdf/feedback" target="_blank" rel="noopener noreferrer">Read all feedback ↗</a></p>');
   }
   TL.on("config:change", function(){reviewRemote=null;renderTestimonials();fetchReviews();});
@@ -8955,17 +8966,20 @@ a:hover .round-arrow{transform:rotate(45deg)}
   TL.live.nextStream = lvNextStream;
 
   (function(){
-    var rows=[],timer=null,busy=false,lastSig="",active=false;
+    var rows=[],timer=null,busy=false,lastSig="",active=false,checkoutReady=false,catalogResults=[];
+    function checkoutStatus(){if(!TL.api.online)return;TL.api.get('/live/checkout/status',{noAuth:true}).then(function(d){checkoutReady=!!d.ready;$('#claimCheckoutState').textContent=d.reason+(d.mode==='sandbox'?' Sandbox only — no real payments.':'');render();}).catch(function(){checkoutReady=false;$('#claimCheckoutState').textContent='Payment connection could not be checked.';});}
+    function controls(c){if(!staff())return '';var states=c.paymentManaged?(c.status==='paid'?['paid','shipped']:[c.status]):['claimed','paid','shipped','cancelled'];return '<br><select data-claim-status="'+esc(c.id)+'" aria-label="Status of '+esc(c.card)+'">'+states.map(function(s){return '<option'+(s===c.status?' selected':'')+'>'+s+'</option>';}).join('')+'</select>'+(c.payable&&c.status==='claimed'?'<br><button type="button" class="btn btn-ghost" data-claim-pay="'+esc(c.id)+'"'+(!checkoutReady?' disabled':'')+'>Get payment link</button>':'')+(c.paymentManaged&&c.status==='claimed'?'<button type="button" class="btn btn-ghost" data-claim-cancel="'+esc(c.id)+'">Cancel unpaid checkout</button>':'');}
     function staff(){return TL.api.online && (TL.api.role==="staff"||TL.api.role==="admin");}
     function render(){
       var list=$("#claimFeed"),empty=$("#claimFeedEmpty"),note=$("#claimFeedNote");
       $("#claimDesk").hidden=!staff();
-      var sig=JSON.stringify(rows)+staff();if(sig!==lastSig){
-        lastSig=sig;list.innerHTML=rows.map(function(c){return '<li class="claim-entry"><div><b>'+esc(c.card)+'</b><br><small>'+esc(c.handle)+' · '+esc(new Date(c.at).toLocaleString())+'</small></div><div>'+money(c.price)+' · '+esc(c.status)+(staff()?'<br><select data-claim-status="'+esc(c.id)+'" aria-label="Status of '+esc(c.card)+'">'+["claimed","paid","shipped","cancelled"].map(function(s){return '<option'+(s===c.status?' selected':'')+'>'+s+'</option>';}).join("")+'</select>':'')+'</div></li>';}).join("");
+      if(!staff()){$('#claimPaymentResult').hidden=true;$('#claimPaymentUrl').value='';$('#claimPaymentLink').removeAttribute('href');}
+      var sig=JSON.stringify(rows)+staff()+checkoutReady;if(sig!==lastSig){
+        lastSig=sig;list.innerHTML=rows.map(function(c){return '<li class="claim-entry"><div><b>'+esc(c.card)+'</b><br><small>'+esc(c.handle)+' · '+esc(new Date(c.at).toLocaleString())+'</small></div><div>'+money(c.price)+' · '+esc(c.status)+controls(c)+'</div></li>';}).join("");
       }
       empty.hidden=!!rows.length;$("#claimCount").textContent=rows.length?rows.length+" posted":"";
       empty.textContent=TL.api.online?"No confirmed card claims posted yet.":"The shared claims board is not connected yet. Follow the stream host for claim confirmations.";
-      note.hidden=false;note.textContent=TL.api.online?"Refreshes every 5 seconds while this page is open. Posted statuses are maintained by staff.":"No sample or device-only claims are displayed as real purchases.";
+      note.hidden=false;note.textContent=TL.api.online?"Refreshes every 5 seconds. Linked checkout payments are confirmed by Square; fulfillment and non-checkout claims are maintained by staff.":"No sample or device-only claims are displayed as real purchases.";
     }
     function refresh(){
       render();if(!active || document.hidden || busy || !TL.api.online)return;
@@ -8977,15 +8991,21 @@ a:hover .round-arrow{transform:rotate(45deg)}
     function start(){clearInterval(timer);refresh();if(active&&!document.hidden)timer=setInterval(refresh,5000);}
     TL.on("view:change",function(d){if(!d||d.name!=="live")return;active=true;start();});
     TL.on("view:leave",function(d){if(d&&d.name==="live"){active=false;clearInterval(timer);}});
-    TL.on("api:ready",start);TL.on("auth:change",render);TL.on("init",render);
+    TL.on("api:ready",function(){checkoutStatus();start();});TL.on("auth:change",function(){checkoutStatus();render();});TL.on("init",render);
     document.addEventListener("visibilitychange",start);
     $("#streamClaimForm").addEventListener("submit",function(e){
       e.preventDefault();if(!staff())return;var form=this,btn=form.querySelector("button"),st=$("#claimDeskStatus");btn.disabled=true;
-      TL.api.post("/live/claims",{card:$("#claimCard").value.trim(),handle:$("#claimHandle").value.trim(),price:Number($("#claimPrice").value)})
+      TL.api.post("/live/claims",{card:$("#claimCard").value.trim(),handle:$("#claimHandle").value.trim(),price:Number($("#claimPrice").value),squareVariationId:$('#claimSquareId').value.trim(),tcgProductId:$('#claimTcgId').value.trim(),fulfillment:$('#claimFulfillment').value})
         .then(function(){form.reset();st.textContent="Confirmed claim posted.";refresh();})
         .catch(function(e){st.textContent=e.error||"Could not post the claim. Retry when connected.";}).finally(function(){btn.disabled=false;});
     });
     $("#claimFeed").addEventListener("change",function(e){var sel=e.target.closest("[data-claim-status]");if(!sel||!staff())return;sel.disabled=true;TL.api.put("/live/claims/"+encodeURIComponent(sel.dataset.claimStatus),{status:sel.value}).then(refresh).catch(function(){toast("Claim status was not saved");lastSig="";render();}).finally(function(){sel.disabled=false;});});
+    $('#claimFeed').addEventListener('click',function(e){var btn=e.target.closest('[data-claim-pay],[data-claim-cancel]');if(!btn||!staff())return;var cancel=btn.hasAttribute('data-claim-cancel'),id=cancel?btn.dataset.claimCancel:btn.dataset.claimPay;if(cancel&&!confirm('Cancel this unpaid Square checkout? The payment link will stop accepting payment.'))return;btn.disabled=true;
+      TL.api.post('/live/claims/'+encodeURIComponent(id)+(cancel?'/cancel-checkout':'/checkout'),{}).then(function(d){if(cancel){$('#claimPaymentResult').hidden=true;toast('Unpaid checkout cancelled');}else{var u=new URL(d.url);if(u.protocol!=='https:'||!/(^|\.)square\.(link|site)$/.test(u.hostname))throw new Error('Unexpected checkout link');$('#claimPaymentLink').href=u.href;$('#claimPaymentUrl').value=u.href;$('#claimPaymentResult').hidden=false;$('#claimPaymentUrl').focus();$('#claimDeskStatus').textContent=d.mode==='sandbox'?'Sandbox link — no real money.':'Share privately with the confirmed buyer. Square will confirm payment.';}refresh();}).catch(function(err){toast(err.error||err.message||'Checkout could not be prepared');}).finally(function(){btn.disabled=false;});
+    });
+    $('#claimPaymentCopy').addEventListener('click',function(){var input=$('#claimPaymentUrl');if(navigator.clipboard)navigator.clipboard.writeText(input.value).then(function(){toast('Payment link copied');}).catch(function(){input.focus();input.select();});else{input.focus();input.select();}});
+    $('#claimCatalogFind').addEventListener('click',function(){if(!staff())return;var btn=this,el=$('#claimCatalogResults'),q=$('#claimCatalogQuery').value.trim();if(q.length<2){el.textContent='Enter at least two characters.';return;}btn.disabled=true;el.textContent='Searching Square…';TL.api.get('/live/catalog?q='+encodeURIComponent(q)).then(function(d){catalogResults=d.items||[];el.innerHTML=catalogResults.length?catalogResults.map(function(c,i){return '<button class="btn btn-ghost" type="button" data-claim-item="'+i+'">'+esc(c.name)+(c.sku?' · '+esc(c.sku):'')+(c.price>0?' · '+money(c.price):'')+'</button>';}).join('')+(d.more?'<p>Narrow the search for more specific results.</p>':''):'No tracked variations matched. Try the exact SKU.';}).catch(function(e){el.textContent=e.error||'Square catalog unavailable.';}).finally(function(){btn.disabled=false;});});
+    $('#claimCatalogResults').addEventListener('click',function(e){var b=e.target.closest('[data-claim-item]'),c=b&&catalogResults[Number(b.dataset.claimItem)];if(!c)return;$('#claimSquareId').value=c.variationId;$('#claimTcgId').value=c.tcgProductId||'';$('#claimCard').value=c.name;if(c.price>0)$('#claimPrice').value=c.price.toFixed(2);$('#claimDeskStatus').textContent='Selected '+c.name+'. Check condition/printing and the agreed price before posting.';$('#claimHandle').focus();});
   })();
 
   /* ---------- play nights · card show · visit · footer ----------
@@ -10952,7 +10972,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
   function renderRevSourceNote(){
     var el = $("#revSourceNote"); if(!el) return;
     el.textContent = val("setRevSource") === "google"
-      ? "Automatic Google reviews need the shared API, a Places key, the shop's Place ID, and published terms/privacy links. TCGplayer highlights refresh independently when enabled below."
+      ? "Google reviews are five-star only. Automatic updates need the shared API, a Places key, the shop's Place ID, and published terms/privacy links. Until connected, dated, verified Google excerpts can appear for up to 30 days. TCGplayer highlights refresh independently."
       : "The reviews below are owner-curated. Automatically refreshed TCGplayer highlights can appear alongside them when enabled below.";
   }
   function renderRevPreview(){

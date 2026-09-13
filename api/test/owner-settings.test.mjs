@@ -59,7 +59,7 @@ test('Google feed keeps source attribution, filters ratings and never exposes th
   const original=globalThis.fetch;let requested;
   globalThis.fetch=async(url,opts)=>{requested={url,opts};return new Response(JSON.stringify({googleMapsUri:'https://maps.google.com/place',reviews:[
     {rating:5,text:{text:'Test-only positive fixture'},googleMapsUri:'https://maps.google.com/review/1',authorAttribution:{displayName:'Test Author',uri:'https://maps.google.com/profile/1',photoUri:'https://example.com/avatar.png'}},
-    {rating:2,text:{text:'Test-only lower rating'}}]}));};
+    {rating:4,text:{text:'Test-only four-star fixture'}},{rating:2,text:{text:'Test-only lower rating'}}]}));};
   try{
     const result=await client(env).get('/reviews');assert.equal(result.status,200);assert.equal(result.data.items.length,1);
     assert.equal(result.data.items[0].authorUrl,'https://maps.google.com/profile/1');assert.equal(result.data.items[0].url,'https://maps.google.com/review/1');

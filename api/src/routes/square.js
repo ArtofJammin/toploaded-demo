@@ -12,6 +12,7 @@ import { getJSON, putJSON, pushList } from '../lib/kv.js';
 import { verifyWebhookSignature, retrieveOrder } from '../lib/square.js';
 import * as alertsModule from './alerts.js';
 import { scheduleSaleCheck } from '../lib/sale-checks.js';
+import {settleClaimPayment} from '../lib/claim-checkout.js';
 
 const EVENT_TTL = 7 * 24 * 3600;
 const COALESCE_SEC = 3600;
@@ -98,6 +99,21 @@ async function onPaymentUpdated(env, event) {
   const ours = ref && ref.id ? await getJSON(env.KV, `order:${ref.id}`, null) : null;
 
   if (status === 'COMPLETED') {
+    // Claim checkout is linked to a real catalog variation. Verify the full Square
+    // order before changing the board; Square owns its inventory adjustment.
+    if(ours?.claimId || env.CLAIM_CHECKOUT_ENABLED==='true'){
+      const full=await retrieveOrder(env,sqOrderId);
+      if(!full && (ours?.claimId || env.CLAIM_CHECKOUT_ENABLED==='true'))throw new HttpError(503,'Cannot verify the completed Square order');
+      const claimOrder=await settleClaimPayment(env,p,full);
+      if(claimOrder){
+        await scheduleSaleCheck(env,p,claimOrder);
+        const record={...(ours||claimOrder),status:'paid',paymentId:p.id,paidAt:ours?.paidAt||new Date().toISOString(),total:Number(full.total_money.amount)/100};
+        await putJSON(env.KV,'order:'+record.id,record,{expirationTtl:EVENT_TTL});
+        await putJSON(env.KV,'order:sq:'+sqOrderId,{id:record.id},{expirationTtl:EVENT_TTL});
+        await appendAlert(env,{ch:'TCGplayer',source:'square:payment.updated',msg:'Paid stream claim: '+claimOrder.lines[0].name+' — Square tracks the catalog sale. Confirm the corresponding TCGplayer listing is adjusted.',orderId:claimOrder.id});
+        return 1;
+      }
+    }
     await scheduleSaleCheck(env, p, ours);
     if (ours) {
       ours.status = 'paid';
@@ -115,7 +131,7 @@ async function onPaymentUpdated(env, event) {
       source: 'square:payment.updated', squareOrderId: sqOrderId });
     return 1;
   }
-  if ((status === 'FAILED' || status === 'CANCELED') && ours) {
+  if ((status === 'FAILED' || status === 'CANCELED') && ours && ours.status!=='paid' && !ours.claimId) {
     ours.status = 'failed';
     ours.error = `payment ${status.toLowerCase()}`;
     await putJSON(env.KV, `order:${ours.id}`, ours, { expirationTtl: EVENT_TTL });

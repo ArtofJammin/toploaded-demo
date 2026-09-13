@@ -61,15 +61,15 @@
     "tablePrices": [
       {
         "n": 1,
-        "price": 60
+        "price": 30
       },
       {
         "n": 2,
-        "price": 110
+        "price": 60
       },
       {
         "n": 3,
-        "price": 150
+        "price": 90
       }
     ],
     "floorplan": {
@@ -146,6 +146,7 @@
     "tcgplayer": "https://www.tcgplayer.com/sellers/Top-Loaded-TCG/5c356cdf",
     "whatnot": "",
     "googleMaps": "https://www.google.com/maps/search/?api=1&query=Top+Loaded+Trading+Cards+2514+Hazelwood+Dr+Crescent+Springs+KY+41017",
+    "googleReviews": "https://share.google/ESpQQCzYsIL1Ffqo8",
     "appleMaps": "https://maps.apple.com/place?place-id=I96E3F1088FE2244C"
   },
   "buy": {
@@ -205,9 +206,9 @@
   },
   "reviews": {
     "tcgplayerAuto": true,
-    "source": "manual",
+    "source": "google",
     "googlePlaceId": "",
-    "minRating": 4,
+    "minRating": 5,
     "items": []
   },
   "updatedAt": null

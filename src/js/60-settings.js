@@ -444,7 +444,7 @@
   function renderRevSourceNote(){
     var el = $("#revSourceNote"); if(!el) return;
     el.textContent = val("setRevSource") === "google"
-      ? "Automatic Google reviews need the shared API, a Places key, the shop's Place ID, and published terms/privacy links. TCGplayer highlights refresh independently when enabled below."
+      ? "Google reviews are five-star only. Automatic updates need the shared API, a Places key, the shop's Place ID, and published terms/privacy links. Until connected, dated, verified Google excerpts can appear for up to 30 days. TCGplayer highlights refresh independently."
       : "The reviews below are owner-curated. Automatically refreshed TCGplayer highlights can appear alongside them when enabled below.";
   }
   function renderRevPreview(){

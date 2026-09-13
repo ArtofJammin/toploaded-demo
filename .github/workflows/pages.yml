@@ -44,7 +44,7 @@ jobs:
           mkdir _site
           cp index.html inventory.json inventory-summary.json favicon.png logo-dark.png logo-light.png og-image.png _site/
           cp catalog-*.json _site/
-          cp reviews-tcgplayer.json _site/
+          cp reviews-tcgplayer.json reviews-google.json _site/
           mkdir _site/venue-plans
           cp venue-plans/hilton-first-floor.svg venue-plans/hilton-first-floor.json _site/venue-plans/
           touch _site/.nojekyll

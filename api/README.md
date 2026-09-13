@@ -37,6 +37,12 @@ Copy `api/.dev.vars.example` to `api/.dev.vars` to add real keys.
 
 Tests: `node --test "api/test/*.test.mjs"`
 
+## Catalog-linked live-claim checkout (disabled until connected)
+
+See [sales connection and acceptance](../SALES-CONNECTION.md). `GET /live/checkout/status` reports readiness; `GET /live/catalog?q=` (staff) searches Square variations. `POST /live/claims` may include `squareVariationId`, `tcgProductId` and `fulfillment`. Staff then call `POST /live/claims/:id/checkout` for the private payment link, or `POST /live/claims/:id/cancel-checkout` to cancel an unpaid link. `CLAIM_CHECKOUT_ENABLED=true`, Square, signed webhooks and shared storage are required. Public claims exclude Square IDs and checkout URLs. Payment confirmation is automated only for these linked claims; Square performs their inventory adjustment, not a second manual decrement. The existing ad-hoc `/checkout` cart is unchanged.
+
+`reviews-google.json` contains dated excerpts verified from the public business listing, not Places API content. Google API responses are not persisted. Automatic Google review fetching still requires the Places configuration; its five-star filter cannot be lowered by the general minimum-rating setting.
+
 ## Deploy
 
 ```bash

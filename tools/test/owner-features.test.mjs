@@ -58,6 +58,23 @@ test('requested removals, section ordering and public catalog are packaged',()=>
   assert.match(read('.github/workflows/pages.yml'),/cp catalog-\*\.json _site/);
 });
 
+test('owner wording, show countdown placement and confirmed $30 table pricing remain intact',()=>{
+  const cfg=JSON.parse(read('config.default.json')),show=read('src/html/12-show.html'),live=read('src/html/15-live.html'),home=read('src/html/10-home.html');
+  assert.deepEqual(cfg.show.tablePrices,[{n:1,price:30},{n:2,price:60},{n:3,price:90}]);
+  assert.ok(show.indexOf('id="showCountdown"')<show.indexOf('class="show-hero"'));
+  assert.doesNotMatch(live,/Rip &amp; Ship|Pre-claim|Live breaks/i);assert.match(live,/Streaming from the shop floor/);assert.match(live,/Shipped within two business days/);
+  assert.match(home,/In the case right now/);assert.doesNotMatch(home,/The good stuff, in stock/i);
+  assert.match(read('src/html/19-packrip.html'),/Simulation only\. No real pack is opened/);
+  assert.match(read('src/js/94-collector.js'),/TL\.cards\.fromSet/);assert.match(read('src/js/58-packrip.js'),/TL\.cards\.fromSet/);
+});
+
+test('Google fallback contains only attributed five-star excerpts within the quotation limit',()=>{
+  const d=JSON.parse(read('reviews-google.json'));assert.equal(d.fid,'0x8841b71c55b9061f:0x3e80278544b6ed21');
+  assert.ok(d.items.length>0);assert.ok(d.items.every(r=>r.rating===5&&r.source==='google'&&r.who&&r.authorUrl&&r.url.includes(d.fid)&&r.excerpt));
+  assert.ok(d.items.reduce((n,r)=>n+r.quote.split(/\s+/).length,0)<=25);
+  assert.match(read('.github/workflows/pages.yml'),/reviews-google\.json/);
+});
+
 test('visual booth placement rejects collisions and off-floor moves without excluding adjacent booths',()=>{
   const c={TL:{on(){}}};vm.createContext(c);vm.runInContext(read('src/js/56-floorplan.js'),c);
   const f=c.TL.floorplan,size={rows:6,cols:10},booths=[{r:1,c:1,w:2,h:1},{r:1,c:3,w:1,h:1}];

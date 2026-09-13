@@ -1,0 +1,28 @@
+{
+  "business": "Top Loaded Trading Cards",
+  "fid": "0x8841b71c55b9061f:0x3e80278544b6ed21",
+  "generated": "2026-09-13T07:45:31Z",
+  "mode": "verified-excerpts",
+  "source": "https://share.google/ESpQQCzYsIL1Ffqo8",
+  "selection": "Selected five-star excerpts verified on the public Google business listing; not a live feed or an overall rating.",
+  "items": [
+    {
+      "quote": "Great place to sell and buy cards, some of the nicest people ever",
+      "who": "Everett Rayburn",
+      "rating": 5,
+      "source": "google",
+      "url": "https://www.google.com/maps/reviews/data=!4m5!14m4!1m3!1m2!1s114351114355107641377!2s0x8841b71c55b9061f:0x3e80278544b6ed21",
+      "authorUrl": "https://www.google.com/maps/contrib/114351114355107641377",
+      "excerpt": true
+    },
+    {
+      "quote": "Would highly recommend stopping in for their variety.",
+      "who": "Savannah Zerbe",
+      "rating": 5,
+      "source": "google",
+      "url": "https://www.google.com/maps/reviews/data=!4m5!14m4!1m3!1m2!1s106678820742609539787!2s0x8841b71c55b9061f:0x3e80278544b6ed21",
+      "authorUrl": "https://www.google.com/maps/contrib/106678820742609539787",
+      "excerpt": true
+    }
+  ]
+}

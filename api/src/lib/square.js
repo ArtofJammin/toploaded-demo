@@ -72,6 +72,7 @@ export async function createPaymentLink(env, { lines, fulfillment, email, note, 
     name: String(l.name).slice(0, 120),
     quantity: String(l.qty),
     base_price_money: { amount: l.cents, currency: 'USD' },
+    ...(l.catalogObjectId ? { catalog_object_id: l.catalogObjectId } : {}),
     ...(l.note ? { note: String(l.note).slice(0, 200) } : {}),
   }));
   if (fulfillment === 'ship' && shippingCents > 0) {
@@ -81,6 +82,7 @@ export async function createPaymentLink(env, { lines, fulfillment, email, note, 
     location_id: env.SQUARE_LOCATION_ID,
     reference_id: ref,
     line_items: lineItems,
+    ...(lines.some(l => l.catalogObjectId) ? { pricing_options: { auto_apply_taxes: true } } : {}),
   };
   if (fulfillment === 'pickup') {
     order.fulfillments = [{

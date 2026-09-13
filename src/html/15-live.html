@@ -77,7 +77,7 @@
         <div class="section-head">
           <h2 id="spotHead">Live stream claims</h2>
         </div>
-        <p class="lede" style="max-width:64ch">Claim a card with the host during the stream. Confirmed claims appear below with your public stream handle, the card and its price. Payment and shipping are arranged with the shop.</p>
+        <p class="lede" style="max-width:64ch">Claim a card with the host during the stream. Confirmed claims appear below with your public stream handle, the card and its price. When checkout is connected, the host sends you a secure Square payment link. Only Square-confirmed payments are marked paid; shipping and applicable tax are shown at checkout.</p>
         <div class="claim-cols">
           <section class="claim-feed" aria-labelledby="claimFeedHead">
             <div class="feed-head">
@@ -96,13 +96,19 @@
       </div>
       <section class="admin-card" id="claimDesk" hidden aria-labelledby="claimDeskTitle">
         <h2 id="claimDeskTitle">Staff claim desk</h2>
-        <p class="card-note">Post only claims the host has confirmed. Use public handles, never email addresses or shipping information. Posting does not charge the customer or change inventory.</p>
+        <p class="card-note">Post only claims the host has confirmed. Use public handles, never email addresses or shipping information. For checkout, attach the exact Square item variation (including condition/printing) and set aside that physical card. Square tracks inventory when the catalog sale completes; a TCGplayer listing needs its authorized connector or a staff adjustment.</p>
+        <p class="card-note" id="claimCheckoutState" role="status">Payments are not activated yet.</p>
+        <div class="field"><label for="claimCatalogQuery">Find a Square card / SKU</label><input id="claimCatalogQuery" maxlength="100" placeholder="Search the connected sales catalog"><button class="btn btn-ghost" type="button" id="claimCatalogFind">Search Square</button><div id="claimCatalogResults" role="status"></div></div>
         <form id="streamClaimForm"><div class="form-grid">
           <div class="field"><label for="claimCard">Card / printing</label><input id="claimCard" required maxlength="120"></div>
           <div class="field"><label for="claimHandle">Public stream handle</label><input id="claimHandle" required maxlength="40"></div>
           <div class="field"><label for="claimPrice">Agreed price ($)</label><input id="claimPrice" type="number" min="0" max="100000" step=".01" required></div>
+          <div class="field"><label for="claimSquareId">Square variation ID (for checkout)</label><input id="claimSquareId" maxlength="100" placeholder="Exact inventory variation, not the product name"></div>
+          <div class="field"><label for="claimTcgId">TCGplayer product ID (optional check)</label><input id="claimTcgId" inputmode="numeric" pattern="[0-9]{1,12}" maxlength="12"></div>
+          <div class="field"><label for="claimFulfillment">Delivery</label><select id="claimFulfillment"><option value="ship">Ship</option><option value="pickup">Shop pickup</option></select></div>
           <div class="field"><button class="btn" type="submit">Post confirmed claim</button></div>
         </div><p id="claimDeskStatus" role="status"></p></form>
+        <div id="claimPaymentResult" class="panel" hidden><p>Send this link privately to the confirmed buyer. It is not shown on the public board.</p><a id="claimPaymentLink" target="_blank" rel="noopener noreferrer">Open Square checkout ↗</a><input id="claimPaymentUrl" readonly aria-label="Payment link to copy"><button type="button" class="btn btn-ghost" id="claimPaymentCopy">Copy payment link</button></div>
       </section>
       <div class="section" style="padding-bottom:0">
         <div class="section-head"><h2>Stream schedule</h2><span class="demo-tag" id="schedTag">Eastern time</span></div>

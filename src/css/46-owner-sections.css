@@ -3,6 +3,7 @@
   .show-clock,.floor-scroll,.fp-row,.rev-row,.claim-feed{--r:12px}
   .review-author{display:inline-flex;gap:8px;align-items:center}.review-author img{border-radius:50%}.review-attribution{grid-column:1/-1;font-size:.85rem;color:var(--ink2)}
   .claim-cols{display:block}#claimDesk{margin-top:24px}
+  #claimPaymentUrl{display:block;width:100%;min-width:0;margin:12px 0}#claimPaymentResult{margin-top:18px}#claimCatalogResults{display:grid;gap:8px;margin:12px 0}#claimCatalogResults button{text-align:left;white-space:normal;overflow-wrap:anywhere}.claim-entry>div{min-width:0;max-width:100%;overflow-wrap:anywhere}.claim-entry .btn{margin-top:8px;white-space:normal}.claim-entry select{max-width:100%;min-height:44px}
   .google-maps-attribution{display:inline-block;white-space:nowrap;font:400 14px/1.5 sans-serif;letter-spacing:normal;text-transform:none;color:#1f1f1f;background:#fff;padding:2px 7px;border-radius:4px}
   .floor-scroll{overflow:auto;max-width:100%;padding:14px;border:1px solid var(--line);border-radius:var(--r);margin:16px 0;background:var(--surface)}
   .floor-map{--fp-cell:64px;display:grid;gap:6px;width:max-content;min-width:100%;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:70px 70px}

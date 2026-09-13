@@ -31,6 +31,8 @@ crons = ["0 11 * * *"]
 # Comma-separated list of origins allowed to call the API from a browser.
 SITE_ORIGIN = "https://artofjammin.github.io,http://localhost:8787,http://127.0.0.1:8787"
 SQUARE_ENV = "sandbox"
+# Enable only after the sales acceptance checklist passes; never active in the static demo.
+CLAIM_CHECKOUT_ENABLED = "false"
 SQUARE_WEBHOOK_URL = "https://toploaded-api.REPLACE.workers.dev/square/webhook"
 GITHUB_REPO = "ArtofJammin/toploaded-demo"
 GITHUB_WORKFLOW = "inventory.yml"
