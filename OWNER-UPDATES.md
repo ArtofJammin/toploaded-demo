@@ -6,7 +6,7 @@
 - Discovery and the free pack simulator: complete catalog snapshots for the selected set, including unstocked cards. Exact TCGplayer product IDs drive stock badges. No real packs, prizes or purchases result from the simulator.
 - Card Show: countdown at the top; removed Past Shows. Admin → Card Show Floor Plan edits booth positions, sizes and types, validates overlaps/bounds, and publishes a labeled heatmap. TCG/Sports/Mixed percentages count vendor booths, excluding entry/food areas. An empty layout is explicitly unpublished.
 - Live Stream: owner-provided wording and staff-confirmed card claims replace numbered pre-claim spots. Logged-in staff use the claim desk on the Live page. Viewers see updates within the five-second polling interval while the page is visible. Posting a claim does not take payment or adjust stock.
-- Buy Collections: removed the estimator.
+- Buy Collections: removed both the estimator and online quote form. Buying categories, cash/credit details and large-collection contact remain; all offers direct customers to the store. The home FAQ matches this policy.
 - Reviews: attributed, owner-curated highlights with a positive-review disclosure; optional Google Places connection. No sample customer quotes are published.
 
 ## Still requires the shop / deployment
@@ -19,6 +19,8 @@
 6. Enter the actual stream platform, URL and schedule in Admin. Old sample rip/break schedules have been removed rather than advertised as confirmed events.
 
 ## Maintenance and checking
+
+- The floor guide now borrows Marketfloor's interaction pattern: vendor search/category filters, selectable booth details, pan, zoom and fit-to-floor. Admin has click-to-place, drag/arrow-key movement, rotation, a single-booth inspector and collision checks. This is a standalone schematic, **not** Marketfloor's measured Hilton plan or a live import of its vendor assignments. Real assignments still need to be supplied and published.
 
 - Existing inventory refresh remains three times daily plus Admin Sync Now (when the API/GitHub token is connected).
 - `tools/update-catalog.mjs` publishes same-origin TCGCSV checklists. `Refresh catalog` runs each morning and can be dispatched manually; downloads are gated to at most once per 24 hours. The existing last-good files remain intact if fetching fails. `Publish site` packages these public JSON files and deploys after successful catalog/inventory workflows.

@@ -554,12 +554,11 @@
 
   /* ---- card show floor plan ----
      config.show.floorplan = {rows, cols, booths:[{id, r, c, w, h, type, label}]}.
-     Grid is 1-indexed: row 1 is the top of the map, column 1 the left. The map here is a
-     read-only preview of the same data the Card show page draws. */
+     Grid is 1-indexed. Visual edits use the same geometry checks as numeric edits. */
   var BOOTH_OPTS = [["tcg", "TCG"], ["sports", "Sports"], ["mixed", "Mixed"], ["food", "Food"], ["entry", "Entry"]];
   var BOOTH_LAB = {tcg: "TCG", sports: "Sports", mixed: "Mixed", food: "Food", entry: "Entry"};
   var FP_MAX_ROWS = 20, FP_MAX_COLS = 26;
-  var fpWork = [], fpReady = false, fpUid = 0;
+  var fpWork = [], fpReady = false, fpUid = 0, fpSelected = -1, fpPlacing = false, fpViewport = null, fpDrag = null, fpSuppressClick = false;
   function fpSize(){
     return {rows: TL.clamp(Math.round(num(val("setFpRows"), 6)), 1, FP_MAX_ROWS), cols: TL.clamp(Math.round(num(val("setFpCols"), 10)), 1, FP_MAX_COLS)};
   }
@@ -572,23 +571,22 @@
         w: Math.max(1, Math.round(num(b.w, 1))), h: Math.max(1, Math.round(num(b.h, 1)))};
     });
   }
-  function fpFits(b, size){ return b.r >= 1 && b.c >= 1 && (b.r + b.h - 1) <= size.rows && (b.c + b.w - 1) <= size.cols; }
-  function fpOverlap(a, b){
-    return a.c < b.c + b.w && b.c < a.c + a.w && a.r < b.r + b.h && b.r < a.r + a.h;
-  }
+  function fpFits(b, size){ return TL.floorplan.fits(b,size); }
+  function fpOverlap(a, b){ return TL.floorplan.overlaps(a,b); }
   function renderFpEditor(){
     var el = $("#fpEditor"); if(!el) return;
-    if(!fpWork.length){
-      el.innerHTML = '<p class="rows-empty">No booths yet. Add one per table block — the Card show page shows nothing until you do.</p>';
+    if(!fpWork[fpSelected]){
+      el.innerHTML = '<h4>Booth details</h4><p class="rows-empty">Select a booth on the floor to edit its vendor name, category and footprint. Use Add booth, or Place on floor to choose a spot.</p>';
       renderFpMap(); return;
     }
     el.innerHTML = fpWork.map(function(b, i){
+      if(i!==fpSelected)return '';
       var n = i + 1;
       function nInput(k, lab, max){
         return '<input data-f="' + k + '" type="number" min="1" max="' + max + '" step="1" inputmode="numeric" value="' + esc(b[k]) + '" aria-label="' + lab + ' of booth ' + n + '">';
       }
       return '<div class="fp-row" data-r="' + n0(i) + '">' +
-        '<input data-f="label" class="fp-label" value="' + esc(b.label) + '" placeholder="Booth name" aria-label="Name of booth ' + n + '">' +
+        '<label>Vendor / booth name<input data-f="label" class="fp-label" maxlength="120" value="' + esc(b.label) + '" placeholder="Booth name" aria-label="Name of booth ' + n + '"></label>' +
         '<select data-f="type" class="fp-type" aria-label="Kind of booth ' + n + '">' + opts(BOOTH_OPTS, b.type) + '</select>' +
         '<div class="fp-nums-head" aria-hidden="true"><span>Row</span><span>Col</span><span>Wide</span><span>Tall</span></div>' +
         '<div class="fp-nums">' + nInput("r", "Row", FP_MAX_ROWS) + nInput("c", "Column", FP_MAX_COLS) + nInput("w", "Width", FP_MAX_COLS) + nInput("h", "Height", FP_MAX_ROWS) + '</div>' +
@@ -601,22 +599,28 @@
   function renderFpMap(){
     var map = $("#fpMap"), size = fpSize();
     if(map){
+      map.dataset.rows=size.rows;map.dataset.cols=size.cols;
+      map.classList.toggle('is-placing',fpPlacing);
       map.style.gridTemplateColumns = "repeat(" + size.cols + ", var(--fp-cell))";
       map.style.gridTemplateRows = "repeat(" + size.rows + ", var(--fp-cell))";
       map.innerHTML = fpWork.map(function(b, i){
-        var fits = fpFits(b, size);
+        var fits = TL.floorplan.canPlace(fpWork,b,size,i);
         var r = TL.clamp(b.r, 1, size.rows), c = TL.clamp(b.c, 1, size.cols);
         var h = TL.clamp(b.h, 1, size.rows - r + 1), w = TL.clamp(b.w, 1, size.cols - c + 1);
-        return '<span class="fp-cell t-' + esc(b.type) + (fits ? "" : " is-bad") + '" style="grid-row:' + r + ' / span ' + h + '; grid-column:' + c + ' / span ' + w + '">' +
-          '<b>' + esc(b.label || "Booth " + (i + 1)) + '</b><i>' + esc(BOOTH_LAB[b.type] || b.type) + '</i></span>';
+        return '<button type="button" data-fpselect="'+i+'" aria-pressed="'+(i===fpSelected)+'" aria-label="'+esc((b.label||'Unnamed booth '+(i+1))+' · '+BOOTH_LAB[b.type]+', row '+r+', column '+c)+'" class="fp-cell t-' + esc(b.type) + (fits ? "" : " is-bad") + '" style="grid-row:' + r + ' / span ' + h + '; grid-column:' + c + ' / span ' + w + '">' +
+          '<b>' + esc(b.label || "Booth " + (i + 1)) + '</b><i>' + esc(BOOTH_LAB[b.type] || b.type) + '</i></button>';
       }).join("");
+      if(!fpViewport)fpViewport=TL.floorplan.viewport($('#cardFloorplan'),map,$('#fpScroll'));
+      fpViewport.refresh();
     }
+    $('#fpRotate').disabled=!fpWork[fpSelected];$('#fpPlace').setAttribute('aria-pressed',String(fpPlacing));
+    $('#fpSelection').textContent=fpPlacing?'Tap an empty square to place a new '+BOOTH_LAB[val('fpBrush')]+' booth.':fpWork[fpSelected]?'Selected: '+(fpWork[fpSelected].label||'Unnamed booth')+' — drag to move, use arrow keys, or edit the details. Changes are not published until saved.':'Add a booth, or choose Place on floor and tap an empty square.';
     renderFpMix(size);
   }
   function renderFpMix(size){
     size = size || fpSize();
     var n = {tcg: 0, sports: 0, mixed: 0, food: 0, entry: 0}, bad = 0;
-    fpWork.forEach(function(b){ n[b.type] = (n[b.type] || 0) + 1; if(!fpFits(b, size)) bad++; });
+    fpWork.forEach(function(b,i){ n[b.type] = (n[b.type] || 0) + 1; if(!TL.floorplan.canPlace(fpWork,b,size,i)) bad++; });
     var tables = n.tcg + n.sports + n.mixed;
     var shares = TL.floorplan.stats(fpWork).pct;
     function pct(k){ return shares[k] || 0; }
@@ -632,7 +636,7 @@
       if(!fpWork.length) txt.textContent = "Nothing placed yet. The Card show page shows the plan once you save booths here.";
       else txt.textContent = (tables ? tables + " table booth" + (tables === 1 ? "" : "s") + " · TCG " + pct("tcg") + "% · Sports " + pct("sports") + "%" + (n.mixed ? " · Mixed " + pct("mixed") + "%" : "") : "No table booths yet") +
         (n.food || n.entry ? " · plus " + [n.food ? n.food + " food" : "", n.entry ? n.entry + " entry" : ""].filter(Boolean).join(" and ") : "") +
-        (bad ? " — " + bad + " booth" + (bad === 1 ? "" : "s") + " outside the " + size.rows + "×" + size.cols + " grid" : "");
+        (bad ? " — " + bad + " booth" + (bad === 1 ? "" : "s") + " overlapping or outside the grid" : "");
     }
     var st = $("#fpRatio");
     if(st) setState(st, bad ? "warn" : "", size.rows + " rows × " + size.cols + " columns");
@@ -650,7 +654,7 @@
     var f = (TL.config.show || {}).floorplan || {};
     setVal("setFpRows", TL.clamp(Math.round(num(f.rows, 6)), 1, FP_MAX_ROWS));
     setVal("setFpCols", TL.clamp(Math.round(num(f.cols, 10)), 1, FP_MAX_COLS));
-    fpWork = fpFromConfig(); fpReady = true;
+    fpWork = fpFromConfig(); fpReady = true;fpSelected=fpWork.length?0:-1;fpPlacing=false;
     renderFpEditor();
   }
   $("#fpEditor").addEventListener("input", fpSync);
@@ -658,6 +662,7 @@
   $("#fpEditor").addEventListener("click", function(e){
     var d = e.target.closest("[data-fpdel]"); if(!d) return;
     fpWork.splice(parseInt(d.dataset.fpdel, 10), 1);
+    fpSelected=Math.min(fpSelected,fpWork.length-1);
     renderFpEditor();
     var first = $("#fpEditor input") || $("#fpAdd"); if(first) first.focus();
     toast("Booth removed — save to make it stick");
@@ -673,12 +678,61 @@
         if(!clash) spot = probe;
       }
     }
-    fpWork.push({uid: "bnew" + (++fpUid), id: "", label: "", type: "tcg", r: spot ? spot.r : 1, c: spot ? spot.c : 1, w: 1, h: 1});
-    renderFpEditor();
-    var rows = $$("#fpEditor .fp-row"), last = rows[rows.length - 1], inp = last && last.querySelector(".fp-label");
-    if(inp) inp.focus();
-    if(!spot) toast("Grid is full — make it bigger or move a booth");
+    if(!spot){toast("Grid is full — make it bigger or move a booth");return;}
+    fpCreate(spot);
   });
+  function fpCreate(spot){
+    if(fpWork.length>=100){toast('A floor plan supports up to 100 locations');return;}
+    fpWork.push({uid:'bnew'+(++fpUid),id:'',label:'',type:val('fpBrush')||'tcg',r:spot.r,c:spot.c,w:1,h:1});
+    fpSelected=fpWork.length-1;fpPlacing=false;renderFpEditor();
+    var inp=$('#fpEditor .fp-label');if(inp)inp.focus();
+    fpViewport.focus($('#fpMap [data-fpselect="'+fpSelected+'"]'));
+  }
+  function fpPoint(e){
+    var map=$('#fpMap'),rect=map.getBoundingClientRect(),step=parseFloat(getComputedStyle(map).getPropertyValue('--fp-cell'))+parseFloat(getComputedStyle(map).gap);
+    return {r:Math.floor((e.clientY-rect.top-2)/step)+1,c:Math.floor((e.clientX-rect.left-2)/step)+1};
+  }
+  function fpFocus(){var b=$('#fpMap [data-fpselect="'+fpSelected+'"]');if(b)b.focus({preventScroll:true});}
+  function fpMove(i,r,c,rotate){
+    var b=fpWork[i];if(!b)return;
+    var next={r:r,c:c,w:rotate?b.h:b.w,h:rotate?b.w:b.h};
+    if(!TL.floorplan.canPlace(fpWork,next,fpSize(),i)){toast('That position overlaps another booth or leaves the floor. Nothing moved.');return;}
+    b.r=next.r;b.c=next.c;b.w=next.w;b.h=next.h;fpSelected=i;renderFpEditor();fpFocus();
+  }
+  $('#fpPlace').addEventListener('click',function(){fpPlacing=!fpPlacing;renderFpMap();});
+  $('#fpBrush').addEventListener('change',renderFpMap);
+  $('#fpRotate').addEventListener('click',function(){var b=fpWork[fpSelected];if(b)fpMove(fpSelected,b.r,b.c,true);});
+  $('#fpMap').addEventListener('click',function(e){
+    if(fpSuppressClick){fpSuppressClick=false;return;}
+    var b=e.target.closest('[data-fpselect]');
+    if(b){fpSelected=Number(b.dataset.fpselect);fpPlacing=false;renderFpEditor();fpFocus();return;}
+    if(fpPlacing){var point=fpPoint(e);point.w=point.h=1;if(TL.floorplan.canPlace(fpWork,point,fpSize(),-1))fpCreate(point);else toast('Choose an empty square inside the floor.');}
+  });
+  $('#fpMap').addEventListener('keydown',function(e){
+    if(e.key==='Escape'){fpPlacing=false;fpSelected=-1;renderFpEditor();$('#fpPlace').focus();return;}
+    var el=e.target.closest('[data-fpselect]'),delta={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]}[e.key];
+    if(!el||!delta)return;e.preventDefault();var i=Number(el.dataset.fpselect),b=fpWork[i];fpMove(i,b.r+delta[0],b.c+delta[1]);
+  });
+  $('#fpMap').addEventListener('pointerdown',function(e){
+    var el=e.target.closest('[data-fpselect]');if(!el||e.button!==0||fpPlacing)return;
+    var i=Number(el.dataset.fpselect),p=fpPoint(e);fpDrag={i:i,p:p,x:e.clientX,y:e.clientY,id:e.pointerId};fpSuppressClick=false;
+    $('#fpMap').setPointerCapture(e.pointerId);
+  });
+  $('#fpMap').addEventListener('pointerup',function(e){
+    if(!fpDrag||e.pointerId!==fpDrag.id)return;var d=fpDrag;fpDrag=null;
+    fpSuppressClick=true;
+    /* Replacing a captured button can cancel the browser's follow-up click. Never
+       leave suppression armed for the user's next, unrelated placement. */
+    setTimeout(function(){fpSuppressClick=false;},0);
+    if(Math.hypot(e.clientX-d.x,e.clientY-d.y)<6){fpSelected=d.i;renderFpEditor();fpFocus();return;}
+    var el=$('#fpMap [data-fpselect="'+d.i+'"]');if(el)el.style.transform='';
+    var p=fpPoint(e),b=fpWork[d.i];fpMove(d.i,b.r+p.r-d.p.r,b.c+p.c-d.p.c);
+  });
+  $('#fpMap').addEventListener('pointermove',function(e){
+    if(!fpDrag||e.pointerId!==fpDrag.id)return;
+    var el=$('#fpMap [data-fpselect="'+fpDrag.i+'"]');if(el)el.style.transform='translate('+(e.clientX-fpDrag.x)+'px,'+(e.clientY-fpDrag.y)+'px)';
+  });
+  $('#fpMap').addEventListener('pointercancel',function(){fpDrag=null;fpSuppressClick=false;renderFpMap();});
   $("#setFpRows").addEventListener("input", renderFpMap);
   $("#setFpCols").addEventListener("input", renderFpMap);
   $("#fpApply").addEventListener("click", function(){
@@ -686,6 +740,7 @@
     var size = fpSize();
     setVal("setFpRows", size.rows); setVal("setFpCols", size.cols);
     function flag(i, sel, msg){
+      fpSelected=i;renderFpEditor();
       var row = $('#fpEditor .fp-row[data-r="' + i + '"]'), inp = row && row.querySelector(sel);
       if(inp){ inp.focus(); inp.setAttribute("aria-invalid", "true"); }
       toast(msg);

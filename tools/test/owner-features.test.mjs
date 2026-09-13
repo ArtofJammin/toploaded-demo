@@ -37,10 +37,24 @@ test('requested removals, section ordering and public catalog are packaged',()=>
   const home=read('src/html/10-home.html');
   assert.ok(home.indexOf('trade-band')<home.indexOf('id="playNow"'));assert.ok(home.indexOf('id="playNow"')<home.indexOf('FIND YOUR'));
   assert.doesNotMatch(home,/id="ticker"|id="featuredGrid"|id="nextUp"/);
-  assert.doesNotMatch(read('src/html/14-buylist.html'),/worthEstimator|worthForm/);
+  assert.doesNotMatch(read('src/html/14-buylist.html'),/worthEstimator|worthForm|buyForm|Get my offer|Start a quote/);
+  assert.match(read('src/html/14-buylist.html'),/All pricing and offers happen in store/);
+  assert.match(read('src/html/14-buylist.html'),/What to bring/);
+  assert.doesNotMatch(home,/start a quote/i);
   assert.doesNotMatch(read('src/html/12-show.html'),/Past shows/);
   const index=JSON.parse(read('catalog-index.json'));
   assert.ok(index.sets.length>0);
   for(const s of index.sets){const d=JSON.parse(read(s.file));assert.equal(d.cards.length,s.count);assert.ok(d.cards.every(c=>c.id&&c.name&&c.game===s.game));}
   assert.match(read('.github/workflows/pages.yml'),/cp catalog-\*\.json _site/);
+});
+
+test('visual booth placement rejects collisions and off-floor moves without excluding adjacent booths',()=>{
+  const c={TL:{on(){}}};vm.createContext(c);vm.runInContext(read('src/js/56-floorplan.js'),c);
+  const f=c.TL.floorplan,size={rows:6,cols:10},booths=[{r:1,c:1,w:2,h:1},{r:1,c:3,w:1,h:1}];
+  assert.equal(f.canPlace(booths,booths[0],size,0),true);
+  assert.equal(f.canPlace(booths,{r:1,c:2,w:2,h:1},size,0),false);
+  assert.equal(f.canPlace(booths,{r:2,c:1,w:1,h:2},size,0),true);
+  assert.equal(f.canPlace(booths,{r:6,c:10,w:2,h:1},size,0),false);
+  assert.equal(f.canPlace(booths,{r:0,c:1,w:1,h:1},size,0),false);
+  assert.equal(f.canPlace(booths,{r:2,c:1,w:0,h:1},size,0),false);
 });

@@ -2,35 +2,42 @@
   <section class="view" id="view-buylist" aria-label="Sell to us">
     <div class="wrap">
       <div class="view-head">
-        <p class="eyebrow">Buylist &middot; Cash or credit</p>
+        <p class="eyebrow">Bring it in &middot; Cash or credit</p>
         <h1>We buy collections</h1>
-        <p class="lede">Binders, bulk, graded slabs, sealed product, whole closets. Walk in any day we're open, or tell us what you've got below and we'll come back to you with a number.</p>
+        <p class="lede">From a few favorite cards to a whole collection, bring what you've got to the shop. We look it over together and make an in-store offer based on condition and current market.</p>
       </div>
       <div class="buy-grid">
         <div class="buy-points">
           <div class="panel"><span class="k">Cash</span><p>Straight cash offer, paid on the spot once we've looked everything over.</p></div>
           <div class="panel"><span class="k" id="buyBonusK">+10%</span><p>Take store credit instead and we add <span id="buyBonusWord">ten percent</span> to the offer.</p></div>
-          <div class="panel"><span class="k">Big?</span><p>Estate or store-closing sized lot? We travel for large collections across the Tri-State &mdash; call <a id="buyPhone" href="tel:+15132222573">(513) 222-2573</a>.</p></div>
-          <div class="panel"><span class="k">How</span><p>No appointment needed &mdash; walk in with it, or send the details below. We sort, price against current market, and the offer is yours to take or leave.</p></div>
+          <div class="panel"><span class="k">Big?</span><p>Estate or store-closing sized lot? Call <a id="buyPhone" href="tel:+15132222573">(513) 222-2573</a> to arrange a time and discuss large-collection options.</p></div>
+          <div class="panel"><span class="k">How</span><p>Bring your cards to the shop. We sort, price against current market, and the offer is yours to take or leave. For large collections, call ahead so we can plan enough time.</p></div>
+          <section class="form-card buy-wanted" aria-labelledby="buyWantedTitle">
+            <p class="eyebrow">Make room for what's next</p>
+            <h2 id="buyWantedTitle">What to bring</h2>
+            <ul class="buy-categories">
+              <li><b>Singles &amp; binders</b><span>Individual cards, binder collections, and deck staples.</span></li>
+              <li><b>Graded cards</b><span>Slabs and graded collections for an in-person review.</span></li>
+              <li><b>Sealed product</b><span>Unopened boxes, packs, and collections.</span></li>
+              <li><b>Bulk &amp; whole collections</b><span>Sorted boxes, mixed lots, or the collection you've outgrown.</span></li>
+            </ul>
+            <p class="buy-games">Pok&eacute;mon &middot; One Piece &middot; Magic: The Gathering &middot; Gundam &middot; Lorcana</p>
+            <p class="card-note">Sports cards or something else? Call the shop to check what we're currently buying. Offers depend on condition, authenticity, and the shop's needs; not every item can be purchased.</p>
+          </section>
         </div>
         <div class="buy-col">
-          <form class="form-card" id="buyForm" novalidate data-kind="buylist">
-            <h3>Start a quote</h3>
-            <p class="form-intro">Tell us roughly what you've got &mdash; photos help but aren't required. We price against current market, and the final offer is made in person once we've seen the cards.</p>
-            <div class="form-grid">
-              <div class="field"><label for="bName">Name</label><input id="bName" name="name" type="text" required autocomplete="name" maxlength="80"></div>
-              <div class="field"><label for="bContact">Email or phone</label><input id="bContact" name="contact" type="text" required autocomplete="email" inputmode="email" maxlength="120"></div>
-              <div class="field full"><label for="bGames">What's in it?</label>
-                <select id="bGames" name="games"><option>Pokemon</option><option>One Piece</option><option>Magic: The Gathering</option><option>Gundam</option><option>Lorcana</option><option>A mix of games</option><option>Sports cards / other</option></select>
-              </div>
-              <div class="field full"><label for="bDesc">Describe the collection</label>
-                <textarea id="bDesc" name="desc" rows="4" required maxlength="2000" placeholder="e.g. two binders of modern Pokemon hits, a Base Set Blastoise, and about 4,000 bulk commons"></textarea>
-              </div>
-              <div class="field full"><label for="bPhotos">Link to photos <small>(optional)</small></label><input id="bPhotos" name="photosUrl" type="url" autocomplete="url" inputmode="url" placeholder="Google Photos, Drive, Imgur&hellip;" maxlength="300"></div>
-              <div class="hp" aria-hidden="true"><label for="bWebsite">Website</label><input id="bWebsite" name="website" type="text" tabindex="-1" autocomplete="off"></div>
-              <div class="field full"><button class="btn" type="submit">Get my offer</button><p class="drawer-note" style="text-align:left; margin-top:8px">No obligation &mdash; we reply with a real number, and you decide.</p></div>
-            </div>
-          </form>
+          <section class="form-card buy-visit" aria-labelledby="buyVisitTitle">
+            <p class="eyebrow">Let's see it in person</p>
+            <h2 id="buyVisitTitle">Bring your collection<br>to the shop.</h2>
+            <p>No online estimates or quote requests. All pricing and offers happen in store, after we've seen the cards.</p>
+            <ol class="buy-steps">
+              <li><b>Pack it up.</b> Keep cards protected; sorting by game helps us look through them.</li>
+              <li><b>Stop in during shop hours.</b> For a large collection, call ahead so we can plan enough time.</li>
+              <li><b>Review your offer.</b> Choose cash or store credit, or take your cards home. No obligation.</li>
+            </ol>
+            <p class="buy-location" id="buyAddress">2514 Hazelwood Dr &middot; Crescent Springs, KY 41017</p>
+            <div class="buy-actions"><a class="btn" href="#/visit" data-go="visit">Hours &amp; directions &rarr;</a><a class="btn btn-ghost" id="buyCall" href="tel:+15132222573">Call the shop</a></div>
+          </section>
         </div>
       </div>
     </div>

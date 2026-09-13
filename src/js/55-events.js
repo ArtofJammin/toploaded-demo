@@ -499,29 +499,12 @@
     });
   }
 
-  /* ---- buylist quote form ---- */
+  /* ---- collection information: all offers happen in store ---- */
   function bindBuylist(){
-    var form = $("#buyForm"); if(!form) return;
     var ph = $("#buyPhone"); if(ph){ ph.href = "tel:" + (TL.config.phoneRaw || ""); ph.textContent = TL.config.phone || ph.textContent; }
-    TL.forms.bind(form, {
-      kind: "buylist",
-      collect: function(f){
-        var out = {name: $("#bName", f).value.trim(), contact: $("#bContact", f).value.trim(), games: $("#bGames", f).value, desc: $("#bDesc", f).value.trim(), website: $("#bWebsite", f).value};
-        var u = $("#bPhotos", f).value.trim(); if(u) out.photosUrl = u;
-        return out;
-      },
-      validate: function(fields, f){
-        var c = fields.contact;
-        if(!TL.forms.looksEmail(c) && !TL.forms.looksPhone(c)) return {ctrl: $("#bContact", f), msg: "Enter an email or a phone number"};
-        return null;
-      },
-      mailto: function(fields){
-        return {href: TL.forms.mailto("Buylist quote — " + fields.games, ["Name: " + fields.name, "Contact: " + fields.contact, "Games: " + fields.games, "", fields.desc, fields.photosUrl ? "Photos: " + fields.photosUrl : ""]), label: "Email the quote request instead"};
-      },
-      success: function(fields, res, st){
-        return "<b>Quote request received</b><p>Thanks " + esc(fields.name.split(" ")[0]) + " — we’ll look it over and reply to " + esc(fields.contact) + " with a real number" + (st.local ? "" : " (ref " + esc(String(res.id).slice(0, 8)) + ")") + ". Bring it in any day we’re open if you’d rather have cash in hand today.</p>";
-      }
-    });
+    var call = $("#buyCall"); if(call) call.href = "tel:" + (TL.config.phoneRaw || "");
+    var address = TL.config.address || {}, addr = $("#buyAddress");
+    if(addr) addr.textContent = [address.line1, [address.city,address.state,address.zip].filter(Boolean).join(" ")].filter(Boolean).join(" · ");
   }
 
   /* ---- count-up helper: safe whether or not the motion package replaced TL.countUp ---- */

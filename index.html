@@ -1512,6 +1512,35 @@ html.page-hidden .drawer .cart-empty::before{animation-play-state:paused}
   .claim-feed{padding:22px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}.feed-list{list-style:none;padding:0;margin:18px 0;display:grid;gap:10px}.claim-entry{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:16px;border:1px solid var(--line);border-radius:8px}.claim-entry small{color:var(--ink2)}.feed-head{display:flex;gap:12px;justify-content:space-between}.feed-empty,.feed-note{color:var(--ink2)}
   @media(max-width:600px){.floor-map{--fp-cell:56px;background-size:62px 62px}.show-clock{padding:16px}.rev-meta,.rev-meta-head{grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr)}}
 
+/* A compact, theme-aware floor guide and visual editor. */
+.floor-tools{display:flex;align-items:end;flex-wrap:wrap;gap:12px;margin:18px 0 12px}
+.floor-tools .field{flex:1 1 170px;min-width:0}.floor-tools input,.floor-tools select{width:100%;min-height:44px}
+.floor-zoom{display:flex;flex-shrink:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.floor-zoom button{border:0;border-right:1px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 13px;min-width:44px;min-height:44px;font:600 .85rem var(--body)}
+.floor-zoom button:last-child{border-right:0}.floor-zoom button:hover{background:var(--surface2)}
+.floor-guide-body{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:18px;margin:16px 0;align-items:start}
+.floor-guide-body .floor-scroll{margin:0;height:410px;cursor:grab;overscroll-behavior-x:contain;position:relative}
+.floor-scroll.is-panning{cursor:grabbing;user-select:none}
+.floor-map{--fp-gap:6px;min-width:0;gap:var(--fp-gap);background-size:calc(var(--fp-cell) + var(--fp-gap)) calc(var(--fp-cell) + var(--fp-gap));border:2px solid var(--line);box-sizing:content-box;isolation:isolate}
+.fp-cell{font-family:var(--body);cursor:pointer;position:relative;min-height:0;box-shadow:0 3px 0 color-mix(in srgb,currentColor 25%,transparent);transition:opacity .15s,border-color .15s}
+.fp-cell b{max-width:100%;font-size:clamp(9px,calc(var(--fp-cell)*.19),15px);line-height:1.1}.fp-cell i{font-size:clamp(8px,calc(var(--fp-cell)*.16),12px)}
+.fp-cell[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:2px;z-index:2}
+.fp-cell:focus-visible{outline:3px dashed var(--ink);outline-offset:3px;z-index:3}
+.fp-cell.is-muted{opacity:.18;box-shadow:none}.floor-map.is-dense .fp-cell i{display:none}.floor-map.is-dense .fp-cell{padding:1px;border-width:1px;box-shadow:none}
+.floor-map.is-dense .fp-cell b{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.floor-detail,.floor-inspector{padding:20px;border:1px solid var(--line);border-radius:12px;background:var(--surface);min-width:0}
+.floor-detail h3{font-size:1.6rem;overflow-wrap:anywhere;margin:10px 0}.floor-detail dl{margin:20px 0;display:grid;gap:5px}.floor-detail dt{font-size:.75rem;color:var(--ink2);text-transform:uppercase}.floor-detail dd{margin:0 0 10px;overflow-wrap:anywhere}
+.floor-vendors{list-style:none;padding:0;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}
+.floor-vendors button{display:flex;align-items:center;gap:12px;text-align:left;padding:16px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);width:100%;height:100%;font:inherit}
+.floor-vendors button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 3px 0 var(--accent)}
+.floor-vendors button>span:nth-child(2){flex:1;min-width:0;overflow-wrap:anywhere}.floor-vendors small{display:block;color:var(--ink2);margin-top:5px}
+.floor-swatch{width:14px;height:30px;flex:0 0 14px;border:1px solid var(--line);border-radius:4px}
+#fpEditor{margin-top:0;display:block}#fpEditor .fp-row{padding:0 28px 0 0;border:0;background:none;gap:12px}#fpEditor .row-del{right:-18px;top:-14px}
+#fpMap .fp-cell{touch-action:none;user-select:none}#fpMap.is-placing{cursor:crosshair}#fpMap.is-placing .fp-cell{cursor:not-allowed}
+#fpPlace[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+@media(max-width:760px){.floor-guide-body{grid-template-columns:1fr}.floor-guide-body .floor-scroll{height:340px}.floor-detail{padding:16px}.floor-tools>.btn{flex:1 1 auto}}
+@media(prefers-reduced-motion:reduce){.fp-cell{transition:none}}
+
 /* ============ EVENTS ============ */
 .next-up{
   display:flex; align-items:center; gap:10px 16px; flex-wrap:wrap;
@@ -1744,9 +1773,7 @@ form.is-done > :not(.form-done){display:none !important}
 @media(max-width:760px){.account-layout{grid-template-columns:1fr}.account-panel{padding:24px}.account-member-head{align-items:flex-start}}
 
 /* ============ BUYLIST ============ */
-/* The "What's my card worth?" estimator was removed at the owner's request
-   (2026-09-12); its styles went with it. What's left is the points column and
-   the quote form (#buyForm) — the point of the page. */
+/* Buying information only: estimates and collection intake happen in store. */
 .buy-grid{display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:32px; align-items:start}
 .buy-col{display:grid; gap:20px; min-width:0}
 .form-card{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:26px; position:relative}
@@ -1755,6 +1782,16 @@ form.is-done > :not(.form-done){display:none !important}
 .buy-points .k{font-family:var(--disp); font-weight:800; font-size:1.6rem; color:var(--accent); min-width:64px; text-transform:uppercase; line-height:1}
 .buy-points p{color:var(--ink2); font-size:.92rem}
 .buy-points a{color:var(--accent)}
+.buy-wanted h2,.buy-visit h2{font-size:clamp(1.65rem,3vw,2.4rem);margin:10px 0 18px}
+.buy-categories{list-style:none;padding:0;display:grid;gap:0;margin:0 0 18px}
+.buy-categories li{padding:16px 0;border-bottom:1px solid var(--line);display:grid;gap:5px}
+.buy-categories span,.buy-visit>p,.buy-steps{color:var(--ink2)}
+.buy-games{font-weight:700;line-height:1.8;margin-bottom:12px}
+.buy-visit{border-top:4px solid var(--accent)}
+.buy-steps{padding-left:24px;display:grid;gap:20px;margin:28px 0}
+.buy-steps b{display:block;color:var(--ink);margin-bottom:4px}
+.buy-location{padding-top:20px;border-top:1px solid var(--line)}
+.buy-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
 @media (max-width:640px){
   .form-card{padding:22px 18px}
 }
@@ -3243,7 +3280,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
           </details>
           <details class="panel">
             <summary>How does selling a collection work?</summary>
-            <p>Walk in any day we're open &mdash; no appointment needed &mdash; or start a quote from the Sell to Us page. We sort it, price it against current market, and make an offer with zero obligation. Estate-sized lot? We travel across the Tri-State.</p>
+            <p>Bring your cards to the shop during opening hours. We look them over, price against current market, and make an in-store offer with zero obligation. For a large collection, call ahead so we can plan enough time. We don't provide online estimates or quotes.</p>
           </details>
           <details class="panel">
             <summary>What's the store credit bonus?</summary>
@@ -3413,8 +3450,13 @@ a:hover .round-arrow{transform:rotate(45deg)}
         <p id="showFloorNote" class="card-note"></p>
         <div id="showFloorMix" class="floor-mix" aria-hidden="true"></div>
         <ul id="showFloorLegend" class="floor-legend"></ul>
-        <div class="floor-scroll" id="showFloorScroll" tabindex="0" role="region" aria-label="Vendor floor plan, scroll horizontally if needed"><div class="floor-map" id="showFloorMap"></div></div>
-        <ul id="showFloorList" class="floor-vendors" aria-label="Vendors and booth positions"></ul>
+        <div id="showFloorGuide" class="floor-guide" hidden>
+          <div class="floor-tools"><div class="field"><label for="floorSearch">Find a vendor</label><input id="floorSearch" type="search" placeholder="Vendor or booth name" maxlength="100"></div><div class="field"><label for="floorType">Show on map</label><select id="floorType"><option value="">All categories</option><option value="tcg">TCG</option><option value="sports">Sports</option><option value="mixed">Mixed</option><option value="food">Food</option><option value="entry">Entry</option></select></div><div class="floor-zoom" aria-label="Map zoom"><button type="button" data-floor-zoom="out" aria-label="Zoom out">&minus;</button><button type="button" data-floor-zoom="fit">Fit floor</button><button type="button" data-floor-zoom="in" aria-label="Zoom in">+</button></div></div>
+          <p class="card-note">Select a booth for details. Drag empty floor to pan, use Ctrl + wheel to zoom, or scroll the map on touch. Schematic layout &mdash; not a scale drawing of the venue.</p>
+          <div class="floor-guide-body"><div class="floor-scroll" id="showFloorScroll" tabindex="0" role="region" aria-label="Interactive vendor floor plan"><div class="floor-map" id="showFloorMap"></div></div><aside class="floor-detail" id="showFloorDetail" aria-live="polite"><h3>Explore the floor</h3><p>Choose a vendor on the map or in the directory.</p></aside></div>
+          <p id="floorResults" role="status" class="card-note"></p>
+          <ul id="showFloorList" class="floor-vendors" aria-label="Vendor directory"></ul>
+        </div>
       </section>
     </div>
   </section>
@@ -3468,35 +3510,42 @@ a:hover .round-arrow{transform:rotate(45deg)}
   <section class="view" id="view-buylist" aria-label="Sell to us">
     <div class="wrap">
       <div class="view-head">
-        <p class="eyebrow">Buylist &middot; Cash or credit</p>
+        <p class="eyebrow">Bring it in &middot; Cash or credit</p>
         <h1>We buy collections</h1>
-        <p class="lede">Binders, bulk, graded slabs, sealed product, whole closets. Walk in any day we're open, or tell us what you've got below and we'll come back to you with a number.</p>
+        <p class="lede">From a few favorite cards to a whole collection, bring what you've got to the shop. We look it over together and make an in-store offer based on condition and current market.</p>
       </div>
       <div class="buy-grid">
         <div class="buy-points">
           <div class="panel"><span class="k">Cash</span><p>Straight cash offer, paid on the spot once we've looked everything over.</p></div>
           <div class="panel"><span class="k" id="buyBonusK">+10%</span><p>Take store credit instead and we add <span id="buyBonusWord">ten percent</span> to the offer.</p></div>
-          <div class="panel"><span class="k">Big?</span><p>Estate or store-closing sized lot? We travel for large collections across the Tri-State &mdash; call <a id="buyPhone" href="tel:+15132222573">(513) 222-2573</a>.</p></div>
-          <div class="panel"><span class="k">How</span><p>No appointment needed &mdash; walk in with it, or send the details below. We sort, price against current market, and the offer is yours to take or leave.</p></div>
+          <div class="panel"><span class="k">Big?</span><p>Estate or store-closing sized lot? Call <a id="buyPhone" href="tel:+15132222573">(513) 222-2573</a> to arrange a time and discuss large-collection options.</p></div>
+          <div class="panel"><span class="k">How</span><p>Bring your cards to the shop. We sort, price against current market, and the offer is yours to take or leave. For large collections, call ahead so we can plan enough time.</p></div>
+          <section class="form-card buy-wanted" aria-labelledby="buyWantedTitle">
+            <p class="eyebrow">Make room for what's next</p>
+            <h2 id="buyWantedTitle">What to bring</h2>
+            <ul class="buy-categories">
+              <li><b>Singles &amp; binders</b><span>Individual cards, binder collections, and deck staples.</span></li>
+              <li><b>Graded cards</b><span>Slabs and graded collections for an in-person review.</span></li>
+              <li><b>Sealed product</b><span>Unopened boxes, packs, and collections.</span></li>
+              <li><b>Bulk &amp; whole collections</b><span>Sorted boxes, mixed lots, or the collection you've outgrown.</span></li>
+            </ul>
+            <p class="buy-games">Pok&eacute;mon &middot; One Piece &middot; Magic: The Gathering &middot; Gundam &middot; Lorcana</p>
+            <p class="card-note">Sports cards or something else? Call the shop to check what we're currently buying. Offers depend on condition, authenticity, and the shop's needs; not every item can be purchased.</p>
+          </section>
         </div>
         <div class="buy-col">
-          <form class="form-card" id="buyForm" novalidate data-kind="buylist">
-            <h3>Start a quote</h3>
-            <p class="form-intro">Tell us roughly what you've got &mdash; photos help but aren't required. We price against current market, and the final offer is made in person once we've seen the cards.</p>
-            <div class="form-grid">
-              <div class="field"><label for="bName">Name</label><input id="bName" name="name" type="text" required autocomplete="name" maxlength="80"></div>
-              <div class="field"><label for="bContact">Email or phone</label><input id="bContact" name="contact" type="text" required autocomplete="email" inputmode="email" maxlength="120"></div>
-              <div class="field full"><label for="bGames">What's in it?</label>
-                <select id="bGames" name="games"><option>Pokemon</option><option>One Piece</option><option>Magic: The Gathering</option><option>Gundam</option><option>Lorcana</option><option>A mix of games</option><option>Sports cards / other</option></select>
-              </div>
-              <div class="field full"><label for="bDesc">Describe the collection</label>
-                <textarea id="bDesc" name="desc" rows="4" required maxlength="2000" placeholder="e.g. two binders of modern Pokemon hits, a Base Set Blastoise, and about 4,000 bulk commons"></textarea>
-              </div>
-              <div class="field full"><label for="bPhotos">Link to photos <small>(optional)</small></label><input id="bPhotos" name="photosUrl" type="url" autocomplete="url" inputmode="url" placeholder="Google Photos, Drive, Imgur&hellip;" maxlength="300"></div>
-              <div class="hp" aria-hidden="true"><label for="bWebsite">Website</label><input id="bWebsite" name="website" type="text" tabindex="-1" autocomplete="off"></div>
-              <div class="field full"><button class="btn" type="submit">Get my offer</button><p class="drawer-note" style="text-align:left; margin-top:8px">No obligation &mdash; we reply with a real number, and you decide.</p></div>
-            </div>
-          </form>
+          <section class="form-card buy-visit" aria-labelledby="buyVisitTitle">
+            <p class="eyebrow">Let's see it in person</p>
+            <h2 id="buyVisitTitle">Bring your collection<br>to the shop.</h2>
+            <p>No online estimates or quote requests. All pricing and offers happen in store, after we've seen the cards.</p>
+            <ol class="buy-steps">
+              <li><b>Pack it up.</b> Keep cards protected; sorting by game helps us look through them.</li>
+              <li><b>Stop in during shop hours.</b> For a large collection, call ahead so we can plan enough time.</li>
+              <li><b>Review your offer.</b> Choose cash or store credit, or take your cards home. No obligation.</li>
+            </ol>
+            <p class="buy-location" id="buyAddress">2514 Hazelwood Dr &middot; Crescent Springs, KY 41017</p>
+            <div class="buy-actions"><a class="btn" href="#/visit" data-go="visit">Hours &amp; directions &rarr;</a><a class="btn btn-ghost" id="buyCall" href="tel:+15132222573">Call the shop</a></div>
+          </section>
         </div>
       </div>
     </div>
@@ -3803,7 +3852,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
 
         <div class="admin-card" id="inboxCard">
           <h3>Inbox <span class="pill warn" id="inboxPill"><span class="dot warn"></span><span id="inboxCount">0</span> new</span></h3>
-          <p class="card-note">Vendor tables, buylist quotes, league signups, restock and contact requests from the site.</p>
+          <p class="card-note">Vendor tables, league signups, restock and contact requests from the site. Earlier collection quote requests remain available; new collection offers happen in store.</p>
           <div class="chip-row inbox-chips" id="inboxChips" role="group" aria-label="Filter inbox by kind">
             <button class="chip" type="button" data-kind="all" aria-pressed="true">All</button>
             <button class="chip" type="button" data-kind="vendor" aria-pressed="false">Vendor</button>
@@ -3995,10 +4044,11 @@ a:hover .round-arrow{transform:rotate(45deg)}
 
       <div class="admin-card" id="cardFloorplan">
         <h3>Card show floor plan</h3>
-        <p class="card-note">Place the actual vendor booths on the grid. TCG, Sports and Mixed percentages count vendor booths, not floor area; entry and food areas are excluded. An empty plan stays unpublished.</p>
+        <p class="card-note">Build the actual show layout: select a booth to edit, drag it to move, or use its arrow keys. TCG, Sports and Mixed percentages count vendor booths, not floor area. Empty space is aisle space; this is a schematic, not a measured venue plan. An empty plan stays unpublished.</p>
         <div class="form-grid"><div class="field"><label for="setFpRows">Grid rows</label><input id="setFpRows" type="number" min="1" max="20" value="6"></div><div class="field"><label for="setFpCols">Grid columns</label><input id="setFpCols" type="number" min="1" max="26" value="10"></div></div>
-        <div id="fpEditor"></div>
-        <div class="floor-scroll" tabindex="0" role="region" aria-label="Floor plan preview"><div class="floor-map" id="fpMap"></div></div>
+        <div class="floor-tools"><div class="field"><label for="fpBrush">New booth category</label><select id="fpBrush"><option value="tcg">TCG</option><option value="sports">Sports</option><option value="mixed">Mixed</option><option value="food">Food</option><option value="entry">Entry</option></select></div><button class="btn btn-ghost" id="fpPlace" type="button" aria-pressed="false">Place on floor</button><button class="btn btn-ghost" id="fpRotate" type="button" disabled>Rotate selected</button><div class="floor-zoom" aria-label="Editor zoom"><button type="button" data-floor-zoom="out" aria-label="Zoom editor out">&minus;</button><button type="button" data-floor-zoom="fit">Fit floor</button><button type="button" data-floor-zoom="in" aria-label="Zoom editor in">+</button></div></div>
+        <p id="fpSelection" class="card-note" role="status">Add a booth, or choose Place on floor and tap an empty square.</p>
+        <div class="floor-guide-body"><div class="floor-scroll" id="fpScroll" tabindex="0" role="region" aria-label="Floor plan editor"><div class="floor-map" id="fpMap"></div></div><div id="fpEditor" class="floor-inspector"></div></div>
         <div class="floor-mix" id="fpMix" aria-hidden="true"></div><p id="fpMixText" class="card-note"></p><span id="fpRatio" class="save-state"></span>
         <div class="card-actions"><button class="btn" id="fpApply" type="button">Save floor plan</button><button class="btn btn-ghost" id="fpAdd" type="button">Add booth</button><span class="save-state" role="status" data-state-for="cardFloorplan"></span></div>
       </div>
@@ -9416,29 +9466,12 @@ a:hover .round-arrow{transform:rotate(45deg)}
     });
   }
 
-  /* ---- buylist quote form ---- */
+  /* ---- collection information: all offers happen in store ---- */
   function bindBuylist(){
-    var form = $("#buyForm"); if(!form) return;
     var ph = $("#buyPhone"); if(ph){ ph.href = "tel:" + (TL.config.phoneRaw || ""); ph.textContent = TL.config.phone || ph.textContent; }
-    TL.forms.bind(form, {
-      kind: "buylist",
-      collect: function(f){
-        var out = {name: $("#bName", f).value.trim(), contact: $("#bContact", f).value.trim(), games: $("#bGames", f).value, desc: $("#bDesc", f).value.trim(), website: $("#bWebsite", f).value};
-        var u = $("#bPhotos", f).value.trim(); if(u) out.photosUrl = u;
-        return out;
-      },
-      validate: function(fields, f){
-        var c = fields.contact;
-        if(!TL.forms.looksEmail(c) && !TL.forms.looksPhone(c)) return {ctrl: $("#bContact", f), msg: "Enter an email or a phone number"};
-        return null;
-      },
-      mailto: function(fields){
-        return {href: TL.forms.mailto("Buylist quote — " + fields.games, ["Name: " + fields.name, "Contact: " + fields.contact, "Games: " + fields.games, "", fields.desc, fields.photosUrl ? "Photos: " + fields.photosUrl : ""]), label: "Email the quote request instead"};
-      },
-      success: function(fields, res, st){
-        return "<b>Quote request received</b><p>Thanks " + esc(fields.name.split(" ")[0]) + " — we’ll look it over and reply to " + esc(fields.contact) + " with a real number" + (st.local ? "" : " (ref " + esc(String(res.id).slice(0, 8)) + ")") + ". Bring it in any day we’re open if you’d rather have cash in hand today.</p>";
-      }
-    });
+    var call = $("#buyCall"); if(call) call.href = "tel:" + (TL.config.phoneRaw || "");
+    var address = TL.config.address || {}, addr = $("#buyAddress");
+    if(addr) addr.textContent = [address.line1, [address.city,address.state,address.zip].filter(Boolean).join(" ")].filter(Boolean).join(" · ");
   }
 
   /* ---- count-up helper: safe whether or not the motion package replaced TL.countUp ---- */
@@ -9516,7 +9549,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
     if(evTimer) tickEvents(); if(showTimer) tickShow(); if(visitTimer) tickVisit();
   });
 
-  /* Published booth heatmap. Empty plans never masquerade as real bookings. */
+  /* Marketfloor-inspired local guide. No external event's bookings are copied. */
   TL.floorplan = (function(){
     var labels = {tcg:"TCG",sports:"Sports",mixed:"Mixed",food:"Food",entry:"Entry"};
     function stats(booths){
@@ -9527,23 +9560,86 @@ a:hover .round-arrow{transform:rotate(45deg)}
       keys.forEach(function(k,i){ pct[k] = i === keys.length-1 ? rest : Math.round(counts[k]/total*100); rest -= pct[k]; });
       return {counts:counts,total:total,pct:pct};
     }
+    function fits(b,size){return b.r>=1 && b.c>=1 && b.w>=1 && b.h>=1 && b.r+b.h-1<=size.rows && b.c+b.w-1<=size.cols;}
+    function overlaps(a,b){return a.c<b.c+b.w && b.c<a.c+a.w && a.r<b.r+b.h && b.r<a.r+a.h;}
+    function canPlace(booths,b,size,skip){return fits(b,size) && !booths.some(function(other,i){return i!==skip && overlaps(b,other);});}
+    function viewport(root,map,scroll){
+      var zoom=1,drag=null,fitMode=true;
+      function setZoom(z){
+        var old=zoom; zoom=Math.max(.18,Math.min(2.5,z));
+        var x=(scroll.scrollLeft+scroll.clientWidth/2)/old,y=(scroll.scrollTop+scroll.clientHeight/2)/old;
+        map.style.setProperty('--fp-cell',(64*zoom)+'px');map.style.setProperty('--fp-gap',(6*zoom)+'px');
+        map.classList.toggle('is-dense',zoom<.6);
+        scroll.scrollLeft=x*zoom-scroll.clientWidth/2;scroll.scrollTop=y*zoom-scroll.clientHeight/2;
+      }
+      function fit(){
+        if(!scroll.clientWidth) return;
+        var cols=Number(map.dataset.cols)||10,rows=Number(map.dataset.rows)||6;
+        setZoom(Math.min(1,(scroll.clientWidth-32)/(cols*70),(scroll.clientHeight-32)/(rows*70)));
+        scroll.scrollLeft=scroll.scrollTop=0;fitMode=true;
+      }
+      function focus(el){
+        if(!el) return;
+        /* Center within this map, without scrolling the entire page. */
+        var a=el.getBoundingClientRect(),b=scroll.getBoundingClientRect();
+        scroll.scrollLeft+=a.left-b.left-(scroll.clientWidth-a.width)/2;
+        scroll.scrollTop+=a.top-b.top-(scroll.clientHeight-a.height)/2;
+      }
+      root.addEventListener('click',function(e){
+        var b=e.target.closest('[data-floor-zoom]');if(!b) return;
+        var k=b.dataset.floorZoom;if(k==='fit') fit();else{fitMode=false;setZoom(zoom*(k==='in'?1.3:1/1.3));}
+      });
+      scroll.addEventListener('wheel',function(e){if(!e.ctrlKey)return;e.preventDefault();fitMode=false;setZoom(zoom*(e.deltaY<0?1.12:1/1.12));},{passive:false});
+      scroll.addEventListener('pointerdown',function(e){
+        if(e.pointerType==='touch'||e.button!==0||e.target.closest('.fp-cell')||map.classList.contains('is-placing'))return;
+        drag={x:e.clientX,y:e.clientY,left:scroll.scrollLeft,top:scroll.scrollTop,id:e.pointerId};scroll.setPointerCapture(e.pointerId);scroll.classList.add('is-panning');
+      });
+      scroll.addEventListener('pointermove',function(e){if(!drag||e.pointerId!==drag.id)return;scroll.scrollLeft=drag.left+drag.x-e.clientX;scroll.scrollTop=drag.top+drag.y-e.clientY;});
+      function stop(){drag=null;scroll.classList.remove('is-panning');}
+      scroll.addEventListener('pointerup',stop);scroll.addEventListener('pointercancel',stop);scroll.addEventListener('lostpointercapture',stop);
+      map.addEventListener('focusin',function(e){var b=e.target.closest('.fp-cell');if(b)focus(b);});
+      if(typeof ResizeObserver!=='undefined')new ResizeObserver(function(){if(fitMode)fit();}).observe(scroll);
+      return {fit:fit,focus:focus,refresh:function(){if(fitMode)fit();}};
+    }
+    var publicBooths=[],selected=-1,publicView=null;
+    function match(b){var q=($('#floorSearch').value||'').trim().toLowerCase(),type=$('#floorType').value;return (!type||b.type===type)&&(!q||(b.label+' '+b.id+' '+labels[b.type]).toLowerCase().includes(q));}
+    function details(i){
+      var b=publicBooths[i];selected=b?i:-1;
+      $('#showFloorDetail').innerHTML=b?'<p class="eyebrow">'+esc(labels[b.type])+' vendor area</p><h3>'+esc(b.label)+'</h3><dl><dt>Booth reference</dt><dd>'+esc(b.id)+'</dd><dt>Find it</dt><dd>Row '+b.r+' · Column '+b.c+'</dd><dt>Footprint</dt><dd>'+b.w+' × '+b.h+' grid squares</dd></dl><p class="card-note">Location shown on the published show layout. A listing is not a live availability or booking guarantee.</p>':'<h3>Explore the floor</h3><p>Choose a vendor on the map or in the directory.</p>';
+      $$('#showFloorGuide [data-floor-booth]').forEach(function(el){el.setAttribute('aria-pressed',String(Number(el.dataset.floorBooth)===selected));});
+    }
+    function filter(){
+      var count=0;
+      publicBooths.forEach(function(b,i){var yes=match(b);if(yes)count++;var cell=$('#showFloorMap [data-floor-booth="'+i+'"]');cell.classList.toggle('is-muted',!yes);cell.disabled=!yes;cell.setAttribute('aria-hidden',String(!yes));});
+      $('#showFloorList').innerHTML=publicBooths.map(function(b,i){return match(b)?'<li><button type="button" data-floor-booth="'+i+'" aria-pressed="'+(i===selected)+'"><span class="floor-swatch t-'+b.type+'" aria-hidden="true"></span><span><b>'+esc(b.label)+'</b><small>'+labels[b.type]+' · Row '+b.r+', column '+b.c+'</small></span><span aria-hidden="true">↗</span></button></li>':'';}).join('');
+      $('#floorResults').textContent=count+' of '+publicBooths.length+' locations shown'+(!count?' — try another name or category.':'. Vendor percentages above always describe the whole floor.');
+      if(selected>=0&&!match(publicBooths[selected]))details(-1);
+    }
     function render(){
       var f = (TL.config.show || {}).floorplan || {}, rows = Number(f.rows)||6, cols = Number(f.cols)||10;
       var booths = (Array.isArray(f.booths) ? f.booths : []).filter(function(b){return b && labels[b.type] && b.r>=1 && b.c>=1 && b.w>=1 && b.h>=1 && b.r+b.h-1<=rows && b.c+b.w-1<=cols;});
       var map=$("#showFloorMap"), note=$("#showFloorNote"), mix=$("#showFloorMix"), legend=$("#showFloorLegend"), list=$("#showFloorList"), scroll=$("#showFloorScroll");
       if(!map) return;
+      var guide=$('#showFloorGuide');guide.hidden=!booths.length;
       scroll.hidden = !booths.length; mix.hidden = !booths.length;
-      if(!booths.length){ note.textContent="The vendor layout is not published yet. Check back for the confirmed TCG and Sports booth locations and percentages."; map.innerHTML=legend.innerHTML=list.innerHTML=mix.innerHTML=""; return; }
+      if(!booths.length){ note.textContent="The vendor layout is not published yet. Check back for the confirmed TCG and Sports booth locations and percentages."; map.innerHTML=legend.innerHTML=list.innerHTML=mix.innerHTML="";publicBooths=[];selected=-1;return; }
       var s=stats(booths);
       note.textContent=s.total+" vendor booths · percentages are by booth, not floor area. Mixed vendors are counted separately; food and entry areas are excluded.";
       map.style.gridTemplateColumns="repeat("+cols+", var(--fp-cell))"; map.style.gridTemplateRows="repeat("+rows+", var(--fp-cell))";
-      map.innerHTML=booths.map(function(b){return '<span class="fp-cell t-'+b.type+'" style="grid-row:'+b.r+' / span '+b.h+';grid-column:'+b.c+' / span '+b.w+'"><b>'+esc(b.label)+'</b><i>'+labels[b.type]+'</i></span>';}).join("");
+      map.dataset.rows=rows;map.dataset.cols=cols;
+      map.innerHTML=booths.map(function(b,i){return '<button type="button" class="fp-cell t-'+b.type+'" data-floor-booth="'+i+'" aria-pressed="false" aria-label="'+esc(b.label+' · '+labels[b.type]+', row '+b.r+', column '+b.c)+'" title="'+esc(b.label+' · '+labels[b.type])+'" style="grid-row:'+b.r+' / span '+b.h+';grid-column:'+b.c+' / span '+b.w+'"><b>'+esc(b.label)+'</b><i>'+labels[b.type]+'</i></button>';}).join("");
       mix.innerHTML=Object.keys(s.pct).map(function(k){return '<span class="t-'+k+'" style="width:'+s.pct[k]+'%"></span>';}).join("");
       legend.innerHTML=Object.keys(labels).filter(function(k){return booths.some(function(b){return b.type===k;});}).map(function(k){return '<li><i class="t-'+k+'" aria-hidden="true"></i>'+labels[k]+(s.pct[k]!==undefined?' '+s.pct[k]+'% ('+s.counts[k]+')':'')+'</li>';}).join("");
-      list.innerHTML=booths.map(function(b){return '<li>'+esc(b.label)+' · '+labels[b.type]+' · row '+b.r+', column '+b.c+'</li>';}).join("");
+      publicBooths=booths;details(-1);filter();
+      if(!publicView){
+        publicView=viewport(guide,map,scroll);
+        $('#floorSearch').addEventListener('input',filter);$('#floorType').addEventListener('change',filter);
+        guide.addEventListener('click',function(e){var b=e.target.closest('[data-floor-booth]');if(!b)return;var i=Number(b.dataset.floorBooth);details(i);publicView.focus($('#showFloorMap [data-floor-booth="'+i+'"]'));});
+      }
+      publicView.refresh();
     }
     TL.on("init",render); TL.on("config:change",render);
-    return {stats:stats,render:render};
+    return {stats:stats,render:render,viewport:viewport,fits:fits,overlaps:overlaps,canPlace:canPlace};
   })();
 
   /* ---------- pack rip: virtual booster mini-game ----------
@@ -10928,12 +11024,11 @@ a:hover .round-arrow{transform:rotate(45deg)}
 
   /* ---- card show floor plan ----
      config.show.floorplan = {rows, cols, booths:[{id, r, c, w, h, type, label}]}.
-     Grid is 1-indexed: row 1 is the top of the map, column 1 the left. The map here is a
-     read-only preview of the same data the Card show page draws. */
+     Grid is 1-indexed. Visual edits use the same geometry checks as numeric edits. */
   var BOOTH_OPTS = [["tcg", "TCG"], ["sports", "Sports"], ["mixed", "Mixed"], ["food", "Food"], ["entry", "Entry"]];
   var BOOTH_LAB = {tcg: "TCG", sports: "Sports", mixed: "Mixed", food: "Food", entry: "Entry"};
   var FP_MAX_ROWS = 20, FP_MAX_COLS = 26;
-  var fpWork = [], fpReady = false, fpUid = 0;
+  var fpWork = [], fpReady = false, fpUid = 0, fpSelected = -1, fpPlacing = false, fpViewport = null, fpDrag = null, fpSuppressClick = false;
   function fpSize(){
     return {rows: TL.clamp(Math.round(num(val("setFpRows"), 6)), 1, FP_MAX_ROWS), cols: TL.clamp(Math.round(num(val("setFpCols"), 10)), 1, FP_MAX_COLS)};
   }
@@ -10946,23 +11041,22 @@ a:hover .round-arrow{transform:rotate(45deg)}
         w: Math.max(1, Math.round(num(b.w, 1))), h: Math.max(1, Math.round(num(b.h, 1)))};
     });
   }
-  function fpFits(b, size){ return b.r >= 1 && b.c >= 1 && (b.r + b.h - 1) <= size.rows && (b.c + b.w - 1) <= size.cols; }
-  function fpOverlap(a, b){
-    return a.c < b.c + b.w && b.c < a.c + a.w && a.r < b.r + b.h && b.r < a.r + a.h;
-  }
+  function fpFits(b, size){ return TL.floorplan.fits(b,size); }
+  function fpOverlap(a, b){ return TL.floorplan.overlaps(a,b); }
   function renderFpEditor(){
     var el = $("#fpEditor"); if(!el) return;
-    if(!fpWork.length){
-      el.innerHTML = '<p class="rows-empty">No booths yet. Add one per table block — the Card show page shows nothing until you do.</p>';
+    if(!fpWork[fpSelected]){
+      el.innerHTML = '<h4>Booth details</h4><p class="rows-empty">Select a booth on the floor to edit its vendor name, category and footprint. Use Add booth, or Place on floor to choose a spot.</p>';
       renderFpMap(); return;
     }
     el.innerHTML = fpWork.map(function(b, i){
+      if(i!==fpSelected)return '';
       var n = i + 1;
       function nInput(k, lab, max){
         return '<input data-f="' + k + '" type="number" min="1" max="' + max + '" step="1" inputmode="numeric" value="' + esc(b[k]) + '" aria-label="' + lab + ' of booth ' + n + '">';
       }
       return '<div class="fp-row" data-r="' + n0(i) + '">' +
-        '<input data-f="label" class="fp-label" value="' + esc(b.label) + '" placeholder="Booth name" aria-label="Name of booth ' + n + '">' +
+        '<label>Vendor / booth name<input data-f="label" class="fp-label" maxlength="120" value="' + esc(b.label) + '" placeholder="Booth name" aria-label="Name of booth ' + n + '"></label>' +
         '<select data-f="type" class="fp-type" aria-label="Kind of booth ' + n + '">' + opts(BOOTH_OPTS, b.type) + '</select>' +
         '<div class="fp-nums-head" aria-hidden="true"><span>Row</span><span>Col</span><span>Wide</span><span>Tall</span></div>' +
         '<div class="fp-nums">' + nInput("r", "Row", FP_MAX_ROWS) + nInput("c", "Column", FP_MAX_COLS) + nInput("w", "Width", FP_MAX_COLS) + nInput("h", "Height", FP_MAX_ROWS) + '</div>' +
@@ -10975,22 +11069,28 @@ a:hover .round-arrow{transform:rotate(45deg)}
   function renderFpMap(){
     var map = $("#fpMap"), size = fpSize();
     if(map){
+      map.dataset.rows=size.rows;map.dataset.cols=size.cols;
+      map.classList.toggle('is-placing',fpPlacing);
       map.style.gridTemplateColumns = "repeat(" + size.cols + ", var(--fp-cell))";
       map.style.gridTemplateRows = "repeat(" + size.rows + ", var(--fp-cell))";
       map.innerHTML = fpWork.map(function(b, i){
-        var fits = fpFits(b, size);
+        var fits = TL.floorplan.canPlace(fpWork,b,size,i);
         var r = TL.clamp(b.r, 1, size.rows), c = TL.clamp(b.c, 1, size.cols);
         var h = TL.clamp(b.h, 1, size.rows - r + 1), w = TL.clamp(b.w, 1, size.cols - c + 1);
-        return '<span class="fp-cell t-' + esc(b.type) + (fits ? "" : " is-bad") + '" style="grid-row:' + r + ' / span ' + h + '; grid-column:' + c + ' / span ' + w + '">' +
-          '<b>' + esc(b.label || "Booth " + (i + 1)) + '</b><i>' + esc(BOOTH_LAB[b.type] || b.type) + '</i></span>';
+        return '<button type="button" data-fpselect="'+i+'" aria-pressed="'+(i===fpSelected)+'" aria-label="'+esc((b.label||'Unnamed booth '+(i+1))+' · '+BOOTH_LAB[b.type]+', row '+r+', column '+c)+'" class="fp-cell t-' + esc(b.type) + (fits ? "" : " is-bad") + '" style="grid-row:' + r + ' / span ' + h + '; grid-column:' + c + ' / span ' + w + '">' +
+          '<b>' + esc(b.label || "Booth " + (i + 1)) + '</b><i>' + esc(BOOTH_LAB[b.type] || b.type) + '</i></button>';
       }).join("");
+      if(!fpViewport)fpViewport=TL.floorplan.viewport($('#cardFloorplan'),map,$('#fpScroll'));
+      fpViewport.refresh();
     }
+    $('#fpRotate').disabled=!fpWork[fpSelected];$('#fpPlace').setAttribute('aria-pressed',String(fpPlacing));
+    $('#fpSelection').textContent=fpPlacing?'Tap an empty square to place a new '+BOOTH_LAB[val('fpBrush')]+' booth.':fpWork[fpSelected]?'Selected: '+(fpWork[fpSelected].label||'Unnamed booth')+' — drag to move, use arrow keys, or edit the details. Changes are not published until saved.':'Add a booth, or choose Place on floor and tap an empty square.';
     renderFpMix(size);
   }
   function renderFpMix(size){
     size = size || fpSize();
     var n = {tcg: 0, sports: 0, mixed: 0, food: 0, entry: 0}, bad = 0;
-    fpWork.forEach(function(b){ n[b.type] = (n[b.type] || 0) + 1; if(!fpFits(b, size)) bad++; });
+    fpWork.forEach(function(b,i){ n[b.type] = (n[b.type] || 0) + 1; if(!TL.floorplan.canPlace(fpWork,b,size,i)) bad++; });
     var tables = n.tcg + n.sports + n.mixed;
     var shares = TL.floorplan.stats(fpWork).pct;
     function pct(k){ return shares[k] || 0; }
@@ -11006,7 +11106,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
       if(!fpWork.length) txt.textContent = "Nothing placed yet. The Card show page shows the plan once you save booths here.";
       else txt.textContent = (tables ? tables + " table booth" + (tables === 1 ? "" : "s") + " · TCG " + pct("tcg") + "% · Sports " + pct("sports") + "%" + (n.mixed ? " · Mixed " + pct("mixed") + "%" : "") : "No table booths yet") +
         (n.food || n.entry ? " · plus " + [n.food ? n.food + " food" : "", n.entry ? n.entry + " entry" : ""].filter(Boolean).join(" and ") : "") +
-        (bad ? " — " + bad + " booth" + (bad === 1 ? "" : "s") + " outside the " + size.rows + "×" + size.cols + " grid" : "");
+        (bad ? " — " + bad + " booth" + (bad === 1 ? "" : "s") + " overlapping or outside the grid" : "");
     }
     var st = $("#fpRatio");
     if(st) setState(st, bad ? "warn" : "", size.rows + " rows × " + size.cols + " columns");
@@ -11024,7 +11124,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
     var f = (TL.config.show || {}).floorplan || {};
     setVal("setFpRows", TL.clamp(Math.round(num(f.rows, 6)), 1, FP_MAX_ROWS));
     setVal("setFpCols", TL.clamp(Math.round(num(f.cols, 10)), 1, FP_MAX_COLS));
-    fpWork = fpFromConfig(); fpReady = true;
+    fpWork = fpFromConfig(); fpReady = true;fpSelected=fpWork.length?0:-1;fpPlacing=false;
     renderFpEditor();
   }
   $("#fpEditor").addEventListener("input", fpSync);
@@ -11032,6 +11132,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
   $("#fpEditor").addEventListener("click", function(e){
     var d = e.target.closest("[data-fpdel]"); if(!d) return;
     fpWork.splice(parseInt(d.dataset.fpdel, 10), 1);
+    fpSelected=Math.min(fpSelected,fpWork.length-1);
     renderFpEditor();
     var first = $("#fpEditor input") || $("#fpAdd"); if(first) first.focus();
     toast("Booth removed — save to make it stick");
@@ -11047,12 +11148,61 @@ a:hover .round-arrow{transform:rotate(45deg)}
         if(!clash) spot = probe;
       }
     }
-    fpWork.push({uid: "bnew" + (++fpUid), id: "", label: "", type: "tcg", r: spot ? spot.r : 1, c: spot ? spot.c : 1, w: 1, h: 1});
-    renderFpEditor();
-    var rows = $$("#fpEditor .fp-row"), last = rows[rows.length - 1], inp = last && last.querySelector(".fp-label");
-    if(inp) inp.focus();
-    if(!spot) toast("Grid is full — make it bigger or move a booth");
+    if(!spot){toast("Grid is full — make it bigger or move a booth");return;}
+    fpCreate(spot);
   });
+  function fpCreate(spot){
+    if(fpWork.length>=100){toast('A floor plan supports up to 100 locations');return;}
+    fpWork.push({uid:'bnew'+(++fpUid),id:'',label:'',type:val('fpBrush')||'tcg',r:spot.r,c:spot.c,w:1,h:1});
+    fpSelected=fpWork.length-1;fpPlacing=false;renderFpEditor();
+    var inp=$('#fpEditor .fp-label');if(inp)inp.focus();
+    fpViewport.focus($('#fpMap [data-fpselect="'+fpSelected+'"]'));
+  }
+  function fpPoint(e){
+    var map=$('#fpMap'),rect=map.getBoundingClientRect(),step=parseFloat(getComputedStyle(map).getPropertyValue('--fp-cell'))+parseFloat(getComputedStyle(map).gap);
+    return {r:Math.floor((e.clientY-rect.top-2)/step)+1,c:Math.floor((e.clientX-rect.left-2)/step)+1};
+  }
+  function fpFocus(){var b=$('#fpMap [data-fpselect="'+fpSelected+'"]');if(b)b.focus({preventScroll:true});}
+  function fpMove(i,r,c,rotate){
+    var b=fpWork[i];if(!b)return;
+    var next={r:r,c:c,w:rotate?b.h:b.w,h:rotate?b.w:b.h};
+    if(!TL.floorplan.canPlace(fpWork,next,fpSize(),i)){toast('That position overlaps another booth or leaves the floor. Nothing moved.');return;}
+    b.r=next.r;b.c=next.c;b.w=next.w;b.h=next.h;fpSelected=i;renderFpEditor();fpFocus();
+  }
+  $('#fpPlace').addEventListener('click',function(){fpPlacing=!fpPlacing;renderFpMap();});
+  $('#fpBrush').addEventListener('change',renderFpMap);
+  $('#fpRotate').addEventListener('click',function(){var b=fpWork[fpSelected];if(b)fpMove(fpSelected,b.r,b.c,true);});
+  $('#fpMap').addEventListener('click',function(e){
+    if(fpSuppressClick){fpSuppressClick=false;return;}
+    var b=e.target.closest('[data-fpselect]');
+    if(b){fpSelected=Number(b.dataset.fpselect);fpPlacing=false;renderFpEditor();fpFocus();return;}
+    if(fpPlacing){var point=fpPoint(e);point.w=point.h=1;if(TL.floorplan.canPlace(fpWork,point,fpSize(),-1))fpCreate(point);else toast('Choose an empty square inside the floor.');}
+  });
+  $('#fpMap').addEventListener('keydown',function(e){
+    if(e.key==='Escape'){fpPlacing=false;fpSelected=-1;renderFpEditor();$('#fpPlace').focus();return;}
+    var el=e.target.closest('[data-fpselect]'),delta={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]}[e.key];
+    if(!el||!delta)return;e.preventDefault();var i=Number(el.dataset.fpselect),b=fpWork[i];fpMove(i,b.r+delta[0],b.c+delta[1]);
+  });
+  $('#fpMap').addEventListener('pointerdown',function(e){
+    var el=e.target.closest('[data-fpselect]');if(!el||e.button!==0||fpPlacing)return;
+    var i=Number(el.dataset.fpselect),p=fpPoint(e);fpDrag={i:i,p:p,x:e.clientX,y:e.clientY,id:e.pointerId};fpSuppressClick=false;
+    $('#fpMap').setPointerCapture(e.pointerId);
+  });
+  $('#fpMap').addEventListener('pointerup',function(e){
+    if(!fpDrag||e.pointerId!==fpDrag.id)return;var d=fpDrag;fpDrag=null;
+    fpSuppressClick=true;
+    /* Replacing a captured button can cancel the browser's follow-up click. Never
+       leave suppression armed for the user's next, unrelated placement. */
+    setTimeout(function(){fpSuppressClick=false;},0);
+    if(Math.hypot(e.clientX-d.x,e.clientY-d.y)<6){fpSelected=d.i;renderFpEditor();fpFocus();return;}
+    var el=$('#fpMap [data-fpselect="'+d.i+'"]');if(el)el.style.transform='';
+    var p=fpPoint(e),b=fpWork[d.i];fpMove(d.i,b.r+p.r-d.p.r,b.c+p.c-d.p.c);
+  });
+  $('#fpMap').addEventListener('pointermove',function(e){
+    if(!fpDrag||e.pointerId!==fpDrag.id)return;
+    var el=$('#fpMap [data-fpselect="'+fpDrag.i+'"]');if(el)el.style.transform='translate('+(e.clientX-fpDrag.x)+'px,'+(e.clientY-fpDrag.y)+'px)';
+  });
+  $('#fpMap').addEventListener('pointercancel',function(){fpDrag=null;fpSuppressClick=false;renderFpMap();});
   $("#setFpRows").addEventListener("input", renderFpMap);
   $("#setFpCols").addEventListener("input", renderFpMap);
   $("#fpApply").addEventListener("click", function(){
@@ -11060,6 +11210,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
     var size = fpSize();
     setVal("setFpRows", size.rows); setVal("setFpCols", size.cols);
     function flag(i, sel, msg){
+      fpSelected=i;renderFpEditor();
       var row = $('#fpEditor .fp-row[data-r="' + i + '"]'), inp = row && row.querySelector(sel);
       if(inp){ inp.focus(); inp.setAttribute("aria-invalid", "true"); }
       toast(msg);

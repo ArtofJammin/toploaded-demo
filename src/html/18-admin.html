@@ -68,7 +68,7 @@
 
         <div class="admin-card" id="inboxCard">
           <h3>Inbox <span class="pill warn" id="inboxPill"><span class="dot warn"></span><span id="inboxCount">0</span> new</span></h3>
-          <p class="card-note">Vendor tables, buylist quotes, league signups, restock and contact requests from the site.</p>
+          <p class="card-note">Vendor tables, league signups, restock and contact requests from the site. Earlier collection quote requests remain available; new collection offers happen in store.</p>
           <div class="chip-row inbox-chips" id="inboxChips" role="group" aria-label="Filter inbox by kind">
             <button class="chip" type="button" data-kind="all" aria-pressed="true">All</button>
             <button class="chip" type="button" data-kind="vendor" aria-pressed="false">Vendor</button>
@@ -260,10 +260,11 @@
 
       <div class="admin-card" id="cardFloorplan">
         <h3>Card show floor plan</h3>
-        <p class="card-note">Place the actual vendor booths on the grid. TCG, Sports and Mixed percentages count vendor booths, not floor area; entry and food areas are excluded. An empty plan stays unpublished.</p>
+        <p class="card-note">Build the actual show layout: select a booth to edit, drag it to move, or use its arrow keys. TCG, Sports and Mixed percentages count vendor booths, not floor area. Empty space is aisle space; this is a schematic, not a measured venue plan. An empty plan stays unpublished.</p>
         <div class="form-grid"><div class="field"><label for="setFpRows">Grid rows</label><input id="setFpRows" type="number" min="1" max="20" value="6"></div><div class="field"><label for="setFpCols">Grid columns</label><input id="setFpCols" type="number" min="1" max="26" value="10"></div></div>
-        <div id="fpEditor"></div>
-        <div class="floor-scroll" tabindex="0" role="region" aria-label="Floor plan preview"><div class="floor-map" id="fpMap"></div></div>
+        <div class="floor-tools"><div class="field"><label for="fpBrush">New booth category</label><select id="fpBrush"><option value="tcg">TCG</option><option value="sports">Sports</option><option value="mixed">Mixed</option><option value="food">Food</option><option value="entry">Entry</option></select></div><button class="btn btn-ghost" id="fpPlace" type="button" aria-pressed="false">Place on floor</button><button class="btn btn-ghost" id="fpRotate" type="button" disabled>Rotate selected</button><div class="floor-zoom" aria-label="Editor zoom"><button type="button" data-floor-zoom="out" aria-label="Zoom editor out">&minus;</button><button type="button" data-floor-zoom="fit">Fit floor</button><button type="button" data-floor-zoom="in" aria-label="Zoom editor in">+</button></div></div>
+        <p id="fpSelection" class="card-note" role="status">Add a booth, or choose Place on floor and tap an empty square.</p>
+        <div class="floor-guide-body"><div class="floor-scroll" id="fpScroll" tabindex="0" role="region" aria-label="Floor plan editor"><div class="floor-map" id="fpMap"></div></div><div id="fpEditor" class="floor-inspector"></div></div>
         <div class="floor-mix" id="fpMix" aria-hidden="true"></div><p id="fpMixText" class="card-note"></p><span id="fpRatio" class="save-state"></span>
         <div class="card-actions"><button class="btn" id="fpApply" type="button">Save floor plan</button><button class="btn btn-ghost" id="fpAdd" type="button">Add booth</button><span class="save-state" role="status" data-state-for="cardFloorplan"></span></div>
       </div>

@@ -50,8 +50,13 @@
         <p id="showFloorNote" class="card-note"></p>
         <div id="showFloorMix" class="floor-mix" aria-hidden="true"></div>
         <ul id="showFloorLegend" class="floor-legend"></ul>
-        <div class="floor-scroll" id="showFloorScroll" tabindex="0" role="region" aria-label="Vendor floor plan, scroll horizontally if needed"><div class="floor-map" id="showFloorMap"></div></div>
-        <ul id="showFloorList" class="floor-vendors" aria-label="Vendors and booth positions"></ul>
+        <div id="showFloorGuide" class="floor-guide" hidden>
+          <div class="floor-tools"><div class="field"><label for="floorSearch">Find a vendor</label><input id="floorSearch" type="search" placeholder="Vendor or booth name" maxlength="100"></div><div class="field"><label for="floorType">Show on map</label><select id="floorType"><option value="">All categories</option><option value="tcg">TCG</option><option value="sports">Sports</option><option value="mixed">Mixed</option><option value="food">Food</option><option value="entry">Entry</option></select></div><div class="floor-zoom" aria-label="Map zoom"><button type="button" data-floor-zoom="out" aria-label="Zoom out">&minus;</button><button type="button" data-floor-zoom="fit">Fit floor</button><button type="button" data-floor-zoom="in" aria-label="Zoom in">+</button></div></div>
+          <p class="card-note">Select a booth for details. Drag empty floor to pan, use Ctrl + wheel to zoom, or scroll the map on touch. Schematic layout &mdash; not a scale drawing of the venue.</p>
+          <div class="floor-guide-body"><div class="floor-scroll" id="showFloorScroll" tabindex="0" role="region" aria-label="Interactive vendor floor plan"><div class="floor-map" id="showFloorMap"></div></div><aside class="floor-detail" id="showFloorDetail" aria-live="polite"><h3>Explore the floor</h3><p>Choose a vendor on the map or in the directory.</p></aside></div>
+          <p id="floorResults" role="status" class="card-note"></p>
+          <ul id="showFloorList" class="floor-vendors" aria-label="Vendor directory"></ul>
+        </div>
       </section>
     </div>
   </section>
