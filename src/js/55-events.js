@@ -50,7 +50,8 @@
     if(dow < 0 || sm === null) return null;
     var days = (dow - t.dow + 7) % 7, running = false;
     if(days === 0 && sm <= t.min){ if(t.min < sm + EV_DUR_MIN) running = true; else days = 7; }
-    return {date: evAddDays(t, days), mins: days * 1440 + (sm - t.min), running: running, startMin: sm};
+    var date = evAddDays(t, days), when = TL.wallTime(date.y, date.m, date.d, Math.floor(sm / 60), sm % 60);
+    return {date: date, when: when, mins: Math.ceil((when.getTime() - (now || new Date()).getTime()) / 60000), running: running, startMin: sm};
   }
   function evUpcoming(now){
     return (TL.config.events || []).map(function(ev){ var o = evNextOcc(ev, now); return o ? {ev: ev, occ: o} : null; })
@@ -387,12 +388,15 @@
     var el = $("#showCountdown"); if(!el) return;
     var s = TL.config.show || {}, d = showNext(); if(!d){ evSetText(el, ""); return; }
     var now = new Date(), st = evHmMin(s.start), en = evHmMin(s.end);
+    d = TL.wallTime(d.getFullYear(), d.getMonth()+1, d.getDate(), Math.floor((st === null ? 600 : st)/60), (st === null ? 600 : st)%60);
     var endMs = d.getTime() + Math.max(60, ((en !== null ? en : 960) - (st !== null ? st : 600))) * 60000;
     var mins = Math.round((d.getTime() - now.getTime()) / 60000);
     /* plain text pill, not a live region: the digits tick every minute and nobody needs that read out */
     if(mins <= 0 && now.getTime() < endMs){ evSetText(el, "Happening now \u00b7 doors open till " + evClock(en !== null ? en : 960)); el.classList.add("live"); return; }
     el.classList.remove("live");
-    evSetText(el, mins <= 0 ? "" : evFmtUntil(mins));
+    var seconds = Math.max(0, Math.floor((d.getTime() - now.getTime()) / 1000));
+    var count = Math.floor(seconds/86400) + "d " + TL.pad2(Math.floor(seconds%86400/3600)) + "h " + TL.pad2(Math.floor(seconds%3600/60)) + "m" + (reduceMotion ? "" : " " + TL.pad2(seconds%60) + "s");
+    evSetText(el, mins <= 0 ? "" : (showFromConfig(showNext()) ? count : "Date to be confirmed · estimated " + count));
   }
   function bindVendor(){
     var form = $("#vendorForm"); if(!form) return;
@@ -580,7 +584,7 @@
   TL.on("view:change", function(d){
     if(!d) return;
     if(d.name === "events" && !evTimer){ tickEvents(); evTimer = setInterval(tickEvents, 60000); }
-    if(d.name === "show" && !showTimer){ tickShow(); showTimer = setInterval(tickShow, 60000); }
+    if(d.name === "show" && !showTimer){ tickShow(); showTimer = setInterval(function(){ if(!document.hidden) tickShow(); }, reduceMotion ? 60000 : 1000); }
     if(d.name === "visit"){ evLoadMap(); if(!visitTimer){ renderVisit(); visitTimer = setInterval(function(){ if(!document.hidden) tickVisit(); }, 60000); } }
     if(d.name === "admin") evEditorFallback();
   });

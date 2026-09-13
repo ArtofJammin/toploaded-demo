@@ -1,17 +1,17 @@
   <!-- ================= LIVE ================= -->
-  <section class="view" id="view-live" aria-label="Live breaks">
+  <section class="view" id="view-live" aria-label="Live stream">
     <div class="wrap">
       <div class="view-head">
-        <p class="eyebrow">Rip &amp; ship &middot; Streaming from the shop floor</p>
-        <h1>Live breaks</h1>
-        <p class="lede">Whatnot-style rip &amp; ship: claim a spot, watch every pack opened on camera, and your hits go out the next morning &mdash; sleeved, top loaded, and tracked. <span class="demo-tag" id="liveDemoTag" hidden>simulated stream</span></p>
+        <p class="eyebrow">Streaming from the shop floor</p>
+        <h1>Live stream</h1>
+        <p class="lede">Card show style; you like the card, you claim it &mdash; sleeved, top loaded, and tracked. Shipped within two business days. <span class="demo-tag" id="liveDemoTag" hidden>simulated stream</span></p>
       </div>
       <div class="live-grid">
         <div class="player">
           <div class="screen off" id="liveScreen">
             <div class="live-stage" id="liveStage">
               <div class="glow" aria-hidden="true"></div>
-              <span class="rip" id="ripLabel">Now ripping &middot; pack 7 of 36</span>
+              <span class="rip" id="ripLabel">On camera now</span>
               <div class="pack" aria-hidden="true"><b>TL</b></div>
               <div class="offair" id="liveOffair">
                 <span class="offair-k">Off air</span>
@@ -24,13 +24,8 @@
             <span class="viewers" id="viewerCount"><b id="viewerNum">214</b> watching</span>
           </div>
           <div class="player-bar">
-            <b id="liveTitle">Live break</b>
+            <b id="liveTitle">Live stream</b>
             <span id="liveSub">Off air</span>
-          </div>
-          <div class="hits" id="recentHits" aria-label="Recent hits">
-            <span class="hits-k" id="hitsLabel">Recent hits</span>
-            <div class="hits-row" id="hitsRow"></div>
-            <span class="demo-tag hits-tag" id="hitsDemoTag" title="Sample pulls drawn from the case &mdash; not a real break">sample</span>
           </div>
           <div class="notify" id="liveNotify">
             <form class="notify-form" id="notifyForm" novalidate>
@@ -80,14 +75,35 @@
       </div>
       <div class="section" style="padding-bottom:0">
         <div class="section-head">
-          <h2 id="spotHead">Claim a spot in the next break</h2>
-          <span class="spot-tags"><span class="demo-tag" id="spotPrice">$24.99 per spot</span><span class="demo-tag spots-open" id="spotsOpen"><b id="spotsLeftNum"></b>Checking spots&hellip;</span><span class="demo-tag" id="spotsDemoTag" title="Sample seats &mdash; the live board fills from real claims" hidden>sample seats</span></span>
+          <h2 id="spotHead">Live stream claims</h2>
         </div>
-        <p class="lede" style="max-width:64ch">One spot = three packs ripped live under your name. Hits ship free the next morning; bulk converts to store credit if you'd rather skip shipping. Claimed spots land straight in your cart.</p>
-        <p class="spot-note" id="spotNote" hidden>We're off air &mdash; a spot you claim now is a <b>pre-claim for the next break</b> (see the schedule below). It holds your seat and rips when we go live.</p>
-        <div class="spot-meter" id="spotMeter" role="progressbar" aria-label="Spots claimed" aria-valuemin="0" aria-valuemax="12" aria-valuenow="3"><i></i></div>
-        <div class="spots" id="spotGrid"></div>
+        <p class="lede" style="max-width:64ch">Claim a card with the host during the stream. Confirmed claims appear below with your public stream handle, the card and its price. Payment and shipping are arranged with the shop.</p>
+        <div class="claim-cols">
+          <section class="claim-feed" aria-labelledby="claimFeedHead">
+            <div class="feed-head">
+              <span id="claimFeedHead">Claims as they happen</span>
+              <span class="feed-head-r">
+                <span class="feed-count" id="claimCount"></span>
+                <span class="demo-tag" id="claimFeedTag" hidden>preview</span>
+              </span>
+            </div>
+            <ol class="feed-list" id="claimFeed" aria-label="Claims, newest first"></ol>
+            <p class="feed-empty" id="claimFeedEmpty">Connecting to the claims board&hellip;</p>
+            <p class="feed-note" id="claimFeedNote" hidden></p>
+            <p class="sr-only" id="claimFeedStatus" role="status" aria-live="polite"></p>
+          </section>
+        </div>
       </div>
+      <section class="admin-card" id="claimDesk" hidden aria-labelledby="claimDeskTitle">
+        <h2 id="claimDeskTitle">Staff claim desk</h2>
+        <p class="card-note">Post only claims the host has confirmed. Use public handles, never email addresses or shipping information. Posting does not charge the customer or change inventory.</p>
+        <form id="streamClaimForm"><div class="form-grid">
+          <div class="field"><label for="claimCard">Card / printing</label><input id="claimCard" required maxlength="120"></div>
+          <div class="field"><label for="claimHandle">Public stream handle</label><input id="claimHandle" required maxlength="40"></div>
+          <div class="field"><label for="claimPrice">Agreed price ($)</label><input id="claimPrice" type="number" min="0" max="100000" step=".01" required></div>
+          <div class="field"><button class="btn" type="submit">Post confirmed claim</button></div>
+        </div><p id="claimDeskStatus" role="status"></p></form>
+      </section>
       <div class="section" style="padding-bottom:0">
         <div class="section-head"><h2>Stream schedule</h2><span class="demo-tag" id="schedTag">Eastern time</span></div>
         <div class="tri" id="liveSchedule"></div>

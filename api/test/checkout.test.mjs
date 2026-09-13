@@ -155,7 +155,7 @@ test('live-spot- lines: priced from config.live.spotPrice, qty capped at 1, spot
     const r = await c.post('/checkout', { lines: [{ id: 'live-spot-3', name: 'Spot', price: 0.01, qty: 5 }] });
     assert.equal(r.status, 200, JSON.stringify(r.data));
     assert.equal(r.data.totalCents, 2499, 'default spotPrice 24.99');
-    assert.deepEqual(r.data.lines[0], { id: 'live-spot-3', name: 'Break spot #3 · Prismatic Evolutions booster box break', price: 24.99, qty: 1, trusted: true });
+    assert.deepEqual(r.data.lines[0], { id: 'live-spot-3', name: 'Break spot #3 · Streaming from the shop floor', price: 24.99, qty: 1, trusted: true });
     assert.equal((await env.KV.get('order:' + r.data.orderId, 'json')).priced, 'inventory');
 
     await env.KV.put('config', JSON.stringify({ live: { spotPrice: 30, spots: 4, title: 'Friday break' } }));
@@ -266,7 +266,7 @@ test('real mode: builds a Square Payment Link request from server prices and sto
     assert.equal(spot.status, 200, JSON.stringify(spot.data));
     assert.equal(spot.data.totalCents, 2499);
     const lb = s.calls[s.calls.length - 1].body;
-    assert.deepEqual(lb.order.line_items, [{ name: 'Break spot #2 · Prismatic Evolutions booster box break', quantity: '1', base_price_money: { amount: 2499, currency: 'USD' }, note: 'live-spot:2' }]);
+    assert.deepEqual(lb.order.line_items, [{ name: 'Break spot #2 · Streaming from the shop floor', quantity: '1', base_price_money: { amount: 2499, currency: 'USD' }, note: 'live-spot:2' }]);
   } finally { s.restore(); }
 });
 

@@ -71,7 +71,12 @@
         "n": 3,
         "price": 150
       }
-    ]
+    ],
+    "floorplan": {
+      "rows": 6,
+      "cols": 10,
+      "booths": []
+    }
   },
   "events": [
     {
@@ -125,32 +130,13 @@
   ],
   "live": {
     "on": false,
-    "title": "Prismatic Evolutions booster box break",
+    "title": "Streaming from the shop floor",
     "platform": "",
     "embed": "",
     "spotPrice": 24.99,
     "spots": 12,
     "packsPerSpot": 3,
-    "schedule": [
-      {
-        "day": "Tue",
-        "time": "7 PM",
-        "name": "Pokemon rip night",
-        "desc": "Sealed singles chases — ETBs, bundles, and a booster box to close the night."
-      },
-      {
-        "day": "Thu",
-        "time": "8 PM",
-        "name": "One Piece box breaks",
-        "desc": "Full box rips with leader giveaways between breaks."
-      },
-      {
-        "day": "Sun",
-        "time": "6 PM",
-        "name": "Mailbag & trades",
-        "desc": "We open what you sent in, price collections live, and take trade offers on air."
-      }
-    ]
+    "schedule": []
   },
   "links": {
     "tcgplus": "https://www.bandai-tcg-plus.com/",
@@ -215,6 +201,12 @@
       "op": 4.49,
       "mtg": 5.49
     }
+  },
+  "reviews": {
+    "source": "manual",
+    "googlePlaceId": "",
+    "minRating": 4,
+    "items": []
   },
   "updatedAt": null
 }

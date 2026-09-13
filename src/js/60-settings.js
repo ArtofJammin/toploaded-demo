@@ -57,7 +57,7 @@
     return list.map(function(o){ return '<option value="' + esc(o[0]) + '"' + (String(o[0]) === String(sel) ? " selected" : "") + '>' + esc(o[1]) + '</option>'; }).join("");
   }
 
-  /* ---- generic row editors (ticker, testimonials, live schedule, table prices) ---- */
+  /* ---- generic row editors (live schedule, table prices) ---- */
   function rowsRender(el, rows, fields, emptyText){
     if(!el) return;
     if(!rows.length){ el.innerHTML = '<p class="rows-empty">' + esc(emptyText || "Nothing yet — add a row.") + '</p>'; return; }
@@ -92,16 +92,10 @@
       if(inp) inp.focus();
     };
   }
-  var TICKER_F = [{k: "label", ph: "Charizard ex · 151", label: "Ticker item"}, {k: "price", ph: "$85", cls: "sm", label: "Top price"}];
-  var TESTI_F = [{k: "quote", ph: "Best prices in NKY, hands down.", label: "Quote"}, {k: "who", ph: "Alex R.", cls: "sm", label: "Who said it"}];
   var SCHED_F = [{k: "day", ph: "Tue", cls: "xs", label: "Day"}, {k: "time", ph: "7 PM", cls: "xs", label: "Time"}, {k: "name", ph: "Pokemon rip night", label: "Stream name"}, {k: "desc", ph: "What gets opened", label: "Description"}];
   var TABLE_F = [{k: "n", ph: "1", cls: "xs", type: "number", min: 1, label: "Tables"}, {k: "price", ph: "60", cls: "sm", type: "number", min: 0, label: "Price $"}];
-  var addTicker = rowsWire($("#tickerEditor"), TICKER_F, function(){ return {label: "", price: ""}; }, "No ticker rows — the strip hides.");
-  var addTesti = rowsWire($("#testiEditor"), TESTI_F, function(){ return {quote: "", who: ""}; }, "No testimonials yet — the section stays hidden.");
   var addSched = rowsWire($("#liveSchedEditor"), SCHED_F, function(){ return {day: "", time: "", name: "", desc: ""}; }, "No streams scheduled.");
   rowsWire($("#tablePriceEditor"), TABLE_F, function(){ return {n: "", price: ""}; }, "No table prices.");
-  $("#tickerAdd").addEventListener("click", function(){ addTicker(); });
-  $("#testiAdd").addEventListener("click", function(){ addTesti(); });
   $("#liveSchedAdd").addEventListener("click", function(){ addSched(); });
 
   /* ---- identity & contact ---- */
@@ -287,12 +281,11 @@
   function renderLivePill(){
     var on = !!(TL.config.live && TL.config.live.on), pill = $("#liveStatusPill"), btn = $("#goLiveBtn");
     if(pill){ pill.className = "pill " + (on ? "ok" : "crit"); pill.innerHTML = '<span class="dot"></span>' + (on ? "On air" : "Offline"); }
-    if(btn) btn.textContent = on ? "End live rip" : "Start live rip";
+    if(btn) btn.textContent = on ? "End live stream" : "Start live stream";
   }
   function renderLiveCard(){
     var l = TL.config.live || {};
     setVal("setLiveTitle", l.title); setVal("setLivePlatform", l.platform || ""); setVal("setLiveEmbed", l.embed);
-    setVal("setLiveSpotPrice", l.spotPrice); setVal("setLiveSpots", l.spots); setVal("setLivePacks", l.packsPerSpot);
     rowsRender($("#liveSchedEditor"), (l.schedule || []).map(function(s){ return {day: s.day, time: s.time, name: s.name, desc: s.desc}; }), SCHED_F, "No streams scheduled.");
     renderLivePill();
   }
@@ -314,7 +307,6 @@
     if(embed && !/^https:\/\//i.test(embed)){ toast("Embed URL needs to start with https://"); $("#setLiveEmbed").focus(); return; }
     saveCard("cardLive", {live: {
       title: val("setLiveTitle"), platform: val("setLivePlatform"), embed: embed,
-      spotPrice: Math.max(0, num(val("setLiveSpotPrice"), 0)), spots: TL.clamp(Math.round(num(val("setLiveSpots"), 12)), 1, 60), packsPerSpot: TL.clamp(Math.round(num(val("setLivePacks"), 3)), 1, 36),
       schedule: rowsRead($("#liveSchedEditor"), SCHED_F).filter(function(s){ return s.name || s.day; })
     }}, "Live settings saved");
   });
@@ -424,16 +416,306 @@
     saveCard("cardEvents", {events: events}, "Schedule published").then(function(){ evWork = evFromConfig(); renderEvEditor(); });
   });
 
-  /* ---- ticker & testimonials ---- */
-  function renderTickerCard(){
-    rowsRender($("#tickerEditor"), (TL.config.ticker || []).map(function(t){ return {label: t[0], price: t[1]}; }), TICKER_F, "No ticker rows — the strip hides.");
-    rowsRender($("#testiEditor"), (TL.config.testimonials || []).map(function(t){ return {quote: t.quote, who: t.who}; }), TESTI_F, "No testimonials yet — the section stays hidden.");
+  /* ---- reviews ("Word around the tables") ----
+     config.reviews = {source, googlePlaceId, minRating, items:[{quote, who, rating, source, url, at}]}.
+     Ships empty: nothing is invented here, the list is whatever the shop pastes in. The
+     "google" source only records intent — pulling reviews needs a Places key on the worker,
+     so the site still shows this list either way (renderRevSourceNote says so out loud). */
+  var REV_SRC_OPTS = [["google", "Google"], ["tcgplayer", "TCGplayer"], ["shop", "In the shop"]];
+  var REV_SRC_LAB = {google: "Google", tcgplayer: "TCGplayer", shop: "In the shop"};
+  var revWork = [], revReady = false, revUid = 0;
+  function tagUid(obj, prefix, n){
+    var uid = obj.__uid;
+    if(!uid){
+      uid = prefix + n;
+      try { Object.defineProperty(obj, "__uid", {value: uid, enumerable: false, writable: true}); } catch(e){ obj.__uid = uid; }
+    }
+    return uid;
   }
-  $("#tickerApply").addEventListener("click", function(){
-    saveCard("cardTicker", {
-      ticker: rowsRead($("#tickerEditor"), TICKER_F).filter(function(r){ return r.label; }).map(function(r){ return [r.label, r.price || "ask"]; }),
-      testimonials: rowsRead($("#testiEditor"), TESTI_F).filter(function(r){ return r.quote; })
-    }, "Ticker and testimonials saved");
+  function revMin(){ return TL.clamp(Math.round(num(val("setRevMin"), 4)), 1, 5); }
+  function revFromConfig(){
+    var r = TL.config.reviews || {};
+    return (r.items || []).map(function(it){
+      return {uid: tagUid(it, "r", ++revUid), quote: it.quote || "", who: it.who || "",
+        rating: TL.clamp(Math.round(num(it.rating, 5)), 1, 5), source: REV_SRC_LAB[it.source] ? it.source : "google",
+        url: it.url || "", at: it.at || ""};
+    });
+  }
+  function renderRevSourceNote(){
+    var el = $("#revSourceNote"); if(!el) return;
+    el.textContent = val("setRevSource") === "google"
+      ? "Automatic Google reviews need the shared API, a Places key, the shop's Place ID, and published terms/privacy links. Until connected, only the genuine reviews entered below can appear."
+      : "Pasted in by hand: the site shows exactly what's in the list below, nothing else.";
+  }
+  function renderRevPreview(){
+    var el = $("#revPreview"); if(!el) return;
+    var min = revMin(), live = 0, held = 0;
+    revWork.forEach(function(r){ if(String(r.quote || "").trim()){ if(r.rating >= min) live++; else held++; } });
+    if(!revWork.length){ el.textContent = "Nothing published — the home page section stays empty until you add a review."; return; }
+    el.textContent = live + " review" + (live === 1 ? "" : "s") + " will show on the home page" +
+      (held ? " · " + held + " held back under the " + min + "-star minimum" : "") +
+      " · publish to put the change live.";
+  }
+  function renderRevEditor(){
+    var el = $("#revEditor"); if(!el) return;
+    if(!revWork.length){
+      el.innerHTML = '<p class="rows-empty">No reviews yet. Copy a real one in with “Add review” — quote, who left it, and the link if it has one.</p>';
+      renderRevPreview(); return;
+    }
+    el.innerHTML = revWork.map(function(r, i){
+      var n = i + 1;
+      return '<div class="rev-row" data-r="' + i + '">' +
+        '<textarea data-f="quote" rows="2" placeholder="Paste what they actually wrote" aria-label="Review ' + n + ' quote">' + esc(r.quote) + '</textarea>' +
+        '<button type="button" class="row-del" data-revdel="' + i + '" aria-label="Remove review ' + n + (r.who ? " from " + esc(r.who) : "") + '">&times;</button>' +
+        '<div class="rev-meta-head" aria-hidden="true"><span>Who left it</span><span>Stars</span><span>Where from</span></div>' +
+        '<div class="rev-meta">' +
+          '<input data-f="who" value="' + esc(r.who) + '" placeholder="First name and initial" aria-label="Who left review ' + n + '">' +
+          '<input data-f="rating" type="number" min="1" max="5" step="1" inputmode="numeric" value="' + esc(r.rating) + '" aria-label="Stars for review ' + n + '">' +
+          '<select data-f="source" aria-label="Where review ' + n + ' came from">' + opts(REV_SRC_OPTS, r.source) + '</select>' +
+        '</div>' +
+        '<div class="rev-url"><input data-f="url" type="url" value="' + esc(r.url) + '" placeholder="https:// link to the review (optional)" aria-label="Link to review ' + n + '"></div>' +
+      '</div>';
+    }).join("");
+    renderRevPreview();
+  }
+  function revSync(e){
+    var inp = e.target.closest("[data-f]"), row = inp && inp.closest(".rev-row"); if(!row) return;
+    var r = revWork[parseInt(row.dataset.r, 10)]; if(!r) return;
+    if(inp.getAttribute("aria-invalid")) inp.removeAttribute("aria-invalid");
+    if(inp.dataset.f === "rating") r.rating = TL.clamp(Math.round(num(inp.value, 5)), 1, 5);
+    else r[inp.dataset.f] = inp.value;
+    renderRevPreview();
+  }
+  function renderReviewsCard(){
+    var r = TL.config.reviews || {};
+    setVal("setRevSource", r.source === "google" ? "google" : "manual");
+    setVal("setRevPlace", r.googlePlaceId);
+    setVal("setRevMin", TL.clamp(Math.round(num(r.minRating, 4)), 1, 5));
+    revWork = revFromConfig(); revReady = true;
+    renderRevSourceNote(); renderRevEditor();
+  }
+  $("#revEditor").addEventListener("input", revSync);
+  $("#revEditor").addEventListener("change", revSync);
+  $("#revEditor").addEventListener("click", function(e){
+    var d = e.target.closest("[data-revdel]"); if(!d) return;
+    revWork.splice(parseInt(d.dataset.revdel, 10), 1);
+    renderRevEditor();
+    var first = $("#revEditor textarea") || $("#revAdd"); if(first) first.focus();
+    toast("Review removed — publish to make it stick");
+  });
+  $("#revAdd").addEventListener("click", function(){
+    revWork.push({uid: "revnew" + (++revUid), quote: "", who: "", rating: 5, source: "google", url: "", at: ""});
+    renderRevEditor();
+    var rows = $$("#revEditor .rev-row"), last = rows[rows.length - 1], inp = last && last.querySelector("textarea");
+    if(inp) inp.focus();
+  });
+  $("#setRevSource").addEventListener("change", renderRevSourceNote);
+  $("#setRevMin").addEventListener("input", renderRevPreview);
+  $("#revApply").addEventListener("click", function(){
+    /* never publish a working copy that was never filled in from the config */
+    if(!revReady){ renderReviewsCard(); toast("Reviews reloaded — check them, then publish"); return; }
+    function flag(i, sel, msg){
+      var row = $('#revEditor .rev-row[data-r="' + i + '"]'), inp = row && row.querySelector(sel);
+      if(inp){ inp.focus(); inp.setAttribute("aria-invalid", "true"); }
+      toast(msg);
+    }
+    for(var i = 0; i < revWork.length; i++){
+      var r = revWork[i];
+      if(!String(r.quote || "").trim()){ flag(i, "textarea", "Review " + (i + 1) + " has no quote — paste it in or remove the row"); return; }
+      if(!String(r.who || "").trim()){ flag(i, '[data-f="who"]', "Add the original review author's display name"); return; }
+      if(r.url && !/^https?:\/\//i.test(r.url)){ flag(i, '[data-f="url"]', "The link on review " + (i + 1) + " needs to start with https://"); return; }
+    }
+    var min = revMin();
+    var items = revWork.map(function(r){
+      var out = {quote: String(r.quote).trim(), who: String(r.who || "").trim(), rating: r.rating,
+        source: r.source, url: String(r.url || "").trim(), at: r.at || new Date().toISOString()};
+      try { Object.defineProperty(out, "__uid", {value: r.uid, enumerable: false, writable: true}); } catch(e){}
+      return out;
+    });
+    /* dropping reviews is destructive — compare identities, not counts (a delete plus an
+       add nets to zero and used to slip through on the play-nights editor) */
+    var keep = {}; revWork.forEach(function(r){ if(r.uid) keep[r.uid] = 1; });
+    var gone = ((TL.config.reviews || {}).items || []).filter(function(it){ return it.__uid && !keep[it.__uid]; });
+    if(gone.length && !window.confirm("Publishing removes " + gone.length + " review" + (gone.length === 1 ? "" : "s") + " from the site. Continue?")){
+      renderReviewsCard();
+      toast("Nothing published — the list is back as it was");
+      return;
+    }
+    var patch = {reviews: {source: val("setRevSource") === "google" ? "google" : "manual", googlePlaceId: val("setRevPlace"), minRating: min, items: items}};
+    /* the older home-page quote list reads {quote, who}; keep it in step so real reviews
+       replace the sample quotes wherever that list is still what gets rendered */
+    if(window.TL_DEFAULT_CONFIG && ("testimonials" in window.TL_DEFAULT_CONFIG)){
+      patch.testimonials = items.filter(function(r){ return r.rating >= min; }).map(function(r){
+        return {quote: r.quote, who: r.who || (REV_SRC_LAB[r.source] || "") + " review"};
+      });
+    }
+    saveCard("cardReviews", patch, "Reviews published").then(function(){ renderReviewsCard(); });
+  });
+
+  /* ---- card show floor plan ----
+     config.show.floorplan = {rows, cols, booths:[{id, r, c, w, h, type, label}]}.
+     Grid is 1-indexed: row 1 is the top of the map, column 1 the left. The map here is a
+     read-only preview of the same data the Card show page draws. */
+  var BOOTH_OPTS = [["tcg", "TCG"], ["sports", "Sports"], ["mixed", "Mixed"], ["food", "Food"], ["entry", "Entry"]];
+  var BOOTH_LAB = {tcg: "TCG", sports: "Sports", mixed: "Mixed", food: "Food", entry: "Entry"};
+  var FP_MAX_ROWS = 20, FP_MAX_COLS = 26;
+  var fpWork = [], fpReady = false, fpUid = 0;
+  function fpSize(){
+    return {rows: TL.clamp(Math.round(num(val("setFpRows"), 6)), 1, FP_MAX_ROWS), cols: TL.clamp(Math.round(num(val("setFpCols"), 10)), 1, FP_MAX_COLS)};
+  }
+  function fpFromConfig(){
+    var f = (TL.config.show || {}).floorplan || {};
+    return (f.booths || []).map(function(b){
+      return {uid: tagUid(b, "b", ++fpUid), id: b.id || "", label: b.label || "",
+        type: BOOTH_LAB[b.type] ? b.type : "tcg",
+        r: Math.max(1, Math.round(num(b.r, 1))), c: Math.max(1, Math.round(num(b.c, 1))),
+        w: Math.max(1, Math.round(num(b.w, 1))), h: Math.max(1, Math.round(num(b.h, 1)))};
+    });
+  }
+  function fpFits(b, size){ return b.r >= 1 && b.c >= 1 && (b.r + b.h - 1) <= size.rows && (b.c + b.w - 1) <= size.cols; }
+  function fpOverlap(a, b){
+    return a.c < b.c + b.w && b.c < a.c + a.w && a.r < b.r + b.h && b.r < a.r + a.h;
+  }
+  function renderFpEditor(){
+    var el = $("#fpEditor"); if(!el) return;
+    if(!fpWork.length){
+      el.innerHTML = '<p class="rows-empty">No booths yet. Add one per table block — the Card show page shows nothing until you do.</p>';
+      renderFpMap(); return;
+    }
+    el.innerHTML = fpWork.map(function(b, i){
+      var n = i + 1;
+      function nInput(k, lab, max){
+        return '<input data-f="' + k + '" type="number" min="1" max="' + max + '" step="1" inputmode="numeric" value="' + esc(b[k]) + '" aria-label="' + lab + ' of booth ' + n + '">';
+      }
+      return '<div class="fp-row" data-r="' + n0(i) + '">' +
+        '<input data-f="label" class="fp-label" value="' + esc(b.label) + '" placeholder="Booth name" aria-label="Name of booth ' + n + '">' +
+        '<select data-f="type" class="fp-type" aria-label="Kind of booth ' + n + '">' + opts(BOOTH_OPTS, b.type) + '</select>' +
+        '<div class="fp-nums-head" aria-hidden="true"><span>Row</span><span>Col</span><span>Wide</span><span>Tall</span></div>' +
+        '<div class="fp-nums">' + nInput("r", "Row", FP_MAX_ROWS) + nInput("c", "Column", FP_MAX_COLS) + nInput("w", "Width", FP_MAX_COLS) + nInput("h", "Height", FP_MAX_ROWS) + '</div>' +
+        '<button type="button" class="row-del" data-fpdel="' + i + '" aria-label="Remove ' + esc(b.label || "booth " + n) + '">&times;</button>' +
+      '</div>';
+    }).join("");
+    renderFpMap();
+  }
+  function n0(i){ return i; }
+  function renderFpMap(){
+    var map = $("#fpMap"), size = fpSize();
+    if(map){
+      map.style.gridTemplateColumns = "repeat(" + size.cols + ", var(--fp-cell))";
+      map.style.gridTemplateRows = "repeat(" + size.rows + ", var(--fp-cell))";
+      map.innerHTML = fpWork.map(function(b, i){
+        var fits = fpFits(b, size);
+        var r = TL.clamp(b.r, 1, size.rows), c = TL.clamp(b.c, 1, size.cols);
+        var h = TL.clamp(b.h, 1, size.rows - r + 1), w = TL.clamp(b.w, 1, size.cols - c + 1);
+        return '<span class="fp-cell t-' + esc(b.type) + (fits ? "" : " is-bad") + '" style="grid-row:' + r + ' / span ' + h + '; grid-column:' + c + ' / span ' + w + '">' +
+          '<b>' + esc(b.label || "Booth " + (i + 1)) + '</b><i>' + esc(BOOTH_LAB[b.type] || b.type) + '</i></span>';
+      }).join("");
+    }
+    renderFpMix(size);
+  }
+  function renderFpMix(size){
+    size = size || fpSize();
+    var n = {tcg: 0, sports: 0, mixed: 0, food: 0, entry: 0}, bad = 0;
+    fpWork.forEach(function(b){ n[b.type] = (n[b.type] || 0) + 1; if(!fpFits(b, size)) bad++; });
+    var tables = n.tcg + n.sports + n.mixed;
+    var shares = TL.floorplan.stats(fpWork).pct;
+    function pct(k){ return shares[k] || 0; }
+    var bar = $("#fpMix");
+    if(bar){
+      bar.innerHTML = tables ? ["tcg", "sports", "mixed"].filter(function(k){ return n[k]; }).map(function(k){
+        return '<span class="t-' + k + '" style="width:' + pct(k) + '%"></span>';
+      }).join("") : "";
+      bar.hidden = !tables;
+    }
+    var txt = $("#fpMixText");
+    if(txt){
+      if(!fpWork.length) txt.textContent = "Nothing placed yet. The Card show page shows the plan once you save booths here.";
+      else txt.textContent = (tables ? tables + " table booth" + (tables === 1 ? "" : "s") + " · TCG " + pct("tcg") + "% · Sports " + pct("sports") + "%" + (n.mixed ? " · Mixed " + pct("mixed") + "%" : "") : "No table booths yet") +
+        (n.food || n.entry ? " · plus " + [n.food ? n.food + " food" : "", n.entry ? n.entry + " entry" : ""].filter(Boolean).join(" and ") : "") +
+        (bad ? " — " + bad + " booth" + (bad === 1 ? "" : "s") + " outside the " + size.rows + "×" + size.cols + " grid" : "");
+    }
+    var st = $("#fpRatio");
+    if(st) setState(st, bad ? "warn" : "", size.rows + " rows × " + size.cols + " columns");
+  }
+  function fpSync(e){
+    var inp = e.target.closest("[data-f]"), row = inp && inp.closest(".fp-row"); if(!row) return;
+    var b = fpWork[parseInt(row.dataset.r, 10)]; if(!b) return;
+    if(inp.getAttribute("aria-invalid")) inp.removeAttribute("aria-invalid");
+    var f = inp.dataset.f;
+    if(f === "label" || f === "type") b[f] = inp.value;
+    else b[f] = Math.max(1, Math.round(num(inp.value, 1)));
+    renderFpMap();
+  }
+  function renderFloorplanCard(){
+    var f = (TL.config.show || {}).floorplan || {};
+    setVal("setFpRows", TL.clamp(Math.round(num(f.rows, 6)), 1, FP_MAX_ROWS));
+    setVal("setFpCols", TL.clamp(Math.round(num(f.cols, 10)), 1, FP_MAX_COLS));
+    fpWork = fpFromConfig(); fpReady = true;
+    renderFpEditor();
+  }
+  $("#fpEditor").addEventListener("input", fpSync);
+  $("#fpEditor").addEventListener("change", fpSync);
+  $("#fpEditor").addEventListener("click", function(e){
+    var d = e.target.closest("[data-fpdel]"); if(!d) return;
+    fpWork.splice(parseInt(d.dataset.fpdel, 10), 1);
+    renderFpEditor();
+    var first = $("#fpEditor input") || $("#fpAdd"); if(first) first.focus();
+    toast("Booth removed — save to make it stick");
+  });
+  $("#fpAdd").addEventListener("click", function(){
+    var size = fpSize();
+    /* drop the new booth in the first free cell so it never lands on top of another one */
+    var spot = null;
+    for(var r = 1; r <= size.rows && !spot; r++){
+      for(var c = 1; c <= size.cols && !spot; c++){
+        var probe = {r: r, c: c, w: 1, h: 1};
+        var clash = fpWork.some(function(b){ return fpOverlap(probe, b); });
+        if(!clash) spot = probe;
+      }
+    }
+    fpWork.push({uid: "bnew" + (++fpUid), id: "", label: "", type: "tcg", r: spot ? spot.r : 1, c: spot ? spot.c : 1, w: 1, h: 1});
+    renderFpEditor();
+    var rows = $$("#fpEditor .fp-row"), last = rows[rows.length - 1], inp = last && last.querySelector(".fp-label");
+    if(inp) inp.focus();
+    if(!spot) toast("Grid is full — make it bigger or move a booth");
+  });
+  $("#setFpRows").addEventListener("input", renderFpMap);
+  $("#setFpCols").addEventListener("input", renderFpMap);
+  $("#fpApply").addEventListener("click", function(){
+    if(!fpReady){ renderFloorplanCard(); toast("Floor plan reloaded — check it, then save"); return; }
+    var size = fpSize();
+    setVal("setFpRows", size.rows); setVal("setFpCols", size.cols);
+    function flag(i, sel, msg){
+      var row = $('#fpEditor .fp-row[data-r="' + i + '"]'), inp = row && row.querySelector(sel);
+      if(inp){ inp.focus(); inp.setAttribute("aria-invalid", "true"); }
+      toast(msg);
+    }
+    for(var i = 0; i < fpWork.length; i++){
+      var b = fpWork[i];
+      if(!String(b.label || "").trim()){ flag(i, ".fp-label", "Booth " + (i + 1) + " needs a name before you save"); return; }
+      if(!fpFits(b, size)){ flag(i, '[data-f="r"]', esc(b.label) + " sits outside the " + size.rows + "×" + size.cols + " grid"); return; }
+      for(var j = 0; j < i; j++){
+        if(fpOverlap(b, fpWork[j])){ flag(i, '[data-f="r"]', b.label + " sits on top of " + (fpWork[j].label || "booth " + (j + 1))); return; }
+      }
+    }
+    var used = {};
+    var booths = fpWork.map(function(b, i){
+      var base = (b.id || String(b.label).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")) || ("booth-" + (i + 1));
+      var id = base, k = 2; while(used[id]){ id = base + "-" + (k++); } used[id] = true;
+      var out = {id: id, label: String(b.label).trim(), type: b.type, r: b.r, c: b.c, w: b.w, h: b.h};
+      try { Object.defineProperty(out, "__uid", {value: b.uid, enumerable: false, writable: true}); } catch(e){}
+      return out;
+    });
+    var keep = {}; fpWork.forEach(function(b){ if(b.uid) keep[b.uid] = 1; });
+    var gone = (((TL.config.show || {}).floorplan || {}).booths || []).filter(function(b){ return b.__uid && !keep[b.__uid]; });
+    if(gone.length && !window.confirm("Saving removes " + gone.length + " booth" + (gone.length === 1 ? "" : "s") + " from the floor plan: " +
+        gone.map(function(b){ return b.label || "an unnamed booth"; }).join(", ") + ". Continue?")){
+      renderFloorplanCard();
+      toast("Nothing saved — the plan is back as it was");
+      return;
+    }
+    saveCard("cardFloorplan", {show: {floorplan: {rows: size.rows, cols: size.cols, booths: booths}}}, "Floor plan saved")
+      .then(function(){ renderFloorplanCard(); });
   });
 
   /* ---- reset ---- */
@@ -457,7 +739,7 @@
     var el = $("#siteBanner"), txt = $("#siteBannerText"), btn = $("#siteBannerBtn"); if(!el) return;
     var live = TL.config.live || {}, b = TL.config.banner || {};
     if(live.on){
-      txt.textContent = "LIVE NOW — " + (live.title ? live.title + " · " : "") + "rip & ship in progress";
+      txt.textContent = "LIVE NOW — " + (live.title ? live.title + " · " : "") + "streaming from the shop floor";
       btn.hidden = false; el.hidden = false;
     } else if(b.on && b.text){
       txt.textContent = b.text; btn.hidden = true; el.hidden = false;
@@ -466,7 +748,7 @@
 
   function renderEditors(){
     renderSite(); renderHours(); renderBannerCard(); renderLinks(); renderShowCard(); renderLiveCard();
-    evWork = evFromConfig(); evReady = true; renderEvEditor(); renderTickerCard(); renderCfgUpdated();
+    evWork = evFromConfig(); evReady = true; renderEvEditor(); renderReviewsCard(); renderFloorplanCard(); renderCfgUpdated();
   }
   var editorsStale = true;
   TL.on("config:change", function(){

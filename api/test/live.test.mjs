@@ -13,7 +13,7 @@ test('live: state reflects config, claims hold for 6 h, conflicts 409', async ()
   const s = await c.get('/live');
   assert.equal(s.status, 200);
   assert.equal(s.data.live.on, false);
-  assert.equal(s.data.live.title, 'Prismatic Evolutions booster box break');
+  assert.equal(s.data.live.title, 'Streaming from the shop floor');
   assert.deepEqual(s.data.spots.taken, []);
   assert.equal(s.data.spots.total, 12);
   assert.equal(s.data.spots.price, 24.99);

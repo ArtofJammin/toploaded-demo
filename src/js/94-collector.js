@@ -93,35 +93,94 @@
     TL.on("motion:change",resetTilt); TL.on("view:leave",resetTilt);
     document.addEventListener("visibilitychange",function(){ if(document.hidden) resetTilt(); });
 
+    /* Whole-set checklists, with exact product-ID stock matching via TL.cards. */
+    var setSel = document.getElementById("discoverySet"), gameSel = document.getElementById("discoveryGame");
+    var setsToken = 0;
+    function loadSets(){
+      if(!setSel || !gameSel) return;
+      var game = gameSel.value, token = ++setsToken;
+      setSel.disabled = true;
+      setSel.innerHTML = '<option value="">Loading sets…</option>';
+      TL.cards.sets(game === "all" ? "all" : game).then(function(list){
+        if(token !== setsToken) return;
+        setSel.innerHTML = '<option value="">Any set (surprise me)</option>' +
+          list.map(function(st){ return '<option value="' + TL.esc(st.code) + '">' + TL.esc(st.name) + '</option>'; }).join("");
+        setSel.disabled = false;
+      }, function(){
+        if(token !== setsToken) return;
+        setSel.innerHTML = '<option value="">Any set (surprise me)</option>';
+        setSel.disabled = false;
+      });
+    }
+    if(gameSel) gameSel.addEventListener("change", loadSets);
+
+    function pickHtml(card){
+      var img = card.img
+        ? '<img class="card-img" src="' + TL.esc(card.img) + '" alt="' + TL.esc(card.name) + '" width="250" height="350" decoding="async" referrerpolicy="no-referrer">'
+        : '<span class="mystery-card" aria-hidden="true"><span>TOP LOADED</span><b>?</b><small>NO PHOTO</small></span>';
+      var price = card.price > 0
+        ? (card.priceIsMarket
+            ? '<span class="pick-price">' + TL.money(card.price) + ' <small>market reference</small></span>'
+            : '<span class="pick-price">' + TL.money(card.price) + ' <small>our price</small></span>')
+        : '<span class="pick-price"><small>no price on file</small></span>';
+      var badge = card.inStock
+        ? '<span class="stock-badge">In stock now</span>'
+        : '<span class="stock-badge out">'+(card.stockKnown ? 'Not in the current inventory' : 'Stock unavailable')+'</span>';
+      var action = card.inStock
+        ? '<button type="button" class="linklike" data-discovery-view>Take a closer look ↗</button>'
+        : (card.url ? '<a class="linklike" href="' + TL.esc(card.url) + '" target="_blank" rel="noopener noreferrer">Look it up ↗</a>' : "");
+      return '<div class="discovery-pick"><span class="discovery-art' + (card.inStock ? '" role="button" tabindex="0" data-discovery-view aria-label="View ' + TL.esc(card.name) : '') + '">' + img + '</span>' +
+        '<div><span class="case-label">A LITTLE DISCOVERY</span><h4>' + TL.esc(card.name) + '</h4>' +
+        '<p>' + TL.esc(card.set || "") + (card.rarity ? ' · ' + TL.esc(card.rarity) : "") + '</p>' +
+        '<p>' + price + '</p>' + badge + action + '</div></div>';
+    }
+
     form.addEventListener("submit", function(e){
       e.preventDefault();
       var button = document.getElementById("discoveryBtn"), status = document.getElementById("discoveryStatus");
       if(button.disabled) return;
-      var game = document.getElementById("discoveryGame").value, budget = Number(document.getElementById("discoveryBudget").value);
-      button.disabled = true; button.textContent = "Opening the case…";
-      status.textContent = "Finding an in-stock single in your budget…";
-      TL.inventory.load().then(function(){
-        if(!TL.inventory.loaded) throw new Error("The inventory is unavailable right now. Try again in a moment.");
-        var choices = TL.inventory.catalog().filter(function(item){
-          return item.type === "single" && item.stock > 0 && item.price > 0 && item.price < budget && (game === "all" || item.game === game);
-        });
-        if(!choices.length){
+      var game = gameSel.value, budget = Number(document.getElementById("discoveryBudget").value);
+      var chosenSet = setSel ? setSel.value : "";
+      button.disabled = true; button.textContent = "Exploring the set…";
+      status.textContent = "Looking through the set…";
+      var pickSet = chosenSet
+        ? Promise.resolve(chosenSet)
+        : TL.cards.sets(game === "all" ? "all" : game).then(function(list){
+            if(!list.length) return "";
+            return list[Math.floor(Math.random() * list.length)].code;
+          }, function(){ return ""; });
+
+      pickSet.then(function(setToken){
+        return TL.cards.fromSet(game === "all" ? "all" : game, setToken, {maxPrice: budget});
+      }).then(function(cards){
+        if(!cards.length){
           lastPick = null;
-          document.getElementById("discoveryResult").innerHTML = '<p class="collector-note">A different game or budget might hold your next favorite.</p>';
-          status.textContent = "No singles under " + TL.money(budget) + " in this game right now. Try another game or budget.";
+          document.getElementById("discoveryResult").innerHTML = '<p class="collector-note">Nothing in that set under ' + TL.money(budget) + '. Try another set or a bigger budget.</p>';
+          status.textContent = "No cards matched. Try another set or budget.";
           return;
         }
-        var pool = choices.length > 1 ? choices.filter(function(item){ return !lastPick || item.id !== lastPick.id; }) : choices;
-        var item = pool[Math.floor(Math.random()*pool.length)]; lastPick = item;
-        document.getElementById("discoveryResult").innerHTML = '<div class="discovery-pick" data-id="' + TL.esc(item.id) + '"><button type="button" class="discovery-art" data-discovery-view aria-label="View ' + TL.esc(item.name) + '">' + art(item,true) + '</button><div><span class="case-label">A LITTLE DISCOVERY</span><h4>' + TL.esc(item.name) + '</h4><p>' + TL.money(item.price) + ' · ' + TL.esc(TL.gameLabel(item.game)) + '</p><button type="button" class="linklike" data-discovery-view>Take a closer look ↗</button></div></div>';
-        status.textContent = item.name + " — " + TL.money(item.price) + ". One of " + TL.fmtInt(choices.length) + " matches. Try again for another find.";
-      }).catch(function(err){ status.textContent = err.message || "Could not open the case. Please try again."; }).finally(function(){
+        var pool = cards.length > 1 ? cards.filter(function(c){ return !lastPick || c.id !== lastPick.id; }) : cards;
+        if(!pool.length) pool=cards;
+        var card = pool[Math.floor(Math.random() * pool.length)];
+        lastPick = card;
+        document.getElementById("discoveryResult").innerHTML = pickHtml(card);
+        status.textContent = card.name + " — one of " + TL.fmtInt(cards.length) + " in " + (card.set || "that set") +
+          (card.inStock ? ". In stock in our latest inventory." : card.stockKnown ? ". Not currently listed in our inventory." : ". Stock could not be checked.") + " Try again for another.";
+      }).catch(function(err){
+        status.textContent = (err && err.message) || "Could not reach the card catalogue. Please try again.";
+      }).finally(function(){
         button.disabled = false; button.innerHTML = (lastPick ? "Find another card" : "Find my next card") + ' <span aria-hidden="true">✦</span>';
       });
     });
+    TL.on("init", loadSets);
     document.getElementById("discoveryResult").addEventListener("click",function(e){
       var trigger = e.target.closest("[data-discovery-view]");
-      if(trigger && lastPick) TL.openQuickView(TL.inventory.byId(lastPick.id) || lastPick,{from:trigger});
+      if(!trigger || !lastPick) return;
+      var stocked = TL.cards.stockOf(lastPick);
+      if(stocked) TL.openQuickView(stocked, {from: trigger});
+    });
+    document.getElementById("discoveryResult").addEventListener("keydown",function(e){
+      if(e.target.matches('[role="button"][data-discovery-view]')&&(e.key==="Enter"||e.key===" ")){e.preventDefault();e.target.click();}
     });
     TL.on("init",renderDeck); TL.on("inventory:summary",renderDeck); TL.on("inventory:summary-failed",renderDeck);
   })();

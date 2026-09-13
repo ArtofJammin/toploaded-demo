@@ -21,6 +21,17 @@
     return out;
   }
   TL.deepMerge = deepMerge;
+  /* Convert a shop-local calendar date to an instant, independent of the visitor's timezone. */
+  TL.wallTime = function(y, m, d, h, mi){
+    var target = Date.UTC(y, m - 1, d, h, mi), guess = target;
+    var fmt = new Intl.DateTimeFormat("en-US", {timeZone: (TL.config && TL.config.timezone) || "America/New_York", year:"numeric",month:"numeric",day:"numeric",hour:"numeric",minute:"numeric",hourCycle:"h23"});
+    for(var i = 0; i < 3; i++){
+      var p = {}; fmt.formatToParts(new Date(guess)).forEach(function(x){ p[x.type] = Number(x.value); });
+      var delta = target - Date.UTC(p.year,p.month-1,p.day,p.hour % 24,p.minute);
+      guess += delta; if(!delta) break;
+    }
+    return new Date(guess);
+  };
   TL.config = deepMerge({}, window.TL_DEFAULT_CONFIG || {});
   TL.saveConfig = function(patch){
     TL.config = deepMerge(TL.config, patch);

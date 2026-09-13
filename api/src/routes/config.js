@@ -17,7 +17,7 @@ const TYPES = {
   title: 'string', tagline: 'string', phone: 'string', phoneRaw: 'string', email: 'string', timezone: 'string',
   address: 'object', hours: 'object', hoursText: 'object', banner: 'object', logo: 'string?', show: 'object',
   events: 'array', live: 'object', links: 'object', buy: 'object', ticker: 'array', testimonials: 'array',
-  rip: 'object', updatedAt: 'string?',
+  rip: 'object', reviews: 'object', updatedAt: 'string?',
 };
 const EMBED_HOSTS = ['youtube.com', 'www.youtube.com', 'youtu.be', 'twitch.tv', 'www.twitch.tv', 'player.twitch.tv', 'whatnot.com', 'www.whatnot.com'];
 function isHttpUrl(u) { try { const x = new URL(u); return x.protocol === 'https:' || x.protocol === 'http:'; } catch { return false; } }
@@ -73,6 +73,28 @@ export async function loadConfig(env) {
   return deepMerge(DEFAULT_CONFIG, stored || {});
 }
 
+export function validateOwnerSettings(cfg) {
+  const fail = m => { throw new HttpError(400, m); };
+  const fp=cfg.show?.floorplan;
+  if(fp !== undefined){
+    if(!fp || !Number.isInteger(fp.rows)||fp.rows<1||fp.rows>20||!Number.isInteger(fp.cols)||fp.cols<1||fp.cols>26||!Array.isArray(fp.booths)||fp.booths.length>100)fail('Floor plan needs a 1–20 by 1–26 grid and at most 100 booths');
+    const occupied=new Set(),ids=new Set();
+    for(const b of fp.booths){
+      if(!b || typeof b.id!=='string'||!b.id.trim()||ids.has(b.id)||typeof b.label!=='string'||!b.label.trim()||b.label.length>120||!['tcg','sports','mixed','food','entry'].includes(b.type))fail('Each booth needs a unique ID, name and valid type');
+      ids.add(b.id);
+      if(!['r','c','w','h'].every(k=>Number.isInteger(b[k])&&b[k]>=1)||b.r+b.h-1>fp.rows||b.c+b.w-1>fp.cols)fail('Booths must fit inside the floor plan');
+      for(let r=b.r;r<b.r+b.h;r++)for(let c=b.c;c<b.c+b.w;c++){const key=r+','+c;if(occupied.has(key))fail('Floor plan booths overlap');occupied.add(key);}
+    }
+  }
+  const rv=cfg.reviews;
+  if(rv !== undefined){
+    if(!rv||!['manual','google'].includes(rv.source)||!Number.isInteger(rv.minRating)||rv.minRating<1||rv.minRating>5||typeof rv.googlePlaceId!=='string'||rv.googlePlaceId.length>200||!Array.isArray(rv.items)||rv.items.length>50)fail('Invalid review settings');
+    for(const t of rv.items){
+      if(!t||typeof t.quote!=='string'||!t.quote.trim()||typeof t.who!=='string'||!t.who.trim()||!Number.isInteger(t.rating)||t.rating<1||t.rating>5||!['google','tcgplayer','shop'].includes(t.source)||t.url && !isHttpUrl(t.url))fail('Reviews need genuine wording, author, rating, source and an http(s) source link');
+    }
+  }
+}
+
 export function register(r) {
   r.get('/config', async ({ env }) => loadConfig(env));
 
@@ -85,6 +107,7 @@ export function register(r) {
     validatePatch(patch);
     const stored = (await getJSON(env.KV, 'config', {})) || {};
     const next = deepMerge(stored, patch);
+    validateOwnerSettings(deepMerge(DEFAULT_CONFIG, next));
     next.updatedAt = new Date().toISOString();
     await putJSON(env.KV, 'config', next);
     return deepMerge(DEFAULT_CONFIG, next);

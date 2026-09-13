@@ -20,6 +20,25 @@
       </div>
     </div>
 
+    <!-- Moved above the play nights at the owner's request. -->
+    <div class="section trade-band">
+      <div class="wrap">
+        <a class="trade-tile" href="#/buylist" data-go="buylist"><span class="tile-number">03 / MAKE ROOM FOR WHAT’S NEXT</span><div><h3>Old binder.<br>New possibilities.</h3><span class="trade-stamp" aria-hidden="true">BUY<br>SELL<br>TRADE</span></div><p>Turn your collection into cash or store credit.<span class="round-arrow" aria-hidden="true">↗</span></p></a>
+      </div>
+    </div>
+
+    <!-- Play nights, one live countdown per game (owner request). Rendered by 20-hero.js. -->
+    <section class="section playnow" id="playNow" aria-labelledby="playNowTitle">
+      <div class="wrap">
+        <div class="section-head">
+          <div><p class="collector-kicker">EVERY WEEK, AROUND THE 8-TOP</p><h2 id="playNowTitle">Play nights</h2></div>
+          <a class="linklike" href="#/events" data-go="events">Full schedule &amp; signups &rarr;</a>
+        </div>
+        <ul class="playnow-grid" id="playNowGrid" aria-label="Next play night for each game"></ul>
+        <p class="collector-source" id="playNowNote">Bandai official store &middot; winner and participation packs on Bandai nights.</p>
+      </div>
+    </section>
+
     <div class="game-shelf wrap" aria-label="Shop by game">
       <span class="game-shelf-label">FIND YOUR<br>UNIVERSE <span aria-hidden="true">→</span></span>
       <a href="#/shop?game=pk" class="game-door" data-universe="pk"><span class="game-mark"><svg class="game-icon" width="36" height="36" aria-hidden="true" focusable="false"><use href="#game-icon-pk"></use></svg></span><span class="game-door-label">Pokémon<small>Gotta find that grail.</small></span><span class="game-arrow" aria-hidden="true">↗</span></a>
@@ -28,67 +47,19 @@
       <a href="#/shop?game=gundam" class="game-door" data-universe="gundam"><span class="game-mark"><svg class="game-icon" width="36" height="36" aria-hidden="true" focusable="false"><use href="#game-icon-gundam"></use></svg></span><span class="game-door-label">Gundam<small>Build your squad.</small></span><span class="game-arrow" aria-hidden="true">↗</span></a>
     </div>
 
-    <div class="ticker" id="ticker">
-      <span class="ticker-label" aria-hidden="true">Buying desk</span>
-      <div class="ticker-track" id="tickerTrack" aria-hidden="true"></div>
-      <ul class="ticker-sr" id="tickerList" aria-label="Buying now"></ul>
-      <span class="ticker-right">
-        <span class="demo-tag" id="tickerDemo" title="Sample offers &mdash; the buying desk list is set by the shop">sample offers</span>
-        <button class="ticker-pause" id="tickerPause" type="button" aria-pressed="false" aria-label="Pause the buying desk ticker">
-          <svg class="ic-pause" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="1.5" width="3" height="9" rx=".8" fill="currentColor"/><rect x="7" y="1.5" width="3" height="9" rx=".8" fill="currentColor"/></svg>
-          <svg class="ic-play" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.8v8.4l7-4.2z" fill="currentColor"/></svg>
-        </button>
-      </span>
-    </div>
-
-    <div class="nextup" id="nextUp">
-      <div class="wrap">
-        <ul class="nextup-list" aria-label="Next up at the shop">
-          <li class="nextup-cell" id="nuEvCell">
-            <a class="nextup-btn" href="#/events" data-go="events">
-              <span class="nextup-k">Next play night</span>
-              <span class="nextup-name" id="nuEvName">Play nights</span>
-              <span class="nextup-when" id="nuEvWhen">See the schedule</span>
-              <span class="nextup-cd" id="nuEvCd" role="timer" aria-live="off"></span>
-            </a>
-          </li>
-          <li class="nextup-cell" id="nuShowCell">
-            <a class="nextup-btn" href="#/show" data-go="show">
-              <span class="nextup-k">Next card show</span>
-              <span class="nextup-name" id="nuShowName">Card show &middot; Hilton, Turfway Rd</span>
-              <span class="nextup-when" id="nuShowWhen">First Saturday or Sunday &middot; 10&ndash;4</span>
-              <span class="nextup-cd" id="nuShowCd" role="timer" aria-live="off"></span>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-
     <div class="section collector-playground">
       <div class="wrap">
         <div class="section-head"><div><p class="collector-kicker">MORE THAN A CHECKOUT</p><h2>Come for the cards.<br>Stay for the good stuff.</h2></div><span class="collector-note">A little luck. A lot of community.</span></div>
         <div class="collector-mosaic">
           <section class="discovery-tile" aria-labelledby="discoveryTitle">
-            <div class="discovery-copy"><span class="tile-number">01 / HAPPY ACCIDENTS</span><h3 id="discoveryTitle">Meet your<br>next favorite.</h3><p>Pick a game. Set your budget.<br>Let the case surprise you.</p>
-              <form id="discoveryForm"><div class="discovery-fields"><label>YOUR GAME<select id="discoveryGame"><option value="all">Any universe</option><option value="pk">Pokémon</option><option value="op">One Piece</option><option value="mtg">Magic</option><option value="gundam">Gundam</option><option value="lorcana">Lorcana</option></select></label><label>YOUR BUDGET<select id="discoveryBudget"><option value="10">Under $10</option><option value="25" selected>Under $25</option><option value="50">Under $50</option><option value="100">Under $100</option></select></label></div><button class="btn" id="discoveryBtn" type="submit">Find my next card <span aria-hidden="true">✦</span></button></form>
-              <p id="discoveryStatus" class="discovery-status" role="status">A free discovery. No purchase, just possibilities.</p>
+            <div class="discovery-copy"><span class="tile-number">01 / HAPPY ACCIDENTS</span><h3 id="discoveryTitle">Meet your<br>next favorite.</h3><p>Pick a game and explore a whole set.<br>Your next favorite might surprise you.</p>
+              <form id="discoveryForm"><div class="discovery-fields"><label>YOUR GAME<select id="discoveryGame"><option value="all">Any universe</option><option value="pk">Pokémon</option><option value="op">One Piece</option><option value="mtg">Magic</option><option value="gundam">Gundam</option><option value="lorcana">Lorcana</option></select></label><label>THE SET<select id="discoverySet"><option value="">Any set</option></select></label><label>OPTIONAL BUDGET<select id="discoveryBudget"><option value="0" selected>Any value</option><option value="10">Up to $10</option><option value="25">Up to $25</option><option value="50">Up to $50</option><option value="100">Up to $100</option></select></label></div><button class="btn" id="discoveryBtn" type="submit">Find my next card <span aria-hidden="true">✦</span></button></form>
+              <p id="discoveryStatus" class="discovery-status" role="status">Any card from the set — we badge the ones sitting in the case today.</p>
             </div><div class="discovery-display" id="discoveryResult"><div class="mystery-card" aria-hidden="true"><span>TOP LOADED</span><b>?</b><small>YOUR NEXT FAVORITE</small></div><span class="discovery-orbit" aria-hidden="true">✳</span></div>
           </section>
         <a class="play-tile" href="#/rip" data-go="rip"><span class="tile-number">02 / FREE PACK SIMULATOR</span><div class="pack-stack" aria-hidden="true"><i></i><i></i><i><span>TOP LOADED</span><b>RIP<br>IT.</b><small>JUST A SIMULATION</small></i></div><div class="play-tile-bottom"><div><h3>Chase the feeling.</h3><p>Free simulation. No real pack is opened, no cards are awarded, and nothing is purchased.</p></div><span class="round-arrow" aria-hidden="true">↗</span></div></a>
-          <a class="trade-tile" href="#/buylist" data-go="buylist"><span class="tile-number">03 / MAKE ROOM FOR WHAT’S NEXT</span><div><h3>Old binder.<br>New possibilities.</h3><span class="trade-stamp" aria-hidden="true">BUY<br>SELL<br>TRADE</span></div><p>Turn your collection into cash or store credit.<span class="round-arrow" aria-hidden="true">↗</span></p></a>
         </div>
-        <p class="collector-source">The case is sourced from our TCGplayer listings · <span id="triFresh">refreshed daily</span>. Availability is confirmed at checkout.</p>
-      </div>
-    </div>
-
-    <div class="section" style="padding-top:0">
-      <div class="wrap">
-        <div class="section-head">
-          <div><p class="collector-kicker">SLEEVED. TOP LOADED. READY.</p><h2>The good stuff, in stock.</h2></div>
-          <a class="linklike" href="#/shop" data-go="shop">Browse all inventory &rarr;</a>
-        </div>
-        <div class="freshness" id="homeFresh"><span class="dot"></span>Live from our TCGplayer store <span class="demo-tag">demo data</span></div>
-        <div class="grid" id="featuredGrid"></div>
+        <p class="collector-source">Set checklists and market references via <a href="https://tcgcsv.com/" target="_blank" rel="noopener noreferrer">TCGCSV / TCGplayer</a>. Stock badges use our latest inventory · <span id="triFresh">refreshed daily</span>. Availability is confirmed at checkout.</p>
       </div>
     </div>
 
@@ -157,23 +128,10 @@
     <div class="section" style="padding-top:0">
       <div class="wrap">
         <div class="section-head">
-          <h2>Word around the tables</h2>
-          <span class="demo-tag" id="testiTag">sample quotes &mdash; replace with real reviews before launch</span>
+          <div><p class="collector-kicker">FROM GOOGLE &amp; TCGPLAYER</p><h2>Word around the tables</h2></div>
+          <span class="collector-note" id="testiTag" hidden></span>
         </div>
-        <div class="tri" id="testimonials">
-          <div class="panel">
-            <p class="quote">&ldquo;Brought in two binders expecting a lowball. Got a fair number, took the credit bonus, and walked out with half a booster box.&rdquo;</p>
-            <p class="p-set quote-who">Sample review &middot; buylist customer</p>
-          </div>
-          <div class="panel">
-            <p class="quote">&ldquo;Locals run on time, prizing every week, and when nine of us showed up they just opened a second list. Nobody sat out.&rdquo;</p>
-            <p class="p-set quote-who">Sample review &middot; One Piece regular</p>
-          </div>
-          <div class="panel">
-            <p class="quote">&ldquo;Claimed a break spot on a Tuesday, hits were in my mailbox by the weekend. Sleeved, top loaded, tracked.&rdquo;</p>
-            <p class="p-set quote-who">Sample review &middot; live break buyer</p>
-          </div>
-        </div>
+        <div class="tri" id="testimonials"></div>
       </div>
     </div>
 
@@ -186,7 +144,7 @@
         <div class="faq">
           <details class="panel">
             <summary>How do I buy a card I see here?</summary>
-            <p>Every single on this site is a live listing in our TCGplayer store &mdash; hit <em>Buy on TCGplayer</em> and it ships sleeved in a top loader (we are who we say we are) inside a bubble mailer, with tracking. Sealed product ships boxed. Local? Call <a href="tel:+15132222573">(513) 222-2573</a> and we'll pull it from the case and hold it at the counter.</p>
+            <p>The Shop shows our inventory; discovery and the free simulator also show cards we do not stock. Look for <em>In Stock Now</em>, then open the listing to check condition and availability. Physical purchases are separate from the simulator. Local? Call <a href="tel:+15132222573">(513) 222-2573</a> to ask about pickup.</p>
           </details>
           <details class="panel">
             <summary>How do you grade card condition?</summary>

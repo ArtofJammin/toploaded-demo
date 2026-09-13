@@ -4,13 +4,13 @@
       <div class="view-head">
         <p class="eyebrow" id="showEyebrow">First Saturday or Sunday &middot; Hilton on Turfway Road &middot; Florence, KY</p>
         <h1>The Top Loaded Card Show</h1>
+        <div class="show-clock"><span>Next card show</span><span id="showCountdown" role="timer" aria-live="off">Date to be confirmed</span></div>
         <p class="lede">Once a month we take over the Hilton ballroom on Turfway Road with vendor tables from across the Tri-State. Buy, sell, trade, and rip packs &mdash; admission is free and the doors are open 10 to 4.</p>
       </div>
       <div class="show-hero">
         <div class="show-date-card">
           <div class="show-date-top">
             <p class="eyebrow">Next show</p>
-            <span class="show-count" id="showCountdown"></span>
           </div>
           <p class="show-date" id="showDateBig">Sat<br>Sep 5</p>
           <p class="show-tbc" id="showTbc" hidden>Exact date confirmed on our socials &mdash; usually the first Saturday or Sunday.</p>
@@ -45,16 +45,13 @@
           </div>
         </form>
       </div>
-      <div class="section" style="padding-bottom:0">
-        <div class="section-head"><h2>From past shows</h2><span class="demo-tag">photos coming</span></div>
-        <div class="gallery" aria-label="Show photos, coming soon">
-          <div class="gal g1"><i class="gal-tag">Photos coming</i><span>July &middot; trade night floor</span></div>
-          <div class="gal g2"><i class="gal-tag">Photos coming</i><span>Vendor row</span></div>
-          <div class="gal g3"><i class="gal-tag">Photos coming</i><span>Pack wars finals</span></div>
-          <div class="gal g4"><i class="gal-tag">Photos coming</i><span>June &middot; ballroom</span></div>
-          <div class="gal g5"><i class="gal-tag">Photos coming</i><span>Grading meetup</span></div>
-          <div class="gal g6"><i class="gal-tag">Photos coming</i><span>Door prize wall</span></div>
-        </div>
-      </div>
+      <section class="section" aria-labelledby="floorTitle">
+        <div class="section-head"><h2 id="floorTitle">Floor plan</h2><span class="collector-note">TCG &amp; Sports vendor map</span></div>
+        <p id="showFloorNote" class="card-note"></p>
+        <div id="showFloorMix" class="floor-mix" aria-hidden="true"></div>
+        <ul id="showFloorLegend" class="floor-legend"></ul>
+        <div class="floor-scroll" id="showFloorScroll" tabindex="0" role="region" aria-label="Vendor floor plan, scroll horizontally if needed"><div class="floor-map" id="showFloorMap"></div></div>
+        <ul id="showFloorList" class="floor-vendors" aria-label="Vendors and booth positions"></ul>
+      </section>
     </div>
   </section>

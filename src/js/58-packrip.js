@@ -1,16 +1,26 @@
   /* ---------- pack rip: virtual booster mini-game ----------
      View #view-rip (route "rip"), app root #ripApp, announcer #ripLive.
-     Every card is a real in-stock single from TL.inventory (game + set); demo ITEMS
-     when inventory is unavailable. Pulls are rarity-weighted per game (see PACKS);
-     the last card in the fan is the hit slot.
+     Cards come from the selected TCGCSV checklist through TL.cards, including
+     unstocked cards. Exact product IDs drive "In Stock Now" badges. Catalog
+     outages show a retry state, never silently switch to the in-stock pool.
+     The inventory-only draw helper remains for compatibility/tests. Pulls are
+     rarity-weighted simulation rules (not manufacturer odds); hit slot last.
 
-       TL.rip.draw(game, set, seed?)   → [{item, tier, rank, rare, rh, hit}]  pure, seedable
+       TL.rip.draw(game, set, seed?)   → [entry]  pure, seedable, our in-stock singles
+       TL.rip.drawFrom(cards, game, seed?) → [entry]  pure, any TL.cards list
+       TL.rip.pull(game, set)          → Promise<{cards, mode, setName}>  the pool for a set
        TL.rip.start(game, set)         → jump to the pack screen
        TL.rip.stats()                  → {packs, value, spent, best} (simulation counters only)
 
-     Consumes (all guarded, all optional): TL.inventory.load()/items/summary,
+     entry: {card, item, tier, rank, rare, rh, foil, hit} — `item` is the inventory
+     item when we stock the card, otherwise null.
+     card:  {key, name, set, game, img, price, priceIsMarket, rarity, url, num, cond,
+             inStock, item, itemSet, source} — `price` is OUR price when inStock,
+     otherwise the catalogue's MARKET REFERENCE (priceIsMarket), never presented as ours.
+
+     Consumes (all guarded, all optional): TL.cards.*, TL.inventory.load()/items/summary,
      TL.cart.add(item, qty, fromEl), TL.openQuickView(item), TL.confetti(x, y, opts).
-     Stores: TL.store "rip" {game, set} last choice, "ripStats" session stats.
+     Stores: TL.store "rip" {game, set, setName} last choice, "ripStats" session stats.
   */
   var PACKS = {
     pk:  {name:"Pokemon",   price:4.49, size:10, tiers:["C","U","R","RR","IR","SIR","HR"], rareFrom:3,
@@ -31,13 +41,15 @@
 
   function ripTier(game, rarity){
     var r = String(rarity || "").toLowerCase();
+    var codes={c:"Common",u:"Uncommon",uc:"Uncommon",r:"Rare",rr:"Double Rare",sr:"Super Rare",sec:"Secret Rare",l:"Leader",m:"Mythic Rare",ir:"Illustration Rare",sir:"Special Illustration Rare",hr:"Hyper Rare"};
+    if(codes[r])r=codes[r].toLowerCase();
     if(game === "pk"){
       if(/^common/.test(r)) return "C";
       if(/^uncommon/.test(r)) return "U";
       if(/special illustration|special art|secret/.test(r)) return "SIR";
-      if(/hyper|rainbow/.test(r)) return "HR";
-      if(/illustration|art rare|shiny holo/.test(r)) return "IR";
-      if(/double|ultra|ace|mega|amazing|radiant|prism|super|shiny|full art/.test(r)) return "RR";
+      if(/hyper|rainbow|gold/.test(r)) return "HR";
+      if(/illustration|art rare|shiny holo|trainer gallery/.test(r)) return "IR";
+      if(/double|ultra|ace|mega|amazing|radiant|prism|super|shiny|full art|\bv\b|vmax|vstar|break|legend|star/.test(r)) return "RR";
       return "R";
     }
     if(game === "op"){
@@ -48,6 +60,7 @@
       if(/super|special|\bsp\b/.test(r)) return "SR";
       return "R";
     }
+    /* Magic — Scryfall reports common | uncommon | rare | mythic | special | bonus */
     if(/^common|land|token|basic/.test(r)) return "C";
     if(/^uncommon/.test(r)) return "U";
     if(/mythic/.test(r)) return "M";
@@ -75,12 +88,14 @@
     return s;
   }
   function ripIsReverse(it){
+    if(!it) return false;
     if(it.cond && /RH|reverse/i.test(it.cond)) return true;
     var ls = it.listings; if(ls && ls.length) for(var i = 0; i < ls.length; i++) if(/reverse/i.test(ls[i].printing || "")) return true;
     return false;
   }
   /* 400px CDN face for any TCGplayer product (the shop grid uses 200px thumbs) */
   function ripImg(it){
+    if(!it) return "";
     var m = /^tcg-(\d+)$/.exec(String(it.id || ""));
     if(m) return "https://tcgplayer-cdn.tcgplayer.com/product/" + m[1] + "_in_400x400.jpg";
     return it.img || "";
@@ -126,16 +141,46 @@
     }
     return s;
   }
-  /* pool: singles in stock for game (+ set), bucketed by tier */
-  function ripPool(items, game, set){
+
+  /* ---- cards: one shape for catalogue pulls and for our own case ---- */
+  function ripCardFromItem(it){
+    return {key: "inv:" + it.id, name: it.name, set: ripSetName(it), game: it.game, img: ripImg(it),
+      price: Number(it.price) || 0, priceIsMarket: false, rarity: ripRarity(it), url: it.url || "",
+      num: it.num || null, cond: it.cond || "", inStock: true, item: it, itemSet: ripSetName(it), source: "inventory"};
+  }
+  /* A TL.cards card; keep the exact product-ID stock match and reject sealed items. */
+  function ripCardFromCatalog(c){
+    if(!c || !c.name) return null;
+    var item = c.item || null, market = !!c.priceIsMarket, price = Number(c.price) || 0;
+    if(item && item.type && item.type !== "single"){ item = null; market = true; price = 0; }
+    return {key: (c.source || "cat") + ":" + (c.id || c.num || "") + ":" + c.name + ":" + (c.set || ""),
+      name: c.name, set: c.set || "", game: c.game, img: c.img || ripImg(item),
+      price: item ? (Number(item.price) || 0) : price, priceIsMarket: item ? false : (market || !price),
+      rarity: c.rarity || (item ? ripRarity(item) : ""), url: c.url || (item ? item.url : "") || "",
+      num: c.num || null, cond: item ? (item.cond || "") : "",
+      inStock: !!item, item: item, itemSet: item ? ripSetName(item) : "", source: c.source || "catalog"};
+  }
+  function ripCardsFromItems(items, game, setName){
+    var out = [], list = items || [];
+    for(var i = 0; i < list.length; i++){
+      var it = list[i];
+      if(!it || it.game !== game || it.type !== "single" || !(it.stock > 0) || it.live) continue;
+      if(setName && setName !== "*" && ripSetName(it) !== setName) continue;
+      out.push(ripCardFromItem(it));
+    }
+    return out;
+  }
+  function ripCardTier(game, card){ return ripTier(game, card.rarity || (card.item ? ripRarity(card.item) : "")); }
+  /* bucket a card list by tier */
+  function ripCardPool(cards, game){
     var pool = {all:[]}, tiers = PACKS[game].tiers, i;
     for(i = 0; i < tiers.length; i++) pool[tiers[i]] = [];
-    for(i = 0; i < items.length; i++){
-      var it = items[i];
-      if(it.game !== game || it.type !== "single" || !(it.stock > 0) || it.live) continue;
-      if(set && set !== "*" && ripSetName(it) !== set) continue;
-      var t = ripTier(game, ripRarity(it));
-      pool[t].push(it); pool.all.push(it);
+    for(i = 0; i < (cards || []).length; i++){
+      var c = cards[i];
+      if(!c || !c.name) continue;
+      if(c.game && c.game !== game) continue;
+      var t = ripCardTier(game, c);
+      pool[t].push(c); pool.all.push(c);
     }
     return pool;
   }
@@ -146,27 +191,30 @@
     for(j = 0; j < order.length; j++){
       lists = pool[tiers[order[j]]];
       if(!lists || !lists.length) continue;
-      var cands = lists.filter(function(it){ return !used[it.id]; });
-      if(slot.rh){ var rh = cands.filter(ripIsReverse); if(rh.length) cands = rh; }
+      var cands = lists.filter(function(c){ return !used[c.key]; });
+      if(slot.rh){ var rh = cands.filter(function(c){ return ripIsReverse(c.item); }); if(rh.length) cands = rh; }
       if(!cands.length) continue;
-      var it = cands[Math.floor(rng() * cands.length)];
-      return {item: it, tier: tiers[order[j]]};
+      var c = cands[Math.floor(rng() * cands.length)];
+      return {card: c, tier: tiers[order[j]]};
     }
     return null; /* pool exhausted: the pack is short rather than repeating a card */
   }
-  function ripDraw(items, game, set, seed){
+  /* pure: the rarity-slot plan applied to any card list (whole set or just our case) */
+  function ripDrawFrom(cards, game, seed){
     var P = PACKS[game]; if(!P) return [];
-    var rng = ripRng(seed), pool = ripPool(items, game, set), slots = ripSlots(game, rng), used = {}, out = [];
+    var rng = ripRng(seed), pool = ripCardPool(cards, game), slots = ripSlots(game, rng), used = {}, out = [];
     if(!pool.all.length) return out;
     for(var i = 0; i < slots.length; i++){
       var got = ripPick(pool, game, slots[i], used, rng);
       if(!got) continue;
-      used[got.item.id] = true;
+      used[got.card.key] = true;
       var rank = P.tiers.indexOf(got.tier);
-      out.push({item: got.item, tier: got.tier, rank: rank, rare: rank >= P.rareFrom, rh: !!slots[i].rh, foil: !!slots[i].foil, hit: !!slots[i].hit});
+      out.push({card: got.card, item: got.card.item || null, tier: got.tier, rank: rank,
+        rare: rank >= P.rareFrom, rh: !!slots[i].rh, foil: !!slots[i].foil, hit: !!slots[i].hit});
     }
     return out;
   }
+  function ripDraw(items, game, set, seed){ return ripDrawFrom(ripCardsFromItems(items, game, set || "*"), game, seed); }
 
   /* ---- inventory access (guarded: the shop package owns TL.inventory) ---- */
   var ripItemsP = null, ripItems = null, ripDemo = false;
@@ -206,6 +254,7 @@
     return ripItemsP;
   }
   var ripSetCache = {};
+  /* set list built from our own case — the fallback when no public checklist answers */
   function ripSetsFor(game){
     var P = PACKS[game];
     if(ripItems){
@@ -216,27 +265,107 @@
         if(it.game !== game || it.type !== "single" || !(it.stock > 0)) continue;
         var s = ripSetName(it); counts[s] = (counts[s] || 0) + 1;
       }
-      var list = Object.keys(counts).map(function(k){ return {name:k, count:counts[k]}; })
+      var list = Object.keys(counts).map(function(k){ return {name:k, code:k, count:counts[k], own:true}; })
         .filter(function(x){ return ripDemo || x.count >= P.size; })
         .sort(function(a, b){ return b.count - a.count; });
-      if(ripDemo) list = [{name:"*", count: list.reduce(function(n, x){ return n + x.count; }, 0)}];
+      if(ripDemo) list = [{name:"*", code:"*", count: list.reduce(function(n, x){ return n + x.count; }, 0), own:true}];
       return (ripSetCache[game] = list);
     }
     var sum = TL.inventory && TL.inventory.summary;
-    if(sum && sum.sets && sum.sets[game]) return sum.sets[game].filter(function(x){ return x.count >= P.size; }).map(function(x){ return {name:x.name, count:x.count, approx:true}; });
+    if(sum && sum.sets && sum.sets[game]) return sum.sets[game].filter(function(x){ return x.count >= P.size; }).map(function(x){ return {name:x.name, code:x.name, count:x.count, approx:true, own:true}; });
     return null;
+  }
+
+  /* ---- set lists: the whole published set list through TL.cards ---- */
+  function ripCatalogGame(game){
+    try { return !!(TL.cards && TL.cards.catalogued && TL.cards.catalogued(game) && TL.cards.fromSet); }
+    catch(e){ return false; }
+  }
+  var ripSetList = {}, ripSetPend = {};
+  function ripSetToken(s){ return String((s && (s.code || s.name)) || ""); }
+  function ripFindSet(sets, val){
+    if(!sets || !val) return null;
+    for(var i = 0; i < sets.length; i++){ if(ripSetToken(sets[i]) === val || sets[i].name === val) return sets[i]; }
+    return null;
+  }
+  function ripSetLabel(game, token){
+    var hit = ripFindSet(ripSetList[game], token);
+    if(hit) return hit.name === "*" ? "Sample case" : hit.name;
+    if(token && token !== "*") return rip.setName || token;
+    return "Sample case";
+  }
+  function ripRequestSets(game){
+    if(ripSetList[game] || ripSetPend[game]) return;
+    ripSetPend[game] = true;
+    var p = null;
+    try { if(TL.cards && TL.cards.sets) p = TL.cards.sets(game); } catch(e){ p = null; }
+    Promise.resolve(p || Promise.reject(new Error("no catalogue")))
+      .then(function(list){
+        list = (list || []).filter(function(s){ return s && s.name && (!s.count || s.count >= PACKS[game].size); });
+        return list.length ? list : Promise.reject(new Error("empty"));
+      })
+      .catch(function(e){ if(ripCatalogGame(game))throw e;return ripLoadItems().then(function(){ return ripSetsFor(game) || []; }); })
+      .then(function(list){ ripSetsReady(game, list); }, function(){ ripSetsReady(game, []); });
+  }
+  function ripSetsReady(game, list){
+    ripSetPend[game] = false;
+    ripSetList[game] = list || [];
+    if(rip.stage === "setup" && TL.current === "rip" && rip.game === game) ripRenderSetup();
+  }
+
+  /* ---- pools: every card in the set, our case as the safety net ---- */
+  var ripPoolCache = {}, ripPoolPend = {};
+  function ripPoolKey(game, token){ return game + "|" + (token || "*"); }
+  function ripCasePoolFrom(items, game, token, mode){
+    var name = ripSetLabel(game, token), cards = ripCardsFromItems(items, game, name), wide = false;
+    if(!cards.length){ cards = ripCardsFromItems(items, game, "*"); wide = !!cards.length; }
+    return {cards: cards, mode: mode, set: token, setName: name, game: game, wide: wide};
+  }
+  /* pool we can build without waiting on the network (repeat rips, games with no catalogue) */
+  function ripSyncPool(game, token){
+    var key = ripPoolKey(game, token);
+    if(ripPoolCache[key]) return ripPoolCache[key];
+    if(ripCatalogGame(game) || !ripItems) return null;
+    var st = ripCasePoolFrom(ripItems, game, token, "case");
+    return st.cards.length ? (ripPoolCache[key] = st) : null;
+  }
+  function ripEnsurePool(game, token){
+    var key = ripPoolKey(game, token), have = ripSyncPool(game, token);
+    if(have) return Promise.resolve(have);
+    if(ripPoolPend[key]) return ripPoolPend[key];
+    var p = ripBuildPool(game, token).then(function(st){
+      delete ripPoolPend[key];
+      if(st && st.cards.length) ripPoolCache[key] = st;
+      return st;
+    }, function(e){ delete ripPoolPend[key]; throw e; });
+    ripPoolPend[key] = p;
+    return p;
+  }
+  function ripBuildPool(game, token){
+    if(!ripCatalogGame(game) || !token || token === "*"){
+      return ripLoadItems().then(function(items){ return ripCasePoolFrom(items, game, token, "case"); });
+    }
+    return Promise.resolve()
+      .then(function(){ return TL.cards.fromSet(game, token); })
+      .then(function(list){
+        var cards = [], i, c;
+        for(i = 0; i < (list || []).length; i++){ c = ripCardFromCatalog(list[i]); if(c) cards.push(c); }
+        if(cards.length < PACKS[game].size) throw new Error("catalogue too thin");
+        return {cards: cards, mode: "catalog", set: token, setName: ripSetLabel(game, token), game: game, wide: false};
+      });
   }
 
   /* ---- state + rendering ---- */
   var ripApp = $("#ripApp"), ripLiveEl = $("#ripLive");
-  var rip = {stage:"setup", game:"pk", set:"", cards:[], flipped:0, timers:[], drag:null};
+  var rip = {stage:"setup", game:"pk", set:"", setName:"", cards:[], flipped:0, timers:[], drag:null, loading:false, pool:null};
   var ripPrefs = TL.store.get("rip", null) || {};
   if(PACKS[ripPrefs.game]) rip.game = ripPrefs.game;
-  if(ripPrefs.set) rip.set = ripPrefs.set;
+  if(ripPrefs.set){ rip.set = String(ripPrefs.set); rip.setName = String(ripPrefs.setName || ripPrefs.set); }
 
   function ripLater(fn, ms){ var t = setTimeout(fn, reduceMotion ? 0 : ms); rip.timers.push(t); return t; }
   function ripClearTimers(){ rip.timers.forEach(clearTimeout); rip.timers = []; }
   function ripSay(msg){ if(ripLiveEl){ ripLiveEl.textContent = ""; ripLiveEl.textContent = msg; } }
+  function ripSavePrefs(){ TL.store.set("rip", {game: rip.game, set: rip.set, setName: rip.setName}); }
   function ripPackPrice(game){
     var cfg = TL.config && TL.config.rip && TL.config.rip.prices;
     return (cfg && Number(cfg[game]) > 0) ? Number(cfg[game]) : PACKS[game].price;
@@ -244,10 +373,49 @@
   function ripStats(){ return TL.store.get("ripStats", null) || {packs:0, value:0, spent:0, best:null}; }
   TL.rip = {
     draw: function(game, set, seed){ return ripDraw(ripItems || ITEMS, game || rip.game, set || rip.set || "*", seed); },
-    start: function(game, set){ if(PACKS[game]) rip.game = game; if(set) rip.set = set; TL.go("rip"); ripStartPack(); },
+    drawFrom: ripDrawFrom,
+    pull: function(game, set){ return ripEnsurePool(game || rip.game, set || rip.set); },
+    start: function(game, set){ if(PACKS[game]) rip.game = game; if(set){ rip.set = set; rip.setName = ""; } TL.go("rip"); ripStartPack(); },
     stats: ripStats,
     packs: PACKS
   };
+
+  /* ---- honest price wording: ours vs a catalogue market reference ---- */
+  function ripHasPrice(c){ return Number(c && c.price) > 0; }
+  function ripPriceText(c){ return ripHasPrice(c) ? money(c.price) : "No catalog price"; }
+  function ripPriceKind(c){ return c.priceIsMarket ? "market reference" : "our price"; }
+  function ripPriceHtml(c){
+    if(!ripHasPrice(c)) return '<span class="rip-price-none">No catalog price</span>';
+    return money(c.price) + '<small>' + (c.priceIsMarket ? "market ref." : "our price") + '</small>';
+  }
+  function ripPriceSay(c){
+    return ripHasPrice(c) ? money(c.price) + " " + ripPriceKind(c) : "no catalog price";
+  }
+  function ripStockBadge(c, cls){
+    if(!c.inStock) return "";
+    return '<span class="rip-stock' + (cls ? " " + cls : "") + '">In Stock Now</span>';
+  }
+  function ripInStockCount(cards){
+    var n = 0; for(var i = 0; i < cards.length; i++) if(cards[i].card.inStock) n++;
+    return n;
+  }
+  /* where this pack's cards came from — said plainly, every time */
+  function ripSourceNote(){
+    var P = PACKS[rip.game], st = rip.pool;
+    if(st && st.mode === "catalog")
+      return "Cards are drawn from the whole " + esc(st.setName) + " set list, not just our shelf. Anything we have in the case is badged In Stock Now.";
+    if(st && st.mode === "offline")
+      return "The public card catalog did not answer, so this simulation used the " + esc(P.name) + " singles in our case" + (st.wide ? " (any set)" : "") + " instead of the full set list.";
+    if(ripDemo)
+      return "Live inventory is unavailable, so this simulation uses sample cards and sample prices.";
+    return "No public checklist exists for " + esc(P.name) + ", so this simulation uses the singles in our case.";
+  }
+  function ripSetupNote(){
+    var P = PACKS[rip.game];
+    if(ripCatalogGame(rip.game))
+      return "Pulls come from the whole published set list, not only what is on our shelf. Cards we have in the case are badged In Stock Now and are the only ones you can add to a cart.";
+    return "There is no free public checklist for " + esc(P.name) + ", so these pulls come from the " + esc(P.name) + " singles in our case.";
+  }
 
   function ripOddsTable(game){
     var P = PACKS[game], keys = Object.keys(P.hit), total = 0, i;
@@ -264,7 +432,9 @@
     var s = ripStats();
     var best = s.best ? '<div class="rip-best-mini">' +
         (s.best.img ? '<img src="' + esc(s.best.img) + '" alt="" loading="lazy" width="48" height="48">' : '<span class="rip-best-ph" aria-hidden="true"></span>') +
-        '<div><b>' + esc(s.best.name) + '</b><span>Simulation highlight &middot; reference price ' + money(s.best.price) + '</span></div></div>'
+        '<div><b>' + esc(s.best.name) + '</b><span>Simulation highlight &middot; ' +
+          (Number(s.best.price) > 0 ? esc((s.best.market ? "market reference " : "our price ") + money(s.best.price)) : "no catalog price") + '</span>' +
+          (s.best.inStock ? ' <span class="rip-stock sm">In Stock Now</span>' : "") + '</div></div>'
       : '<p class="rip-note">No simulations yet &mdash; try one for free.</p>';
     return '<aside class="rip-stats panel" aria-labelledby="ripStatsH"><h3 id="ripStatsH">Simulator stats</h3>' +
       '<dl><div><dt>Simulations</dt><dd>' + fmtInt(s.packs) + '</dd></div>' +
@@ -275,15 +445,19 @@
   }
   function ripRenderSetup(){
     rip.stage = "setup"; ripApp.dataset.stage = "setup";
-    var sets = ripSetsFor(rip.game), P = PACKS[rip.game];
+    var P = PACKS[rip.game], sets = ripSetList[rip.game];
+    if(!sets) ripRequestSets(rip.game);
     var setOpts, canRip = true;
-    if(sets === null){ setOpts = '<option value="">Loading sets…</option>'; canRip = false; }
-    else if(!sets.length){ setOpts = '<option value="">No sets with enough singles yet</option>'; canRip = false; }
+    if(!sets){ setOpts = '<option value="">Loading sets…</option>'; canRip = false; }
+    else if(!sets.length){ setOpts = '<option value="">No sets available right now</option>'; canRip = false; }
     else {
-      if(!sets.some(function(x){ return x.name === rip.set; })) rip.set = sets[0].name;
+      var chosen = ripFindSet(sets, rip.set) || sets[0];
+      rip.set = ripSetToken(chosen); rip.setName = chosen.name;
       setOpts = sets.map(function(x){
-        return '<option value="' + esc(x.name) + '"' + (x.name === rip.set ? " selected" : "") + '>' +
-          (x.name === "*" ? "Sample cards (demo case)" : esc(x.name)) + " · " + fmtInt(x.count) + (x.approx ? " products" : " singles") + '</option>';
+        var tok = ripSetToken(x);
+        return '<option value="' + esc(tok) + '"' + (tok === rip.set ? " selected" : "") + '>' +
+          (x.name === "*" ? "Sample cards (demo case)" : esc(x.name)) + " · " + fmtInt(x.count) +
+          (x.approx ? " products" : x.own ? " singles in the case" : " cards") + '</option>';
       }).join("");
     }
     ripApp.innerHTML = '<div class="rip-setup">' +
@@ -292,17 +466,20 @@
           '<div class="chip-row" role="group" aria-labelledby="ripGameL">' + RIP_GAMES.map(function(g){
             return '<button class="chip" type="button" data-rip-game="' + g + '" aria-pressed="' + (g === rip.game) + '">' + TL.gameIcon(g) + esc(PACKS[g].name) + '</button>';
           }).join("") + '</div></div>' +
-        '<div class="rip-field"><label class="rip-label" for="ripSet">Set</label><select id="ripSet"' + (canRip ? "" : " disabled") + '>' + setOpts + '</select></div>' +
+        '<div class="rip-field"><label class="rip-label" for="ripSet">Set</label><select id="ripSet"' + (canRip ? "" : " disabled") + '>' + setOpts + '</select>' +
+          '<p class="rip-note rip-source-note">' + ripSetupNote() + '</p></div>' +
         '<div class="rip-price"><span class="rip-label">Cost to play</span><b>Free</b><span class="rip-note">' + esc(P.size) + ' simulated card reveals &middot; ' + esc(P.name) + '</span></div>' +
-        '<button class="btn rip-go" type="button" data-rip-open aria-describedby="ripDisclaimerH"' + (canRip ? "" : " disabled") + '>Start free simulation</button>' +
-        (ripDemo ? '<p class="rip-note">Live inventory is unavailable, so this simulation uses sample cards and prices. <button class="linklike" type="button" data-rip-retry>Retry</button></p>' : "") +
+        '<button class="btn rip-go" type="button" data-rip-open aria-describedby="ripDisclaimerH"' + (canRip && !rip.loading ? "" : " disabled") + '>' +
+          (rip.loading ? "Building the set list…" : "Start free simulation") + '</button>' +
+        ((ripDemo || sets && !sets.length) ? '<p class="rip-note">A data connection is unavailable. <button class="linklike" type="button" data-rip-retry>Retry loading</button></p>' : "") +
       '</div>' +
       '<div class="rip-odds-wrap panel"><h3>Simulated odds</h3>' + ripOddsTable(rip.game) + '</div>' +
       ripStatsCard() + '</div>';
   }
   function ripRenderPack(){
     rip.stage = "pack"; ripApp.dataset.stage = "pack";
-    var P = PACKS[rip.game], setLabel = rip.set === "*" ? "Sample case" : rip.set;
+    var P = PACKS[rip.game], setLabel = (rip.pool && rip.pool.setName) || ripSetLabel(rip.game, rip.set);
+    if(setLabel === "*") setLabel = "Sample case";
     ripApp.innerHTML = '<div class="rip-stage" id="ripStage" data-game="' + esc(rip.game) + '">' +
       '<div class="rip-packwrap">' +
         '<p class="rip-mode">Free simulation &middot; no real pack or card prizes</p>' +
@@ -312,6 +489,7 @@
           '<div class="rip-packart" aria-hidden="true"><span class="rip-packgame">' + esc(P.name) + '</span><b>TL</b><span class="rip-packset">' + esc(setLabel) + '</span><span class="rip-packn">SIMULATION ONLY</span></div>' +
           '<span class="rip-crimp bottom" aria-hidden="true"></span>' +
         '</div>' +
+        '<p class="rip-note rip-source-note">' + ripSourceNote() + '</p>' +
         '<p class="rip-hint" id="ripHint">' + (reduceMotion ? "Press Open simulated pack to reveal the cards." : "Swipe across the strip or press Enter to play the simulated opening.") + '</p>' +
         '<div class="rip-actions"><button class="btn" type="button" data-rip-tear>Open simulated pack</button><button class="btn btn-ghost" type="button" data-rip-back>Change set</button></div>' +
       '</div>' +
@@ -321,15 +499,38 @@
     ripSay("Free simulation ready: " + P.name + ", " + setLabel + ". No real pack is opened and no cards are awarded. Press Enter or Open simulated pack to play.");
     var pack = $("#ripPack"); if(pack) try { pack.focus({preventScroll:true}); } catch(e){}
   }
-  function ripStartPack(){
-    ripClearTimers();
-    TL.store.set("rip", {game: rip.game, set: rip.set});
-    rip.cards = ripDraw(ripItems || ITEMS, rip.game, rip.set || "*");
+  function ripLaunch(st){
+    rip.pool = st || null;
+    rip.cards = ripDrawFrom(st ? st.cards : [], rip.game);
     rip.flipped = 0;
-    if(!rip.cards.length){ toast("That set has no singles in stock right now"); ripRenderSetup(); return; }
-    /* warm the CDN thumbs while the pack is on screen */
-    rip.cards.forEach(function(c){ var src = ripImg(c.item); if(src){ var im = new Image(); im.decoding = "async"; im.src = src; } });
+    if(!rip.cards.length){
+      toast(ripCatalogGame(rip.game) ? "No cards came back for that set — try another" : "That set has no singles in stock right now");
+      ripRenderSetup(); return;
+    }
+    /* warm the card faces while the pack is on screen */
+    rip.cards.forEach(function(c){ var src = c.card.img; if(src){ var im = new Image(); im.decoding = "async"; im.src = src; } });
     ripRenderPack();
+  }
+  function ripStartPack(){
+    if(rip.loading) return;
+    ripClearTimers();
+    ripSavePrefs();
+    var have = ripSyncPool(rip.game, rip.set);
+    if(have){ ripLaunch(have); return; }
+    var game = rip.game, token = rip.set;
+    rip.loading = true;
+    if(rip.stage === "setup") ripRenderSetup();
+    ripSay("Building the " + ripSetLabel(game, token) + " set list…");
+    ripEnsurePool(game, token).then(function(st){
+      rip.loading = false;
+      if(rip.game !== game || rip.set !== token) return;      /* the visitor moved on */
+      if(TL.current && TL.current !== "rip"){ ripRenderSetup(); return; }
+      ripLaunch(st);
+    }, function(){
+      rip.loading = false;
+      toast("Could not build that set right now — try another");
+      ripRenderSetup();
+    });
   }
 
   /* ---- tear ---- */
@@ -347,17 +548,22 @@
     ripLater(function(){ ripDeal(cx, cy); }, 380);
   }
   function ripCardHtml(c, i){
-    var it = c.item, P = PACKS[rip.game], src = ripImg(it);
-    var front = src ? '<img src="' + esc(src) + '" alt="" decoding="async">' : cardArt(it);
-    return '<button class="rip-card" type="button" data-rip-flip="' + i + '" style="--i:' + i + '" aria-label="Card ' + (i + 1) + ' of ' + rip.cards.length + ', face down. Flip it." aria-pressed="false">' +
+    var card = c.card, P = PACKS[rip.game], src = card.img;
+    var front = src ? '<img src="' + esc(src) + '" alt="" decoding="async">' : cardArt(card.item || card);
+    return '<button class="rip-card' + (card.inStock ? " has-stock" : "") + '" type="button" data-rip-flip="' + i + '" style="--i:' + i + '" aria-label="Card ' + (i + 1) + ' of ' + rip.cards.length + ', face down. Flip it." aria-pressed="false">' +
       '<span class="rip-card-inner"><span class="rip-face back" aria-hidden="true"><b>TL</b></span>' +
       '<span class="rip-face front"' + (src ? "" : ' data-drawn') + '>' + front + '<span class="rip-sheen" aria-hidden="true"></span>' +
+      ripStockBadge(card, "on-card") +
       '<span class="rip-tag' + (c.rare ? " rare" : "") + '">' + esc(c.rh ? "Reverse holo" : c.foil ? "Foil " + P.labels[c.tier] : P.labels[c.tier]) + '</span></span></span></button>';
   }
   function ripDeal(cx, cy){
     var wrap = $("#ripCards"); if(!wrap) return;
     rip.stage = "cards"; ripApp.dataset.stage = "cards";
-    wrap.innerHTML = '<p class="rip-mode">Simulation only &middot; these cards are not awarded to you</p><div class="rip-cardbar"><span class="rip-progress" id="ripProgress">0 of ' + rip.cards.length + ' flipped</span>' +
+    var stocked = ripInStockCount(rip.cards);
+    wrap.innerHTML = '<p class="rip-mode">Simulation only &middot; these cards are not awarded to you</p>' +
+      '<p class="rip-note rip-source-note">' + ripSourceNote() +
+        (stocked ? " " + fmtInt(stocked) + " of these " + fmtInt(rip.cards.length) + " are in our case right now." : "") + '</p>' +
+      '<div class="rip-cardbar"><span class="rip-progress" id="ripProgress">0 of ' + rip.cards.length + ' flipped</span>' +
       '<div class="rip-cardbtns"><button class="btn btn-ghost" type="button" data-rip-next>Flip next</button><button class="btn btn-ghost" type="button" data-rip-all>Flip all</button></div></div>' +
       '<div class="rip-grid" id="ripGrid">' + rip.cards.map(ripCardHtml).join("") + '</div>';
     wrap.hidden = false;
@@ -378,16 +584,18 @@
   function ripFlip(i, quiet){
     var c = rip.cards[i], el = $('.rip-card[data-rip-flip="' + i + '"]', ripApp);
     if(!c || !el || el.classList.contains("is-flipped")) return false;
-    var P = PACKS[rip.game], it = c.item;
+    var P = PACKS[rip.game], card = c.card;
     el.classList.add("is-flipped");
     if(c.rare) el.classList.add("is-rare");
     if(c.hit) el.classList.add("is-hit");
     el.setAttribute("aria-pressed", "true");
-    el.setAttribute("aria-label", it.name + ", " + (P.labels[c.tier] || c.tier) + ", reference price " + money(it.price) + ". Open product details; sold separately.");
+    el.setAttribute("aria-label", card.name + ", " + (P.labels[c.tier] || c.tier) + ", " + ripPriceSay(card) + ". " +
+      (card.inStock ? "In stock now at the shop. Open product details." : "Not in our case right now. Open card details."));
     el.dataset.ripView = i; el.removeAttribute("data-rip-flip");
     rip.flipped++;
     var prog = $("#ripProgress"); if(prog) prog.textContent = rip.flipped + " of " + rip.cards.length + " flipped";
-    if(!quiet) ripSay((c.rare ? "Simulated hit! " : "") + "Card " + (i + 1) + " of " + rip.cards.length + ": " + it.name + ", " + (P.labels[c.tier] || c.tier) + ", reference price " + money(it.price));
+    if(!quiet) ripSay((c.rare ? "Simulated hit! " : "") + "Card " + (i + 1) + " of " + rip.cards.length + ": " + card.name + ", " +
+      (P.labels[c.tier] || c.tier) + ", " + ripPriceSay(card) + (card.inStock ? ", in stock now" : ""));
     if(c.rare && !reduceMotion){
       var r = el.getBoundingClientRect(), big = c.hit;
       ripLater(function(){
@@ -407,11 +615,19 @@
   function ripShowResults(){
     if(rip.stage === "results") return;
     rip.stage = "results"; ripApp.dataset.stage = "results";
-    var P = PACKS[rip.game], price = ripPackPrice(rip.game), total = 0, best = null;
-    rip.cards.forEach(function(c){ total += Number(c.item.price) || 0; if(!best || c.item.price > best.item.price) best = c; });
+    var P = PACKS[rip.game], price = ripPackPrice(rip.game), total = 0, best = null, ours = 0, refs = 0;
+    rip.cards.forEach(function(c){
+      var p = Number(c.card.price) || 0;
+      total += p;
+      if(p > 0){ if(c.card.priceIsMarket) refs++; else ours++; }
+      if(!best || p > (Number(best.card.price) || 0)) best = c;
+    });
+    var stocked = ripInStockCount(rip.cards);
     var s = ripStats();
     s.packs++; s.value = Math.round((s.value + total) * 100) / 100; s.spent = Math.round((s.spent + price) * 100) / 100;
-    if(best && (!s.best || best.item.price > s.best.price)) s.best = {id: best.item.id, name: best.item.name, price: best.item.price, img: ripImg(best.item)};
+    if(best && (!s.best || (Number(best.card.price) || 0) > (Number(s.best.price) || 0)))
+      s.best = {id: best.card.item ? best.card.item.id : "", name: best.card.name, price: Number(best.card.price) || 0,
+        img: best.card.img, market: !!best.card.priceIsMarket, inStock: !!best.card.inStock};
     TL.store.set("ripStats", s);
     var bi = rip.cards.indexOf(best);
     var res = $("#ripResults"); if(!res) return;
@@ -420,39 +636,60 @@
       '<h2 id="ripResultH" tabindex="-1">Your simulated reveal</h2>' +
       '<p class="rip-simulation-copy"><strong>No real pack was opened. No cards or prizes were awarded.</strong> Nothing was purchased or charged, and no store credit was earned.</p>' +
       '<p class="rip-simulation-copy">Reference singles total: <b class="rip-total">' + money(total) + '</b>. This is catalog pricing, not winnings, profit, or a balance you can spend. Prices and availability may change.</p>' +
-      (ripDemo ? '<p class="rip-simulation-copy">Sample cards and prices shown because live inventory is unavailable.</p>' : "") +
-      (best ? '<div class="rip-bestpull"><div class="rip-best-art">' + (ripImg(best.item) ? '<img src="' + esc(ripImg(best.item)) + '" alt="' + esc(best.item.name) + '">' : cardArt(best.item)) + '</div>' +
-        '<div class="rip-best-meta"><span class="rip-label">Simulation highlight</span><h3>' + esc(best.item.name) + '</h3>' +
-        '<p class="rip-note">' + esc(P.labels[best.tier] || best.tier) + ' &middot; ' + esc(ripSetName(best.item)) + (best.item.cond ? ' &middot; ' + esc(best.item.cond) : "") + '</p>' +
-        '<b class="rip-price">' + money(best.item.price) + '</b>' +
-        '<p class="rip-simulation-copy">Want the physical single? It is sold separately; adding it to your cart does not claim a prize.</p>' +
-        '<div class="rip-btns"><button class="btn" type="button" data-rip-add="' + bi + '">Add single to cart</button><button class="btn btn-ghost" type="button" data-rip-view="' + bi + '">Product details</button></div></div></div>' : "") +
+      '<p class="rip-simulation-copy">' + (refs ? "That total mixes catalog market references for the " + fmtInt(refs) + " card" + (refs === 1 ? "" : "s") + " we do not stock" + (ours ? " with our shelf price on the " + fmtInt(ours) + " we do" : "") + ". " : "") +
+        ripSourceNote() + '</p>' +
+      '<p class="rip-simulation-copy rip-stocked">' + (stocked
+        ? fmtInt(stocked) + " of these " + fmtInt(rip.cards.length) + " card" + (rip.cards.length === 1 ? " is" : "s are") + " in our case right now &mdash; badged <span class=\"rip-stock sm\">In Stock Now</span> below. Only those can be added to a cart, and they are sold separately."
+        : "None of these cards are in our case right now, so there is nothing here to add to a cart.") + '</p>' +
+      (best ? '<div class="rip-bestpull"><div class="rip-best-art">' + (best.card.img ? '<img src="' + esc(best.card.img) + '" alt="' + esc(best.card.name) + '">' : cardArt(best.card.item || best.card)) + '</div>' +
+        '<div class="rip-best-meta"><span class="rip-label">Simulation highlight</span><h3>' + esc(best.card.name) + '</h3>' +
+        '<p class="rip-note">' + esc(P.labels[best.tier] || best.tier) + ' &middot; ' + esc(best.card.set || ripSetLabel(rip.game, rip.set)) + (best.card.cond ? ' &middot; ' + esc(best.card.cond) : "") + '</p>' +
+        ripStockBadge(best.card) +
+        '<b class="rip-price">' + ripPriceHtml(best.card) + '</b>' +
+        '<p class="rip-simulation-copy">' + (best.card.inStock
+          ? "We have this single in the case. It is sold separately; adding it to your cart does not claim a prize."
+          : "We do not have this single in the case right now, so the figure above is a catalog market reference, not our price.") + '</p>' +
+        '<div class="rip-btns">' +
+          (best.card.inStock ? '<button class="btn" type="button" data-rip-add="' + bi + '">Add single to cart</button>' : "") +
+          '<button class="btn btn-ghost" type="button" data-rip-view="' + bi + '">' + (best.card.inStock ? "Product details" : "Card details") + '</button>' +
+        '</div></div></div>' : "") +
       '<div class="rip-btns rip-again"><button class="btn" type="button" data-rip-again>Simulate another &middot; free</button><button class="btn btn-ghost" type="button" data-rip-share>Share simulation</button>' +
       '<button class="btn btn-ghost" type="button" data-go="shop" data-params="type=sealed&game=' + esc(rip.game) + '">Shop physical ' + esc(P.name) + ' packs</button></div>' +
       '<p class="rip-simulation-copy">Optional shopping: physical singles and packs are sold separately and require a separate checkout.</p>' +
     '</div>' +
     '<ul class="rip-list" aria-label="Cards shown in the simulation; physical singles sold separately">' + rip.cards.map(function(c, i){
-      var it = c.item, src = ripImg(it);
-      return '<li class="rip-row' + (c.rare ? " rare" : "") + (c === best ? " best" : "") + '">' +
-        '<button class="rip-row-view" type="button" data-rip-view="' + i + '" aria-label="' + esc(it.name) + ', open details">' + (src ? '<img src="' + esc(src) + '" alt="" loading="lazy" width="44" height="44">' : '<span class="rip-best-ph" aria-hidden="true"></span>') +
-          '<span class="rip-row-name"><b>' + esc(it.name) + '</b><span>' + esc(P.labels[c.tier] || c.tier) + (c.rh ? " · reverse holo" : "") + (it.cond ? " · " + esc(it.cond) : "") + '</span></span></button>' +
-        '<span class="rip-row-price">' + money(it.price) + '</span>' +
-        '<button class="add rip-row-add" type="button" data-rip-add="' + i + '"' + (it.stock > 0 ? "" : " disabled") + '>' + (it.stock > 0 ? "Add single to cart" : "Sold out") + '</button></li>';
+      var card = c.card, src = card.img;
+      return '<li class="rip-row' + (c.rare ? " rare" : "") + (c === best ? " best" : "") + (card.inStock ? " stocked" : "") + '">' +
+        '<button class="rip-row-view" type="button" data-rip-view="' + i + '" aria-label="' + esc(card.name) + ', ' + esc(ripPriceSay(card)) + (card.inStock ? ", in stock now" : "") + ', open details">' +
+          (src ? '<img src="' + esc(src) + '" alt="" loading="lazy" width="44" height="44">' : '<span class="rip-best-ph" aria-hidden="true"></span>') +
+          '<span class="rip-row-name"><b>' + esc(card.name) + '</b><span>' + esc(P.labels[c.tier] || c.tier) + (c.rh ? " · reverse holo" : "") +
+            (card.inStock && card.itemSet && card.itemSet !== card.set ? " · our copy: " + esc(card.itemSet) : "") +
+            (card.cond ? " · " + esc(card.cond) : "") + '</span></span>' +
+          ripStockBadge(card, "sm") + '</button>' +
+        '<span class="rip-row-price">' + ripPriceHtml(card) + '</span>' +
+        (card.inStock
+          ? '<button class="add rip-row-add" type="button" data-rip-add="' + i + '">Add single to cart</button>'
+          : '<span class="rip-row-flag">Not in our case</span>') + '</li>';
     }).join("") + '</ul>';
     res.hidden = false;
-    ripSay("Simulation complete. No real pack was opened, no cards were awarded, and nothing was charged. Reference singles total: " + money(total) + ", not winnings or store credit." + (best ? " Simulation highlight: " + best.item.name + "." : ""));
+    ripSay("Simulation complete. No real pack was opened, no cards were awarded, and nothing was charged. Reference singles total: " + money(total) +
+      ", not winnings or store credit. " + stocked + " of " + rip.cards.length + " are in stock at the shop." + (best ? " Simulation highlight: " + best.card.name + "." : ""));
     ripLater(function(){
       try { res.scrollIntoView({behavior: reduceMotion ? "auto" : "smooth", block: "start"}); } catch(e){}
       var h = $("#ripResultH"); if(h) try { h.focus({preventScroll:true}); } catch(e){}
     }, 60);
   }
   function ripShare(){
-    var best = null, total = 0;
-    rip.cards.forEach(function(c){ total += Number(c.item.price) || 0; if(!best || c.item.price > best.item.price) best = c; });
+    var best = null, total = 0, stocked = 0;
+    rip.cards.forEach(function(c){
+      total += Number(c.card.price) || 0;
+      if(c.card.inStock) stocked++;
+      if(!best || (Number(c.card.price) || 0) > (Number(best.card.price) || 0)) best = c;
+    });
     var url = location.origin + location.pathname + "#/rip";
     var text = "I tried Top Loaded's free pack-opening simulator!";
-    if(best) text += " Simulation highlight: " + best.item.name + ".";
-    text += " No real pack was opened and no cards or prizes were awarded. Reference singles total: " + money(total) + " (not winnings or store credit).";
+    if(best) text += " Simulation highlight: " + best.card.name + (best.card.inStock ? " (in their case right now)" : "") + ".";
+    text += " No real pack was opened and no cards or prizes were awarded. Reference singles total: " + money(total) + " (catalog pricing, not winnings or store credit).";
     if(navigator.share){
       navigator.share({title: "Top Loaded free pack simulator", text: text, url: url}).catch(function(){});
       return;
@@ -462,9 +699,14 @@
       navigator.clipboard.writeText(full).then(function(){ toast("Copied to clipboard — paste it anywhere"); }, function(){ toast(full); });
     } else toast(full);
   }
+  /* only a card we actually stock can go in the cart */
   function ripAddToCart(i, btn){
     var c = rip.cards[i]; if(!c) return;
-    var it = c.item;
+    var card = c.card, it = card.item;
+    if(!it || !card.inStock){
+      toast(card.name + " is not in our case right now — nothing to add");
+      return;
+    }
     if(TL.cart && typeof TL.cart.add === "function"){
       try { TL.cart.add(it, 1, btn); return; } catch(e){ if(window.console) console.error("[rip] cart", e); }
     }
@@ -473,27 +715,32 @@
   }
   function ripView(i){
     var c = rip.cards[i]; if(!c) return;
+    var card = c.card;
     /* the core default is an empty no-op until the shop package defines the modal */
-    if(String(TL.openQuickView).replace(/\s/g, "") === "function(){}"){
-      if(c.item.url){ window.open(c.item.url, "_blank", "noopener"); return; }
-      toast(c.item.name + " · " + money(c.item.price) + " · " + (c.item.cond || "sealed"));
-      return;
+    var noModal = String(TL.openQuickView).replace(/\s/g, "") === "function(){}";
+    if(card.item && !noModal){
+      try { TL.openQuickView(card.item); return; } catch(e){ if(window.console) console.error("[rip] quickview", e); }
     }
-    try { TL.openQuickView(c.item); } catch(e){ if(window.console) console.error("[rip] quickview", e); }
+    if(card.url){ window.open(card.url, "_blank", "noopener"); return; }
+    toast(card.name + " · " + ripPriceText(card) + " · " + (card.inStock ? "in stock now" : "not in our case"));
   }
 
   /* ---- events ---- */
   ripApp.addEventListener("click", function(e){
     var t;
     if((t = e.target.closest("[data-rip-game]"))){
-      rip.game = t.dataset.ripGame;
-      var sets = ripSetsFor(rip.game); rip.set = (sets && sets[0]) ? sets[0].name : "";
-      TL.store.set("rip", {game: rip.game, set: rip.set});
+      if(rip.game === t.dataset.ripGame) return;
+      rip.game = t.dataset.ripGame; rip.set = ""; rip.setName = "";
+      ripSavePrefs();
       ripRenderSetup(); var b = $('[data-rip-game="' + rip.game + '"]', ripApp); if(b) b.focus();
       return;
     }
     if(e.target.closest("[data-rip-open]")){ ripStartPack(); return; }
-    if(e.target.closest("[data-rip-retry]")){ ripItemsP = null; ripRenderSetup(); ripLoadItems().then(function(){ if(rip.stage === "setup") ripRenderSetup(); }); return; }
+    if(e.target.closest("[data-rip-retry]")){
+      ripItemsP = null; ripItems = null; ripSetCache = {}; ripSetList = {}; ripPoolCache = {};
+      ripRenderSetup(); ripLoadItems().then(function(){ if(rip.stage === "setup") ripRenderSetup(); });
+      return;
+    }
     if(e.target.closest("[data-rip-back]")){ ripClearTimers(); ripRenderSetup(); return; }
     if(e.target.closest("[data-rip-tear]")){ ripTear(); return; }
     if((t = e.target.closest("[data-rip-flip]"))){ ripFlip(Number(t.dataset.ripFlip)); return; }
@@ -512,7 +759,12 @@
     }
   });
   ripApp.addEventListener("change", function(e){
-    if(e.target && e.target.id === "ripSet"){ rip.set = e.target.value; TL.store.set("rip", {game: rip.game, set: rip.set}); }
+    if(e.target && e.target.id === "ripSet"){
+      rip.set = e.target.value;
+      var hit = ripFindSet(ripSetList[rip.game], rip.set);
+      rip.setName = hit ? hit.name : rip.set;
+      ripSavePrefs();
+    }
   });
   ripApp.addEventListener("keydown", function(e){
     /* #ripPack is a div[role=button], so the browser synthesises no click for Enter or Space — tear on both here,
@@ -553,6 +805,7 @@
   function ripEnter(){
     if(!ripBooted || rip.stage === "setup"){
       ripBooted = true; ripRenderSetup();
+      ripRequestSets(rip.game);
       ripLoadItems().then(function(){ if(rip.stage === "setup" && TL.current === "rip") ripRenderSetup(); });
     }
   }
@@ -560,7 +813,13 @@
   TL.on("view:leave", function(d){ if(d && d.name === "rip"){ ripClearTimers(); rip.drag = null; } });
   TL.on("inventory:summary", function(){ if(rip.stage === "setup" && TL.current === "rip") ripRenderSetup(); });
   TL.on("inventory:loaded", function(d){
-    if(d && d.items && d.items.length && !(ripItems && !ripDemo)){ ripItems = d.items; ripDemo = !d.items.some(function(it){ return it.tcg; }); ripSetCache = {}; ripItemsP = Promise.resolve(ripItems); }
+    if(d && d.items && d.items.length && !(ripItems && !ripDemo)){
+      ripItems = d.items; ripDemo = !d.items.some(function(it){ return it.tcg; });
+      ripSetCache = {}; ripItemsP = Promise.resolve(ripItems);
+      /* fresh stock: rebuild pools so "In Stock Now" reflects the live case */
+      ripPoolCache = {};
+      if(!ripCatalogGame(rip.game)) ripSetList = {};
+    }
     if(rip.stage === "setup" && TL.current === "rip") ripRenderSetup();
   });
   TL.on("init", function(){ ripRenderSetup(); });

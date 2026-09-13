@@ -110,15 +110,16 @@
     }, 2500);
   });
 
-  /* ---- next up strip ----
-     Writes only when the string changes; the countdown digits live in role="timer" aria-live="off"
-     elements and nothing in #nextUp is a live region, so a ticking clock is never announced. */
+  /* ---- play nights: one live countdown per game ----
+     The owner asked for a clock to the next play event for EACH game, and for the
+     card-show countdown to move to the Card Show page. Countdown digits sit in
+     role="timer" aria-live="off" so a screen reader is never spammed by the tick. */
   var nuTimer = 0;
   function setText(el, s){ if(el && el.textContent !== s) el.textContent = s; }
   function setHtml(el, s){ if(el && el.innerHTML !== s) el.innerHTML = s; }
   function fmtWhen(d){
     try {
-      return new Intl.DateTimeFormat("en-US", {weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit"}).format(d).replace(":00", "");
+      return new Intl.DateTimeFormat("en-US", {timeZone: TL.config.timezone || "America/New_York", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit"}).format(d).replace(":00", "") + " Eastern";
     } catch(e){ return d.toDateString(); }
   }
   function renderCd(el, when, windowMs){
@@ -133,35 +134,65 @@
     if(!reduceMotion && !d) html += "<b>" + TL.pad2(sec) + "</b><small>s</small>";
     setHtml(el, html);
   }
-  function tickNextUp(){
-    var ev = null, show = null;
-    try { ev = TL.nextEvent && TL.nextEvent(); } catch(e){}
-    try { show = TL.nextShow && TL.nextShow(); } catch(e){}
-    var evCell = $("#nuEvCell");
-    if(ev && ev.event && ev.when){
-      setText($("#nuEvName"), ev.event.name || "Play night");
-      setText($("#nuEvWhen"), fmtWhen(ev.when) + (ev.event.small ? " · " + ev.event.small.split(" · ")[0] : ""));
-      renderCd($("#nuEvCd"), ev.when);
-      if(evCell && evCell.hidden) evCell.hidden = false;
-    } else if(evCell && !evCell.hidden) evCell.hidden = true;
-    var showCell = $("#nuShowCell");
-    if(show && !isNaN(show)){
-      var cfg = (TL.config && TL.config.show) || {};
-      setText($("#nuShowName"), "Card show · " + (cfg.venue ? cfg.venue.replace("Cincinnati Airport", "").trim() : "Hilton"));
-      setText($("#nuShowWhen"), fmtWhen(show).replace(/,\s*\d{1,2}(:\d{2})?\s*(AM|PM)$/i, "") + " · " + (cfg.hours || "10 AM – 4 PM") + " · Turfway Rd");
-      renderCd($("#nuShowCd"), show, 6 * 36e5);
-      if(showCell && showCell.hidden) showCell.hidden = false;
-    } else if(showCell && !showCell.hidden) showCell.hidden = true;
+  /* soonest upcoming event per game, using the shared schedule maths in 55-events.js */
+  function playNightsByGame(){
+    var events = (TL.config && TL.config.events) || [], next = {}, order = [];
+    var occOf = (TL.calendar && TL.calendar.nextOccurrence) || null;
+    for(var i = 0; i < events.length; i++){
+      var ev = events[i];
+      if(!ev || !ev.name) continue;
+      var game = ev.game || "other", occ = null;
+      try { occ = occOf ? occOf(ev) : null; } catch(e){ occ = null; }
+      if(!occ) continue;
+      var when = occ.when;
+      var rank = occ.running ? -1 : occ.mins;
+      if(!next[game]){ next[game] = {game: game, ev: ev, when: when, rank: rank, running: occ.running}; order.push(game); }
+      else if(rank < next[game].rank){ next[game] = {game: game, ev: ev, when: when, rank: rank, running: occ.running}; }
+    }
+    return order.map(function(g){ return next[g]; }).sort(function(a, b){ return a.rank - b.rank; });
+  }
+  var pnKey = "";
+  function renderPlayNow(){
+    var grid = $("#playNowGrid"); if(!grid) return;
+    var rows = playNightsByGame();
+    if(!rows.length){
+      if(pnKey !== "empty"){ pnKey = "empty"; grid.innerHTML = '<li class="playnow-empty">The weekly schedule is being set — <a href="#/events" data-go="events">see the play nights page</a>.</li>'; }
+      return;
+    }
+    var key = rows.map(function(r){ return r.game + r.ev.name + r.when.getTime(); }).join("|");
+    if(key !== pnKey){
+      pnKey = key;
+      grid.innerHTML = rows.map(function(r){
+        var label = (TL.gameLabel ? TL.gameLabel(r.game) : r.game) || "Play night";
+        var icon = document.getElementById("game-icon-" + r.game)
+          ? '<svg class="game-icon" width="30" height="30" aria-hidden="true" focusable="false"><use href="#game-icon-' + esc(r.game) + '"></use></svg>' : "";
+        return '<li class="playnow-card" data-game="' + esc(r.game) + '">' +
+          '<a class="playnow-btn" href="#/events" data-go="events">' +
+            '<span class="playnow-mark">' + icon + '</span>' +
+            '<span class="playnow-game">' + esc(label) + '</span>' +
+            '<span class="playnow-ev">' + esc(r.ev.name) + '</span>' +
+            '<span class="playnow-when" data-when></span>' +
+            '<span class="playnow-cd" data-cd role="timer" aria-live="off"></span>' +
+            (r.ev.fee ? '<span class="playnow-fee">' + esc(/tbd/i.test(r.ev.fee) ? "Entry TBD" : "Entry " + r.ev.fee) + '</span>' : "") +
+          '</a></li>';
+      }).join("");
+    }
+    var cells = grid.querySelectorAll(".playnow-card");
+    for(var i = 0; i < rows.length && i < cells.length; i++){
+      setText(cells[i].querySelector("[data-when]"), fmtWhen(rows[i].when));
+      renderCd(cells[i].querySelector("[data-cd]"), rows[i].when);
+    }
   }
   function startNextUp(){
     stopNextUp();
-    if(!$("#nextUp")) return;
-    tickNextUp();
-    if(!document.hidden) nuTimer = setInterval(tickNextUp, reduceMotion ? 60000 : 1000);
+    if(!$("#playNowGrid")) return;
+    renderPlayNow();
+    if(!document.hidden) nuTimer = setInterval(renderPlayNow, reduceMotion ? 60000 : 1000);
   }
   function stopNextUp(){ if(nuTimer){ clearInterval(nuTimer); nuTimer = 0; } }
+  TL.on("motion:change",function(){if(homeActive)startNextUp();});
   document.addEventListener("visibilitychange", function(){ if(document.hidden) stopNextUp(); else if(homeActive) startNextUp(); });
-  TL.on("config:change", function(){ if(homeActive) tickNextUp(); });
+  TL.on("config:change", function(){ if(homeActive){ pnKey = ""; renderPlayNow(); } });
 
   /* ---- the wall ---- */
   var wallLive = false, wallImagesStarted = false;
@@ -251,19 +282,64 @@
     });
   })();
 
-  /* ---- testimonials from config (sample quotes stay until the shop adds real ones) ---- */
-  function renderTestimonials(){
-    var list = TL.config && TL.config.testimonials, box = $("#testimonials"), tag = $("#testiTag");
-    if(!box || !Array.isArray(list) || !list.length) return;
-    var real = list.map(function(t){
-      if(typeof t === "string") return {q: t, who: ""};
-      return {q: t.quote || t.text || t.q || "", who: t.who || t.name || t.author || ""};
-    }).filter(function(t){ return t.q; }).slice(0, 6);
-    if(!real.length) return;
-    box.innerHTML = real.map(function(t){
-      return '<div class="panel"><p class="quote">“' + esc(t.q) + '”</p>' + (t.who ? '<p class="p-set quote-who">' + esc(t.who) + "</p>" : "") + "</div>";
-    }).join("");
-    /* the "sample quotes" tag only clears once the list differs from the built-in defaults */
-    if(tag) tag.hidden = !(typeof TL.sameAsDefault === "function" && TL.sameAsDefault("testimonials"));
+  /* ---- reviews ----
+     The owner asked for real Google / TCGplayer reviews here. We render only what the
+     shop has actually supplied (Admin → Reviews, or a Google Places pull once the
+     Worker is deployed with a key). Nothing is ever invented: with no reviews on file
+     the section invites customers to read and leave real ones instead. */
+  var REVIEW_SOURCES = {
+    google: {label: "Google review", link: function(){ return (TL.config.links && TL.config.links.googleMaps) || ""; }},
+    tcgplayer: {label: "TCGplayer feedback", link: function(){ return (TL.config.links && TL.config.links.tcgplayer) || ""; }},
+    shop: {label: "In the shop", link: function(){ return ""; }}
+  };
+  function reviewStars(n){
+    n = Math.max(0, Math.min(5, Math.round(Number(n) || 0)));
+    if(!n) return "";
+    return '<span class="review-stars" aria-label="' + n + ' out of 5">' + new Array(n + 1).join("★") + '</span>';
   }
-  TL.on("config:change", renderTestimonials);
+  var reviewRemote=null,reviewFetchKey="";
+  function reviewUrl(u){try{var p=new URL(u);return p.protocol==="https:"||p.protocol==="http:"?p.href:"";}catch(e){return "";}}
+  function fetchReviews(){
+    var cfg=TL.config.reviews||{},key=JSON.stringify(cfg);
+    if(!TL.api.online||key===reviewFetchKey)return;
+    reviewFetchKey=key;reviewRemote=null;
+    TL.api.get("/reviews",{noAuth:true}).then(function(d){if(reviewFetchKey===key){reviewRemote=d;renderTestimonials();}}).catch(function(){reviewFetchKey="";});
+  }
+  function renderTestimonials(){
+    var box = $("#testimonials"), tag = $("#testiTag");
+    if(!box) return;
+    var cfg = (TL.config && TL.config.reviews) || {};
+    var min = Number(cfg.minRating || 0);
+    var list = (reviewRemote ? reviewRemote.items : Array.isArray(cfg.items) ? cfg.items : []).map(function(t){
+      return {q: t.quote || t.text || "", who: t.who || t.name || "", rating: Number(t.rating || 0),
+        source: REVIEW_SOURCES[t.source] ? t.source : "shop", url: reviewUrl(t.url),authorUrl:reviewUrl(t.authorUrl),photo:reviewUrl(t.photo)};
+    }).filter(function(t){ return t.q && t.rating >= min; }).slice(0, 6);
+
+    if(!list.length){
+      var g = (TL.config.links && TL.config.links.googleMaps) || "", tcg = (TL.config.links && TL.config.links.tcgplayer) || "";
+      box.innerHTML = '<div class="panel review-empty">' +
+        '<p class="quote">Reviews from Google and TCGplayer land here.</p>' +
+        '<p class="p-set quote-who">Been in lately? Telling people what you thought is the best thing you can do for a small shop.</p>' +
+        '<p class="review-links">' +
+          (g ? '<a class="btn btn-ghost" href="' + esc(g) + '" target="_blank" rel="noopener noreferrer">Read &amp; leave a Google review ↗</a>' : "") +
+          (tcg ? '<a class="btn btn-ghost" href="' + esc(tcg) + '" target="_blank" rel="noopener noreferrer">Our TCGplayer feedback ↗</a>' : "") +
+        '</p></div>';
+      if(tag){ tag.textContent = "No reviews published yet"; tag.hidden = false; }
+      return;
+    }
+    box.innerHTML = list.map(function(t){
+      var src = REVIEW_SOURCES[t.source], href = t.url || reviewUrl(src.link());
+      var who = [t.who, src.label].filter(Boolean).join(" · ");
+      return '<div class="panel review-card">' + reviewStars(t.rating) +
+        (t.source==="google"&&reviewRemote&&reviewRemote.mode==="google"?'<p><span class="google-maps-attribution" translate="no">Google Maps</span></p>':'')+
+        '<p class="quote">“' + esc(t.q) + '”</p>' +
+        (t.authorUrl ? '<a class="review-author" href="'+esc(t.authorUrl)+'" target="_blank" rel="noopener noreferrer">'+(t.photo?'<img src="'+esc(t.photo)+'" alt="" width="32" height="32" loading="lazy">':'')+esc(t.who)+'</a>' : '')+
+        '<p class="p-set quote-who">' + (href
+          ? '<a href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">' + esc(who) + ' ↗</a>'
+          : esc(who)) + '</p></div>';
+    }).join("");
+    if(reviewRemote && reviewRemote.mode==="google")box.insertAdjacentHTML("beforeend",'<p class="review-attribution">Google-selected reviews ordered by relevance, filtered to '+esc(min)+'+ stars. <a href="'+esc(reviewUrl(reviewRemote.allReviews))+'" target="_blank" rel="noopener">View all reviews</a> · <a href="'+esc(reviewUrl(reviewRemote.terms))+'">Terms</a> · <a href="'+esc(reviewUrl(reviewRemote.privacy))+'">Privacy</a></p>');
+    if(tag){ tag.hidden = false;tag.textContent="Selected positive reviews · "+min+"+ stars, not an overall rating"; }
+  }
+  TL.on("config:change", function(){reviewRemote=null;renderTestimonials();fetchReviews();});
+  TL.on("api:ready",fetchReviews);

@@ -12,6 +12,14 @@ main = "src/index.js"
 compatibility_date = "2026-08-01"
 workers_dev = true
 
+[[durable_objects.bindings]]
+name = "LIVE_CLAIMS"
+class_name = "StreamClaims"
+
+[[migrations]]
+tag = "stream-claims-v1"
+new_sqlite_classes = ["StreamClaims"]
+
 [[kv_namespaces]]
 binding = "KV"
 id = "REPLACE_WITH_KV_NAMESPACE_ID"

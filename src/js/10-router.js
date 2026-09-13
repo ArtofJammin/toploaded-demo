@@ -15,7 +15,7 @@
   $$("section.view[id^='view-']").forEach(function(s){ views[s.id.slice(5)] = "#" + s.id; });
   var current = "home";
   var pendingView = null;
-  var VIEW_TITLES = {home:"", shop:"Shop", live:"Live breaks", show:"Card show", events:"Play nights", buylist:"Sell to us", visit:"Visit", staff:"Staff desk", admin:"Admin", rip:"Free pack simulator", account:"My account"};
+  var VIEW_TITLES = {home:"", shop:"Shop", live:"Live stream", show:"Card show", events:"Play nights", buylist:"Sell to us", visit:"Visit", staff:"Staff desk", admin:"Admin", rip:"Free pack simulator", account:"My account"};
   var BASE_TITLE = document.title;
   function isAuthed(){
     if(TL.auth && typeof TL.auth.can === "function") return TL.auth.can(current);

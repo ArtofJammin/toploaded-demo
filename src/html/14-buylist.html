@@ -4,36 +4,19 @@
       <div class="view-head">
         <p class="eyebrow">Buylist &middot; Cash or credit</p>
         <h1>We buy collections</h1>
-        <p class="lede">Binders, bulk, graded slabs, sealed product, whole closets. Walk in any day we're open, or start a quote here and we'll get back to you with a number.</p>
+        <p class="lede">Binders, bulk, graded slabs, sealed product, whole closets. Walk in any day we're open, or tell us what you've got below and we'll come back to you with a number.</p>
       </div>
       <div class="buy-grid">
         <div class="buy-points">
           <div class="panel"><span class="k">Cash</span><p>Straight cash offer, paid on the spot once we've looked everything over.</p></div>
           <div class="panel"><span class="k" id="buyBonusK">+10%</span><p>Take store credit instead and we add <span id="buyBonusWord">ten percent</span> to the offer.</p></div>
           <div class="panel"><span class="k">Big?</span><p>Estate or store-closing sized lot? We travel for large collections across the Tri-State &mdash; call <a id="buyPhone" href="tel:+15132222573">(513) 222-2573</a>.</p></div>
-          <div class="panel"><span class="k">How</span><p>No appointment needed &mdash; walk in with it, or start a quote here. We sort, price against current market, and the offer is yours to take or leave.</p></div>
+          <div class="panel"><span class="k">How</span><p>No appointment needed &mdash; walk in with it, or send the details below. We sort, price against current market, and the offer is yours to take or leave.</p></div>
         </div>
         <div class="buy-col">
-          <div class="form-card worth" id="worth">
-            <p class="eyebrow">Estimator</p>
-            <h3>What's my card worth?</h3>
-            <p class="form-intro">Search a card, pick how it grades, and see roughly what we'd pay &mdash; cash or store credit.</p>
-            <div class="worth-search">
-              <div class="field worth-game"><label for="worthGame">Game</label>
-                <select id="worthGame"><option value="pk">Pokemon</option><option value="op">One Piece</option><option value="mtg">Magic</option><option value="other">Other</option></select>
-              </div>
-              <div class="field worth-q"><label for="worthQ">Card name</label>
-                <input id="worthQ" type="search" autocomplete="off" placeholder="e.g. Charizard ex, Shanks, The One Ring" aria-describedby="worthHint" aria-controls="worthResults">
-              </div>
-            </div>
-            <p class="worth-hint" id="worthHint" role="status" aria-live="polite">Start typing a card name.</p>
-            <ul class="worth-results" id="worthResults" role="list" aria-label="Matching cards"></ul>
-            <div class="worth-pick" id="worthPick" hidden></div>
-            <p class="worth-disclaimer">Estimates only &mdash; market moves daily and final offers are made in person after we see the card.</p>
-          </div>
           <form class="form-card" id="buyForm" novalidate data-kind="buylist">
             <h3>Start a quote</h3>
-            <p class="form-intro">Tell us roughly what you've got &mdash; photos help but aren't required.</p>
+            <p class="form-intro">Tell us roughly what you've got &mdash; photos help but aren't required. We price against current market, and the final offer is made in person once we've seen the cards.</p>
             <div class="form-grid">
               <div class="field"><label for="bName">Name</label><input id="bName" name="name" type="text" required autocomplete="name" maxlength="80"></div>
               <div class="field"><label for="bContact">Email or phone</label><input id="bContact" name="contact" type="text" required autocomplete="email" inputmode="email" maxlength="120"></div>

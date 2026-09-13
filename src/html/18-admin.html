@@ -217,20 +217,14 @@
         </div>
 
         <div class="admin-card" id="cardLive">
-          <h3>Live rips <span class="pill crit" id="liveStatusPill"><span class="dot crit"></span>Offline</span></h3>
-          <p class="card-note">Going live puts a banner across the storefront, lights up the Live tab, and opens break-spot claims.</p>
-          <div style="margin-top:14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap"><button class="btn" id="goLiveBtn" type="button">Start live rip</button><span class="save-state" id="liveState" role="status"></span></div>
+          <h3>Live stream <span class="pill crit" id="liveStatusPill"><span class="dot crit"></span>Offline</span></h3>
+          <p class="card-note">Going live lights up the Live tab. Post confirmed card claims from the staff-only desk on the Live Stream page; it does not process payments.</p>
+          <div style="margin-top:14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap"><button class="btn" id="goLiveBtn" type="button">Start live stream</button><span class="save-state" id="liveState" role="status"></span></div>
           <dl class="kv" style="margin-top:18px">
-            <dt><label for="setLiveTitle">Break title</label></dt><dd><input id="setLiveTitle" style="width:100%"></dd>
+            <dt><label for="setLiveTitle">Stream title</label></dt><dd><input id="setLiveTitle" style="width:100%"></dd>
             <dt><label for="setLivePlatform">Platform</label></dt>
             <dd><select id="setLivePlatform"><option value="">Not set</option><option value="whatnot">Whatnot</option><option value="youtube">YouTube</option><option value="twitch">Twitch</option><option value="tiktok">TikTok</option></select></dd>
             <dt><label for="setLiveEmbed">Embed URL</label></dt><dd><input id="setLiveEmbed" type="url" placeholder="https://&hellip;" style="width:100%"></dd>
-            <dt>Spots</dt>
-            <dd class="time-row">
-              <label>Price $ <input id="setLiveSpotPrice" type="number" min="0" step="0.01" inputmode="decimal" style="width:90px"></label>
-              <label>Count <input id="setLiveSpots" type="number" min="1" max="60" step="1" inputmode="numeric" style="width:70px"></label>
-              <label>Packs each <input id="setLivePacks" type="number" min="1" max="36" step="1" inputmode="numeric" style="width:70px"></label>
-            </dd>
             <dt>Schedule</dt><dd><div id="liveSchedEditor" class="rows-editor"></div><button class="linklike" type="button" id="liveSchedAdd" style="margin-top:6px">+ Add stream</button></dd>
           </dl>
           <div class="card-actions"><button class="btn" id="liveApply" type="button">Save live settings</button><span class="save-state" role="status" data-state-for="cardLive"></span></div>
@@ -249,17 +243,29 @@
           </div>
         </div>
 
-        <div class="admin-card" id="cardTicker">
-          <h3>Buylist ticker</h3>
-          <p class="card-note">The "Buying now" strip on the home page. Item, then the top price.</p>
-          <div id="tickerEditor" class="rows-editor"></div>
-          <button class="linklike" type="button" id="tickerAdd" style="margin-top:8px">+ Add row</button>
-          <h3 style="margin-top:22px">Testimonials</h3>
-          <p class="card-note">Quote and who said it. Leave empty to hide the section.</p>
-          <div id="testiEditor" class="rows-editor"></div>
-          <button class="linklike" type="button" id="testiAdd" style="margin-top:8px">+ Add quote</button>
-          <div class="card-actions"><button class="btn" id="tickerApply" type="button">Save</button><span class="save-state" role="status" data-state-for="cardTicker"></span></div>
+        <div class="admin-card" id="cardReviews">
+          <h3>Google &amp; TCGplayer reviews</h3>
+          <p class="card-note">Only use genuine reviews, with the original wording and attribution. Selected positive reviews are labelled as highlights, not an overall rating.</p>
+          <div class="form-grid">
+            <div class="field"><label for="setRevSource">Review source</label><select id="setRevSource"><option value="manual">Owner-curated reviews</option><option value="google">Google Places + curated reviews</option></select></div>
+            <div class="field"><label for="setRevMin">Minimum stars</label><input id="setRevMin" type="number" min="1" max="5" value="4"></div>
+            <div class="field full"><label for="setRevPlace">Google Place ID</label><input id="setRevPlace" placeholder="The shop's verified Google Place ID"></div>
+          </div>
+          <p class="card-note" id="revSourceNote"></p>
+          <div id="revEditor"></div>
+          <p class="card-note" id="revPreview" role="status"></p>
+          <div class="card-actions"><button class="btn" id="revApply" type="button">Publish reviews</button><button class="btn btn-ghost" id="revAdd" type="button">Add review</button><span class="save-state" role="status" data-state-for="cardReviews"></span></div>
         </div>
+      </div>
+
+      <div class="admin-card" id="cardFloorplan">
+        <h3>Card show floor plan</h3>
+        <p class="card-note">Place the actual vendor booths on the grid. TCG, Sports and Mixed percentages count vendor booths, not floor area; entry and food areas are excluded. An empty plan stays unpublished.</p>
+        <div class="form-grid"><div class="field"><label for="setFpRows">Grid rows</label><input id="setFpRows" type="number" min="1" max="20" value="6"></div><div class="field"><label for="setFpCols">Grid columns</label><input id="setFpCols" type="number" min="1" max="26" value="10"></div></div>
+        <div id="fpEditor"></div>
+        <div class="floor-scroll" tabindex="0" role="region" aria-label="Floor plan preview"><div class="floor-map" id="fpMap"></div></div>
+        <div class="floor-mix" id="fpMix" aria-hidden="true"></div><p id="fpMixText" class="card-note"></p><span id="fpRatio" class="save-state"></span>
+        <div class="card-actions"><button class="btn" id="fpApply" type="button">Save floor plan</button><button class="btn btn-ghost" id="fpAdd" type="button">Add booth</button><span class="save-state" role="status" data-state-for="cardFloorplan"></span></div>
       </div>
 
       <div class="reset-row">

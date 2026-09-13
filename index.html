@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Render a public deep link directly, before the bottom-of-page app script loads. -->
 <script>(function(){var v=(location.hash.match(/^#\/(shop|live|show|events|buylist|visit|rip|account)(?:\?|$)/)||[])[1];if(v)document.documentElement.setAttribute("data-boot-view",v)})()</script>
-<meta name="description" content="Top Loaded Trading Cards — Northern Kentucky's card shop for Pokemon, One Piece, Magic, and Gundam in Crescent Springs, KY. Buy, sell, and trade singles and sealed. Weekly play nights, live rip-and-ship breaks, and a monthly card show at the Hilton on Turfway Rd.">
+<meta name="description" content="Top Loaded Trading Cards — Northern Kentucky's card shop for Pokemon, One Piece, Magic, and Gundam in Crescent Springs, KY. Buy, sell, and trade singles and sealed. Weekly play nights, card-show-style live streams, and a monthly card show at the Hilton on Turfway Rd.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Top Loaded Trading Cards">
 <meta property="og:title" content="Top Loaded Trading Cards — Buy. Sell. Trade.">
@@ -1490,6 +1490,28 @@ html.page-hidden .drawer .cart-empty::before{animation-play-state:paused}
   .view.active .meter i{animation:none}
 }
 
+  .show-clock{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;margin:20px 0;padding:20px 24px;background:var(--accent);color:var(--accent-ink);border-radius:var(--r);font-weight:700}
+  #showCountdown{font:700 clamp(1.3rem,4vw,2.4rem)/1.2 var(--disp);font-variant-numeric:tabular-nums}
+  .show-clock,.floor-scroll,.fp-row,.rev-row,.claim-feed{--r:12px}
+  .review-author{display:inline-flex;gap:8px;align-items:center}.review-author img{border-radius:50%}.review-attribution{grid-column:1/-1;font-size:.85rem;color:var(--ink2)}
+  .claim-cols{display:block}#claimDesk{margin-top:24px}
+  .google-maps-attribution{display:inline-block;white-space:nowrap;font:400 14px/1.5 sans-serif;letter-spacing:normal;text-transform:none;color:#1f1f1f;background:#fff;padding:2px 7px;border-radius:4px}
+  .floor-scroll{overflow:auto;max-width:100%;padding:14px;border:1px solid var(--line);border-radius:var(--r);margin:16px 0;background:var(--surface)}
+  .floor-map{--fp-cell:64px;display:grid;gap:6px;width:max-content;min-width:100%;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:70px 70px}
+  .fp-cell{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;overflow:hidden;padding:4px;font-size:.8rem;text-align:center;border:2px solid currentColor;border-radius:6px;overflow-wrap:anywhere;min-width:0}
+  .fp-cell i{font-style:normal;font-size:.75rem}.fp-cell.is-bad{outline:3px dashed #df4738}
+  .t-tcg{background:var(--accent);color:var(--accent-ink)}.t-sports{background:#316c9c;color:#fff}.t-mixed{background:repeating-linear-gradient(45deg,#775311,#775311 7px,#513a10 7px,#513a10 14px);color:#fff}.t-food,.t-entry{background:var(--surface2);color:var(--ink2)}
+  .floor-mix{display:flex;overflow:hidden;height:18px;border-radius:9px}.floor-mix span{min-width:0}
+  .floor-legend{display:flex;gap:12px 24px;flex-wrap:wrap;padding:0;list-style:none}.floor-legend li{display:flex;gap:8px;align-items:center}.floor-legend i{width:18px;height:18px;border:1px solid var(--line);border-radius:4px}
+  .floor-vendors{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 24px;padding-left:20px;color:var(--ink2)}
+  #cardFloorplan{margin-top:24px}#fpEditor,#revEditor{display:grid;gap:16px;margin-top:18px}
+  .fp-row,.rev-row{position:relative;border:1px solid var(--line);border-radius:var(--r);padding:14px 52px 14px 14px;display:grid;gap:8px;background:var(--surface)}
+  .fp-row input,.fp-row select,.rev-row input,.rev-row select,.rev-row textarea{width:100%;min-width:0}
+  .row-del{position:absolute;right:4px;top:8px;width:44px;height:44px;border:0;background:none;color:var(--ink);font-size:1.5rem}
+  .fp-nums,.fp-nums-head{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.rev-meta,.rev-meta-head{display:grid;grid-template-columns:minmax(0,1fr) 65px minmax(0,1fr);gap:8px}.fp-nums-head,.rev-meta-head{font-size:.8rem;color:var(--ink2)}
+  .claim-feed{padding:22px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}.feed-list{list-style:none;padding:0;margin:18px 0;display:grid;gap:10px}.claim-entry{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:16px;border:1px solid var(--line);border-radius:8px}.claim-entry small{color:var(--ink2)}.feed-head{display:flex;gap:12px;justify-content:space-between}.feed-empty,.feed-note{color:var(--ink2)}
+  @media(max-width:600px){.floor-map{--fp-cell:56px;background-size:62px 62px}.show-clock{padding:16px}.rev-meta,.rev-meta-head{grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr)}}
+
 /* ============ EVENTS ============ */
 .next-up{
   display:flex; align-items:center; gap:10px 16px; flex-wrap:wrap;
@@ -1722,6 +1744,9 @@ form.is-done > :not(.form-done){display:none !important}
 @media(max-width:760px){.account-layout{grid-template-columns:1fr}.account-panel{padding:24px}.account-member-head{align-items:flex-start}}
 
 /* ============ BUYLIST ============ */
+/* The "What's my card worth?" estimator was removed at the owner's request
+   (2026-09-12); its styles went with it. What's left is the points column and
+   the quote form (#buyForm) — the point of the page. */
 .buy-grid{display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:32px; align-items:start}
 .buy-col{display:grid; gap:20px; min-width:0}
 .form-card{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:26px; position:relative}
@@ -1730,70 +1755,8 @@ form.is-done > :not(.form-done){display:none !important}
 .buy-points .k{font-family:var(--disp); font-weight:800; font-size:1.6rem; color:var(--accent); min-width:64px; text-transform:uppercase; line-height:1}
 .buy-points p{color:var(--ink2); font-size:.92rem}
 .buy-points a{color:var(--accent)}
-/* estimator */
-.worth .eyebrow{margin-bottom:8px}
-.worth-search{display:grid; grid-template-columns:150px minmax(0,1fr); gap:12px; margin-top:16px}
-.worth-search input[type="search"]{-webkit-appearance:none; appearance:none}
-.worth-hint{font-family:var(--mono); font-size:.7rem; letter-spacing:.04em; color:var(--ink3); margin-top:10px; min-height:1.2em}
-.worth-results{list-style:none; margin:10px 0 0; padding:0; display:grid; gap:6px}
-.worth-results:empty{margin:0}
-.worth-row{
-  width:100%; display:grid; grid-template-columns:44px minmax(0,1fr) auto; gap:12px; align-items:center; text-align:left;
-  background:var(--surface2); border:1px solid var(--line); border-radius:6px; padding:8px 12px 8px 8px; color:var(--ink);
-  transition:border-color .15s ease, transform .15s ease;
-}
-.worth-row:hover{border-color:var(--line2); transform:translateY(-1px)}
-.worth-row[aria-pressed="true"]{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent)}
-.worth-thumb{width:44px; height:44px; border-radius:4px; overflow:hidden; background:var(--slab); display:grid; place-items:center; border:1px solid var(--slab-line)}
-.worth-thumb img{width:100%; height:100%; object-fit:cover; display:block}
-.worth-thumb-ph{font-family:var(--mono); font-size:.62rem; letter-spacing:.1em; color:var(--ink3)}
-.worth-txt{min-width:0; display:grid}
-.worth-txt b{font-weight:600; font-size:.92rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.worth-txt small{color:var(--ink3); font-size:.76rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.worth-mkt{font-family:var(--mono); font-size:.86rem; text-align:right; font-variant-numeric:tabular-nums; display:grid}
-.worth-mkt small{font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3)}
-.worth-pick{margin-top:18px; border-top:1px solid var(--line); padding-top:18px; animation:worthIn .35s cubic-bezier(.2,.7,.2,1) both}
-.worth-pick[hidden]{display:none}
-@keyframes worthIn{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
-.worth-pick-head{display:flex; gap:16px; align-items:center}
-.worth-pick-head .eyebrow{margin-bottom:4px}
-.worth-pick-head h4{font-family:var(--disp); font-weight:700; text-transform:uppercase; font-size:1.4rem; letter-spacing:.03em; line-height:1; margin:0}
-.worth-pick-set{color:var(--ink3); font-size:.82rem; margin-top:4px}
-.worth-pick-img{width:64px; aspect-ratio:5/7; object-fit:cover; border-radius:5px; border:1px solid var(--slab-line); background:var(--slab); flex:0 0 auto}
-.worth-tiers{border:0; padding:0; margin:16px 0 0; display:grid; grid-template-columns:1fr 1fr; gap:8px}
-.worth-tiers legend{font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3); padding:0; margin-bottom:8px}
-.worth-tier{
-  display:flex; gap:10px; align-items:flex-start; border:1px solid var(--line); border-radius:6px; padding:10px 12px; cursor:pointer;
-  font-family:var(--body); text-transform:none; letter-spacing:0; color:var(--ink); transition:border-color .15s ease, background .15s ease;
-}
-.worth-tier:hover{border-color:var(--line2)}
-.worth-tier.on{border-color:var(--accent); background:color-mix(in srgb, var(--accent) 8%, var(--surface))}
-.worth-tier input{margin:3px 0 0; accent-color:var(--accent); flex:0 0 auto}
-.worth-tier span{display:grid; gap:2px; min-width:0}
-.worth-tier b{font-weight:600; font-size:.88rem}
-.worth-tier small{color:var(--ink3); font-size:.72rem; line-height:1.3}
-.worth-nums{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:16px}
-.worth-num{border:1px solid var(--line); border-radius:6px; padding:12px 14px; background:var(--surface2); display:grid; gap:4px; min-width:0}
-.worth-num small{font-family:var(--mono); font-size:.62rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3)}
-.worth-num small em{font-style:normal; color:var(--good)}
-.worth-val{font-family:var(--disp); font-weight:800; font-size:clamp(1.4rem,3vw,1.9rem); line-height:1; font-variant-numeric:tabular-nums; letter-spacing:.01em}
-.worth-num.cash{border-color:color-mix(in srgb, var(--accent) 45%, var(--line))}
-.worth-num.credit{border-color:color-mix(in srgb, var(--good) 55%, var(--line)); background:var(--good-bg)}
-.worth-num.credit .worth-val{color:var(--good)}
-.worth-actions{display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-top:14px}
-.worth-link{color:var(--accent); font-size:.86rem}
-.worth-disclaimer{font-family:var(--mono); font-size:.68rem; letter-spacing:.04em; color:var(--ink3); margin-top:16px}
 @media (max-width:640px){
-  .worth-search{grid-template-columns:1fr}
-  .worth-tiers{grid-template-columns:1fr}
-  .worth-nums{grid-template-columns:1fr}
   .form-card{padding:22px 18px}
-}
-@media (pointer:coarse){ .worth-row{min-height:60px} .worth-tier{min-height:48px} }
-@media (prefers-reduced-motion: reduce){
-  .worth-pick{animation:none}
-  .worth-row{transition:none}
-  .worth-row:hover{transform:none}
 }
 
 /* ============ ADMIN / STAFF ============ */
@@ -2946,6 +2909,72 @@ a:hover .round-arrow{transform:rotate(45deg)}
 }
 @media (pointer:coarse){.deck-controls button{min-width:44px;min-height:44px}.discovery-pick .linklike{min-height:44px}}
 
+/* ============ PLAY NIGHTS + TRADE BAND (home) ============
+   The owner moved the trade call-out above the play nights, asked for a live
+   countdown per game, and moved the card-show countdown to the Card Show page. */
+.trade-band{padding-top:34px; padding-bottom:0}
+.trade-band .trade-tile{display:block}
+.trade-band .trade-tile > div{margin-top:14px}
+.trade-band .trade-tile p{margin-top:14px}
+@media (min-width:861px){
+  .trade-band .trade-tile{display:grid; grid-template-columns:minmax(0,1.15fr) auto; align-items:center; gap:28px; padding:26px 32px}
+  .trade-band .trade-tile .tile-number{grid-column:1/-1}
+  .trade-band .trade-tile > div{margin-top:10px}
+  .trade-band .trade-tile p{margin-top:10px; align-self:end}
+}
+
+.playnow{padding-top:34px}
+.playnow-grid{list-style:none; margin:0; padding:0; display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.playnow-card{min-width:0}
+.playnow-btn{
+  display:grid; grid-template-columns:auto minmax(0,1fr); grid-auto-rows:min-content; gap:2px 12px;
+  height:100%; padding:18px 20px 16px; border:1px solid var(--line); border-radius:12px;
+  background:linear-gradient(180deg,var(--surface2),var(--surface) 60%); color:var(--ink); text-decoration:none;
+  transition:border-color .18s ease, transform .18s ease;
+}
+.playnow-btn:hover,.playnow-btn:focus-visible{border-color:var(--accent); transform:translateY(-2px)}
+.playnow-mark{grid-row:1/3; width:42px; height:42px; border-radius:10px; display:grid; place-items:center; background:var(--bg2); border:1px solid var(--line); color:var(--accent)}
+.playnow-mark .game-icon{display:block}
+.playnow-game{font-family:var(--mono); font-size:.64rem; letter-spacing:.16em; text-transform:uppercase; color:var(--ink3); align-self:end}
+.playnow-ev{font-weight:600; font-size:1rem; line-height:1.25; align-self:start}
+.playnow-when,.playnow-cd,.playnow-fee{grid-column:1/-1}
+.playnow-when{font-family:var(--mono); font-size:.72rem; color:var(--ink2); margin-top:12px}
+.playnow-cd{display:flex; align-items:baseline; gap:2px; margin-top:8px; font-family:var(--mono); color:var(--accent); font-variant-numeric:tabular-nums}
+.playnow-cd b{font-family:var(--disp); font-weight:800; font-size:1.5rem; line-height:1}
+.playnow-cd small{font-size:.62rem; color:var(--ink3); margin-right:7px}
+.playnow-cd .now{font-family:var(--mono); font-size:.74rem; letter-spacing:.1em; text-transform:uppercase; color:var(--good)}
+.playnow-fee{margin-top:10px; font-family:var(--mono); font-size:.64rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3)}
+.playnow-empty{grid-column:1/-1; padding:22px; border:1px dashed var(--line2); border-radius:12px; color:var(--ink2); font-size:.94rem}
+.playnow-empty a{color:var(--accent)}
+@media (max-width:520px){
+  .playnow-grid{grid-template-columns:1fr}
+  .playnow-cd b{font-size:1.3rem}
+}
+@media (prefers-reduced-motion: reduce){
+  .playnow-btn{transition:none}
+  .playnow-btn:hover,.playnow-btn:focus-visible{transform:none}
+}
+
+/* discovery pick: any card from the set, badged when it is in the case */
+.discovery-pick .pick-price{font-family:var(--mono); font-size:.95rem; color:var(--ink)}
+.discovery-pick .pick-price small{font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); margin-left:6px}
+.stock-badge{
+  display:inline-flex; align-items:center; gap:6px; margin:10px 0 4px; padding:4px 10px; border-radius:99px;
+  font-family:var(--mono); font-size:.62rem; letter-spacing:.12em; text-transform:uppercase;
+  background:var(--good-bg); color:var(--good); border:1px solid color-mix(in srgb, var(--good) 40%, transparent);
+}
+.stock-badge::before{content:""; width:6px; height:6px; border-radius:50%; background:currentColor}
+.stock-badge.out{background:transparent; color:var(--ink3); border-color:var(--line2)}
+.discovery-pick [role="button"]{cursor:pointer}
+
+/* reviews: only what the shop actually supplied */
+.review-card .review-stars{display:block; color:var(--accent); letter-spacing:.14em; font-size:.86rem; margin-bottom:8px}
+.review-card .quote-who a{color:var(--ink3); text-decoration:none}
+.review-card .quote-who a:hover{color:var(--accent); text-decoration:underline}
+.review-empty{grid-column:1/-1}
+.review-empty .review-links{display:flex; flex-wrap:wrap; gap:10px; margin-top:16px}
+.review-empty .btn-ghost{text-decoration:none}
+
 /* ============ REDUCED MOTION ============ */
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important}
@@ -3078,6 +3107,25 @@ a:hover .round-arrow{transform:rotate(45deg)}
       </div>
     </div>
 
+    <!-- Moved above the play nights at the owner's request. -->
+    <div class="section trade-band">
+      <div class="wrap">
+        <a class="trade-tile" href="#/buylist" data-go="buylist"><span class="tile-number">03 / MAKE ROOM FOR WHAT’S NEXT</span><div><h3>Old binder.<br>New possibilities.</h3><span class="trade-stamp" aria-hidden="true">BUY<br>SELL<br>TRADE</span></div><p>Turn your collection into cash or store credit.<span class="round-arrow" aria-hidden="true">↗</span></p></a>
+      </div>
+    </div>
+
+    <!-- Play nights, one live countdown per game (owner request). Rendered by 20-hero.js. -->
+    <section class="section playnow" id="playNow" aria-labelledby="playNowTitle">
+      <div class="wrap">
+        <div class="section-head">
+          <div><p class="collector-kicker">EVERY WEEK, AROUND THE 8-TOP</p><h2 id="playNowTitle">Play nights</h2></div>
+          <a class="linklike" href="#/events" data-go="events">Full schedule &amp; signups &rarr;</a>
+        </div>
+        <ul class="playnow-grid" id="playNowGrid" aria-label="Next play night for each game"></ul>
+        <p class="collector-source" id="playNowNote">Bandai official store &middot; winner and participation packs on Bandai nights.</p>
+      </div>
+    </section>
+
     <div class="game-shelf wrap" aria-label="Shop by game">
       <span class="game-shelf-label">FIND YOUR<br>UNIVERSE <span aria-hidden="true">→</span></span>
       <a href="#/shop?game=pk" class="game-door" data-universe="pk"><span class="game-mark"><svg class="game-icon" width="36" height="36" aria-hidden="true" focusable="false"><use href="#game-icon-pk"></use></svg></span><span class="game-door-label">Pokémon<small>Gotta find that grail.</small></span><span class="game-arrow" aria-hidden="true">↗</span></a>
@@ -3086,67 +3134,19 @@ a:hover .round-arrow{transform:rotate(45deg)}
       <a href="#/shop?game=gundam" class="game-door" data-universe="gundam"><span class="game-mark"><svg class="game-icon" width="36" height="36" aria-hidden="true" focusable="false"><use href="#game-icon-gundam"></use></svg></span><span class="game-door-label">Gundam<small>Build your squad.</small></span><span class="game-arrow" aria-hidden="true">↗</span></a>
     </div>
 
-    <div class="ticker" id="ticker">
-      <span class="ticker-label" aria-hidden="true">Buying desk</span>
-      <div class="ticker-track" id="tickerTrack" aria-hidden="true"></div>
-      <ul class="ticker-sr" id="tickerList" aria-label="Buying now"></ul>
-      <span class="ticker-right">
-        <span class="demo-tag" id="tickerDemo" title="Sample offers &mdash; the buying desk list is set by the shop">sample offers</span>
-        <button class="ticker-pause" id="tickerPause" type="button" aria-pressed="false" aria-label="Pause the buying desk ticker">
-          <svg class="ic-pause" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="1.5" width="3" height="9" rx=".8" fill="currentColor"/><rect x="7" y="1.5" width="3" height="9" rx=".8" fill="currentColor"/></svg>
-          <svg class="ic-play" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.8v8.4l7-4.2z" fill="currentColor"/></svg>
-        </button>
-      </span>
-    </div>
-
-    <div class="nextup" id="nextUp">
-      <div class="wrap">
-        <ul class="nextup-list" aria-label="Next up at the shop">
-          <li class="nextup-cell" id="nuEvCell">
-            <a class="nextup-btn" href="#/events" data-go="events">
-              <span class="nextup-k">Next play night</span>
-              <span class="nextup-name" id="nuEvName">Play nights</span>
-              <span class="nextup-when" id="nuEvWhen">See the schedule</span>
-              <span class="nextup-cd" id="nuEvCd" role="timer" aria-live="off"></span>
-            </a>
-          </li>
-          <li class="nextup-cell" id="nuShowCell">
-            <a class="nextup-btn" href="#/show" data-go="show">
-              <span class="nextup-k">Next card show</span>
-              <span class="nextup-name" id="nuShowName">Card show &middot; Hilton, Turfway Rd</span>
-              <span class="nextup-when" id="nuShowWhen">First Saturday or Sunday &middot; 10&ndash;4</span>
-              <span class="nextup-cd" id="nuShowCd" role="timer" aria-live="off"></span>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-
     <div class="section collector-playground">
       <div class="wrap">
         <div class="section-head"><div><p class="collector-kicker">MORE THAN A CHECKOUT</p><h2>Come for the cards.<br>Stay for the good stuff.</h2></div><span class="collector-note">A little luck. A lot of community.</span></div>
         <div class="collector-mosaic">
           <section class="discovery-tile" aria-labelledby="discoveryTitle">
-            <div class="discovery-copy"><span class="tile-number">01 / HAPPY ACCIDENTS</span><h3 id="discoveryTitle">Meet your<br>next favorite.</h3><p>Pick a game. Set your budget.<br>Let the case surprise you.</p>
-              <form id="discoveryForm"><div class="discovery-fields"><label>YOUR GAME<select id="discoveryGame"><option value="all">Any universe</option><option value="pk">Pokémon</option><option value="op">One Piece</option><option value="mtg">Magic</option><option value="gundam">Gundam</option><option value="lorcana">Lorcana</option></select></label><label>YOUR BUDGET<select id="discoveryBudget"><option value="10">Under $10</option><option value="25" selected>Under $25</option><option value="50">Under $50</option><option value="100">Under $100</option></select></label></div><button class="btn" id="discoveryBtn" type="submit">Find my next card <span aria-hidden="true">✦</span></button></form>
-              <p id="discoveryStatus" class="discovery-status" role="status">A free discovery. No purchase, just possibilities.</p>
+            <div class="discovery-copy"><span class="tile-number">01 / HAPPY ACCIDENTS</span><h3 id="discoveryTitle">Meet your<br>next favorite.</h3><p>Pick a game and explore a whole set.<br>Your next favorite might surprise you.</p>
+              <form id="discoveryForm"><div class="discovery-fields"><label>YOUR GAME<select id="discoveryGame"><option value="all">Any universe</option><option value="pk">Pokémon</option><option value="op">One Piece</option><option value="mtg">Magic</option><option value="gundam">Gundam</option><option value="lorcana">Lorcana</option></select></label><label>THE SET<select id="discoverySet"><option value="">Any set</option></select></label><label>OPTIONAL BUDGET<select id="discoveryBudget"><option value="0" selected>Any value</option><option value="10">Up to $10</option><option value="25">Up to $25</option><option value="50">Up to $50</option><option value="100">Up to $100</option></select></label></div><button class="btn" id="discoveryBtn" type="submit">Find my next card <span aria-hidden="true">✦</span></button></form>
+              <p id="discoveryStatus" class="discovery-status" role="status">Any card from the set — we badge the ones sitting in the case today.</p>
             </div><div class="discovery-display" id="discoveryResult"><div class="mystery-card" aria-hidden="true"><span>TOP LOADED</span><b>?</b><small>YOUR NEXT FAVORITE</small></div><span class="discovery-orbit" aria-hidden="true">✳</span></div>
           </section>
         <a class="play-tile" href="#/rip" data-go="rip"><span class="tile-number">02 / FREE PACK SIMULATOR</span><div class="pack-stack" aria-hidden="true"><i></i><i></i><i><span>TOP LOADED</span><b>RIP<br>IT.</b><small>JUST A SIMULATION</small></i></div><div class="play-tile-bottom"><div><h3>Chase the feeling.</h3><p>Free simulation. No real pack is opened, no cards are awarded, and nothing is purchased.</p></div><span class="round-arrow" aria-hidden="true">↗</span></div></a>
-          <a class="trade-tile" href="#/buylist" data-go="buylist"><span class="tile-number">03 / MAKE ROOM FOR WHAT’S NEXT</span><div><h3>Old binder.<br>New possibilities.</h3><span class="trade-stamp" aria-hidden="true">BUY<br>SELL<br>TRADE</span></div><p>Turn your collection into cash or store credit.<span class="round-arrow" aria-hidden="true">↗</span></p></a>
         </div>
-        <p class="collector-source">The case is sourced from our TCGplayer listings · <span id="triFresh">refreshed daily</span>. Availability is confirmed at checkout.</p>
-      </div>
-    </div>
-
-    <div class="section" style="padding-top:0">
-      <div class="wrap">
-        <div class="section-head">
-          <div><p class="collector-kicker">SLEEVED. TOP LOADED. READY.</p><h2>The good stuff, in stock.</h2></div>
-          <a class="linklike" href="#/shop" data-go="shop">Browse all inventory &rarr;</a>
-        </div>
-        <div class="freshness" id="homeFresh"><span class="dot"></span>Live from our TCGplayer store <span class="demo-tag">demo data</span></div>
-        <div class="grid" id="featuredGrid"></div>
+        <p class="collector-source">Set checklists and market references via <a href="https://tcgcsv.com/" target="_blank" rel="noopener noreferrer">TCGCSV / TCGplayer</a>. Stock badges use our latest inventory · <span id="triFresh">refreshed daily</span>. Availability is confirmed at checkout.</p>
       </div>
     </div>
 
@@ -3215,23 +3215,10 @@ a:hover .round-arrow{transform:rotate(45deg)}
     <div class="section" style="padding-top:0">
       <div class="wrap">
         <div class="section-head">
-          <h2>Word around the tables</h2>
-          <span class="demo-tag" id="testiTag">sample quotes &mdash; replace with real reviews before launch</span>
+          <div><p class="collector-kicker">FROM GOOGLE &amp; TCGPLAYER</p><h2>Word around the tables</h2></div>
+          <span class="collector-note" id="testiTag" hidden></span>
         </div>
-        <div class="tri" id="testimonials">
-          <div class="panel">
-            <p class="quote">&ldquo;Brought in two binders expecting a lowball. Got a fair number, took the credit bonus, and walked out with half a booster box.&rdquo;</p>
-            <p class="p-set quote-who">Sample review &middot; buylist customer</p>
-          </div>
-          <div class="panel">
-            <p class="quote">&ldquo;Locals run on time, prizing every week, and when nine of us showed up they just opened a second list. Nobody sat out.&rdquo;</p>
-            <p class="p-set quote-who">Sample review &middot; One Piece regular</p>
-          </div>
-          <div class="panel">
-            <p class="quote">&ldquo;Claimed a break spot on a Tuesday, hits were in my mailbox by the weekend. Sleeved, top loaded, tracked.&rdquo;</p>
-            <p class="p-set quote-who">Sample review &middot; live break buyer</p>
-          </div>
-        </div>
+        <div class="tri" id="testimonials"></div>
       </div>
     </div>
 
@@ -3244,7 +3231,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
         <div class="faq">
           <details class="panel">
             <summary>How do I buy a card I see here?</summary>
-            <p>Every single on this site is a live listing in our TCGplayer store &mdash; hit <em>Buy on TCGplayer</em> and it ships sleeved in a top loader (we are who we say we are) inside a bubble mailer, with tracking. Sealed product ships boxed. Local? Call <a href="tel:+15132222573">(513) 222-2573</a> and we'll pull it from the case and hold it at the counter.</p>
+            <p>The Shop shows our inventory; discovery and the free simulator also show cards we do not stock. Look for <em>In Stock Now</em>, then open the listing to check condition and availability. Physical purchases are separate from the simulator. Local? Call <a href="tel:+15132222573">(513) 222-2573</a> to ask about pickup.</p>
           </details>
           <details class="panel">
             <summary>How do you grade card condition?</summary>
@@ -3380,13 +3367,13 @@ a:hover .round-arrow{transform:rotate(45deg)}
       <div class="view-head">
         <p class="eyebrow" id="showEyebrow">First Saturday or Sunday &middot; Hilton on Turfway Road &middot; Florence, KY</p>
         <h1>The Top Loaded Card Show</h1>
+        <div class="show-clock"><span>Next card show</span><span id="showCountdown" role="timer" aria-live="off">Date to be confirmed</span></div>
         <p class="lede">Once a month we take over the Hilton ballroom on Turfway Road with vendor tables from across the Tri-State. Buy, sell, trade, and rip packs &mdash; admission is free and the doors are open 10 to 4.</p>
       </div>
       <div class="show-hero">
         <div class="show-date-card">
           <div class="show-date-top">
             <p class="eyebrow">Next show</p>
-            <span class="show-count" id="showCountdown"></span>
           </div>
           <p class="show-date" id="showDateBig">Sat<br>Sep 5</p>
           <p class="show-tbc" id="showTbc" hidden>Exact date confirmed on our socials &mdash; usually the first Saturday or Sunday.</p>
@@ -3421,17 +3408,14 @@ a:hover .round-arrow{transform:rotate(45deg)}
           </div>
         </form>
       </div>
-      <div class="section" style="padding-bottom:0">
-        <div class="section-head"><h2>From past shows</h2><span class="demo-tag">photos coming</span></div>
-        <div class="gallery" aria-label="Show photos, coming soon">
-          <div class="gal g1"><i class="gal-tag">Photos coming</i><span>July &middot; trade night floor</span></div>
-          <div class="gal g2"><i class="gal-tag">Photos coming</i><span>Vendor row</span></div>
-          <div class="gal g3"><i class="gal-tag">Photos coming</i><span>Pack wars finals</span></div>
-          <div class="gal g4"><i class="gal-tag">Photos coming</i><span>June &middot; ballroom</span></div>
-          <div class="gal g5"><i class="gal-tag">Photos coming</i><span>Grading meetup</span></div>
-          <div class="gal g6"><i class="gal-tag">Photos coming</i><span>Door prize wall</span></div>
-        </div>
-      </div>
+      <section class="section" aria-labelledby="floorTitle">
+        <div class="section-head"><h2 id="floorTitle">Floor plan</h2><span class="collector-note">TCG &amp; Sports vendor map</span></div>
+        <p id="showFloorNote" class="card-note"></p>
+        <div id="showFloorMix" class="floor-mix" aria-hidden="true"></div>
+        <ul id="showFloorLegend" class="floor-legend"></ul>
+        <div class="floor-scroll" id="showFloorScroll" tabindex="0" role="region" aria-label="Vendor floor plan, scroll horizontally if needed"><div class="floor-map" id="showFloorMap"></div></div>
+        <ul id="showFloorList" class="floor-vendors" aria-label="Vendors and booth positions"></ul>
+      </section>
     </div>
   </section>
 
@@ -3486,36 +3470,19 @@ a:hover .round-arrow{transform:rotate(45deg)}
       <div class="view-head">
         <p class="eyebrow">Buylist &middot; Cash or credit</p>
         <h1>We buy collections</h1>
-        <p class="lede">Binders, bulk, graded slabs, sealed product, whole closets. Walk in any day we're open, or start a quote here and we'll get back to you with a number.</p>
+        <p class="lede">Binders, bulk, graded slabs, sealed product, whole closets. Walk in any day we're open, or tell us what you've got below and we'll come back to you with a number.</p>
       </div>
       <div class="buy-grid">
         <div class="buy-points">
           <div class="panel"><span class="k">Cash</span><p>Straight cash offer, paid on the spot once we've looked everything over.</p></div>
           <div class="panel"><span class="k" id="buyBonusK">+10%</span><p>Take store credit instead and we add <span id="buyBonusWord">ten percent</span> to the offer.</p></div>
           <div class="panel"><span class="k">Big?</span><p>Estate or store-closing sized lot? We travel for large collections across the Tri-State &mdash; call <a id="buyPhone" href="tel:+15132222573">(513) 222-2573</a>.</p></div>
-          <div class="panel"><span class="k">How</span><p>No appointment needed &mdash; walk in with it, or start a quote here. We sort, price against current market, and the offer is yours to take or leave.</p></div>
+          <div class="panel"><span class="k">How</span><p>No appointment needed &mdash; walk in with it, or send the details below. We sort, price against current market, and the offer is yours to take or leave.</p></div>
         </div>
         <div class="buy-col">
-          <div class="form-card worth" id="worth">
-            <p class="eyebrow">Estimator</p>
-            <h3>What's my card worth?</h3>
-            <p class="form-intro">Search a card, pick how it grades, and see roughly what we'd pay &mdash; cash or store credit.</p>
-            <div class="worth-search">
-              <div class="field worth-game"><label for="worthGame">Game</label>
-                <select id="worthGame"><option value="pk">Pokemon</option><option value="op">One Piece</option><option value="mtg">Magic</option><option value="other">Other</option></select>
-              </div>
-              <div class="field worth-q"><label for="worthQ">Card name</label>
-                <input id="worthQ" type="search" autocomplete="off" placeholder="e.g. Charizard ex, Shanks, The One Ring" aria-describedby="worthHint" aria-controls="worthResults">
-              </div>
-            </div>
-            <p class="worth-hint" id="worthHint" role="status" aria-live="polite">Start typing a card name.</p>
-            <ul class="worth-results" id="worthResults" role="list" aria-label="Matching cards"></ul>
-            <div class="worth-pick" id="worthPick" hidden></div>
-            <p class="worth-disclaimer">Estimates only &mdash; market moves daily and final offers are made in person after we see the card.</p>
-          </div>
           <form class="form-card" id="buyForm" novalidate data-kind="buylist">
             <h3>Start a quote</h3>
-            <p class="form-intro">Tell us roughly what you've got &mdash; photos help but aren't required.</p>
+            <p class="form-intro">Tell us roughly what you've got &mdash; photos help but aren't required. We price against current market, and the final offer is made in person once we've seen the cards.</p>
             <div class="form-grid">
               <div class="field"><label for="bName">Name</label><input id="bName" name="name" type="text" required autocomplete="name" maxlength="80"></div>
               <div class="field"><label for="bContact">Email or phone</label><input id="bContact" name="contact" type="text" required autocomplete="email" inputmode="email" maxlength="120"></div>
@@ -3536,19 +3503,19 @@ a:hover .round-arrow{transform:rotate(45deg)}
   </section>
 
   <!-- ================= LIVE ================= -->
-  <section class="view" id="view-live" aria-label="Live breaks">
+  <section class="view" id="view-live" aria-label="Live stream">
     <div class="wrap">
       <div class="view-head">
-        <p class="eyebrow">Rip &amp; ship &middot; Streaming from the shop floor</p>
-        <h1>Live breaks</h1>
-        <p class="lede">Whatnot-style rip &amp; ship: claim a spot, watch every pack opened on camera, and your hits go out the next morning &mdash; sleeved, top loaded, and tracked. <span class="demo-tag" id="liveDemoTag" hidden>simulated stream</span></p>
+        <p class="eyebrow">Streaming from the shop floor</p>
+        <h1>Live stream</h1>
+        <p class="lede">Card show style; you like the card, you claim it &mdash; sleeved, top loaded, and tracked. Shipped within two business days. <span class="demo-tag" id="liveDemoTag" hidden>simulated stream</span></p>
       </div>
       <div class="live-grid">
         <div class="player">
           <div class="screen off" id="liveScreen">
             <div class="live-stage" id="liveStage">
               <div class="glow" aria-hidden="true"></div>
-              <span class="rip" id="ripLabel">Now ripping &middot; pack 7 of 36</span>
+              <span class="rip" id="ripLabel">On camera now</span>
               <div class="pack" aria-hidden="true"><b>TL</b></div>
               <div class="offair" id="liveOffair">
                 <span class="offair-k">Off air</span>
@@ -3561,13 +3528,8 @@ a:hover .round-arrow{transform:rotate(45deg)}
             <span class="viewers" id="viewerCount"><b id="viewerNum">214</b> watching</span>
           </div>
           <div class="player-bar">
-            <b id="liveTitle">Live break</b>
+            <b id="liveTitle">Live stream</b>
             <span id="liveSub">Off air</span>
-          </div>
-          <div class="hits" id="recentHits" aria-label="Recent hits">
-            <span class="hits-k" id="hitsLabel">Recent hits</span>
-            <div class="hits-row" id="hitsRow"></div>
-            <span class="demo-tag hits-tag" id="hitsDemoTag" title="Sample pulls drawn from the case &mdash; not a real break">sample</span>
           </div>
           <div class="notify" id="liveNotify">
             <form class="notify-form" id="notifyForm" novalidate>
@@ -3617,14 +3579,35 @@ a:hover .round-arrow{transform:rotate(45deg)}
       </div>
       <div class="section" style="padding-bottom:0">
         <div class="section-head">
-          <h2 id="spotHead">Claim a spot in the next break</h2>
-          <span class="spot-tags"><span class="demo-tag" id="spotPrice">$24.99 per spot</span><span class="demo-tag spots-open" id="spotsOpen"><b id="spotsLeftNum"></b>Checking spots&hellip;</span><span class="demo-tag" id="spotsDemoTag" title="Sample seats &mdash; the live board fills from real claims" hidden>sample seats</span></span>
+          <h2 id="spotHead">Live stream claims</h2>
         </div>
-        <p class="lede" style="max-width:64ch">One spot = three packs ripped live under your name. Hits ship free the next morning; bulk converts to store credit if you'd rather skip shipping. Claimed spots land straight in your cart.</p>
-        <p class="spot-note" id="spotNote" hidden>We're off air &mdash; a spot you claim now is a <b>pre-claim for the next break</b> (see the schedule below). It holds your seat and rips when we go live.</p>
-        <div class="spot-meter" id="spotMeter" role="progressbar" aria-label="Spots claimed" aria-valuemin="0" aria-valuemax="12" aria-valuenow="3"><i></i></div>
-        <div class="spots" id="spotGrid"></div>
+        <p class="lede" style="max-width:64ch">Claim a card with the host during the stream. Confirmed claims appear below with your public stream handle, the card and its price. Payment and shipping are arranged with the shop.</p>
+        <div class="claim-cols">
+          <section class="claim-feed" aria-labelledby="claimFeedHead">
+            <div class="feed-head">
+              <span id="claimFeedHead">Claims as they happen</span>
+              <span class="feed-head-r">
+                <span class="feed-count" id="claimCount"></span>
+                <span class="demo-tag" id="claimFeedTag" hidden>preview</span>
+              </span>
+            </div>
+            <ol class="feed-list" id="claimFeed" aria-label="Claims, newest first"></ol>
+            <p class="feed-empty" id="claimFeedEmpty">Connecting to the claims board&hellip;</p>
+            <p class="feed-note" id="claimFeedNote" hidden></p>
+            <p class="sr-only" id="claimFeedStatus" role="status" aria-live="polite"></p>
+          </section>
+        </div>
       </div>
+      <section class="admin-card" id="claimDesk" hidden aria-labelledby="claimDeskTitle">
+        <h2 id="claimDeskTitle">Staff claim desk</h2>
+        <p class="card-note">Post only claims the host has confirmed. Use public handles, never email addresses or shipping information. Posting does not charge the customer or change inventory.</p>
+        <form id="streamClaimForm"><div class="form-grid">
+          <div class="field"><label for="claimCard">Card / printing</label><input id="claimCard" required maxlength="120"></div>
+          <div class="field"><label for="claimHandle">Public stream handle</label><input id="claimHandle" required maxlength="40"></div>
+          <div class="field"><label for="claimPrice">Agreed price ($)</label><input id="claimPrice" type="number" min="0" max="100000" step=".01" required></div>
+          <div class="field"><button class="btn" type="submit">Post confirmed claim</button></div>
+        </div><p id="claimDeskStatus" role="status"></p></form>
+      </section>
       <div class="section" style="padding-bottom:0">
         <div class="section-head"><h2>Stream schedule</h2><span class="demo-tag" id="schedTag">Eastern time</span></div>
         <div class="tri" id="liveSchedule"></div>
@@ -3969,20 +3952,14 @@ a:hover .round-arrow{transform:rotate(45deg)}
         </div>
 
         <div class="admin-card" id="cardLive">
-          <h3>Live rips <span class="pill crit" id="liveStatusPill"><span class="dot crit"></span>Offline</span></h3>
-          <p class="card-note">Going live puts a banner across the storefront, lights up the Live tab, and opens break-spot claims.</p>
-          <div style="margin-top:14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap"><button class="btn" id="goLiveBtn" type="button">Start live rip</button><span class="save-state" id="liveState" role="status"></span></div>
+          <h3>Live stream <span class="pill crit" id="liveStatusPill"><span class="dot crit"></span>Offline</span></h3>
+          <p class="card-note">Going live lights up the Live tab. Post confirmed card claims from the staff-only desk on the Live Stream page; it does not process payments.</p>
+          <div style="margin-top:14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap"><button class="btn" id="goLiveBtn" type="button">Start live stream</button><span class="save-state" id="liveState" role="status"></span></div>
           <dl class="kv" style="margin-top:18px">
-            <dt><label for="setLiveTitle">Break title</label></dt><dd><input id="setLiveTitle" style="width:100%"></dd>
+            <dt><label for="setLiveTitle">Stream title</label></dt><dd><input id="setLiveTitle" style="width:100%"></dd>
             <dt><label for="setLivePlatform">Platform</label></dt>
             <dd><select id="setLivePlatform"><option value="">Not set</option><option value="whatnot">Whatnot</option><option value="youtube">YouTube</option><option value="twitch">Twitch</option><option value="tiktok">TikTok</option></select></dd>
             <dt><label for="setLiveEmbed">Embed URL</label></dt><dd><input id="setLiveEmbed" type="url" placeholder="https://&hellip;" style="width:100%"></dd>
-            <dt>Spots</dt>
-            <dd class="time-row">
-              <label>Price $ <input id="setLiveSpotPrice" type="number" min="0" step="0.01" inputmode="decimal" style="width:90px"></label>
-              <label>Count <input id="setLiveSpots" type="number" min="1" max="60" step="1" inputmode="numeric" style="width:70px"></label>
-              <label>Packs each <input id="setLivePacks" type="number" min="1" max="36" step="1" inputmode="numeric" style="width:70px"></label>
-            </dd>
             <dt>Schedule</dt><dd><div id="liveSchedEditor" class="rows-editor"></div><button class="linklike" type="button" id="liveSchedAdd" style="margin-top:6px">+ Add stream</button></dd>
           </dl>
           <div class="card-actions"><button class="btn" id="liveApply" type="button">Save live settings</button><span class="save-state" role="status" data-state-for="cardLive"></span></div>
@@ -4001,17 +3978,29 @@ a:hover .round-arrow{transform:rotate(45deg)}
           </div>
         </div>
 
-        <div class="admin-card" id="cardTicker">
-          <h3>Buylist ticker</h3>
-          <p class="card-note">The "Buying now" strip on the home page. Item, then the top price.</p>
-          <div id="tickerEditor" class="rows-editor"></div>
-          <button class="linklike" type="button" id="tickerAdd" style="margin-top:8px">+ Add row</button>
-          <h3 style="margin-top:22px">Testimonials</h3>
-          <p class="card-note">Quote and who said it. Leave empty to hide the section.</p>
-          <div id="testiEditor" class="rows-editor"></div>
-          <button class="linklike" type="button" id="testiAdd" style="margin-top:8px">+ Add quote</button>
-          <div class="card-actions"><button class="btn" id="tickerApply" type="button">Save</button><span class="save-state" role="status" data-state-for="cardTicker"></span></div>
+        <div class="admin-card" id="cardReviews">
+          <h3>Google &amp; TCGplayer reviews</h3>
+          <p class="card-note">Only use genuine reviews, with the original wording and attribution. Selected positive reviews are labelled as highlights, not an overall rating.</p>
+          <div class="form-grid">
+            <div class="field"><label for="setRevSource">Review source</label><select id="setRevSource"><option value="manual">Owner-curated reviews</option><option value="google">Google Places + curated reviews</option></select></div>
+            <div class="field"><label for="setRevMin">Minimum stars</label><input id="setRevMin" type="number" min="1" max="5" value="4"></div>
+            <div class="field full"><label for="setRevPlace">Google Place ID</label><input id="setRevPlace" placeholder="The shop's verified Google Place ID"></div>
+          </div>
+          <p class="card-note" id="revSourceNote"></p>
+          <div id="revEditor"></div>
+          <p class="card-note" id="revPreview" role="status"></p>
+          <div class="card-actions"><button class="btn" id="revApply" type="button">Publish reviews</button><button class="btn btn-ghost" id="revAdd" type="button">Add review</button><span class="save-state" role="status" data-state-for="cardReviews"></span></div>
         </div>
+      </div>
+
+      <div class="admin-card" id="cardFloorplan">
+        <h3>Card show floor plan</h3>
+        <p class="card-note">Place the actual vendor booths on the grid. TCG, Sports and Mixed percentages count vendor booths, not floor area; entry and food areas are excluded. An empty plan stays unpublished.</p>
+        <div class="form-grid"><div class="field"><label for="setFpRows">Grid rows</label><input id="setFpRows" type="number" min="1" max="20" value="6"></div><div class="field"><label for="setFpCols">Grid columns</label><input id="setFpCols" type="number" min="1" max="26" value="10"></div></div>
+        <div id="fpEditor"></div>
+        <div class="floor-scroll" tabindex="0" role="region" aria-label="Floor plan preview"><div class="floor-map" id="fpMap"></div></div>
+        <div class="floor-mix" id="fpMix" aria-hidden="true"></div><p id="fpMixText" class="card-note"></p><span id="fpRatio" class="save-state"></span>
+        <div class="card-actions"><button class="btn" id="fpApply" type="button">Save floor plan</button><button class="btn btn-ghost" id="fpAdd" type="button">Add booth</button><span class="save-state" role="status" data-state-for="cardFloorplan"></span></div>
       </div>
 
       <div class="reset-row">
@@ -4120,7 +4109,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
         <h4>Site</h4>
         <ul>
           <li><button class="linklike" data-go="shop">Shop the case</button></li>
-          <li><button class="linklike" data-go="live">Live breaks</button></li>
+          <li><button class="linklike" data-go="live">Live stream</button></li>
           <li><button class="linklike" data-go="show">Card show</button></li>
           <li><button class="linklike" data-go="events">Play nights</button></li>
           <li><button class="linklike" data-go="buylist">Sell your collection</button></li>
@@ -4340,7 +4329,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
   </div>
 </div>
 
-<script id="siteConfig">window.TL_DEFAULT_CONFIG={"title":"Top Loaded","tagline":"Trading Cards · NKY","phone":"(513) 222-2573","phoneRaw":"+15132222573","email":"toploadedtcg@gmail.com","address":{"line1":"2514 Hazelwood Dr","city":"Crescent Springs","state":"KY","zip":"41017"},"timezone":"America/New_York","hours":{"mon":null,"tue":["11:00","18:00"],"wed":["11:00","18:00"],"thu":["11:00","18:00"],"fri":["11:00","18:00"],"sat":["10:00","16:00"],"sun":["10:00","16:00"]},"hoursText":{"wk":"Tue–Fri · 11 AM – 6 PM","we":"Sat–Sun · 10 AM – 4 PM"},"banner":{"on":false,"text":""},"logo":null,"show":{"date":"2026-09-05","start":"10:00","end":"16:00","setup":"08:00","hours":"10 AM – 4 PM","venue":"Hilton Cincinnati Airport","address":"7373 Turfway Rd, Florence, KY 41042","tables":24,"booked":11,"cadence":"First Saturday or Sunday of every month","tablePrices":[{"n":1,"price":60},{"n":2,"price":110},{"n":3,"price":150}]},"events":[{"id":"op-wed","day":"Wed","dow":3,"name":"One Piece Locals","small":"Bandai official · winner & participation packs","time":"5:00 PM","start":"17:00","fee":"TBD","game":"op","signup":"tcgplus"},{"id":"op-sat","day":"Sat","dow":6,"name":"One Piece Locals","small":"Bandai official · winner & participation packs","time":"11:00 AM","start":"11:00","fee":"TBD","game":"op","signup":"tcgplus"},{"id":"gd-sat","day":"Sat","dow":6,"name":"Gundam Card Game","small":"Bandai official · winner & participation packs","time":"1:00 PM","start":"13:00","fee":"TBD","game":"gundam","signup":"tcgplus"},{"id":"pk-sun","day":"Sun","dow":0,"name":"Pokemon League","small":"All ages · league promo prizing","time":"11:00 AM","start":"11:00","fee":"TBD","game":"pk","signup":"form"}],"live":{"on":false,"title":"Prismatic Evolutions booster box break","platform":"","embed":"","spotPrice":24.99,"spots":12,"packsPerSpot":3,"schedule":[{"day":"Tue","time":"7 PM","name":"Pokemon rip night","desc":"Sealed singles chases — ETBs, bundles, and a booster box to close the night."},{"day":"Thu","time":"8 PM","name":"One Piece box breaks","desc":"Full box rips with leader giveaways between breaks."},{"day":"Sun","time":"6 PM","name":"Mailbag & trades","desc":"We open what you sent in, price collections live, and take trade offers on air."}]},"links":{"tcgplus":"https://www.bandai-tcg-plus.com/","facebook":"https://www.facebook.com/toploadedtradingcards","instagram":"https://www.instagram.com/toploadedtcg","tcgplayer":"https://www.tcgplayer.com/sellers/Top-Loaded-TCG/5c356cdf","whatnot":"","googleMaps":"https://www.google.com/maps/search/?api=1&query=Top+Loaded+Trading+Cards+2514+Hazelwood+Dr+Crescent+Springs+KY+41017","appleMaps":"https://maps.apple.com/place?place-id=I96E3F1088FE2244C"},"buy":{"rates":{"bulk":0.55,"standard":0.6,"hot":0.7,"graded":0.8},"creditBonus":0.1},"ticker":[["Charizard ex · 151","$85"],["Umbreon VMAX Alt","$450"],["Shanks OP-09 Leader","$42"],["The One Ring","$40"],["Prismatic ETBs","$70"],["Luffy OP-05 Alt","$88"],["Ragavan MH2","$41"],["Base Set holos","ask"],["Sealed booster boxes","top rates"]],"testimonials":[],"rip":{"prices":{"pk":4.49,"op":4.49,"mtg":5.49}},"updatedAt":null};</script>
+<script id="siteConfig">window.TL_DEFAULT_CONFIG={"title":"Top Loaded","tagline":"Trading Cards · NKY","phone":"(513) 222-2573","phoneRaw":"+15132222573","email":"toploadedtcg@gmail.com","address":{"line1":"2514 Hazelwood Dr","city":"Crescent Springs","state":"KY","zip":"41017"},"timezone":"America/New_York","hours":{"mon":null,"tue":["11:00","18:00"],"wed":["11:00","18:00"],"thu":["11:00","18:00"],"fri":["11:00","18:00"],"sat":["10:00","16:00"],"sun":["10:00","16:00"]},"hoursText":{"wk":"Tue–Fri · 11 AM – 6 PM","we":"Sat–Sun · 10 AM – 4 PM"},"banner":{"on":false,"text":""},"logo":null,"show":{"date":"2026-09-05","start":"10:00","end":"16:00","setup":"08:00","hours":"10 AM – 4 PM","venue":"Hilton Cincinnati Airport","address":"7373 Turfway Rd, Florence, KY 41042","tables":24,"booked":11,"cadence":"First Saturday or Sunday of every month","tablePrices":[{"n":1,"price":60},{"n":2,"price":110},{"n":3,"price":150}],"floorplan":{"rows":6,"cols":10,"booths":[]}},"events":[{"id":"op-wed","day":"Wed","dow":3,"name":"One Piece Locals","small":"Bandai official · winner & participation packs","time":"5:00 PM","start":"17:00","fee":"TBD","game":"op","signup":"tcgplus"},{"id":"op-sat","day":"Sat","dow":6,"name":"One Piece Locals","small":"Bandai official · winner & participation packs","time":"11:00 AM","start":"11:00","fee":"TBD","game":"op","signup":"tcgplus"},{"id":"gd-sat","day":"Sat","dow":6,"name":"Gundam Card Game","small":"Bandai official · winner & participation packs","time":"1:00 PM","start":"13:00","fee":"TBD","game":"gundam","signup":"tcgplus"},{"id":"pk-sun","day":"Sun","dow":0,"name":"Pokemon League","small":"All ages · league promo prizing","time":"11:00 AM","start":"11:00","fee":"TBD","game":"pk","signup":"form"}],"live":{"on":false,"title":"Streaming from the shop floor","platform":"","embed":"","spotPrice":24.99,"spots":12,"packsPerSpot":3,"schedule":[]},"links":{"tcgplus":"https://www.bandai-tcg-plus.com/","facebook":"https://www.facebook.com/toploadedtradingcards","instagram":"https://www.instagram.com/toploadedtcg","tcgplayer":"https://www.tcgplayer.com/sellers/Top-Loaded-TCG/5c356cdf","whatnot":"","googleMaps":"https://www.google.com/maps/search/?api=1&query=Top+Loaded+Trading+Cards+2514+Hazelwood+Dr+Crescent+Springs+KY+41017","appleMaps":"https://maps.apple.com/place?place-id=I96E3F1088FE2244C"},"buy":{"rates":{"bulk":0.55,"standard":0.6,"hot":0.7,"graded":0.8},"creditBonus":0.1},"ticker":[["Charizard ex · 151","$85"],["Umbreon VMAX Alt","$450"],["Shanks OP-09 Leader","$42"],["The One Ring","$40"],["Prismatic ETBs","$70"],["Luffy OP-05 Alt","$88"],["Ragavan MH2","$41"],["Base Set holos","ask"],["Sealed booster boxes","top rates"]],"testimonials":[],"rip":{"prices":{"pk":4.49,"op":4.49,"mtg":5.49}},"reviews":{"source":"manual","googlePlaceId":"","minRating":4,"items":[]},"updatedAt":null};</script>
 <script id="cardArtData"></script>
 <script>
 (function(){
@@ -4597,6 +4586,17 @@ a:hover .round-arrow{transform:rotate(45deg)}
     return out;
   }
   TL.deepMerge = deepMerge;
+  /* Convert a shop-local calendar date to an instant, independent of the visitor's timezone. */
+  TL.wallTime = function(y, m, d, h, mi){
+    var target = Date.UTC(y, m - 1, d, h, mi), guess = target;
+    var fmt = new Intl.DateTimeFormat("en-US", {timeZone: (TL.config && TL.config.timezone) || "America/New_York", year:"numeric",month:"numeric",day:"numeric",hour:"numeric",minute:"numeric",hourCycle:"h23"});
+    for(var i = 0; i < 3; i++){
+      var p = {}; fmt.formatToParts(new Date(guess)).forEach(function(x){ p[x.type] = Number(x.value); });
+      var delta = target - Date.UTC(p.year,p.month-1,p.day,p.hour % 24,p.minute);
+      guess += delta; if(!delta) break;
+    }
+    return new Date(guess);
+  };
   TL.config = deepMerge({}, window.TL_DEFAULT_CONFIG || {});
   TL.saveConfig = function(patch){
     TL.config = deepMerge(TL.config, patch);
@@ -4757,6 +4757,47 @@ a:hover .round-arrow{transform:rotate(45deg)}
     TL.on("view:change", function(){ requestAnimationFrame(function(){ scan(document); }); });
   })();
 
+  /* Whole-set snapshots on our origin; exact product IDs keep reprint stock separate. */
+  TL.cards = (function(){
+    var pending={};
+    function get(file){
+      if(pending[file])return pending[file];
+      var ctrl=typeof AbortController!=="undefined"?new AbortController():null;
+      var timer=ctrl?setTimeout(function(){ctrl.abort();},12000):0;
+      pending[file]=fetch(file,{cache:"no-cache",signal:ctrl?ctrl.signal:undefined}).then(function(r){if(!r.ok)throw new Error("The card catalogue is unavailable. Please retry shortly.");return r.json();}).catch(function(e){delete pending[file];throw e;}).finally(function(){if(timer)clearTimeout(timer);});
+      return pending[file];
+    }
+    function sets(game){return get("catalog-index.json").then(function(d){
+      if(!d || !Array.isArray(d.sets))throw new Error("Invalid card catalogue");
+      return d.sets.filter(function(s){return game==="all"||s.game===game;}).sort(function(a,b){return Number(b.code)-Number(a.code);});
+    });}
+    function stockOf(card){
+      if(!card || !TL.inventory || !TL.inventory.loaded || TL.inventory.failed)return null;
+      var it=TL.inventory.byId("tcg-"+String(card.id));
+      return it && it.type==="single" && it.stock>0 && it.game===card.game?it:null;
+    }
+    function withStock(c){
+      var card=Object.assign({},c),it=stockOf(card);
+      card.inStock=!!it;card.item=it;card.stockKnown=!!(TL.inventory && TL.inventory.loaded && !TL.inventory.failed);
+      card.priceIsMarket=!it;if(it)card.price=it.price;return card;
+    }
+    function fromSet(game,code,opts){
+      opts=opts||{};
+      return Promise.all([sets(game),TL.inventory.load().catch(function(){return null;})]).then(function(parts){
+        var list=parts[0],set=list.find(function(s){return s.code===String(code)||s.name===code;});
+        if(!set&&!code)set=list[Math.floor(Math.random()*list.length)];
+        if(!set || !/^catalog-\d+\.json$/.test(set.file))throw new Error("Choose an available catalogue set.");
+        return get(set.file).then(function(d){
+          if(!d||!Array.isArray(d.cards)||d.cards.length!==set.count)throw new Error("The complete set could not be loaded. Please retry.");
+          var cards=d.cards.map(withStock).filter(function(c){return (!opts.requirePhoto||c.img)&&(!opts.maxPrice||c.price>0&&c.price<=opts.maxPrice);});
+          if(opts.count){var out=[];while(out.length<opts.count&&cards.length)out.push(cards.splice(Math.floor(Math.random()*cards.length),1)[0]);return out;}
+          return cards;
+        });
+      });
+    }
+    return {sets:sets,fromSet:fromSet,stockOf:stockOf,catalogued:function(g){return ["pk","op","mtg","gundam","lorcana"].indexOf(g)>-1;}};
+  })();
+
   /* ---------- router: hash routes, view lifecycle, transitions ----------
      Views are <section class="view" id="view-NAME"> discovered from the DOM, so a new
      file in src/html adding a section registers a route automatically.
@@ -4774,7 +4815,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
   $$("section.view[id^='view-']").forEach(function(s){ views[s.id.slice(5)] = "#" + s.id; });
   var current = "home";
   var pendingView = null;
-  var VIEW_TITLES = {home:"", shop:"Shop", live:"Live breaks", show:"Card show", events:"Play nights", buylist:"Sell to us", visit:"Visit", staff:"Staff desk", admin:"Admin", rip:"Free pack simulator", account:"My account"};
+  var VIEW_TITLES = {home:"", shop:"Shop", live:"Live stream", show:"Card show", events:"Play nights", buylist:"Sell to us", visit:"Visit", staff:"Staff desk", admin:"Admin", rip:"Free pack simulator", account:"My account"};
   var BASE_TITLE = document.title;
   function isAuthed(){
     if(TL.auth && typeof TL.auth.can === "function") return TL.auth.can(current);
@@ -5159,15 +5200,16 @@ a:hover .round-arrow{transform:rotate(45deg)}
     }, 2500);
   });
 
-  /* ---- next up strip ----
-     Writes only when the string changes; the countdown digits live in role="timer" aria-live="off"
-     elements and nothing in #nextUp is a live region, so a ticking clock is never announced. */
+  /* ---- play nights: one live countdown per game ----
+     The owner asked for a clock to the next play event for EACH game, and for the
+     card-show countdown to move to the Card Show page. Countdown digits sit in
+     role="timer" aria-live="off" so a screen reader is never spammed by the tick. */
   var nuTimer = 0;
   function setText(el, s){ if(el && el.textContent !== s) el.textContent = s; }
   function setHtml(el, s){ if(el && el.innerHTML !== s) el.innerHTML = s; }
   function fmtWhen(d){
     try {
-      return new Intl.DateTimeFormat("en-US", {weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit"}).format(d).replace(":00", "");
+      return new Intl.DateTimeFormat("en-US", {timeZone: TL.config.timezone || "America/New_York", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit"}).format(d).replace(":00", "") + " Eastern";
     } catch(e){ return d.toDateString(); }
   }
   function renderCd(el, when, windowMs){
@@ -5182,35 +5224,65 @@ a:hover .round-arrow{transform:rotate(45deg)}
     if(!reduceMotion && !d) html += "<b>" + TL.pad2(sec) + "</b><small>s</small>";
     setHtml(el, html);
   }
-  function tickNextUp(){
-    var ev = null, show = null;
-    try { ev = TL.nextEvent && TL.nextEvent(); } catch(e){}
-    try { show = TL.nextShow && TL.nextShow(); } catch(e){}
-    var evCell = $("#nuEvCell");
-    if(ev && ev.event && ev.when){
-      setText($("#nuEvName"), ev.event.name || "Play night");
-      setText($("#nuEvWhen"), fmtWhen(ev.when) + (ev.event.small ? " · " + ev.event.small.split(" · ")[0] : ""));
-      renderCd($("#nuEvCd"), ev.when);
-      if(evCell && evCell.hidden) evCell.hidden = false;
-    } else if(evCell && !evCell.hidden) evCell.hidden = true;
-    var showCell = $("#nuShowCell");
-    if(show && !isNaN(show)){
-      var cfg = (TL.config && TL.config.show) || {};
-      setText($("#nuShowName"), "Card show · " + (cfg.venue ? cfg.venue.replace("Cincinnati Airport", "").trim() : "Hilton"));
-      setText($("#nuShowWhen"), fmtWhen(show).replace(/,\s*\d{1,2}(:\d{2})?\s*(AM|PM)$/i, "") + " · " + (cfg.hours || "10 AM – 4 PM") + " · Turfway Rd");
-      renderCd($("#nuShowCd"), show, 6 * 36e5);
-      if(showCell && showCell.hidden) showCell.hidden = false;
-    } else if(showCell && !showCell.hidden) showCell.hidden = true;
+  /* soonest upcoming event per game, using the shared schedule maths in 55-events.js */
+  function playNightsByGame(){
+    var events = (TL.config && TL.config.events) || [], next = {}, order = [];
+    var occOf = (TL.calendar && TL.calendar.nextOccurrence) || null;
+    for(var i = 0; i < events.length; i++){
+      var ev = events[i];
+      if(!ev || !ev.name) continue;
+      var game = ev.game || "other", occ = null;
+      try { occ = occOf ? occOf(ev) : null; } catch(e){ occ = null; }
+      if(!occ) continue;
+      var when = occ.when;
+      var rank = occ.running ? -1 : occ.mins;
+      if(!next[game]){ next[game] = {game: game, ev: ev, when: when, rank: rank, running: occ.running}; order.push(game); }
+      else if(rank < next[game].rank){ next[game] = {game: game, ev: ev, when: when, rank: rank, running: occ.running}; }
+    }
+    return order.map(function(g){ return next[g]; }).sort(function(a, b){ return a.rank - b.rank; });
+  }
+  var pnKey = "";
+  function renderPlayNow(){
+    var grid = $("#playNowGrid"); if(!grid) return;
+    var rows = playNightsByGame();
+    if(!rows.length){
+      if(pnKey !== "empty"){ pnKey = "empty"; grid.innerHTML = '<li class="playnow-empty">The weekly schedule is being set — <a href="#/events" data-go="events">see the play nights page</a>.</li>'; }
+      return;
+    }
+    var key = rows.map(function(r){ return r.game + r.ev.name + r.when.getTime(); }).join("|");
+    if(key !== pnKey){
+      pnKey = key;
+      grid.innerHTML = rows.map(function(r){
+        var label = (TL.gameLabel ? TL.gameLabel(r.game) : r.game) || "Play night";
+        var icon = document.getElementById("game-icon-" + r.game)
+          ? '<svg class="game-icon" width="30" height="30" aria-hidden="true" focusable="false"><use href="#game-icon-' + esc(r.game) + '"></use></svg>' : "";
+        return '<li class="playnow-card" data-game="' + esc(r.game) + '">' +
+          '<a class="playnow-btn" href="#/events" data-go="events">' +
+            '<span class="playnow-mark">' + icon + '</span>' +
+            '<span class="playnow-game">' + esc(label) + '</span>' +
+            '<span class="playnow-ev">' + esc(r.ev.name) + '</span>' +
+            '<span class="playnow-when" data-when></span>' +
+            '<span class="playnow-cd" data-cd role="timer" aria-live="off"></span>' +
+            (r.ev.fee ? '<span class="playnow-fee">' + esc(/tbd/i.test(r.ev.fee) ? "Entry TBD" : "Entry " + r.ev.fee) + '</span>' : "") +
+          '</a></li>';
+      }).join("");
+    }
+    var cells = grid.querySelectorAll(".playnow-card");
+    for(var i = 0; i < rows.length && i < cells.length; i++){
+      setText(cells[i].querySelector("[data-when]"), fmtWhen(rows[i].when));
+      renderCd(cells[i].querySelector("[data-cd]"), rows[i].when);
+    }
   }
   function startNextUp(){
     stopNextUp();
-    if(!$("#nextUp")) return;
-    tickNextUp();
-    if(!document.hidden) nuTimer = setInterval(tickNextUp, reduceMotion ? 60000 : 1000);
+    if(!$("#playNowGrid")) return;
+    renderPlayNow();
+    if(!document.hidden) nuTimer = setInterval(renderPlayNow, reduceMotion ? 60000 : 1000);
   }
   function stopNextUp(){ if(nuTimer){ clearInterval(nuTimer); nuTimer = 0; } }
+  TL.on("motion:change",function(){if(homeActive)startNextUp();});
   document.addEventListener("visibilitychange", function(){ if(document.hidden) stopNextUp(); else if(homeActive) startNextUp(); });
-  TL.on("config:change", function(){ if(homeActive) tickNextUp(); });
+  TL.on("config:change", function(){ if(homeActive){ pnKey = ""; renderPlayNow(); } });
 
   /* ---- the wall ---- */
   var wallLive = false, wallImagesStarted = false;
@@ -5300,22 +5372,67 @@ a:hover .round-arrow{transform:rotate(45deg)}
     });
   })();
 
-  /* ---- testimonials from config (sample quotes stay until the shop adds real ones) ---- */
-  function renderTestimonials(){
-    var list = TL.config && TL.config.testimonials, box = $("#testimonials"), tag = $("#testiTag");
-    if(!box || !Array.isArray(list) || !list.length) return;
-    var real = list.map(function(t){
-      if(typeof t === "string") return {q: t, who: ""};
-      return {q: t.quote || t.text || t.q || "", who: t.who || t.name || t.author || ""};
-    }).filter(function(t){ return t.q; }).slice(0, 6);
-    if(!real.length) return;
-    box.innerHTML = real.map(function(t){
-      return '<div class="panel"><p class="quote">“' + esc(t.q) + '”</p>' + (t.who ? '<p class="p-set quote-who">' + esc(t.who) + "</p>" : "") + "</div>";
-    }).join("");
-    /* the "sample quotes" tag only clears once the list differs from the built-in defaults */
-    if(tag) tag.hidden = !(typeof TL.sameAsDefault === "function" && TL.sameAsDefault("testimonials"));
+  /* ---- reviews ----
+     The owner asked for real Google / TCGplayer reviews here. We render only what the
+     shop has actually supplied (Admin → Reviews, or a Google Places pull once the
+     Worker is deployed with a key). Nothing is ever invented: with no reviews on file
+     the section invites customers to read and leave real ones instead. */
+  var REVIEW_SOURCES = {
+    google: {label: "Google review", link: function(){ return (TL.config.links && TL.config.links.googleMaps) || ""; }},
+    tcgplayer: {label: "TCGplayer feedback", link: function(){ return (TL.config.links && TL.config.links.tcgplayer) || ""; }},
+    shop: {label: "In the shop", link: function(){ return ""; }}
+  };
+  function reviewStars(n){
+    n = Math.max(0, Math.min(5, Math.round(Number(n) || 0)));
+    if(!n) return "";
+    return '<span class="review-stars" aria-label="' + n + ' out of 5">' + new Array(n + 1).join("★") + '</span>';
   }
-  TL.on("config:change", renderTestimonials);
+  var reviewRemote=null,reviewFetchKey="";
+  function reviewUrl(u){try{var p=new URL(u);return p.protocol==="https:"||p.protocol==="http:"?p.href:"";}catch(e){return "";}}
+  function fetchReviews(){
+    var cfg=TL.config.reviews||{},key=JSON.stringify(cfg);
+    if(!TL.api.online||key===reviewFetchKey)return;
+    reviewFetchKey=key;reviewRemote=null;
+    TL.api.get("/reviews",{noAuth:true}).then(function(d){if(reviewFetchKey===key){reviewRemote=d;renderTestimonials();}}).catch(function(){reviewFetchKey="";});
+  }
+  function renderTestimonials(){
+    var box = $("#testimonials"), tag = $("#testiTag");
+    if(!box) return;
+    var cfg = (TL.config && TL.config.reviews) || {};
+    var min = Number(cfg.minRating || 0);
+    var list = (reviewRemote ? reviewRemote.items : Array.isArray(cfg.items) ? cfg.items : []).map(function(t){
+      return {q: t.quote || t.text || "", who: t.who || t.name || "", rating: Number(t.rating || 0),
+        source: REVIEW_SOURCES[t.source] ? t.source : "shop", url: reviewUrl(t.url),authorUrl:reviewUrl(t.authorUrl),photo:reviewUrl(t.photo)};
+    }).filter(function(t){ return t.q && t.rating >= min; }).slice(0, 6);
+
+    if(!list.length){
+      var g = (TL.config.links && TL.config.links.googleMaps) || "", tcg = (TL.config.links && TL.config.links.tcgplayer) || "";
+      box.innerHTML = '<div class="panel review-empty">' +
+        '<p class="quote">Reviews from Google and TCGplayer land here.</p>' +
+        '<p class="p-set quote-who">Been in lately? Telling people what you thought is the best thing you can do for a small shop.</p>' +
+        '<p class="review-links">' +
+          (g ? '<a class="btn btn-ghost" href="' + esc(g) + '" target="_blank" rel="noopener noreferrer">Read &amp; leave a Google review ↗</a>' : "") +
+          (tcg ? '<a class="btn btn-ghost" href="' + esc(tcg) + '" target="_blank" rel="noopener noreferrer">Our TCGplayer feedback ↗</a>' : "") +
+        '</p></div>';
+      if(tag){ tag.textContent = "No reviews published yet"; tag.hidden = false; }
+      return;
+    }
+    box.innerHTML = list.map(function(t){
+      var src = REVIEW_SOURCES[t.source], href = t.url || reviewUrl(src.link());
+      var who = [t.who, src.label].filter(Boolean).join(" · ");
+      return '<div class="panel review-card">' + reviewStars(t.rating) +
+        (t.source==="google"&&reviewRemote&&reviewRemote.mode==="google"?'<p><span class="google-maps-attribution" translate="no">Google Maps</span></p>':'')+
+        '<p class="quote">“' + esc(t.q) + '”</p>' +
+        (t.authorUrl ? '<a class="review-author" href="'+esc(t.authorUrl)+'" target="_blank" rel="noopener noreferrer">'+(t.photo?'<img src="'+esc(t.photo)+'" alt="" width="32" height="32" loading="lazy">':'')+esc(t.who)+'</a>' : '')+
+        '<p class="p-set quote-who">' + (href
+          ? '<a href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">' + esc(who) + ' ↗</a>'
+          : esc(who)) + '</p></div>';
+    }).join("");
+    if(reviewRemote && reviewRemote.mode==="google")box.insertAdjacentHTML("beforeend",'<p class="review-attribution">Google-selected reviews ordered by relevance, filtered to '+esc(min)+'+ stars. <a href="'+esc(reviewUrl(reviewRemote.allReviews))+'" target="_blank" rel="noopener">View all reviews</a> · <a href="'+esc(reviewUrl(reviewRemote.terms))+'">Terms</a> · <a href="'+esc(reviewUrl(reviewRemote.privacy))+'">Privacy</a></p>');
+    if(tag){ tag.hidden = false;tag.textContent="Selected positive reviews · "+min+"+ stars, not an overall rating"; }
+  }
+  TL.on("config:change", function(){reviewRemote=null;renderTestimonials();fetchReviews();});
+  TL.on("api:ready",fetchReviews);
 
   /* ---------- product rendering + the shop ----------
      Exports kept for other modules: esc(), prodCard(it, opts), cardArt(it), stockLabel(it),
@@ -7587,155 +7704,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
   }
   TL.forms = {bind: formsBind, submit: formsSubmit, local: formsLocal, mailto: formsMailto, looksEmail: formsLooksEmail, looksPhone: formsLooksPhone, setFieldError: formsSetFieldError, clearFieldError: formsClearFieldError};
 
-  /* ---------- "What's my card worth?" buylist estimator ----------
-     Search (debounced) → TL.inventory.search (our stocked items, market field) merged
-     with GET /price?game=&q= when the API is online (dedupe by name+set). Picking a
-     result shows Market, Cash offer (config.buy.rates by tier) and Store credit
-     (+config.buy.creditBonus), with an "Add to my quote" button that appends a line
-     to the #bDesc textarea. Works fully offline from the demo/inventory data. */
-  var WORTH_TIERS = [
-    {key: "bulk", label: "Bulk & commons", hint: "Playable but not chase cards"},
-    {key: "standard", label: "Standard single", hint: "Most rares, holos and promos"},
-    {key: "hot", label: "Hot / chase card", hint: "In-demand hits we can move fast"},
-    {key: "graded", label: "Graded slab", hint: "PSA, CGC, BGS 9 and up"}
-  ];
-  var worthState = {q: "", game: "pk", results: [], pick: null, tier: "standard", seq: 0};
-  function worthRate(tier){ var r = (TL.config.buy || {}).rates || {}; var v = Number(r[tier]); return isNaN(v) ? 0.6 : v; }
-  function worthBonus(){ var b = Number((TL.config.buy || {}).creditBonus); return isNaN(b) ? 0.1 : b; }
-  function worthMarketOf(it){ var m = Number(it.market); if(m > 0) return m; var p = Number(it.price); return p > 0 ? p : 0; }
-  function worthKeyOf(it){ return (String(it.name || "").toLowerCase().replace(/\s+/g, " ").trim() + "|" + String(it.set || "").toLowerCase().replace(/\s+/g, " ").trim()); }
-  function worthLocalSearch(q, game, limit){
-    var ql = q.toLowerCase(), terms = ql.split(/\s+/).filter(Boolean), pool = [];
-    if(TL.inventory && typeof TL.inventory.search === "function"){
-      try { var r = TL.inventory.search(q, {game: game, limit: limit}); if(Array.isArray(r) && r.length) return r; } catch(e){}
-    }
-    if(TL.inventory && Array.isArray(TL.inventory.items) && TL.inventory.items.length) pool = TL.inventory.items;
-    else if(typeof LIVE !== "undefined" && LIVE && LIVE.items) pool = LIVE.items;
-    else pool = TL.ITEMS || [];
-    var out = [];
-    for(var i = 0; i < pool.length && out.length < limit; i++){
-      var it = pool[i];
-      if(game && game !== "all" && it.game !== game) continue;
-      var hay = (it.name + " " + (it.set || "")).toLowerCase(), ok = true;
-      for(var t = 0; t < terms.length; t++){ if(hay.indexOf(terms[t]) === -1){ ok = false; break; } }
-      if(ok) out.push(it);
-    }
-    return out;
-  }
-  function worthEnsureInventory(){
-    if(TL.inventory && !TL.inventory.loaded && typeof TL.inventory.load === "function"){
-      try { var p = TL.inventory.load(); if(p && p.then) return p.catch(function(){ return null; }); } catch(e){}
-    }
-    return Promise.resolve(null);
-  }
-  function worthSearch(){
-    var q = worthState.q, game = worthState.game, hint = $("#worthHint"), list = $("#worthResults");
-    if(!list) return;
-    if(q.length < 2){ list.innerHTML = ""; if(hint) hint.textContent = q.length ? "Keep typing…" : "Start typing a card name."; return; }
-    var seq = ++worthState.seq;
-    if(hint) hint.textContent = (TL.inventory && !TL.inventory.loaded) ? "Loading the case…" : "Searching…";
-    list.setAttribute("aria-busy", "true");
-    worthEnsureInventory().then(function(){
-      if(seq !== worthState.seq) return;
-      var local = worthLocalSearch(q, game, 8).map(function(it){ return {name: it.name, set: it.set || "", game: it.game, img: it.img || null, market: worthMarketOf(it), price: it.price, stock: it.stock, source: "inventory", url: it.url || null, item: it}; });
-      var remote = TL.api.online ? TL.api.get("/price?game=" + encodeURIComponent(game) + "&q=" + encodeURIComponent(q)).then(function(d){ return (d && Array.isArray(d.results)) ? d.results : []; }).catch(function(){ return []; }) : Promise.resolve([]);
-      return remote.then(function(rows){
-        if(seq !== worthState.seq) return;
-        var seen = {}, merged = [];
-        local.forEach(function(r){ var k = worthKeyOf(r); if(!seen[k]){ seen[k] = true; merged.push(r); } });
-        rows.forEach(function(r){ if(!r || !r.name) return; var k = worthKeyOf(r); if(seen[k]) return; seen[k] = true; merged.push({name: r.name, set: r.set || "", game: game, img: r.img || null, market: Number(r.market) || 0, source: r.source || "market", url: r.url || null, number: r.number}); });
-        merged = merged.filter(function(r){ return r.market > 0; }).slice(0, 10);
-        worthState.results = merged;
-        renderWorthResults();
-      });
-    }).catch(function(){ if(seq === worthState.seq){ worthState.results = []; renderWorthResults(); } });
-  }
-  function renderWorthResults(){
-    var list = $("#worthResults"), hint = $("#worthHint"), rs = worthState.results;
-    list.removeAttribute("aria-busy");
-    if(!rs.length){
-      list.innerHTML = "";
-      if(hint) hint.textContent = "No match in the case" + (TL.api.online ? " or on the market feed" : "") + " — describe it in the quote form below and we’ll price it by hand.";
-      return;
-    }
-    if(hint) hint.textContent = rs.length + (rs.length === 1 ? " match" : " matches") + " — pick one to see our offer.";
-    list.innerHTML = rs.map(function(r, i){
-      var thumb = r.img ? '<img src="' + esc(r.img) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' : '<span class="worth-thumb-ph" aria-hidden="true">' + esc((TL.GAMES && TL.GAMES[r.game]) || "TCG").slice(0, 2).toUpperCase() + "</span>";
-      return '<li><button type="button" class="worth-row" data-worth="' + i + '" aria-pressed="' + String(worthState.pick === r) + '">' +
-        '<span class="worth-thumb">' + thumb + '</span>' +
-        '<span class="worth-txt"><b>' + esc(r.name) + '</b><small>' + esc(r.set) + (r.source === "inventory" ? " · in the case" : "") + '</small></span>' +
-        '<span class="worth-mkt"><small>Market</small>' + esc(money(r.market)) + '</span></button></li>';
-    }).join("");
-  }
-  function worthNumbers(r){
-    var market = r.market, cash = Math.max(0, market * worthRate(worthState.tier)), credit = cash * (1 + worthBonus());
-    return {market: market, cash: Math.round(cash * 100) / 100, credit: Math.round(credit * 100) / 100};
-  }
-  function renderWorthPick(animate){
-    var box = $("#worthPick"), r = worthState.pick; if(!box) return;
-    if(!r){ box.hidden = true; box.innerHTML = ""; return; }
-    var n = worthNumbers(r), bonusPct = Math.round(worthBonus() * 100);
-    box.hidden = false;
-    box.innerHTML =
-      '<div class="worth-pick-head">' +
-        (r.img ? '<img class="worth-pick-img" src="' + esc(r.img) + '" alt="" onerror="this.style.display=\'none\'">' : "") +
-        '<div><p class="eyebrow">Your card</p><h4>' + esc(r.name) + '</h4><p class="worth-pick-set">' + esc(r.set) + (r.source === "inventory" ? " · we stock this one" : "") + '</p></div>' +
-      '</div>' +
-      '<fieldset class="worth-tiers"><legend>How would you grade it?</legend>' +
-        WORTH_TIERS.map(function(t){ return '<label class="worth-tier' + (worthState.tier === t.key ? " on" : "") + '"><input type="radio" name="worthTier" value="' + t.key + '"' + (worthState.tier === t.key ? " checked" : "") + '><span><b>' + esc(t.label) + '</b><small>' + esc(t.hint) + " · " + Math.round(worthRate(t.key) * 100) + "% of market</small></span></label>"; }).join("") +
-      '</fieldset>' +
-      '<div class="worth-nums" role="status" aria-live="polite">' +
-        '<div class="worth-num"><small>Market</small><span class="worth-val">$<span id="worthMarket">' + esc(n.market.toFixed(2)) + '</span></span></div>' +
-        '<div class="worth-num cash"><small>Cash offer</small><span class="worth-val">$<span id="worthCash">' + esc(n.cash.toFixed(2)) + '</span></span></div>' +
-        '<div class="worth-num credit"><small>Store credit <em>+' + bonusPct + '%</em></small><span class="worth-val">$<span id="worthCredit">' + esc(n.credit.toFixed(2)) + '</span></span></div>' +
-      '</div>' +
-      '<div class="worth-actions"><button type="button" class="btn" id="worthAdd">Add to my quote</button>' + (r.url ? '<a class="worth-link" href="' + esc(r.url) + '" target="_blank" rel="noopener noreferrer">See our listing &rarr;</a>' : "") + '</div>';
-    if(animate){ evCountTo($("#worthMarket"), n.market, {decimals: 2, duration: 500}); evCountTo($("#worthCash"), n.cash, {decimals: 2, duration: 700}); evCountTo($("#worthCredit"), n.credit, {decimals: 2, duration: 800}); }
-  }
-  function worthUpdateNumbers(){
-    var r = worthState.pick; if(!r) return;
-    var n = worthNumbers(r);
-    evCountTo($("#worthCash"), n.cash, {decimals: 2, duration: 450});
-    evCountTo($("#worthCredit"), n.credit, {decimals: 2, duration: 550});
-    $$(".worth-tier").forEach(function(l){ l.classList.toggle("on", l.querySelector("input").value === worthState.tier); });
-  }
-  function worthAddToQuote(){
-    var r = worthState.pick, ta = $("#bDesc"); if(!r || !ta) return;
-    var n = worthNumbers(r), tier = WORTH_TIERS.filter(function(t){ return t.key === worthState.tier; })[0];
-    var line = r.name + (r.set ? " (" + r.set + ")" : "") + " ~" + money(n.market) + " market · " + (tier ? tier.label.toLowerCase() : worthState.tier) + " → est. " + money(n.cash) + " cash / " + money(n.credit) + " credit";
-    ta.value = (ta.value.trim() ? ta.value.replace(/\s+$/, "") + "\n" : "") + line;
-    ta.dispatchEvent(new Event("input", {bubbles: true}));
-    var sel = $("#bGames"), gname = {pk: "Pokemon", op: "One Piece", mtg: "Magic: The Gathering"}[r.game];
-    if(sel && gname && sel.value !== gname && !/mix/i.test(sel.value)){ var has = false; for(var i = 0; i < sel.options.length; i++){ if(sel.options[i].value === gname) has = true; } if(has && ta.value.split("\n").length <= 1) sel.value = gname; }
-    toast("Added to your quote — " + r.name);
-    var btn = $("#worthAdd"); if(btn){ btn.textContent = "Added ✓"; btn.disabled = true; setTimeout(function(){ btn.textContent = "Add to my quote"; btn.disabled = false; }, 1400); }
-  }
-  TL.on("init", function(){
-    var q = $("#worthQ"), g = $("#worthGame"), list = $("#worthResults"), pick = $("#worthPick");
-    if(!q || !g || !list) return;
-    var run = TL.debounce(worthSearch, 260);
-    q.addEventListener("input", function(){ worthState.q = q.value.trim(); run(); });
-    q.addEventListener("keydown", function(e){ if(e.key === "ArrowDown"){ var first = $(".worth-row", list); if(first){ e.preventDefault(); first.focus(); } } });
-    g.addEventListener("change", function(){ worthState.game = g.value; if(worthState.q.length >= 2) worthSearch(); });
-    list.addEventListener("click", function(e){
-      var b = e.target.closest("[data-worth]"); if(!b) return;
-      worthState.pick = worthState.results[parseInt(b.dataset.worth, 10)] || null;
-      $$("[data-worth]", list).forEach(function(x){ x.setAttribute("aria-pressed", String(x === b)); });
-      renderWorthPick(true);
-      if(pick && !reduceMotion){ try { pick.scrollIntoView({block: "nearest", behavior: "smooth"}); } catch(err){} }
-    });
-    list.addEventListener("keydown", function(e){
-      var rows = $$(".worth-row", list), i = rows.indexOf(document.activeElement); if(i < 0) return;
-      if(e.key === "ArrowDown" && rows[i + 1]){ e.preventDefault(); rows[i + 1].focus(); }
-      if(e.key === "ArrowUp"){ e.preventDefault(); if(rows[i - 1]) rows[i - 1].focus(); else q.focus(); }
-    });
-    if(pick){
-      pick.addEventListener("change", function(e){ if(e.target.name === "worthTier"){ worthState.tier = e.target.value; worthUpdateNumbers(); } });
-      pick.addEventListener("click", function(e){ if(e.target.closest("#worthAdd")) worthAddToQuote(); });
-    }
-    TL.on("config:change", function(){ if(worthState.pick) renderWorthPick(false); });
-  });
-  TL.on("inventory:loaded", function(){ if(worthState.q.length >= 2) worthSearch(); });
+  /* The "What's my card worth?" buylist estimator was removed at the owner's request (2026-09-12); this file intentionally does nothing. */
 
   /* ---------- admin: dashboard, integrations, sync, inventory table ----------
      Shared helpers for the back office (also used by 60-settings, 65-alerts, 70-staff):
@@ -8160,50 +8129,62 @@ a:hover .round-arrow{transform:rotate(45deg)}
   TL.on("view:leave", function(d){ if(d && d.name === "admin") stopSyncPoll(); });
   TL.on("init", function(){ renderAdminDate(); renderConn(); renderIntegrations(); });
 
-  /* ---------- live breaks ----------
-     State comes from TL.config.live ({on, title, platform, embed, spotPrice, spots,
-     packsPerSpot, pack?, packs?, taken?, schedule:[{day,time,name,desc}]}); the
-     module re-renders on 'live:change' and 'config:change'.
-     API online: GET /live (spots, viewers, live state) every 10 s, GET /live/chat
+  /* ---------- live stream ----------
+     Card-show-style claiming: cards go up on camera, a viewer claims the number, it lands in
+     their cart and posts to the claims feed. State comes from TL.config.live ({on, title,
+     platform, embed, spotPrice, spots, packsPerSpot, pack?, packs?, taken?,
+     schedule:[{day,time,name,desc}]}); the module re-renders on 'live:change' and 'config:change'.
+     API online: GET /live (spots + spots.claims, viewers, live state) every 10 s, GET /live/chat
      every 3 s, POST /live/viewers heartbeat every 20 s, claims via
      POST /live/spots/claim, releases via POST /live/spots/release. Every timer runs
      only while the Live view is showing AND the tab is visible.
      API offline, or the live endpoints answering 404: simulated chat (aria-live off, a visible
-     pause, and it stops after LV_SIM_MAX lines until the visitor interacts) and viewers, sample
-     seats tagged as such, localStorage spot claims ("liveSpots"), newsletter signups into
-     TL.store "forms". With an API the board shows "Checking spots…" until GET /live answers —
-     taken seats come only from the server. The claim owner id ("sid") lives in localStorage next
-     to the claims. Off air, claiming is labelled a pre-claim for the next break.
+     pause, and it stops after LV_SIM_MAX lines until the visitor interacts) and viewers,
+     localStorage claims ("liveSpots" → {mine, at}), newsletter signups into TL.store "forms".
+     With an API the board shows "Checking the board…" until GET /live answers — taken numbers
+     come only from the server. The claim owner id ("sid") lives in localStorage next to the
+     claims, so a reload keeps ownership of what the board shows as "Yours".
+     CLAIMS FEED (#claimFeed): newest first, one row per held number.
+       online  — rows come from GET /live spots.claims ({spot, name, confirmed, exp}); the claim
+                 time is derived from exp (exp − LV_CLAIM_TTL, the server's 6 h hold) and falls
+                 back to when this browser first saw the row. Own rows read "You".
+       offline — ONLY this browser's own claims, with the feed tagged "preview" and a note saying
+                 so. Other people's claims are never invented.
        TL.live.state()          {on, active, online, embed, spots:{taken, mine, total, price}}
        TL.live.refresh()        re-fetch /live (online) or re-render (offline)
-       TL.live.claim(n, el?)    same path as clicking a spot button
-       TL.live.release(n)       free a spot you hold
-       TL.live.rip(item?)       advance "now ripping" with a pull; emits 'live:rip'
+       TL.live.claim(n, el?)    same path as clicking a number on the board
+       TL.live.release(n)       free a number you hold
+       TL.live.claims()         the rows the feed is showing ([{spot, name, mine, confirmed, at}])
+       TL.live.rip(item?)       put the next card on camera; emits 'live:rip'
        TL.live.pushChat(user, text, sys)
      Events: 'live:rip' {item, pack, total, hit}   'live:spot' {spot, el, item}
      DOM events for motion modules: 'tl:live-state' {on}, 'tl:spot-claimed' {n, el},
      'tl:live-rip' {item, pack, total, hit}.
      Ids other modules rely on: #chatBody #chatForm #chatInput #spotGrid #viewerCount #livePillText */
   var LV_DAYS = ["sun","mon","tue","wed","thu","fri","sat"];
+  var LV_CLAIM_TTL = 6 * 3600 * 1000; /* server hold length (api/src/routes/live.js CLAIM_TTL_MS) */
   var CHAT_FEED = [
-    ["mike_pulls", "LETS GO that alt art was insane"],
-    ["nky_collector", "how many spots left?"],
+    ["mike_pulls", "LETS GO that alt art is clean"],
+    ["nky_collector", "how many numbers left?"],
     ["sarah_tcg", "shipping was crazy fast last week btw"],
-    ["breakz_bill", "my spot is up next, no whammies"],
-    ["gundam_greg", "any gundam breaks coming?"],
-    ["toploaded_shop", "Gundam locals Saturday 1 PM — breaks soon after"],
-    ["jess_rips", "chase card is still in there I can feel it"],
+    ["breakz_bill", "claimed 4, that charizard is mine"],
+    ["gundam_greg", "any gundam on camera tonight?"],
+    ["toploaded_shop", "Gundam locals Saturday 1 PM — come play"],
+    ["jess_rips", "hold that one up again please"],
     ["cincy_cards", "W shop"],
     ["packrat_pete", "see everyone at the Turfway show, first weekend of the month"]
   ];
-  var LV_HYPE = ["LETS GOOOO", "no way", "W pull", "that's the chase!!", "sheesh", "pack luck is unreal tonight", "who had that spot??"];
+  var LV_HYPE = ["LETS GOOOO", "no way", "that one is clean", "that's the chase!!", "sheesh", "case is stacked tonight", "who claimed that??"];
   var LV_SIM_MAX = 8; /* simulated chat lines per sitting — the replay stops after this many until the visitor interacts */
   var lv = {
     booted: false, active: false, api: null, apiReady: false, mounted: "", timers: {}, sid: null, name: "",
-    taken: {}, mine: {}, claimAt: {}, demoTaken: [2, 5, 9], total: 12, price: 24.99, spotsLoaded: false, spotsErr: false,
+    taken: {}, mine: {}, claimAt: {}, demoTaken: [], total: 12, price: 24.99, spotsLoaded: false, spotsErr: false,
     viewers: 214, chatIdx: 0, chatMode: "", chatSeen: {}, chatSeenN: 0, chatSince: 0, chatBusy: false, lastReact: 0,
     simN: 0, simIdle: false, chatPaused: false,
-    pack: 7, packs: 36, ripped: 0, hitPool: [], hits: [], hitMap: {}, lastRip: ""
+    /* claims feed: claimTimes = when this browser claimed a number (persisted), claimKeys = identity
+       of each server row so a release + re-claim of the same number counts as a new claim */
+    serverClaims: null, claimTimes: {}, claimKeys: {}, feedShown: {}, feedSeeded: false, feedSig: null, feedRows: [],
+    pack: 7, packs: 36, ripped: 0, hitPool: [], hits: [], hitMap: {}, lastRip: "", onCamera: ""
   };
   function liveCfg(){ return (TL.config && TL.config.live) || {}; }
   function liveIsOn(){ return !!liveCfg().on; }
@@ -8315,16 +8296,17 @@ a:hover .round-arrow{transform:rotate(45deg)}
     if(Number(cfg.pack) > 0) lv.pack = Math.min(lv.packs, Number(cfg.pack));
   }
   function lvRenderAll(){ lvRenderState(); lvRenderSpots(); lvRenderSchedule(); lvRenderRip(); lvRenderOffair(); lvRenderNotify(); lvRenderNameRow(); }
+  function lvTitle(){ return liveCfg().title || "Live stream"; }
   function lvRenderState(){
     var on = liveIsOn(), cfg = liveCfg(), emb = lvParseEmbed(cfg), root = document.documentElement;
     var was = lv.on; /* tracked here — other modules toggle html.is-live too, so the class is not a reliable "before" */
     lv.on = on;
     root.classList.toggle("is-live", on);
     var pt = lvEl("livePillText"); if(pt) pt.textContent = on ? "Live" : "Offline";
-    var title = lvEl("liveTitle"); if(title) title.textContent = cfg.title || "Live break";
+    var title = lvEl("liveTitle"); if(title) title.textContent = lvTitle();
     var sub = lvEl("liveSub"), tag = lvEl("liveDemoTag"), screen = lvEl("liveScreen");
     if(on){
-      if(emb && emb.src){ if(sub) sub.textContent = "Streaming live on " + (emb.kind === "youtube" ? "YouTube" : "Twitch") + " · claim a spot below"; if(tag) tag.hidden = true; }
+      if(emb && emb.src){ if(sub) sub.textContent = "Streaming live on " + (emb.kind === "youtube" ? "YouTube" : "Twitch") + " · claim a card with the host"; if(tag) tag.hidden = true; }
       else if(emb){ if(sub) sub.textContent = "Streaming live on Whatnot — open the stream to watch and bid"; if(tag) tag.hidden = true; }
       else { if(sub) sub.textContent = "Simulated stream — the live site embeds Whatnot, YouTube, or Twitch here"; if(tag){ tag.hidden = false; tag.textContent = "simulated stream"; } }
     } else {
@@ -8333,10 +8315,10 @@ a:hover .round-arrow{transform:rotate(45deg)}
       if(tag) tag.hidden = true;
     }
     if(screen){ screen.classList.toggle("off", !on); screen.classList.toggle("embedded", !!(on && emb && emb.src)); }
-    var head = lvEl("spotHead"); if(head) head.textContent = on ? "Claim a spot in this break" : "Pre-claim for the next break";
+    var head = lvEl("spotHead"); if(head) head.textContent = "Live stream claims";
     var note = lvEl("spotNote"); if(note) note.hidden = on;
-    var hl = lvEl("hitsLabel"); if(hl) hl.textContent = on ? "Recent hits" : "Last break's hits";
-    /* every hit on the strip is drawn from the case by the simulation — there is no real rip history yet */
+    var hl = lvEl("hitsLabel"); if(hl) hl.textContent = on ? "On camera" : "Last stream";
+    /* every card on the strip is drawn from our own inventory by the simulation — there is no real stream log yet */
     var ht = lvEl("hitsDemoTag"); if(ht) ht.hidden = false;
     var vn = lvEl("viewerNum"); if(vn && on && !vn.dataset.set){ vn.dataset.set = "1"; vn.textContent = lv.viewers; }
     var ct = lvEl("chatTag"); if(ct){ ct.hidden = liveOnline() && lv.api === true; ct.textContent = on ? "simulated" : "replay · simulated"; }
@@ -8362,9 +8344,9 @@ a:hover .round-arrow{transform:rotate(45deg)}
       host.appendChild(f);
     } else {
       var wn = emb.kind === "whatnot";
-      host.innerHTML = '<div class="embed-card"><span class="embed-k">' + (wn ? "Live on Whatnot" : "Live stream") + '</span><b>' + esc(cfg.title || "Live break") + '</b>' +
+      host.innerHTML = '<div class="embed-card"><span class="embed-k">' + (wn ? "Live on Whatnot" : "Live stream") + '</span><b>' + esc(lvTitle()) + '</b>' +
         '<a class="btn" href="' + esc(emb.href) + '" target="_blank" rel="noopener noreferrer">Watch on ' + (wn ? "Whatnot" : "the stream") + ' ↗<span class="sr-only"> (opens in a new tab)</span></a>' +
-        '<span class="embed-sub">Whatnot has no embed — the break runs in their app, spots and chat stay here.</span></div>';
+        '<span class="embed-sub">Whatnot has no embed — the stream runs in their app, claims and chat stay here.</span></div>';
     }
   }
   function lvRenderOffair(){
@@ -8390,9 +8372,9 @@ a:hover .round-arrow{transform:rotate(45deg)}
   }
   function lvRenderRip(){
     var el = lvEl("ripLabel"); if(!el) return;
-    var cfg = liveCfg(), text = liveIsOn()
-      ? "Now ripping · pack " + lv.pack + " of " + lv.packs
-      : "Next break · " + lv.packs + " packs · " + (Number(cfg.spots) > 0 ? Number(cfg.spots) : lv.total) + " spots";
+    var text = liveIsOn()
+      ? "On camera now" + (lv.onCamera ? " · " + lv.onCamera : "")
+      : "Join us for the next live stream";
     if(text === lv.lastRip) return;
     lv.lastRip = text;
     el.textContent = text;
@@ -8415,17 +8397,17 @@ a:hover .round-arrow{transform:rotate(45deg)}
     if(as){ as.hidden = !lv.name; as.textContent = "as " + lv.name; as.setAttribute("aria-label", "Chatting as " + lv.name + " — change display name"); }
   }
   /* ---- spots ---- */
-  function lvSaveSpots(){ TL.store.set("liveSpots", {mine: lv.mine}); }
+  function lvSaveSpots(){ TL.store.set("liveSpots", {mine: lv.mine, at: lv.claimTimes}); }
   function lvSpotsLeft(){ var left = 0; for(var i = 1; i <= lv.total; i++){ if(!lv.taken[i]) left++; } return left; }
   function lvRenderSpots(){
     var grid = lvEl("spotGrid"); if(!grid) return;
-    var cfg = liveCfg(), html = "", left = lvSpotsLeft(), on = liveIsOn(), loading = !lv.spotsLoaded, demo = lvDemoMode();
-    var verb = on ? "Claim" : "Pre-claim", tailWord = on ? "" : " for the next break";
+    var cfg=liveCfg(), html = "", left = lvSpotsLeft(), on = liveIsOn(), loading = !lv.spotsLoaded, demo = lvDemoMode();
+    var tailWord = on ? "" : " for the next stream";
     for(var i = 1; i <= lv.total; i++){
       var t = !!lv.taken[i], m = !!lv.mine[i];
-      if(loading){ html += '<button type="button" class="spot loading" data-spot="' + i + '" disabled aria-label="Spot ' + i + ' — checking availability">#' + i + '</button>'; continue; }
+      if(loading){ html += '<button type="button" class="spot loading" data-spot="' + i + '" disabled aria-label="Number ' + i + ' — checking the board">#' + i + '</button>'; continue; }
       html += '<button type="button" class="spot' + (m ? " mine" : t ? " taken" : "") + '" data-spot="' + i + '"' +
-        (m ? ' aria-label="Spot ' + i + ' is yours' + tailWord + ' — open cart"' : t ? ' disabled aria-label="Spot ' + i + ' taken"' : ' aria-label="' + verb + ' spot ' + i + ' for ' + esc(money(lv.price)) + tailWord + '"') + '>' +
+        (m ? ' aria-label="Number ' + i + ' is yours' + tailWord + ' — open cart"' : t ? ' disabled aria-label="Number ' + i + ' is claimed"' : ' aria-label="Claim number ' + i + ' for ' + esc(money(lv.price)) + tailWord + '"') + '>' +
         (m ? "Yours" : t ? "Taken" : "#" + i) + "</button>";
     }
     grid.innerHTML = html;
@@ -8627,7 +8609,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
     body.innerHTML = "";
     lv.chatSeen = {}; lv.chatSeenN = 0; lv.chatSince = 0;
     if(mode === "sim"){
-      pushChat(null, liveIsOn() ? "Welcome to the break — chat is simulated for this demo" : "Off air — replaying chat from the last break (simulated)", true, {seed: true});
+      pushChat(null, liveIsOn() ? "Welcome to the stream — chat is simulated for this demo" : "Off air — sample chat, not a real stream replay", true, {seed: true});
       CHAT_FEED.slice(0, 4).forEach(function(c){ pushChat(c[0], c[1], false, {seed: true}); });
       lv.chatIdx = 4;
     } else {
@@ -8899,6 +8881,40 @@ a:hover .round-arrow{transform:rotate(45deg)}
   TL.live.pushChat = function(user, text, sys){ pushChat(user, text, sys); };
   TL.live.nextStream = lvNextStream;
 
+  (function(){
+    var rows=[],timer=null,busy=false,lastSig="",active=false;
+    function staff(){return TL.api.online && (TL.api.role==="staff"||TL.api.role==="admin");}
+    function render(){
+      var list=$("#claimFeed"),empty=$("#claimFeedEmpty"),note=$("#claimFeedNote");
+      $("#claimDesk").hidden=!staff();
+      var sig=JSON.stringify(rows)+staff();if(sig!==lastSig){
+        lastSig=sig;list.innerHTML=rows.map(function(c){return '<li class="claim-entry"><div><b>'+esc(c.card)+'</b><br><small>'+esc(c.handle)+' · '+esc(new Date(c.at).toLocaleString())+'</small></div><div>'+money(c.price)+' · '+esc(c.status)+(staff()?'<br><select data-claim-status="'+esc(c.id)+'" aria-label="Status of '+esc(c.card)+'">'+["claimed","paid","shipped","cancelled"].map(function(s){return '<option'+(s===c.status?' selected':'')+'>'+s+'</option>';}).join("")+'</select>':'')+'</div></li>';}).join("");
+      }
+      empty.hidden=!!rows.length;$("#claimCount").textContent=rows.length?rows.length+" posted":"";
+      empty.textContent=TL.api.online?"No confirmed card claims posted yet.":"The shared claims board is not connected yet. Follow the stream host for claim confirmations.";
+      note.hidden=false;note.textContent=TL.api.online?"Refreshes every 5 seconds while this page is open. Posted statuses are maintained by staff.":"No sample or device-only claims are displayed as real purchases.";
+    }
+    function refresh(){
+      render();if(!active || document.hidden || busy || !TL.api.online)return;
+      busy=true;TL.api.get("/live/claims",{noAuth:true}).then(function(d){
+        var before=rows.length;rows=Array.isArray(d.claims)?d.claims:[];render();
+        if(rows.length>before)$("#claimFeedStatus").textContent=(rows.length-before)+" new confirmed claim(s) posted.";
+      }).catch(function(){var n=$("#claimFeedNote");n.hidden=false;n.textContent="Claims could not refresh. Any displayed claims are from the last successful update; confirm with the host.";}).finally(function(){busy=false;});
+    }
+    function start(){clearInterval(timer);refresh();if(active&&!document.hidden)timer=setInterval(refresh,5000);}
+    TL.on("view:change",function(d){if(!d||d.name!=="live")return;active=true;start();});
+    TL.on("view:leave",function(d){if(d&&d.name==="live"){active=false;clearInterval(timer);}});
+    TL.on("api:ready",start);TL.on("auth:change",render);TL.on("init",render);
+    document.addEventListener("visibilitychange",start);
+    $("#streamClaimForm").addEventListener("submit",function(e){
+      e.preventDefault();if(!staff())return;var form=this,btn=form.querySelector("button"),st=$("#claimDeskStatus");btn.disabled=true;
+      TL.api.post("/live/claims",{card:$("#claimCard").value.trim(),handle:$("#claimHandle").value.trim(),price:Number($("#claimPrice").value)})
+        .then(function(){form.reset();st.textContent="Confirmed claim posted.";refresh();})
+        .catch(function(e){st.textContent=e.error||"Could not post the claim. Retry when connected.";}).finally(function(){btn.disabled=false;});
+    });
+    $("#claimFeed").addEventListener("change",function(e){var sel=e.target.closest("[data-claim-status]");if(!sel||!staff())return;sel.disabled=true;TL.api.put("/live/claims/"+encodeURIComponent(sel.dataset.claimStatus),{status:sel.value}).then(refresh).catch(function(){toast("Claim status was not saved");lastSig="";render();}).finally(function(){sel.disabled=false;});});
+  })();
+
   /* ---------- play nights · card show · visit · footer ----------
      Everything here renders from TL.config (events, hours, show, links, address) on
      'init' and 'config:change'. Countdown / status timers run at 60 s and only while
@@ -8951,7 +8967,8 @@ a:hover .round-arrow{transform:rotate(45deg)}
     if(dow < 0 || sm === null) return null;
     var days = (dow - t.dow + 7) % 7, running = false;
     if(days === 0 && sm <= t.min){ if(t.min < sm + EV_DUR_MIN) running = true; else days = 7; }
-    return {date: evAddDays(t, days), mins: days * 1440 + (sm - t.min), running: running, startMin: sm};
+    var date = evAddDays(t, days), when = TL.wallTime(date.y, date.m, date.d, Math.floor(sm / 60), sm % 60);
+    return {date: date, when: when, mins: Math.ceil((when.getTime() - (now || new Date()).getTime()) / 60000), running: running, startMin: sm};
   }
   function evUpcoming(now){
     return (TL.config.events || []).map(function(ev){ var o = evNextOcc(ev, now); return o ? {ev: ev, occ: o} : null; })
@@ -9288,12 +9305,15 @@ a:hover .round-arrow{transform:rotate(45deg)}
     var el = $("#showCountdown"); if(!el) return;
     var s = TL.config.show || {}, d = showNext(); if(!d){ evSetText(el, ""); return; }
     var now = new Date(), st = evHmMin(s.start), en = evHmMin(s.end);
+    d = TL.wallTime(d.getFullYear(), d.getMonth()+1, d.getDate(), Math.floor((st === null ? 600 : st)/60), (st === null ? 600 : st)%60);
     var endMs = d.getTime() + Math.max(60, ((en !== null ? en : 960) - (st !== null ? st : 600))) * 60000;
     var mins = Math.round((d.getTime() - now.getTime()) / 60000);
     /* plain text pill, not a live region: the digits tick every minute and nobody needs that read out */
     if(mins <= 0 && now.getTime() < endMs){ evSetText(el, "Happening now \u00b7 doors open till " + evClock(en !== null ? en : 960)); el.classList.add("live"); return; }
     el.classList.remove("live");
-    evSetText(el, mins <= 0 ? "" : evFmtUntil(mins));
+    var seconds = Math.max(0, Math.floor((d.getTime() - now.getTime()) / 1000));
+    var count = Math.floor(seconds/86400) + "d " + TL.pad2(Math.floor(seconds%86400/3600)) + "h " + TL.pad2(Math.floor(seconds%3600/60)) + "m" + (reduceMotion ? "" : " " + TL.pad2(seconds%60) + "s");
+    evSetText(el, mins <= 0 ? "" : (showFromConfig(showNext()) ? count : "Date to be confirmed · estimated " + count));
   }
   function bindVendor(){
     var form = $("#vendorForm"); if(!form) return;
@@ -9481,7 +9501,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
   TL.on("view:change", function(d){
     if(!d) return;
     if(d.name === "events" && !evTimer){ tickEvents(); evTimer = setInterval(tickEvents, 60000); }
-    if(d.name === "show" && !showTimer){ tickShow(); showTimer = setInterval(tickShow, 60000); }
+    if(d.name === "show" && !showTimer){ tickShow(); showTimer = setInterval(function(){ if(!document.hidden) tickShow(); }, reduceMotion ? 60000 : 1000); }
     if(d.name === "visit"){ evLoadMap(); if(!visitTimer){ renderVisit(); visitTimer = setInterval(function(){ if(!document.hidden) tickVisit(); }, 60000); } }
     if(d.name === "admin") evEditorFallback();
   });
@@ -9496,19 +9516,59 @@ a:hover .round-arrow{transform:rotate(45deg)}
     if(evTimer) tickEvents(); if(showTimer) tickShow(); if(visitTimer) tickVisit();
   });
 
+  /* Published booth heatmap. Empty plans never masquerade as real bookings. */
+  TL.floorplan = (function(){
+    var labels = {tcg:"TCG",sports:"Sports",mixed:"Mixed",food:"Food",entry:"Entry"};
+    function stats(booths){
+      var counts = {tcg:0,sports:0,mixed:0};
+      (booths || []).forEach(function(b){ if(b && Object.prototype.hasOwnProperty.call(counts,b.type)) counts[b.type]++; });
+      var total = counts.tcg + counts.sports + counts.mixed, pct = {}, rest = 100;
+      var keys = Object.keys(counts).filter(function(k){ return counts[k]; });
+      keys.forEach(function(k,i){ pct[k] = i === keys.length-1 ? rest : Math.round(counts[k]/total*100); rest -= pct[k]; });
+      return {counts:counts,total:total,pct:pct};
+    }
+    function render(){
+      var f = (TL.config.show || {}).floorplan || {}, rows = Number(f.rows)||6, cols = Number(f.cols)||10;
+      var booths = (Array.isArray(f.booths) ? f.booths : []).filter(function(b){return b && labels[b.type] && b.r>=1 && b.c>=1 && b.w>=1 && b.h>=1 && b.r+b.h-1<=rows && b.c+b.w-1<=cols;});
+      var map=$("#showFloorMap"), note=$("#showFloorNote"), mix=$("#showFloorMix"), legend=$("#showFloorLegend"), list=$("#showFloorList"), scroll=$("#showFloorScroll");
+      if(!map) return;
+      scroll.hidden = !booths.length; mix.hidden = !booths.length;
+      if(!booths.length){ note.textContent="The vendor layout is not published yet. Check back for the confirmed TCG and Sports booth locations and percentages."; map.innerHTML=legend.innerHTML=list.innerHTML=mix.innerHTML=""; return; }
+      var s=stats(booths);
+      note.textContent=s.total+" vendor booths · percentages are by booth, not floor area. Mixed vendors are counted separately; food and entry areas are excluded.";
+      map.style.gridTemplateColumns="repeat("+cols+", var(--fp-cell))"; map.style.gridTemplateRows="repeat("+rows+", var(--fp-cell))";
+      map.innerHTML=booths.map(function(b){return '<span class="fp-cell t-'+b.type+'" style="grid-row:'+b.r+' / span '+b.h+';grid-column:'+b.c+' / span '+b.w+'"><b>'+esc(b.label)+'</b><i>'+labels[b.type]+'</i></span>';}).join("");
+      mix.innerHTML=Object.keys(s.pct).map(function(k){return '<span class="t-'+k+'" style="width:'+s.pct[k]+'%"></span>';}).join("");
+      legend.innerHTML=Object.keys(labels).filter(function(k){return booths.some(function(b){return b.type===k;});}).map(function(k){return '<li><i class="t-'+k+'" aria-hidden="true"></i>'+labels[k]+(s.pct[k]!==undefined?' '+s.pct[k]+'% ('+s.counts[k]+')':'')+'</li>';}).join("");
+      list.innerHTML=booths.map(function(b){return '<li>'+esc(b.label)+' · '+labels[b.type]+' · row '+b.r+', column '+b.c+'</li>';}).join("");
+    }
+    TL.on("init",render); TL.on("config:change",render);
+    return {stats:stats,render:render};
+  })();
+
   /* ---------- pack rip: virtual booster mini-game ----------
      View #view-rip (route "rip"), app root #ripApp, announcer #ripLive.
-     Every card is a real in-stock single from TL.inventory (game + set); demo ITEMS
-     when inventory is unavailable. Pulls are rarity-weighted per game (see PACKS);
-     the last card in the fan is the hit slot.
+     Cards come from the selected TCGCSV checklist through TL.cards, including
+     unstocked cards. Exact product IDs drive "In Stock Now" badges. Catalog
+     outages show a retry state, never silently switch to the in-stock pool.
+     The inventory-only draw helper remains for compatibility/tests. Pulls are
+     rarity-weighted simulation rules (not manufacturer odds); hit slot last.
 
-       TL.rip.draw(game, set, seed?)   → [{item, tier, rank, rare, rh, hit}]  pure, seedable
+       TL.rip.draw(game, set, seed?)   → [entry]  pure, seedable, our in-stock singles
+       TL.rip.drawFrom(cards, game, seed?) → [entry]  pure, any TL.cards list
+       TL.rip.pull(game, set)          → Promise<{cards, mode, setName}>  the pool for a set
        TL.rip.start(game, set)         → jump to the pack screen
        TL.rip.stats()                  → {packs, value, spent, best} (simulation counters only)
 
-     Consumes (all guarded, all optional): TL.inventory.load()/items/summary,
+     entry: {card, item, tier, rank, rare, rh, foil, hit} — `item` is the inventory
+     item when we stock the card, otherwise null.
+     card:  {key, name, set, game, img, price, priceIsMarket, rarity, url, num, cond,
+             inStock, item, itemSet, source} — `price` is OUR price when inStock,
+     otherwise the catalogue's MARKET REFERENCE (priceIsMarket), never presented as ours.
+
+     Consumes (all guarded, all optional): TL.cards.*, TL.inventory.load()/items/summary,
      TL.cart.add(item, qty, fromEl), TL.openQuickView(item), TL.confetti(x, y, opts).
-     Stores: TL.store "rip" {game, set} last choice, "ripStats" session stats.
+     Stores: TL.store "rip" {game, set, setName} last choice, "ripStats" session stats.
   */
   var PACKS = {
     pk:  {name:"Pokemon",   price:4.49, size:10, tiers:["C","U","R","RR","IR","SIR","HR"], rareFrom:3,
@@ -9529,13 +9589,15 @@ a:hover .round-arrow{transform:rotate(45deg)}
 
   function ripTier(game, rarity){
     var r = String(rarity || "").toLowerCase();
+    var codes={c:"Common",u:"Uncommon",uc:"Uncommon",r:"Rare",rr:"Double Rare",sr:"Super Rare",sec:"Secret Rare",l:"Leader",m:"Mythic Rare",ir:"Illustration Rare",sir:"Special Illustration Rare",hr:"Hyper Rare"};
+    if(codes[r])r=codes[r].toLowerCase();
     if(game === "pk"){
       if(/^common/.test(r)) return "C";
       if(/^uncommon/.test(r)) return "U";
       if(/special illustration|special art|secret/.test(r)) return "SIR";
-      if(/hyper|rainbow/.test(r)) return "HR";
-      if(/illustration|art rare|shiny holo/.test(r)) return "IR";
-      if(/double|ultra|ace|mega|amazing|radiant|prism|super|shiny|full art/.test(r)) return "RR";
+      if(/hyper|rainbow|gold/.test(r)) return "HR";
+      if(/illustration|art rare|shiny holo|trainer gallery/.test(r)) return "IR";
+      if(/double|ultra|ace|mega|amazing|radiant|prism|super|shiny|full art|\bv\b|vmax|vstar|break|legend|star/.test(r)) return "RR";
       return "R";
     }
     if(game === "op"){
@@ -9546,6 +9608,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
       if(/super|special|\bsp\b/.test(r)) return "SR";
       return "R";
     }
+    /* Magic — Scryfall reports common | uncommon | rare | mythic | special | bonus */
     if(/^common|land|token|basic/.test(r)) return "C";
     if(/^uncommon/.test(r)) return "U";
     if(/mythic/.test(r)) return "M";
@@ -9573,12 +9636,14 @@ a:hover .round-arrow{transform:rotate(45deg)}
     return s;
   }
   function ripIsReverse(it){
+    if(!it) return false;
     if(it.cond && /RH|reverse/i.test(it.cond)) return true;
     var ls = it.listings; if(ls && ls.length) for(var i = 0; i < ls.length; i++) if(/reverse/i.test(ls[i].printing || "")) return true;
     return false;
   }
   /* 400px CDN face for any TCGplayer product (the shop grid uses 200px thumbs) */
   function ripImg(it){
+    if(!it) return "";
     var m = /^tcg-(\d+)$/.exec(String(it.id || ""));
     if(m) return "https://tcgplayer-cdn.tcgplayer.com/product/" + m[1] + "_in_400x400.jpg";
     return it.img || "";
@@ -9624,16 +9689,46 @@ a:hover .round-arrow{transform:rotate(45deg)}
     }
     return s;
   }
-  /* pool: singles in stock for game (+ set), bucketed by tier */
-  function ripPool(items, game, set){
+
+  /* ---- cards: one shape for catalogue pulls and for our own case ---- */
+  function ripCardFromItem(it){
+    return {key: "inv:" + it.id, name: it.name, set: ripSetName(it), game: it.game, img: ripImg(it),
+      price: Number(it.price) || 0, priceIsMarket: false, rarity: ripRarity(it), url: it.url || "",
+      num: it.num || null, cond: it.cond || "", inStock: true, item: it, itemSet: ripSetName(it), source: "inventory"};
+  }
+  /* A TL.cards card; keep the exact product-ID stock match and reject sealed items. */
+  function ripCardFromCatalog(c){
+    if(!c || !c.name) return null;
+    var item = c.item || null, market = !!c.priceIsMarket, price = Number(c.price) || 0;
+    if(item && item.type && item.type !== "single"){ item = null; market = true; price = 0; }
+    return {key: (c.source || "cat") + ":" + (c.id || c.num || "") + ":" + c.name + ":" + (c.set || ""),
+      name: c.name, set: c.set || "", game: c.game, img: c.img || ripImg(item),
+      price: item ? (Number(item.price) || 0) : price, priceIsMarket: item ? false : (market || !price),
+      rarity: c.rarity || (item ? ripRarity(item) : ""), url: c.url || (item ? item.url : "") || "",
+      num: c.num || null, cond: item ? (item.cond || "") : "",
+      inStock: !!item, item: item, itemSet: item ? ripSetName(item) : "", source: c.source || "catalog"};
+  }
+  function ripCardsFromItems(items, game, setName){
+    var out = [], list = items || [];
+    for(var i = 0; i < list.length; i++){
+      var it = list[i];
+      if(!it || it.game !== game || it.type !== "single" || !(it.stock > 0) || it.live) continue;
+      if(setName && setName !== "*" && ripSetName(it) !== setName) continue;
+      out.push(ripCardFromItem(it));
+    }
+    return out;
+  }
+  function ripCardTier(game, card){ return ripTier(game, card.rarity || (card.item ? ripRarity(card.item) : "")); }
+  /* bucket a card list by tier */
+  function ripCardPool(cards, game){
     var pool = {all:[]}, tiers = PACKS[game].tiers, i;
     for(i = 0; i < tiers.length; i++) pool[tiers[i]] = [];
-    for(i = 0; i < items.length; i++){
-      var it = items[i];
-      if(it.game !== game || it.type !== "single" || !(it.stock > 0) || it.live) continue;
-      if(set && set !== "*" && ripSetName(it) !== set) continue;
-      var t = ripTier(game, ripRarity(it));
-      pool[t].push(it); pool.all.push(it);
+    for(i = 0; i < (cards || []).length; i++){
+      var c = cards[i];
+      if(!c || !c.name) continue;
+      if(c.game && c.game !== game) continue;
+      var t = ripCardTier(game, c);
+      pool[t].push(c); pool.all.push(c);
     }
     return pool;
   }
@@ -9644,27 +9739,30 @@ a:hover .round-arrow{transform:rotate(45deg)}
     for(j = 0; j < order.length; j++){
       lists = pool[tiers[order[j]]];
       if(!lists || !lists.length) continue;
-      var cands = lists.filter(function(it){ return !used[it.id]; });
-      if(slot.rh){ var rh = cands.filter(ripIsReverse); if(rh.length) cands = rh; }
+      var cands = lists.filter(function(c){ return !used[c.key]; });
+      if(slot.rh){ var rh = cands.filter(function(c){ return ripIsReverse(c.item); }); if(rh.length) cands = rh; }
       if(!cands.length) continue;
-      var it = cands[Math.floor(rng() * cands.length)];
-      return {item: it, tier: tiers[order[j]]};
+      var c = cands[Math.floor(rng() * cands.length)];
+      return {card: c, tier: tiers[order[j]]};
     }
     return null; /* pool exhausted: the pack is short rather than repeating a card */
   }
-  function ripDraw(items, game, set, seed){
+  /* pure: the rarity-slot plan applied to any card list (whole set or just our case) */
+  function ripDrawFrom(cards, game, seed){
     var P = PACKS[game]; if(!P) return [];
-    var rng = ripRng(seed), pool = ripPool(items, game, set), slots = ripSlots(game, rng), used = {}, out = [];
+    var rng = ripRng(seed), pool = ripCardPool(cards, game), slots = ripSlots(game, rng), used = {}, out = [];
     if(!pool.all.length) return out;
     for(var i = 0; i < slots.length; i++){
       var got = ripPick(pool, game, slots[i], used, rng);
       if(!got) continue;
-      used[got.item.id] = true;
+      used[got.card.key] = true;
       var rank = P.tiers.indexOf(got.tier);
-      out.push({item: got.item, tier: got.tier, rank: rank, rare: rank >= P.rareFrom, rh: !!slots[i].rh, foil: !!slots[i].foil, hit: !!slots[i].hit});
+      out.push({card: got.card, item: got.card.item || null, tier: got.tier, rank: rank,
+        rare: rank >= P.rareFrom, rh: !!slots[i].rh, foil: !!slots[i].foil, hit: !!slots[i].hit});
     }
     return out;
   }
+  function ripDraw(items, game, set, seed){ return ripDrawFrom(ripCardsFromItems(items, game, set || "*"), game, seed); }
 
   /* ---- inventory access (guarded: the shop package owns TL.inventory) ---- */
   var ripItemsP = null, ripItems = null, ripDemo = false;
@@ -9704,6 +9802,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
     return ripItemsP;
   }
   var ripSetCache = {};
+  /* set list built from our own case — the fallback when no public checklist answers */
   function ripSetsFor(game){
     var P = PACKS[game];
     if(ripItems){
@@ -9714,27 +9813,107 @@ a:hover .round-arrow{transform:rotate(45deg)}
         if(it.game !== game || it.type !== "single" || !(it.stock > 0)) continue;
         var s = ripSetName(it); counts[s] = (counts[s] || 0) + 1;
       }
-      var list = Object.keys(counts).map(function(k){ return {name:k, count:counts[k]}; })
+      var list = Object.keys(counts).map(function(k){ return {name:k, code:k, count:counts[k], own:true}; })
         .filter(function(x){ return ripDemo || x.count >= P.size; })
         .sort(function(a, b){ return b.count - a.count; });
-      if(ripDemo) list = [{name:"*", count: list.reduce(function(n, x){ return n + x.count; }, 0)}];
+      if(ripDemo) list = [{name:"*", code:"*", count: list.reduce(function(n, x){ return n + x.count; }, 0), own:true}];
       return (ripSetCache[game] = list);
     }
     var sum = TL.inventory && TL.inventory.summary;
-    if(sum && sum.sets && sum.sets[game]) return sum.sets[game].filter(function(x){ return x.count >= P.size; }).map(function(x){ return {name:x.name, count:x.count, approx:true}; });
+    if(sum && sum.sets && sum.sets[game]) return sum.sets[game].filter(function(x){ return x.count >= P.size; }).map(function(x){ return {name:x.name, code:x.name, count:x.count, approx:true, own:true}; });
     return null;
+  }
+
+  /* ---- set lists: the whole published set list through TL.cards ---- */
+  function ripCatalogGame(game){
+    try { return !!(TL.cards && TL.cards.catalogued && TL.cards.catalogued(game) && TL.cards.fromSet); }
+    catch(e){ return false; }
+  }
+  var ripSetList = {}, ripSetPend = {};
+  function ripSetToken(s){ return String((s && (s.code || s.name)) || ""); }
+  function ripFindSet(sets, val){
+    if(!sets || !val) return null;
+    for(var i = 0; i < sets.length; i++){ if(ripSetToken(sets[i]) === val || sets[i].name === val) return sets[i]; }
+    return null;
+  }
+  function ripSetLabel(game, token){
+    var hit = ripFindSet(ripSetList[game], token);
+    if(hit) return hit.name === "*" ? "Sample case" : hit.name;
+    if(token && token !== "*") return rip.setName || token;
+    return "Sample case";
+  }
+  function ripRequestSets(game){
+    if(ripSetList[game] || ripSetPend[game]) return;
+    ripSetPend[game] = true;
+    var p = null;
+    try { if(TL.cards && TL.cards.sets) p = TL.cards.sets(game); } catch(e){ p = null; }
+    Promise.resolve(p || Promise.reject(new Error("no catalogue")))
+      .then(function(list){
+        list = (list || []).filter(function(s){ return s && s.name && (!s.count || s.count >= PACKS[game].size); });
+        return list.length ? list : Promise.reject(new Error("empty"));
+      })
+      .catch(function(e){ if(ripCatalogGame(game))throw e;return ripLoadItems().then(function(){ return ripSetsFor(game) || []; }); })
+      .then(function(list){ ripSetsReady(game, list); }, function(){ ripSetsReady(game, []); });
+  }
+  function ripSetsReady(game, list){
+    ripSetPend[game] = false;
+    ripSetList[game] = list || [];
+    if(rip.stage === "setup" && TL.current === "rip" && rip.game === game) ripRenderSetup();
+  }
+
+  /* ---- pools: every card in the set, our case as the safety net ---- */
+  var ripPoolCache = {}, ripPoolPend = {};
+  function ripPoolKey(game, token){ return game + "|" + (token || "*"); }
+  function ripCasePoolFrom(items, game, token, mode){
+    var name = ripSetLabel(game, token), cards = ripCardsFromItems(items, game, name), wide = false;
+    if(!cards.length){ cards = ripCardsFromItems(items, game, "*"); wide = !!cards.length; }
+    return {cards: cards, mode: mode, set: token, setName: name, game: game, wide: wide};
+  }
+  /* pool we can build without waiting on the network (repeat rips, games with no catalogue) */
+  function ripSyncPool(game, token){
+    var key = ripPoolKey(game, token);
+    if(ripPoolCache[key]) return ripPoolCache[key];
+    if(ripCatalogGame(game) || !ripItems) return null;
+    var st = ripCasePoolFrom(ripItems, game, token, "case");
+    return st.cards.length ? (ripPoolCache[key] = st) : null;
+  }
+  function ripEnsurePool(game, token){
+    var key = ripPoolKey(game, token), have = ripSyncPool(game, token);
+    if(have) return Promise.resolve(have);
+    if(ripPoolPend[key]) return ripPoolPend[key];
+    var p = ripBuildPool(game, token).then(function(st){
+      delete ripPoolPend[key];
+      if(st && st.cards.length) ripPoolCache[key] = st;
+      return st;
+    }, function(e){ delete ripPoolPend[key]; throw e; });
+    ripPoolPend[key] = p;
+    return p;
+  }
+  function ripBuildPool(game, token){
+    if(!ripCatalogGame(game) || !token || token === "*"){
+      return ripLoadItems().then(function(items){ return ripCasePoolFrom(items, game, token, "case"); });
+    }
+    return Promise.resolve()
+      .then(function(){ return TL.cards.fromSet(game, token); })
+      .then(function(list){
+        var cards = [], i, c;
+        for(i = 0; i < (list || []).length; i++){ c = ripCardFromCatalog(list[i]); if(c) cards.push(c); }
+        if(cards.length < PACKS[game].size) throw new Error("catalogue too thin");
+        return {cards: cards, mode: "catalog", set: token, setName: ripSetLabel(game, token), game: game, wide: false};
+      });
   }
 
   /* ---- state + rendering ---- */
   var ripApp = $("#ripApp"), ripLiveEl = $("#ripLive");
-  var rip = {stage:"setup", game:"pk", set:"", cards:[], flipped:0, timers:[], drag:null};
+  var rip = {stage:"setup", game:"pk", set:"", setName:"", cards:[], flipped:0, timers:[], drag:null, loading:false, pool:null};
   var ripPrefs = TL.store.get("rip", null) || {};
   if(PACKS[ripPrefs.game]) rip.game = ripPrefs.game;
-  if(ripPrefs.set) rip.set = ripPrefs.set;
+  if(ripPrefs.set){ rip.set = String(ripPrefs.set); rip.setName = String(ripPrefs.setName || ripPrefs.set); }
 
   function ripLater(fn, ms){ var t = setTimeout(fn, reduceMotion ? 0 : ms); rip.timers.push(t); return t; }
   function ripClearTimers(){ rip.timers.forEach(clearTimeout); rip.timers = []; }
   function ripSay(msg){ if(ripLiveEl){ ripLiveEl.textContent = ""; ripLiveEl.textContent = msg; } }
+  function ripSavePrefs(){ TL.store.set("rip", {game: rip.game, set: rip.set, setName: rip.setName}); }
   function ripPackPrice(game){
     var cfg = TL.config && TL.config.rip && TL.config.rip.prices;
     return (cfg && Number(cfg[game]) > 0) ? Number(cfg[game]) : PACKS[game].price;
@@ -9742,10 +9921,49 @@ a:hover .round-arrow{transform:rotate(45deg)}
   function ripStats(){ return TL.store.get("ripStats", null) || {packs:0, value:0, spent:0, best:null}; }
   TL.rip = {
     draw: function(game, set, seed){ return ripDraw(ripItems || ITEMS, game || rip.game, set || rip.set || "*", seed); },
-    start: function(game, set){ if(PACKS[game]) rip.game = game; if(set) rip.set = set; TL.go("rip"); ripStartPack(); },
+    drawFrom: ripDrawFrom,
+    pull: function(game, set){ return ripEnsurePool(game || rip.game, set || rip.set); },
+    start: function(game, set){ if(PACKS[game]) rip.game = game; if(set){ rip.set = set; rip.setName = ""; } TL.go("rip"); ripStartPack(); },
     stats: ripStats,
     packs: PACKS
   };
+
+  /* ---- honest price wording: ours vs a catalogue market reference ---- */
+  function ripHasPrice(c){ return Number(c && c.price) > 0; }
+  function ripPriceText(c){ return ripHasPrice(c) ? money(c.price) : "No catalog price"; }
+  function ripPriceKind(c){ return c.priceIsMarket ? "market reference" : "our price"; }
+  function ripPriceHtml(c){
+    if(!ripHasPrice(c)) return '<span class="rip-price-none">No catalog price</span>';
+    return money(c.price) + '<small>' + (c.priceIsMarket ? "market ref." : "our price") + '</small>';
+  }
+  function ripPriceSay(c){
+    return ripHasPrice(c) ? money(c.price) + " " + ripPriceKind(c) : "no catalog price";
+  }
+  function ripStockBadge(c, cls){
+    if(!c.inStock) return "";
+    return '<span class="rip-stock' + (cls ? " " + cls : "") + '">In Stock Now</span>';
+  }
+  function ripInStockCount(cards){
+    var n = 0; for(var i = 0; i < cards.length; i++) if(cards[i].card.inStock) n++;
+    return n;
+  }
+  /* where this pack's cards came from — said plainly, every time */
+  function ripSourceNote(){
+    var P = PACKS[rip.game], st = rip.pool;
+    if(st && st.mode === "catalog")
+      return "Cards are drawn from the whole " + esc(st.setName) + " set list, not just our shelf. Anything we have in the case is badged In Stock Now.";
+    if(st && st.mode === "offline")
+      return "The public card catalog did not answer, so this simulation used the " + esc(P.name) + " singles in our case" + (st.wide ? " (any set)" : "") + " instead of the full set list.";
+    if(ripDemo)
+      return "Live inventory is unavailable, so this simulation uses sample cards and sample prices.";
+    return "No public checklist exists for " + esc(P.name) + ", so this simulation uses the singles in our case.";
+  }
+  function ripSetupNote(){
+    var P = PACKS[rip.game];
+    if(ripCatalogGame(rip.game))
+      return "Pulls come from the whole published set list, not only what is on our shelf. Cards we have in the case are badged In Stock Now and are the only ones you can add to a cart.";
+    return "There is no free public checklist for " + esc(P.name) + ", so these pulls come from the " + esc(P.name) + " singles in our case.";
+  }
 
   function ripOddsTable(game){
     var P = PACKS[game], keys = Object.keys(P.hit), total = 0, i;
@@ -9762,7 +9980,9 @@ a:hover .round-arrow{transform:rotate(45deg)}
     var s = ripStats();
     var best = s.best ? '<div class="rip-best-mini">' +
         (s.best.img ? '<img src="' + esc(s.best.img) + '" alt="" loading="lazy" width="48" height="48">' : '<span class="rip-best-ph" aria-hidden="true"></span>') +
-        '<div><b>' + esc(s.best.name) + '</b><span>Simulation highlight &middot; reference price ' + money(s.best.price) + '</span></div></div>'
+        '<div><b>' + esc(s.best.name) + '</b><span>Simulation highlight &middot; ' +
+          (Number(s.best.price) > 0 ? esc((s.best.market ? "market reference " : "our price ") + money(s.best.price)) : "no catalog price") + '</span>' +
+          (s.best.inStock ? ' <span class="rip-stock sm">In Stock Now</span>' : "") + '</div></div>'
       : '<p class="rip-note">No simulations yet &mdash; try one for free.</p>';
     return '<aside class="rip-stats panel" aria-labelledby="ripStatsH"><h3 id="ripStatsH">Simulator stats</h3>' +
       '<dl><div><dt>Simulations</dt><dd>' + fmtInt(s.packs) + '</dd></div>' +
@@ -9773,15 +9993,19 @@ a:hover .round-arrow{transform:rotate(45deg)}
   }
   function ripRenderSetup(){
     rip.stage = "setup"; ripApp.dataset.stage = "setup";
-    var sets = ripSetsFor(rip.game), P = PACKS[rip.game];
+    var P = PACKS[rip.game], sets = ripSetList[rip.game];
+    if(!sets) ripRequestSets(rip.game);
     var setOpts, canRip = true;
-    if(sets === null){ setOpts = '<option value="">Loading sets…</option>'; canRip = false; }
-    else if(!sets.length){ setOpts = '<option value="">No sets with enough singles yet</option>'; canRip = false; }
+    if(!sets){ setOpts = '<option value="">Loading sets…</option>'; canRip = false; }
+    else if(!sets.length){ setOpts = '<option value="">No sets available right now</option>'; canRip = false; }
     else {
-      if(!sets.some(function(x){ return x.name === rip.set; })) rip.set = sets[0].name;
+      var chosen = ripFindSet(sets, rip.set) || sets[0];
+      rip.set = ripSetToken(chosen); rip.setName = chosen.name;
       setOpts = sets.map(function(x){
-        return '<option value="' + esc(x.name) + '"' + (x.name === rip.set ? " selected" : "") + '>' +
-          (x.name === "*" ? "Sample cards (demo case)" : esc(x.name)) + " · " + fmtInt(x.count) + (x.approx ? " products" : " singles") + '</option>';
+        var tok = ripSetToken(x);
+        return '<option value="' + esc(tok) + '"' + (tok === rip.set ? " selected" : "") + '>' +
+          (x.name === "*" ? "Sample cards (demo case)" : esc(x.name)) + " · " + fmtInt(x.count) +
+          (x.approx ? " products" : x.own ? " singles in the case" : " cards") + '</option>';
       }).join("");
     }
     ripApp.innerHTML = '<div class="rip-setup">' +
@@ -9790,17 +10014,20 @@ a:hover .round-arrow{transform:rotate(45deg)}
           '<div class="chip-row" role="group" aria-labelledby="ripGameL">' + RIP_GAMES.map(function(g){
             return '<button class="chip" type="button" data-rip-game="' + g + '" aria-pressed="' + (g === rip.game) + '">' + TL.gameIcon(g) + esc(PACKS[g].name) + '</button>';
           }).join("") + '</div></div>' +
-        '<div class="rip-field"><label class="rip-label" for="ripSet">Set</label><select id="ripSet"' + (canRip ? "" : " disabled") + '>' + setOpts + '</select></div>' +
+        '<div class="rip-field"><label class="rip-label" for="ripSet">Set</label><select id="ripSet"' + (canRip ? "" : " disabled") + '>' + setOpts + '</select>' +
+          '<p class="rip-note rip-source-note">' + ripSetupNote() + '</p></div>' +
         '<div class="rip-price"><span class="rip-label">Cost to play</span><b>Free</b><span class="rip-note">' + esc(P.size) + ' simulated card reveals &middot; ' + esc(P.name) + '</span></div>' +
-        '<button class="btn rip-go" type="button" data-rip-open aria-describedby="ripDisclaimerH"' + (canRip ? "" : " disabled") + '>Start free simulation</button>' +
-        (ripDemo ? '<p class="rip-note">Live inventory is unavailable, so this simulation uses sample cards and prices. <button class="linklike" type="button" data-rip-retry>Retry</button></p>' : "") +
+        '<button class="btn rip-go" type="button" data-rip-open aria-describedby="ripDisclaimerH"' + (canRip && !rip.loading ? "" : " disabled") + '>' +
+          (rip.loading ? "Building the set list…" : "Start free simulation") + '</button>' +
+        ((ripDemo || sets && !sets.length) ? '<p class="rip-note">A data connection is unavailable. <button class="linklike" type="button" data-rip-retry>Retry loading</button></p>' : "") +
       '</div>' +
       '<div class="rip-odds-wrap panel"><h3>Simulated odds</h3>' + ripOddsTable(rip.game) + '</div>' +
       ripStatsCard() + '</div>';
   }
   function ripRenderPack(){
     rip.stage = "pack"; ripApp.dataset.stage = "pack";
-    var P = PACKS[rip.game], setLabel = rip.set === "*" ? "Sample case" : rip.set;
+    var P = PACKS[rip.game], setLabel = (rip.pool && rip.pool.setName) || ripSetLabel(rip.game, rip.set);
+    if(setLabel === "*") setLabel = "Sample case";
     ripApp.innerHTML = '<div class="rip-stage" id="ripStage" data-game="' + esc(rip.game) + '">' +
       '<div class="rip-packwrap">' +
         '<p class="rip-mode">Free simulation &middot; no real pack or card prizes</p>' +
@@ -9810,6 +10037,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
           '<div class="rip-packart" aria-hidden="true"><span class="rip-packgame">' + esc(P.name) + '</span><b>TL</b><span class="rip-packset">' + esc(setLabel) + '</span><span class="rip-packn">SIMULATION ONLY</span></div>' +
           '<span class="rip-crimp bottom" aria-hidden="true"></span>' +
         '</div>' +
+        '<p class="rip-note rip-source-note">' + ripSourceNote() + '</p>' +
         '<p class="rip-hint" id="ripHint">' + (reduceMotion ? "Press Open simulated pack to reveal the cards." : "Swipe across the strip or press Enter to play the simulated opening.") + '</p>' +
         '<div class="rip-actions"><button class="btn" type="button" data-rip-tear>Open simulated pack</button><button class="btn btn-ghost" type="button" data-rip-back>Change set</button></div>' +
       '</div>' +
@@ -9819,15 +10047,38 @@ a:hover .round-arrow{transform:rotate(45deg)}
     ripSay("Free simulation ready: " + P.name + ", " + setLabel + ". No real pack is opened and no cards are awarded. Press Enter or Open simulated pack to play.");
     var pack = $("#ripPack"); if(pack) try { pack.focus({preventScroll:true}); } catch(e){}
   }
-  function ripStartPack(){
-    ripClearTimers();
-    TL.store.set("rip", {game: rip.game, set: rip.set});
-    rip.cards = ripDraw(ripItems || ITEMS, rip.game, rip.set || "*");
+  function ripLaunch(st){
+    rip.pool = st || null;
+    rip.cards = ripDrawFrom(st ? st.cards : [], rip.game);
     rip.flipped = 0;
-    if(!rip.cards.length){ toast("That set has no singles in stock right now"); ripRenderSetup(); return; }
-    /* warm the CDN thumbs while the pack is on screen */
-    rip.cards.forEach(function(c){ var src = ripImg(c.item); if(src){ var im = new Image(); im.decoding = "async"; im.src = src; } });
+    if(!rip.cards.length){
+      toast(ripCatalogGame(rip.game) ? "No cards came back for that set — try another" : "That set has no singles in stock right now");
+      ripRenderSetup(); return;
+    }
+    /* warm the card faces while the pack is on screen */
+    rip.cards.forEach(function(c){ var src = c.card.img; if(src){ var im = new Image(); im.decoding = "async"; im.src = src; } });
     ripRenderPack();
+  }
+  function ripStartPack(){
+    if(rip.loading) return;
+    ripClearTimers();
+    ripSavePrefs();
+    var have = ripSyncPool(rip.game, rip.set);
+    if(have){ ripLaunch(have); return; }
+    var game = rip.game, token = rip.set;
+    rip.loading = true;
+    if(rip.stage === "setup") ripRenderSetup();
+    ripSay("Building the " + ripSetLabel(game, token) + " set list…");
+    ripEnsurePool(game, token).then(function(st){
+      rip.loading = false;
+      if(rip.game !== game || rip.set !== token) return;      /* the visitor moved on */
+      if(TL.current && TL.current !== "rip"){ ripRenderSetup(); return; }
+      ripLaunch(st);
+    }, function(){
+      rip.loading = false;
+      toast("Could not build that set right now — try another");
+      ripRenderSetup();
+    });
   }
 
   /* ---- tear ---- */
@@ -9845,17 +10096,22 @@ a:hover .round-arrow{transform:rotate(45deg)}
     ripLater(function(){ ripDeal(cx, cy); }, 380);
   }
   function ripCardHtml(c, i){
-    var it = c.item, P = PACKS[rip.game], src = ripImg(it);
-    var front = src ? '<img src="' + esc(src) + '" alt="" decoding="async">' : cardArt(it);
-    return '<button class="rip-card" type="button" data-rip-flip="' + i + '" style="--i:' + i + '" aria-label="Card ' + (i + 1) + ' of ' + rip.cards.length + ', face down. Flip it." aria-pressed="false">' +
+    var card = c.card, P = PACKS[rip.game], src = card.img;
+    var front = src ? '<img src="' + esc(src) + '" alt="" decoding="async">' : cardArt(card.item || card);
+    return '<button class="rip-card' + (card.inStock ? " has-stock" : "") + '" type="button" data-rip-flip="' + i + '" style="--i:' + i + '" aria-label="Card ' + (i + 1) + ' of ' + rip.cards.length + ', face down. Flip it." aria-pressed="false">' +
       '<span class="rip-card-inner"><span class="rip-face back" aria-hidden="true"><b>TL</b></span>' +
       '<span class="rip-face front"' + (src ? "" : ' data-drawn') + '>' + front + '<span class="rip-sheen" aria-hidden="true"></span>' +
+      ripStockBadge(card, "on-card") +
       '<span class="rip-tag' + (c.rare ? " rare" : "") + '">' + esc(c.rh ? "Reverse holo" : c.foil ? "Foil " + P.labels[c.tier] : P.labels[c.tier]) + '</span></span></span></button>';
   }
   function ripDeal(cx, cy){
     var wrap = $("#ripCards"); if(!wrap) return;
     rip.stage = "cards"; ripApp.dataset.stage = "cards";
-    wrap.innerHTML = '<p class="rip-mode">Simulation only &middot; these cards are not awarded to you</p><div class="rip-cardbar"><span class="rip-progress" id="ripProgress">0 of ' + rip.cards.length + ' flipped</span>' +
+    var stocked = ripInStockCount(rip.cards);
+    wrap.innerHTML = '<p class="rip-mode">Simulation only &middot; these cards are not awarded to you</p>' +
+      '<p class="rip-note rip-source-note">' + ripSourceNote() +
+        (stocked ? " " + fmtInt(stocked) + " of these " + fmtInt(rip.cards.length) + " are in our case right now." : "") + '</p>' +
+      '<div class="rip-cardbar"><span class="rip-progress" id="ripProgress">0 of ' + rip.cards.length + ' flipped</span>' +
       '<div class="rip-cardbtns"><button class="btn btn-ghost" type="button" data-rip-next>Flip next</button><button class="btn btn-ghost" type="button" data-rip-all>Flip all</button></div></div>' +
       '<div class="rip-grid" id="ripGrid">' + rip.cards.map(ripCardHtml).join("") + '</div>';
     wrap.hidden = false;
@@ -9876,16 +10132,18 @@ a:hover .round-arrow{transform:rotate(45deg)}
   function ripFlip(i, quiet){
     var c = rip.cards[i], el = $('.rip-card[data-rip-flip="' + i + '"]', ripApp);
     if(!c || !el || el.classList.contains("is-flipped")) return false;
-    var P = PACKS[rip.game], it = c.item;
+    var P = PACKS[rip.game], card = c.card;
     el.classList.add("is-flipped");
     if(c.rare) el.classList.add("is-rare");
     if(c.hit) el.classList.add("is-hit");
     el.setAttribute("aria-pressed", "true");
-    el.setAttribute("aria-label", it.name + ", " + (P.labels[c.tier] || c.tier) + ", reference price " + money(it.price) + ". Open product details; sold separately.");
+    el.setAttribute("aria-label", card.name + ", " + (P.labels[c.tier] || c.tier) + ", " + ripPriceSay(card) + ". " +
+      (card.inStock ? "In stock now at the shop. Open product details." : "Not in our case right now. Open card details."));
     el.dataset.ripView = i; el.removeAttribute("data-rip-flip");
     rip.flipped++;
     var prog = $("#ripProgress"); if(prog) prog.textContent = rip.flipped + " of " + rip.cards.length + " flipped";
-    if(!quiet) ripSay((c.rare ? "Simulated hit! " : "") + "Card " + (i + 1) + " of " + rip.cards.length + ": " + it.name + ", " + (P.labels[c.tier] || c.tier) + ", reference price " + money(it.price));
+    if(!quiet) ripSay((c.rare ? "Simulated hit! " : "") + "Card " + (i + 1) + " of " + rip.cards.length + ": " + card.name + ", " +
+      (P.labels[c.tier] || c.tier) + ", " + ripPriceSay(card) + (card.inStock ? ", in stock now" : ""));
     if(c.rare && !reduceMotion){
       var r = el.getBoundingClientRect(), big = c.hit;
       ripLater(function(){
@@ -9905,11 +10163,19 @@ a:hover .round-arrow{transform:rotate(45deg)}
   function ripShowResults(){
     if(rip.stage === "results") return;
     rip.stage = "results"; ripApp.dataset.stage = "results";
-    var P = PACKS[rip.game], price = ripPackPrice(rip.game), total = 0, best = null;
-    rip.cards.forEach(function(c){ total += Number(c.item.price) || 0; if(!best || c.item.price > best.item.price) best = c; });
+    var P = PACKS[rip.game], price = ripPackPrice(rip.game), total = 0, best = null, ours = 0, refs = 0;
+    rip.cards.forEach(function(c){
+      var p = Number(c.card.price) || 0;
+      total += p;
+      if(p > 0){ if(c.card.priceIsMarket) refs++; else ours++; }
+      if(!best || p > (Number(best.card.price) || 0)) best = c;
+    });
+    var stocked = ripInStockCount(rip.cards);
     var s = ripStats();
     s.packs++; s.value = Math.round((s.value + total) * 100) / 100; s.spent = Math.round((s.spent + price) * 100) / 100;
-    if(best && (!s.best || best.item.price > s.best.price)) s.best = {id: best.item.id, name: best.item.name, price: best.item.price, img: ripImg(best.item)};
+    if(best && (!s.best || (Number(best.card.price) || 0) > (Number(s.best.price) || 0)))
+      s.best = {id: best.card.item ? best.card.item.id : "", name: best.card.name, price: Number(best.card.price) || 0,
+        img: best.card.img, market: !!best.card.priceIsMarket, inStock: !!best.card.inStock};
     TL.store.set("ripStats", s);
     var bi = rip.cards.indexOf(best);
     var res = $("#ripResults"); if(!res) return;
@@ -9918,39 +10184,60 @@ a:hover .round-arrow{transform:rotate(45deg)}
       '<h2 id="ripResultH" tabindex="-1">Your simulated reveal</h2>' +
       '<p class="rip-simulation-copy"><strong>No real pack was opened. No cards or prizes were awarded.</strong> Nothing was purchased or charged, and no store credit was earned.</p>' +
       '<p class="rip-simulation-copy">Reference singles total: <b class="rip-total">' + money(total) + '</b>. This is catalog pricing, not winnings, profit, or a balance you can spend. Prices and availability may change.</p>' +
-      (ripDemo ? '<p class="rip-simulation-copy">Sample cards and prices shown because live inventory is unavailable.</p>' : "") +
-      (best ? '<div class="rip-bestpull"><div class="rip-best-art">' + (ripImg(best.item) ? '<img src="' + esc(ripImg(best.item)) + '" alt="' + esc(best.item.name) + '">' : cardArt(best.item)) + '</div>' +
-        '<div class="rip-best-meta"><span class="rip-label">Simulation highlight</span><h3>' + esc(best.item.name) + '</h3>' +
-        '<p class="rip-note">' + esc(P.labels[best.tier] || best.tier) + ' &middot; ' + esc(ripSetName(best.item)) + (best.item.cond ? ' &middot; ' + esc(best.item.cond) : "") + '</p>' +
-        '<b class="rip-price">' + money(best.item.price) + '</b>' +
-        '<p class="rip-simulation-copy">Want the physical single? It is sold separately; adding it to your cart does not claim a prize.</p>' +
-        '<div class="rip-btns"><button class="btn" type="button" data-rip-add="' + bi + '">Add single to cart</button><button class="btn btn-ghost" type="button" data-rip-view="' + bi + '">Product details</button></div></div></div>' : "") +
+      '<p class="rip-simulation-copy">' + (refs ? "That total mixes catalog market references for the " + fmtInt(refs) + " card" + (refs === 1 ? "" : "s") + " we do not stock" + (ours ? " with our shelf price on the " + fmtInt(ours) + " we do" : "") + ". " : "") +
+        ripSourceNote() + '</p>' +
+      '<p class="rip-simulation-copy rip-stocked">' + (stocked
+        ? fmtInt(stocked) + " of these " + fmtInt(rip.cards.length) + " card" + (rip.cards.length === 1 ? " is" : "s are") + " in our case right now &mdash; badged <span class=\"rip-stock sm\">In Stock Now</span> below. Only those can be added to a cart, and they are sold separately."
+        : "None of these cards are in our case right now, so there is nothing here to add to a cart.") + '</p>' +
+      (best ? '<div class="rip-bestpull"><div class="rip-best-art">' + (best.card.img ? '<img src="' + esc(best.card.img) + '" alt="' + esc(best.card.name) + '">' : cardArt(best.card.item || best.card)) + '</div>' +
+        '<div class="rip-best-meta"><span class="rip-label">Simulation highlight</span><h3>' + esc(best.card.name) + '</h3>' +
+        '<p class="rip-note">' + esc(P.labels[best.tier] || best.tier) + ' &middot; ' + esc(best.card.set || ripSetLabel(rip.game, rip.set)) + (best.card.cond ? ' &middot; ' + esc(best.card.cond) : "") + '</p>' +
+        ripStockBadge(best.card) +
+        '<b class="rip-price">' + ripPriceHtml(best.card) + '</b>' +
+        '<p class="rip-simulation-copy">' + (best.card.inStock
+          ? "We have this single in the case. It is sold separately; adding it to your cart does not claim a prize."
+          : "We do not have this single in the case right now, so the figure above is a catalog market reference, not our price.") + '</p>' +
+        '<div class="rip-btns">' +
+          (best.card.inStock ? '<button class="btn" type="button" data-rip-add="' + bi + '">Add single to cart</button>' : "") +
+          '<button class="btn btn-ghost" type="button" data-rip-view="' + bi + '">' + (best.card.inStock ? "Product details" : "Card details") + '</button>' +
+        '</div></div></div>' : "") +
       '<div class="rip-btns rip-again"><button class="btn" type="button" data-rip-again>Simulate another &middot; free</button><button class="btn btn-ghost" type="button" data-rip-share>Share simulation</button>' +
       '<button class="btn btn-ghost" type="button" data-go="shop" data-params="type=sealed&game=' + esc(rip.game) + '">Shop physical ' + esc(P.name) + ' packs</button></div>' +
       '<p class="rip-simulation-copy">Optional shopping: physical singles and packs are sold separately and require a separate checkout.</p>' +
     '</div>' +
     '<ul class="rip-list" aria-label="Cards shown in the simulation; physical singles sold separately">' + rip.cards.map(function(c, i){
-      var it = c.item, src = ripImg(it);
-      return '<li class="rip-row' + (c.rare ? " rare" : "") + (c === best ? " best" : "") + '">' +
-        '<button class="rip-row-view" type="button" data-rip-view="' + i + '" aria-label="' + esc(it.name) + ', open details">' + (src ? '<img src="' + esc(src) + '" alt="" loading="lazy" width="44" height="44">' : '<span class="rip-best-ph" aria-hidden="true"></span>') +
-          '<span class="rip-row-name"><b>' + esc(it.name) + '</b><span>' + esc(P.labels[c.tier] || c.tier) + (c.rh ? " · reverse holo" : "") + (it.cond ? " · " + esc(it.cond) : "") + '</span></span></button>' +
-        '<span class="rip-row-price">' + money(it.price) + '</span>' +
-        '<button class="add rip-row-add" type="button" data-rip-add="' + i + '"' + (it.stock > 0 ? "" : " disabled") + '>' + (it.stock > 0 ? "Add single to cart" : "Sold out") + '</button></li>';
+      var card = c.card, src = card.img;
+      return '<li class="rip-row' + (c.rare ? " rare" : "") + (c === best ? " best" : "") + (card.inStock ? " stocked" : "") + '">' +
+        '<button class="rip-row-view" type="button" data-rip-view="' + i + '" aria-label="' + esc(card.name) + ', ' + esc(ripPriceSay(card)) + (card.inStock ? ", in stock now" : "") + ', open details">' +
+          (src ? '<img src="' + esc(src) + '" alt="" loading="lazy" width="44" height="44">' : '<span class="rip-best-ph" aria-hidden="true"></span>') +
+          '<span class="rip-row-name"><b>' + esc(card.name) + '</b><span>' + esc(P.labels[c.tier] || c.tier) + (c.rh ? " · reverse holo" : "") +
+            (card.inStock && card.itemSet && card.itemSet !== card.set ? " · our copy: " + esc(card.itemSet) : "") +
+            (card.cond ? " · " + esc(card.cond) : "") + '</span></span>' +
+          ripStockBadge(card, "sm") + '</button>' +
+        '<span class="rip-row-price">' + ripPriceHtml(card) + '</span>' +
+        (card.inStock
+          ? '<button class="add rip-row-add" type="button" data-rip-add="' + i + '">Add single to cart</button>'
+          : '<span class="rip-row-flag">Not in our case</span>') + '</li>';
     }).join("") + '</ul>';
     res.hidden = false;
-    ripSay("Simulation complete. No real pack was opened, no cards were awarded, and nothing was charged. Reference singles total: " + money(total) + ", not winnings or store credit." + (best ? " Simulation highlight: " + best.item.name + "." : ""));
+    ripSay("Simulation complete. No real pack was opened, no cards were awarded, and nothing was charged. Reference singles total: " + money(total) +
+      ", not winnings or store credit. " + stocked + " of " + rip.cards.length + " are in stock at the shop." + (best ? " Simulation highlight: " + best.card.name + "." : ""));
     ripLater(function(){
       try { res.scrollIntoView({behavior: reduceMotion ? "auto" : "smooth", block: "start"}); } catch(e){}
       var h = $("#ripResultH"); if(h) try { h.focus({preventScroll:true}); } catch(e){}
     }, 60);
   }
   function ripShare(){
-    var best = null, total = 0;
-    rip.cards.forEach(function(c){ total += Number(c.item.price) || 0; if(!best || c.item.price > best.item.price) best = c; });
+    var best = null, total = 0, stocked = 0;
+    rip.cards.forEach(function(c){
+      total += Number(c.card.price) || 0;
+      if(c.card.inStock) stocked++;
+      if(!best || (Number(c.card.price) || 0) > (Number(best.card.price) || 0)) best = c;
+    });
     var url = location.origin + location.pathname + "#/rip";
     var text = "I tried Top Loaded's free pack-opening simulator!";
-    if(best) text += " Simulation highlight: " + best.item.name + ".";
-    text += " No real pack was opened and no cards or prizes were awarded. Reference singles total: " + money(total) + " (not winnings or store credit).";
+    if(best) text += " Simulation highlight: " + best.card.name + (best.card.inStock ? " (in their case right now)" : "") + ".";
+    text += " No real pack was opened and no cards or prizes were awarded. Reference singles total: " + money(total) + " (catalog pricing, not winnings or store credit).";
     if(navigator.share){
       navigator.share({title: "Top Loaded free pack simulator", text: text, url: url}).catch(function(){});
       return;
@@ -9960,9 +10247,14 @@ a:hover .round-arrow{transform:rotate(45deg)}
       navigator.clipboard.writeText(full).then(function(){ toast("Copied to clipboard — paste it anywhere"); }, function(){ toast(full); });
     } else toast(full);
   }
+  /* only a card we actually stock can go in the cart */
   function ripAddToCart(i, btn){
     var c = rip.cards[i]; if(!c) return;
-    var it = c.item;
+    var card = c.card, it = card.item;
+    if(!it || !card.inStock){
+      toast(card.name + " is not in our case right now — nothing to add");
+      return;
+    }
     if(TL.cart && typeof TL.cart.add === "function"){
       try { TL.cart.add(it, 1, btn); return; } catch(e){ if(window.console) console.error("[rip] cart", e); }
     }
@@ -9971,27 +10263,32 @@ a:hover .round-arrow{transform:rotate(45deg)}
   }
   function ripView(i){
     var c = rip.cards[i]; if(!c) return;
+    var card = c.card;
     /* the core default is an empty no-op until the shop package defines the modal */
-    if(String(TL.openQuickView).replace(/\s/g, "") === "function(){}"){
-      if(c.item.url){ window.open(c.item.url, "_blank", "noopener"); return; }
-      toast(c.item.name + " · " + money(c.item.price) + " · " + (c.item.cond || "sealed"));
-      return;
+    var noModal = String(TL.openQuickView).replace(/\s/g, "") === "function(){}";
+    if(card.item && !noModal){
+      try { TL.openQuickView(card.item); return; } catch(e){ if(window.console) console.error("[rip] quickview", e); }
     }
-    try { TL.openQuickView(c.item); } catch(e){ if(window.console) console.error("[rip] quickview", e); }
+    if(card.url){ window.open(card.url, "_blank", "noopener"); return; }
+    toast(card.name + " · " + ripPriceText(card) + " · " + (card.inStock ? "in stock now" : "not in our case"));
   }
 
   /* ---- events ---- */
   ripApp.addEventListener("click", function(e){
     var t;
     if((t = e.target.closest("[data-rip-game]"))){
-      rip.game = t.dataset.ripGame;
-      var sets = ripSetsFor(rip.game); rip.set = (sets && sets[0]) ? sets[0].name : "";
-      TL.store.set("rip", {game: rip.game, set: rip.set});
+      if(rip.game === t.dataset.ripGame) return;
+      rip.game = t.dataset.ripGame; rip.set = ""; rip.setName = "";
+      ripSavePrefs();
       ripRenderSetup(); var b = $('[data-rip-game="' + rip.game + '"]', ripApp); if(b) b.focus();
       return;
     }
     if(e.target.closest("[data-rip-open]")){ ripStartPack(); return; }
-    if(e.target.closest("[data-rip-retry]")){ ripItemsP = null; ripRenderSetup(); ripLoadItems().then(function(){ if(rip.stage === "setup") ripRenderSetup(); }); return; }
+    if(e.target.closest("[data-rip-retry]")){
+      ripItemsP = null; ripItems = null; ripSetCache = {}; ripSetList = {}; ripPoolCache = {};
+      ripRenderSetup(); ripLoadItems().then(function(){ if(rip.stage === "setup") ripRenderSetup(); });
+      return;
+    }
     if(e.target.closest("[data-rip-back]")){ ripClearTimers(); ripRenderSetup(); return; }
     if(e.target.closest("[data-rip-tear]")){ ripTear(); return; }
     if((t = e.target.closest("[data-rip-flip]"))){ ripFlip(Number(t.dataset.ripFlip)); return; }
@@ -10010,7 +10307,12 @@ a:hover .round-arrow{transform:rotate(45deg)}
     }
   });
   ripApp.addEventListener("change", function(e){
-    if(e.target && e.target.id === "ripSet"){ rip.set = e.target.value; TL.store.set("rip", {game: rip.game, set: rip.set}); }
+    if(e.target && e.target.id === "ripSet"){
+      rip.set = e.target.value;
+      var hit = ripFindSet(ripSetList[rip.game], rip.set);
+      rip.setName = hit ? hit.name : rip.set;
+      ripSavePrefs();
+    }
   });
   ripApp.addEventListener("keydown", function(e){
     /* #ripPack is a div[role=button], so the browser synthesises no click for Enter or Space — tear on both here,
@@ -10051,6 +10353,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
   function ripEnter(){
     if(!ripBooted || rip.stage === "setup"){
       ripBooted = true; ripRenderSetup();
+      ripRequestSets(rip.game);
       ripLoadItems().then(function(){ if(rip.stage === "setup" && TL.current === "rip") ripRenderSetup(); });
     }
   }
@@ -10058,7 +10361,13 @@ a:hover .round-arrow{transform:rotate(45deg)}
   TL.on("view:leave", function(d){ if(d && d.name === "rip"){ ripClearTimers(); rip.drag = null; } });
   TL.on("inventory:summary", function(){ if(rip.stage === "setup" && TL.current === "rip") ripRenderSetup(); });
   TL.on("inventory:loaded", function(d){
-    if(d && d.items && d.items.length && !(ripItems && !ripDemo)){ ripItems = d.items; ripDemo = !d.items.some(function(it){ return it.tcg; }); ripSetCache = {}; ripItemsP = Promise.resolve(ripItems); }
+    if(d && d.items && d.items.length && !(ripItems && !ripDemo)){
+      ripItems = d.items; ripDemo = !d.items.some(function(it){ return it.tcg; });
+      ripSetCache = {}; ripItemsP = Promise.resolve(ripItems);
+      /* fresh stock: rebuild pools so "In Stock Now" reflects the live case */
+      ripPoolCache = {};
+      if(!ripCatalogGame(rip.game)) ripSetList = {};
+    }
     if(rip.stage === "setup" && TL.current === "rip") ripRenderSetup();
   });
   TL.on("init", function(){ ripRenderSetup(); });
@@ -10122,7 +10431,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
     return list.map(function(o){ return '<option value="' + esc(o[0]) + '"' + (String(o[0]) === String(sel) ? " selected" : "") + '>' + esc(o[1]) + '</option>'; }).join("");
   }
 
-  /* ---- generic row editors (ticker, testimonials, live schedule, table prices) ---- */
+  /* ---- generic row editors (live schedule, table prices) ---- */
   function rowsRender(el, rows, fields, emptyText){
     if(!el) return;
     if(!rows.length){ el.innerHTML = '<p class="rows-empty">' + esc(emptyText || "Nothing yet — add a row.") + '</p>'; return; }
@@ -10157,16 +10466,10 @@ a:hover .round-arrow{transform:rotate(45deg)}
       if(inp) inp.focus();
     };
   }
-  var TICKER_F = [{k: "label", ph: "Charizard ex · 151", label: "Ticker item"}, {k: "price", ph: "$85", cls: "sm", label: "Top price"}];
-  var TESTI_F = [{k: "quote", ph: "Best prices in NKY, hands down.", label: "Quote"}, {k: "who", ph: "Alex R.", cls: "sm", label: "Who said it"}];
   var SCHED_F = [{k: "day", ph: "Tue", cls: "xs", label: "Day"}, {k: "time", ph: "7 PM", cls: "xs", label: "Time"}, {k: "name", ph: "Pokemon rip night", label: "Stream name"}, {k: "desc", ph: "What gets opened", label: "Description"}];
   var TABLE_F = [{k: "n", ph: "1", cls: "xs", type: "number", min: 1, label: "Tables"}, {k: "price", ph: "60", cls: "sm", type: "number", min: 0, label: "Price $"}];
-  var addTicker = rowsWire($("#tickerEditor"), TICKER_F, function(){ return {label: "", price: ""}; }, "No ticker rows — the strip hides.");
-  var addTesti = rowsWire($("#testiEditor"), TESTI_F, function(){ return {quote: "", who: ""}; }, "No testimonials yet — the section stays hidden.");
   var addSched = rowsWire($("#liveSchedEditor"), SCHED_F, function(){ return {day: "", time: "", name: "", desc: ""}; }, "No streams scheduled.");
   rowsWire($("#tablePriceEditor"), TABLE_F, function(){ return {n: "", price: ""}; }, "No table prices.");
-  $("#tickerAdd").addEventListener("click", function(){ addTicker(); });
-  $("#testiAdd").addEventListener("click", function(){ addTesti(); });
   $("#liveSchedAdd").addEventListener("click", function(){ addSched(); });
 
   /* ---- identity & contact ---- */
@@ -10352,12 +10655,11 @@ a:hover .round-arrow{transform:rotate(45deg)}
   function renderLivePill(){
     var on = !!(TL.config.live && TL.config.live.on), pill = $("#liveStatusPill"), btn = $("#goLiveBtn");
     if(pill){ pill.className = "pill " + (on ? "ok" : "crit"); pill.innerHTML = '<span class="dot"></span>' + (on ? "On air" : "Offline"); }
-    if(btn) btn.textContent = on ? "End live rip" : "Start live rip";
+    if(btn) btn.textContent = on ? "End live stream" : "Start live stream";
   }
   function renderLiveCard(){
     var l = TL.config.live || {};
     setVal("setLiveTitle", l.title); setVal("setLivePlatform", l.platform || ""); setVal("setLiveEmbed", l.embed);
-    setVal("setLiveSpotPrice", l.spotPrice); setVal("setLiveSpots", l.spots); setVal("setLivePacks", l.packsPerSpot);
     rowsRender($("#liveSchedEditor"), (l.schedule || []).map(function(s){ return {day: s.day, time: s.time, name: s.name, desc: s.desc}; }), SCHED_F, "No streams scheduled.");
     renderLivePill();
   }
@@ -10379,7 +10681,6 @@ a:hover .round-arrow{transform:rotate(45deg)}
     if(embed && !/^https:\/\//i.test(embed)){ toast("Embed URL needs to start with https://"); $("#setLiveEmbed").focus(); return; }
     saveCard("cardLive", {live: {
       title: val("setLiveTitle"), platform: val("setLivePlatform"), embed: embed,
-      spotPrice: Math.max(0, num(val("setLiveSpotPrice"), 0)), spots: TL.clamp(Math.round(num(val("setLiveSpots"), 12)), 1, 60), packsPerSpot: TL.clamp(Math.round(num(val("setLivePacks"), 3)), 1, 36),
       schedule: rowsRead($("#liveSchedEditor"), SCHED_F).filter(function(s){ return s.name || s.day; })
     }}, "Live settings saved");
   });
@@ -10489,16 +10790,306 @@ a:hover .round-arrow{transform:rotate(45deg)}
     saveCard("cardEvents", {events: events}, "Schedule published").then(function(){ evWork = evFromConfig(); renderEvEditor(); });
   });
 
-  /* ---- ticker & testimonials ---- */
-  function renderTickerCard(){
-    rowsRender($("#tickerEditor"), (TL.config.ticker || []).map(function(t){ return {label: t[0], price: t[1]}; }), TICKER_F, "No ticker rows — the strip hides.");
-    rowsRender($("#testiEditor"), (TL.config.testimonials || []).map(function(t){ return {quote: t.quote, who: t.who}; }), TESTI_F, "No testimonials yet — the section stays hidden.");
+  /* ---- reviews ("Word around the tables") ----
+     config.reviews = {source, googlePlaceId, minRating, items:[{quote, who, rating, source, url, at}]}.
+     Ships empty: nothing is invented here, the list is whatever the shop pastes in. The
+     "google" source only records intent — pulling reviews needs a Places key on the worker,
+     so the site still shows this list either way (renderRevSourceNote says so out loud). */
+  var REV_SRC_OPTS = [["google", "Google"], ["tcgplayer", "TCGplayer"], ["shop", "In the shop"]];
+  var REV_SRC_LAB = {google: "Google", tcgplayer: "TCGplayer", shop: "In the shop"};
+  var revWork = [], revReady = false, revUid = 0;
+  function tagUid(obj, prefix, n){
+    var uid = obj.__uid;
+    if(!uid){
+      uid = prefix + n;
+      try { Object.defineProperty(obj, "__uid", {value: uid, enumerable: false, writable: true}); } catch(e){ obj.__uid = uid; }
+    }
+    return uid;
   }
-  $("#tickerApply").addEventListener("click", function(){
-    saveCard("cardTicker", {
-      ticker: rowsRead($("#tickerEditor"), TICKER_F).filter(function(r){ return r.label; }).map(function(r){ return [r.label, r.price || "ask"]; }),
-      testimonials: rowsRead($("#testiEditor"), TESTI_F).filter(function(r){ return r.quote; })
-    }, "Ticker and testimonials saved");
+  function revMin(){ return TL.clamp(Math.round(num(val("setRevMin"), 4)), 1, 5); }
+  function revFromConfig(){
+    var r = TL.config.reviews || {};
+    return (r.items || []).map(function(it){
+      return {uid: tagUid(it, "r", ++revUid), quote: it.quote || "", who: it.who || "",
+        rating: TL.clamp(Math.round(num(it.rating, 5)), 1, 5), source: REV_SRC_LAB[it.source] ? it.source : "google",
+        url: it.url || "", at: it.at || ""};
+    });
+  }
+  function renderRevSourceNote(){
+    var el = $("#revSourceNote"); if(!el) return;
+    el.textContent = val("setRevSource") === "google"
+      ? "Automatic Google reviews need the shared API, a Places key, the shop's Place ID, and published terms/privacy links. Until connected, only the genuine reviews entered below can appear."
+      : "Pasted in by hand: the site shows exactly what's in the list below, nothing else.";
+  }
+  function renderRevPreview(){
+    var el = $("#revPreview"); if(!el) return;
+    var min = revMin(), live = 0, held = 0;
+    revWork.forEach(function(r){ if(String(r.quote || "").trim()){ if(r.rating >= min) live++; else held++; } });
+    if(!revWork.length){ el.textContent = "Nothing published — the home page section stays empty until you add a review."; return; }
+    el.textContent = live + " review" + (live === 1 ? "" : "s") + " will show on the home page" +
+      (held ? " · " + held + " held back under the " + min + "-star minimum" : "") +
+      " · publish to put the change live.";
+  }
+  function renderRevEditor(){
+    var el = $("#revEditor"); if(!el) return;
+    if(!revWork.length){
+      el.innerHTML = '<p class="rows-empty">No reviews yet. Copy a real one in with “Add review” — quote, who left it, and the link if it has one.</p>';
+      renderRevPreview(); return;
+    }
+    el.innerHTML = revWork.map(function(r, i){
+      var n = i + 1;
+      return '<div class="rev-row" data-r="' + i + '">' +
+        '<textarea data-f="quote" rows="2" placeholder="Paste what they actually wrote" aria-label="Review ' + n + ' quote">' + esc(r.quote) + '</textarea>' +
+        '<button type="button" class="row-del" data-revdel="' + i + '" aria-label="Remove review ' + n + (r.who ? " from " + esc(r.who) : "") + '">&times;</button>' +
+        '<div class="rev-meta-head" aria-hidden="true"><span>Who left it</span><span>Stars</span><span>Where from</span></div>' +
+        '<div class="rev-meta">' +
+          '<input data-f="who" value="' + esc(r.who) + '" placeholder="First name and initial" aria-label="Who left review ' + n + '">' +
+          '<input data-f="rating" type="number" min="1" max="5" step="1" inputmode="numeric" value="' + esc(r.rating) + '" aria-label="Stars for review ' + n + '">' +
+          '<select data-f="source" aria-label="Where review ' + n + ' came from">' + opts(REV_SRC_OPTS, r.source) + '</select>' +
+        '</div>' +
+        '<div class="rev-url"><input data-f="url" type="url" value="' + esc(r.url) + '" placeholder="https:// link to the review (optional)" aria-label="Link to review ' + n + '"></div>' +
+      '</div>';
+    }).join("");
+    renderRevPreview();
+  }
+  function revSync(e){
+    var inp = e.target.closest("[data-f]"), row = inp && inp.closest(".rev-row"); if(!row) return;
+    var r = revWork[parseInt(row.dataset.r, 10)]; if(!r) return;
+    if(inp.getAttribute("aria-invalid")) inp.removeAttribute("aria-invalid");
+    if(inp.dataset.f === "rating") r.rating = TL.clamp(Math.round(num(inp.value, 5)), 1, 5);
+    else r[inp.dataset.f] = inp.value;
+    renderRevPreview();
+  }
+  function renderReviewsCard(){
+    var r = TL.config.reviews || {};
+    setVal("setRevSource", r.source === "google" ? "google" : "manual");
+    setVal("setRevPlace", r.googlePlaceId);
+    setVal("setRevMin", TL.clamp(Math.round(num(r.minRating, 4)), 1, 5));
+    revWork = revFromConfig(); revReady = true;
+    renderRevSourceNote(); renderRevEditor();
+  }
+  $("#revEditor").addEventListener("input", revSync);
+  $("#revEditor").addEventListener("change", revSync);
+  $("#revEditor").addEventListener("click", function(e){
+    var d = e.target.closest("[data-revdel]"); if(!d) return;
+    revWork.splice(parseInt(d.dataset.revdel, 10), 1);
+    renderRevEditor();
+    var first = $("#revEditor textarea") || $("#revAdd"); if(first) first.focus();
+    toast("Review removed — publish to make it stick");
+  });
+  $("#revAdd").addEventListener("click", function(){
+    revWork.push({uid: "revnew" + (++revUid), quote: "", who: "", rating: 5, source: "google", url: "", at: ""});
+    renderRevEditor();
+    var rows = $$("#revEditor .rev-row"), last = rows[rows.length - 1], inp = last && last.querySelector("textarea");
+    if(inp) inp.focus();
+  });
+  $("#setRevSource").addEventListener("change", renderRevSourceNote);
+  $("#setRevMin").addEventListener("input", renderRevPreview);
+  $("#revApply").addEventListener("click", function(){
+    /* never publish a working copy that was never filled in from the config */
+    if(!revReady){ renderReviewsCard(); toast("Reviews reloaded — check them, then publish"); return; }
+    function flag(i, sel, msg){
+      var row = $('#revEditor .rev-row[data-r="' + i + '"]'), inp = row && row.querySelector(sel);
+      if(inp){ inp.focus(); inp.setAttribute("aria-invalid", "true"); }
+      toast(msg);
+    }
+    for(var i = 0; i < revWork.length; i++){
+      var r = revWork[i];
+      if(!String(r.quote || "").trim()){ flag(i, "textarea", "Review " + (i + 1) + " has no quote — paste it in or remove the row"); return; }
+      if(!String(r.who || "").trim()){ flag(i, '[data-f="who"]', "Add the original review author's display name"); return; }
+      if(r.url && !/^https?:\/\//i.test(r.url)){ flag(i, '[data-f="url"]', "The link on review " + (i + 1) + " needs to start with https://"); return; }
+    }
+    var min = revMin();
+    var items = revWork.map(function(r){
+      var out = {quote: String(r.quote).trim(), who: String(r.who || "").trim(), rating: r.rating,
+        source: r.source, url: String(r.url || "").trim(), at: r.at || new Date().toISOString()};
+      try { Object.defineProperty(out, "__uid", {value: r.uid, enumerable: false, writable: true}); } catch(e){}
+      return out;
+    });
+    /* dropping reviews is destructive — compare identities, not counts (a delete plus an
+       add nets to zero and used to slip through on the play-nights editor) */
+    var keep = {}; revWork.forEach(function(r){ if(r.uid) keep[r.uid] = 1; });
+    var gone = ((TL.config.reviews || {}).items || []).filter(function(it){ return it.__uid && !keep[it.__uid]; });
+    if(gone.length && !window.confirm("Publishing removes " + gone.length + " review" + (gone.length === 1 ? "" : "s") + " from the site. Continue?")){
+      renderReviewsCard();
+      toast("Nothing published — the list is back as it was");
+      return;
+    }
+    var patch = {reviews: {source: val("setRevSource") === "google" ? "google" : "manual", googlePlaceId: val("setRevPlace"), minRating: min, items: items}};
+    /* the older home-page quote list reads {quote, who}; keep it in step so real reviews
+       replace the sample quotes wherever that list is still what gets rendered */
+    if(window.TL_DEFAULT_CONFIG && ("testimonials" in window.TL_DEFAULT_CONFIG)){
+      patch.testimonials = items.filter(function(r){ return r.rating >= min; }).map(function(r){
+        return {quote: r.quote, who: r.who || (REV_SRC_LAB[r.source] || "") + " review"};
+      });
+    }
+    saveCard("cardReviews", patch, "Reviews published").then(function(){ renderReviewsCard(); });
+  });
+
+  /* ---- card show floor plan ----
+     config.show.floorplan = {rows, cols, booths:[{id, r, c, w, h, type, label}]}.
+     Grid is 1-indexed: row 1 is the top of the map, column 1 the left. The map here is a
+     read-only preview of the same data the Card show page draws. */
+  var BOOTH_OPTS = [["tcg", "TCG"], ["sports", "Sports"], ["mixed", "Mixed"], ["food", "Food"], ["entry", "Entry"]];
+  var BOOTH_LAB = {tcg: "TCG", sports: "Sports", mixed: "Mixed", food: "Food", entry: "Entry"};
+  var FP_MAX_ROWS = 20, FP_MAX_COLS = 26;
+  var fpWork = [], fpReady = false, fpUid = 0;
+  function fpSize(){
+    return {rows: TL.clamp(Math.round(num(val("setFpRows"), 6)), 1, FP_MAX_ROWS), cols: TL.clamp(Math.round(num(val("setFpCols"), 10)), 1, FP_MAX_COLS)};
+  }
+  function fpFromConfig(){
+    var f = (TL.config.show || {}).floorplan || {};
+    return (f.booths || []).map(function(b){
+      return {uid: tagUid(b, "b", ++fpUid), id: b.id || "", label: b.label || "",
+        type: BOOTH_LAB[b.type] ? b.type : "tcg",
+        r: Math.max(1, Math.round(num(b.r, 1))), c: Math.max(1, Math.round(num(b.c, 1))),
+        w: Math.max(1, Math.round(num(b.w, 1))), h: Math.max(1, Math.round(num(b.h, 1)))};
+    });
+  }
+  function fpFits(b, size){ return b.r >= 1 && b.c >= 1 && (b.r + b.h - 1) <= size.rows && (b.c + b.w - 1) <= size.cols; }
+  function fpOverlap(a, b){
+    return a.c < b.c + b.w && b.c < a.c + a.w && a.r < b.r + b.h && b.r < a.r + a.h;
+  }
+  function renderFpEditor(){
+    var el = $("#fpEditor"); if(!el) return;
+    if(!fpWork.length){
+      el.innerHTML = '<p class="rows-empty">No booths yet. Add one per table block — the Card show page shows nothing until you do.</p>';
+      renderFpMap(); return;
+    }
+    el.innerHTML = fpWork.map(function(b, i){
+      var n = i + 1;
+      function nInput(k, lab, max){
+        return '<input data-f="' + k + '" type="number" min="1" max="' + max + '" step="1" inputmode="numeric" value="' + esc(b[k]) + '" aria-label="' + lab + ' of booth ' + n + '">';
+      }
+      return '<div class="fp-row" data-r="' + n0(i) + '">' +
+        '<input data-f="label" class="fp-label" value="' + esc(b.label) + '" placeholder="Booth name" aria-label="Name of booth ' + n + '">' +
+        '<select data-f="type" class="fp-type" aria-label="Kind of booth ' + n + '">' + opts(BOOTH_OPTS, b.type) + '</select>' +
+        '<div class="fp-nums-head" aria-hidden="true"><span>Row</span><span>Col</span><span>Wide</span><span>Tall</span></div>' +
+        '<div class="fp-nums">' + nInput("r", "Row", FP_MAX_ROWS) + nInput("c", "Column", FP_MAX_COLS) + nInput("w", "Width", FP_MAX_COLS) + nInput("h", "Height", FP_MAX_ROWS) + '</div>' +
+        '<button type="button" class="row-del" data-fpdel="' + i + '" aria-label="Remove ' + esc(b.label || "booth " + n) + '">&times;</button>' +
+      '</div>';
+    }).join("");
+    renderFpMap();
+  }
+  function n0(i){ return i; }
+  function renderFpMap(){
+    var map = $("#fpMap"), size = fpSize();
+    if(map){
+      map.style.gridTemplateColumns = "repeat(" + size.cols + ", var(--fp-cell))";
+      map.style.gridTemplateRows = "repeat(" + size.rows + ", var(--fp-cell))";
+      map.innerHTML = fpWork.map(function(b, i){
+        var fits = fpFits(b, size);
+        var r = TL.clamp(b.r, 1, size.rows), c = TL.clamp(b.c, 1, size.cols);
+        var h = TL.clamp(b.h, 1, size.rows - r + 1), w = TL.clamp(b.w, 1, size.cols - c + 1);
+        return '<span class="fp-cell t-' + esc(b.type) + (fits ? "" : " is-bad") + '" style="grid-row:' + r + ' / span ' + h + '; grid-column:' + c + ' / span ' + w + '">' +
+          '<b>' + esc(b.label || "Booth " + (i + 1)) + '</b><i>' + esc(BOOTH_LAB[b.type] || b.type) + '</i></span>';
+      }).join("");
+    }
+    renderFpMix(size);
+  }
+  function renderFpMix(size){
+    size = size || fpSize();
+    var n = {tcg: 0, sports: 0, mixed: 0, food: 0, entry: 0}, bad = 0;
+    fpWork.forEach(function(b){ n[b.type] = (n[b.type] || 0) + 1; if(!fpFits(b, size)) bad++; });
+    var tables = n.tcg + n.sports + n.mixed;
+    var shares = TL.floorplan.stats(fpWork).pct;
+    function pct(k){ return shares[k] || 0; }
+    var bar = $("#fpMix");
+    if(bar){
+      bar.innerHTML = tables ? ["tcg", "sports", "mixed"].filter(function(k){ return n[k]; }).map(function(k){
+        return '<span class="t-' + k + '" style="width:' + pct(k) + '%"></span>';
+      }).join("") : "";
+      bar.hidden = !tables;
+    }
+    var txt = $("#fpMixText");
+    if(txt){
+      if(!fpWork.length) txt.textContent = "Nothing placed yet. The Card show page shows the plan once you save booths here.";
+      else txt.textContent = (tables ? tables + " table booth" + (tables === 1 ? "" : "s") + " · TCG " + pct("tcg") + "% · Sports " + pct("sports") + "%" + (n.mixed ? " · Mixed " + pct("mixed") + "%" : "") : "No table booths yet") +
+        (n.food || n.entry ? " · plus " + [n.food ? n.food + " food" : "", n.entry ? n.entry + " entry" : ""].filter(Boolean).join(" and ") : "") +
+        (bad ? " — " + bad + " booth" + (bad === 1 ? "" : "s") + " outside the " + size.rows + "×" + size.cols + " grid" : "");
+    }
+    var st = $("#fpRatio");
+    if(st) setState(st, bad ? "warn" : "", size.rows + " rows × " + size.cols + " columns");
+  }
+  function fpSync(e){
+    var inp = e.target.closest("[data-f]"), row = inp && inp.closest(".fp-row"); if(!row) return;
+    var b = fpWork[parseInt(row.dataset.r, 10)]; if(!b) return;
+    if(inp.getAttribute("aria-invalid")) inp.removeAttribute("aria-invalid");
+    var f = inp.dataset.f;
+    if(f === "label" || f === "type") b[f] = inp.value;
+    else b[f] = Math.max(1, Math.round(num(inp.value, 1)));
+    renderFpMap();
+  }
+  function renderFloorplanCard(){
+    var f = (TL.config.show || {}).floorplan || {};
+    setVal("setFpRows", TL.clamp(Math.round(num(f.rows, 6)), 1, FP_MAX_ROWS));
+    setVal("setFpCols", TL.clamp(Math.round(num(f.cols, 10)), 1, FP_MAX_COLS));
+    fpWork = fpFromConfig(); fpReady = true;
+    renderFpEditor();
+  }
+  $("#fpEditor").addEventListener("input", fpSync);
+  $("#fpEditor").addEventListener("change", fpSync);
+  $("#fpEditor").addEventListener("click", function(e){
+    var d = e.target.closest("[data-fpdel]"); if(!d) return;
+    fpWork.splice(parseInt(d.dataset.fpdel, 10), 1);
+    renderFpEditor();
+    var first = $("#fpEditor input") || $("#fpAdd"); if(first) first.focus();
+    toast("Booth removed — save to make it stick");
+  });
+  $("#fpAdd").addEventListener("click", function(){
+    var size = fpSize();
+    /* drop the new booth in the first free cell so it never lands on top of another one */
+    var spot = null;
+    for(var r = 1; r <= size.rows && !spot; r++){
+      for(var c = 1; c <= size.cols && !spot; c++){
+        var probe = {r: r, c: c, w: 1, h: 1};
+        var clash = fpWork.some(function(b){ return fpOverlap(probe, b); });
+        if(!clash) spot = probe;
+      }
+    }
+    fpWork.push({uid: "bnew" + (++fpUid), id: "", label: "", type: "tcg", r: spot ? spot.r : 1, c: spot ? spot.c : 1, w: 1, h: 1});
+    renderFpEditor();
+    var rows = $$("#fpEditor .fp-row"), last = rows[rows.length - 1], inp = last && last.querySelector(".fp-label");
+    if(inp) inp.focus();
+    if(!spot) toast("Grid is full — make it bigger or move a booth");
+  });
+  $("#setFpRows").addEventListener("input", renderFpMap);
+  $("#setFpCols").addEventListener("input", renderFpMap);
+  $("#fpApply").addEventListener("click", function(){
+    if(!fpReady){ renderFloorplanCard(); toast("Floor plan reloaded — check it, then save"); return; }
+    var size = fpSize();
+    setVal("setFpRows", size.rows); setVal("setFpCols", size.cols);
+    function flag(i, sel, msg){
+      var row = $('#fpEditor .fp-row[data-r="' + i + '"]'), inp = row && row.querySelector(sel);
+      if(inp){ inp.focus(); inp.setAttribute("aria-invalid", "true"); }
+      toast(msg);
+    }
+    for(var i = 0; i < fpWork.length; i++){
+      var b = fpWork[i];
+      if(!String(b.label || "").trim()){ flag(i, ".fp-label", "Booth " + (i + 1) + " needs a name before you save"); return; }
+      if(!fpFits(b, size)){ flag(i, '[data-f="r"]', esc(b.label) + " sits outside the " + size.rows + "×" + size.cols + " grid"); return; }
+      for(var j = 0; j < i; j++){
+        if(fpOverlap(b, fpWork[j])){ flag(i, '[data-f="r"]', b.label + " sits on top of " + (fpWork[j].label || "booth " + (j + 1))); return; }
+      }
+    }
+    var used = {};
+    var booths = fpWork.map(function(b, i){
+      var base = (b.id || String(b.label).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")) || ("booth-" + (i + 1));
+      var id = base, k = 2; while(used[id]){ id = base + "-" + (k++); } used[id] = true;
+      var out = {id: id, label: String(b.label).trim(), type: b.type, r: b.r, c: b.c, w: b.w, h: b.h};
+      try { Object.defineProperty(out, "__uid", {value: b.uid, enumerable: false, writable: true}); } catch(e){}
+      return out;
+    });
+    var keep = {}; fpWork.forEach(function(b){ if(b.uid) keep[b.uid] = 1; });
+    var gone = (((TL.config.show || {}).floorplan || {}).booths || []).filter(function(b){ return b.__uid && !keep[b.__uid]; });
+    if(gone.length && !window.confirm("Saving removes " + gone.length + " booth" + (gone.length === 1 ? "" : "s") + " from the floor plan: " +
+        gone.map(function(b){ return b.label || "an unnamed booth"; }).join(", ") + ". Continue?")){
+      renderFloorplanCard();
+      toast("Nothing saved — the plan is back as it was");
+      return;
+    }
+    saveCard("cardFloorplan", {show: {floorplan: {rows: size.rows, cols: size.cols, booths: booths}}}, "Floor plan saved")
+      .then(function(){ renderFloorplanCard(); });
   });
 
   /* ---- reset ---- */
@@ -10522,7 +11113,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
     var el = $("#siteBanner"), txt = $("#siteBannerText"), btn = $("#siteBannerBtn"); if(!el) return;
     var live = TL.config.live || {}, b = TL.config.banner || {};
     if(live.on){
-      txt.textContent = "LIVE NOW — " + (live.title ? live.title + " · " : "") + "rip & ship in progress";
+      txt.textContent = "LIVE NOW — " + (live.title ? live.title + " · " : "") + "streaming from the shop floor";
       btn.hidden = false; el.hidden = false;
     } else if(b.on && b.text){
       txt.textContent = b.text; btn.hidden = true; el.hidden = false;
@@ -10531,7 +11122,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
 
   function renderEditors(){
     renderSite(); renderHours(); renderBannerCard(); renderLinks(); renderShowCard(); renderLiveCard();
-    evWork = evFromConfig(); evReady = true; renderEvEditor(); renderTickerCard(); renderCfgUpdated();
+    evWork = evFromConfig(); evReady = true; renderEvEditor(); renderReviewsCard(); renderFloorplanCard(); renderCfgUpdated();
   }
   var editorsStale = true;
   TL.on("config:change", function(){
@@ -11652,35 +12243,94 @@ a:hover .round-arrow{transform:rotate(45deg)}
     TL.on("motion:change",resetTilt); TL.on("view:leave",resetTilt);
     document.addEventListener("visibilitychange",function(){ if(document.hidden) resetTilt(); });
 
+    /* Whole-set checklists, with exact product-ID stock matching via TL.cards. */
+    var setSel = document.getElementById("discoverySet"), gameSel = document.getElementById("discoveryGame");
+    var setsToken = 0;
+    function loadSets(){
+      if(!setSel || !gameSel) return;
+      var game = gameSel.value, token = ++setsToken;
+      setSel.disabled = true;
+      setSel.innerHTML = '<option value="">Loading sets…</option>';
+      TL.cards.sets(game === "all" ? "all" : game).then(function(list){
+        if(token !== setsToken) return;
+        setSel.innerHTML = '<option value="">Any set (surprise me)</option>' +
+          list.map(function(st){ return '<option value="' + TL.esc(st.code) + '">' + TL.esc(st.name) + '</option>'; }).join("");
+        setSel.disabled = false;
+      }, function(){
+        if(token !== setsToken) return;
+        setSel.innerHTML = '<option value="">Any set (surprise me)</option>';
+        setSel.disabled = false;
+      });
+    }
+    if(gameSel) gameSel.addEventListener("change", loadSets);
+
+    function pickHtml(card){
+      var img = card.img
+        ? '<img class="card-img" src="' + TL.esc(card.img) + '" alt="' + TL.esc(card.name) + '" width="250" height="350" decoding="async" referrerpolicy="no-referrer">'
+        : '<span class="mystery-card" aria-hidden="true"><span>TOP LOADED</span><b>?</b><small>NO PHOTO</small></span>';
+      var price = card.price > 0
+        ? (card.priceIsMarket
+            ? '<span class="pick-price">' + TL.money(card.price) + ' <small>market reference</small></span>'
+            : '<span class="pick-price">' + TL.money(card.price) + ' <small>our price</small></span>')
+        : '<span class="pick-price"><small>no price on file</small></span>';
+      var badge = card.inStock
+        ? '<span class="stock-badge">In stock now</span>'
+        : '<span class="stock-badge out">'+(card.stockKnown ? 'Not in the current inventory' : 'Stock unavailable')+'</span>';
+      var action = card.inStock
+        ? '<button type="button" class="linklike" data-discovery-view>Take a closer look ↗</button>'
+        : (card.url ? '<a class="linklike" href="' + TL.esc(card.url) + '" target="_blank" rel="noopener noreferrer">Look it up ↗</a>' : "");
+      return '<div class="discovery-pick"><span class="discovery-art' + (card.inStock ? '" role="button" tabindex="0" data-discovery-view aria-label="View ' + TL.esc(card.name) : '') + '">' + img + '</span>' +
+        '<div><span class="case-label">A LITTLE DISCOVERY</span><h4>' + TL.esc(card.name) + '</h4>' +
+        '<p>' + TL.esc(card.set || "") + (card.rarity ? ' · ' + TL.esc(card.rarity) : "") + '</p>' +
+        '<p>' + price + '</p>' + badge + action + '</div></div>';
+    }
+
     form.addEventListener("submit", function(e){
       e.preventDefault();
       var button = document.getElementById("discoveryBtn"), status = document.getElementById("discoveryStatus");
       if(button.disabled) return;
-      var game = document.getElementById("discoveryGame").value, budget = Number(document.getElementById("discoveryBudget").value);
-      button.disabled = true; button.textContent = "Opening the case…";
-      status.textContent = "Finding an in-stock single in your budget…";
-      TL.inventory.load().then(function(){
-        if(!TL.inventory.loaded) throw new Error("The inventory is unavailable right now. Try again in a moment.");
-        var choices = TL.inventory.catalog().filter(function(item){
-          return item.type === "single" && item.stock > 0 && item.price > 0 && item.price < budget && (game === "all" || item.game === game);
-        });
-        if(!choices.length){
+      var game = gameSel.value, budget = Number(document.getElementById("discoveryBudget").value);
+      var chosenSet = setSel ? setSel.value : "";
+      button.disabled = true; button.textContent = "Exploring the set…";
+      status.textContent = "Looking through the set…";
+      var pickSet = chosenSet
+        ? Promise.resolve(chosenSet)
+        : TL.cards.sets(game === "all" ? "all" : game).then(function(list){
+            if(!list.length) return "";
+            return list[Math.floor(Math.random() * list.length)].code;
+          }, function(){ return ""; });
+
+      pickSet.then(function(setToken){
+        return TL.cards.fromSet(game === "all" ? "all" : game, setToken, {maxPrice: budget});
+      }).then(function(cards){
+        if(!cards.length){
           lastPick = null;
-          document.getElementById("discoveryResult").innerHTML = '<p class="collector-note">A different game or budget might hold your next favorite.</p>';
-          status.textContent = "No singles under " + TL.money(budget) + " in this game right now. Try another game or budget.";
+          document.getElementById("discoveryResult").innerHTML = '<p class="collector-note">Nothing in that set under ' + TL.money(budget) + '. Try another set or a bigger budget.</p>';
+          status.textContent = "No cards matched. Try another set or budget.";
           return;
         }
-        var pool = choices.length > 1 ? choices.filter(function(item){ return !lastPick || item.id !== lastPick.id; }) : choices;
-        var item = pool[Math.floor(Math.random()*pool.length)]; lastPick = item;
-        document.getElementById("discoveryResult").innerHTML = '<div class="discovery-pick" data-id="' + TL.esc(item.id) + '"><button type="button" class="discovery-art" data-discovery-view aria-label="View ' + TL.esc(item.name) + '">' + art(item,true) + '</button><div><span class="case-label">A LITTLE DISCOVERY</span><h4>' + TL.esc(item.name) + '</h4><p>' + TL.money(item.price) + ' · ' + TL.esc(TL.gameLabel(item.game)) + '</p><button type="button" class="linklike" data-discovery-view>Take a closer look ↗</button></div></div>';
-        status.textContent = item.name + " — " + TL.money(item.price) + ". One of " + TL.fmtInt(choices.length) + " matches. Try again for another find.";
-      }).catch(function(err){ status.textContent = err.message || "Could not open the case. Please try again."; }).finally(function(){
+        var pool = cards.length > 1 ? cards.filter(function(c){ return !lastPick || c.id !== lastPick.id; }) : cards;
+        if(!pool.length) pool=cards;
+        var card = pool[Math.floor(Math.random() * pool.length)];
+        lastPick = card;
+        document.getElementById("discoveryResult").innerHTML = pickHtml(card);
+        status.textContent = card.name + " — one of " + TL.fmtInt(cards.length) + " in " + (card.set || "that set") +
+          (card.inStock ? ". In stock in our latest inventory." : card.stockKnown ? ". Not currently listed in our inventory." : ". Stock could not be checked.") + " Try again for another.";
+      }).catch(function(err){
+        status.textContent = (err && err.message) || "Could not reach the card catalogue. Please try again.";
+      }).finally(function(){
         button.disabled = false; button.innerHTML = (lastPick ? "Find another card" : "Find my next card") + ' <span aria-hidden="true">✦</span>';
       });
     });
+    TL.on("init", loadSets);
     document.getElementById("discoveryResult").addEventListener("click",function(e){
       var trigger = e.target.closest("[data-discovery-view]");
-      if(trigger && lastPick) TL.openQuickView(TL.inventory.byId(lastPick.id) || lastPick,{from:trigger});
+      if(!trigger || !lastPick) return;
+      var stocked = TL.cards.stockOf(lastPick);
+      if(stocked) TL.openQuickView(stocked, {from: trigger});
+    });
+    document.getElementById("discoveryResult").addEventListener("keydown",function(e){
+      if(e.target.matches('[role="button"][data-discovery-view]')&&(e.key==="Enter"||e.key===" ")){e.preventDefault();e.target.click();}
     });
     TL.on("init",renderDeck); TL.on("inventory:summary",renderDeck); TL.on("inventory:summary-failed",renderDeck);
   })();

@@ -1,47 +1,59 @@
-  /* ---------- live breaks ----------
-     State comes from TL.config.live ({on, title, platform, embed, spotPrice, spots,
-     packsPerSpot, pack?, packs?, taken?, schedule:[{day,time,name,desc}]}); the
-     module re-renders on 'live:change' and 'config:change'.
-     API online: GET /live (spots, viewers, live state) every 10 s, GET /live/chat
+  /* ---------- live stream ----------
+     Card-show-style claiming: cards go up on camera, a viewer claims the number, it lands in
+     their cart and posts to the claims feed. State comes from TL.config.live ({on, title,
+     platform, embed, spotPrice, spots, packsPerSpot, pack?, packs?, taken?,
+     schedule:[{day,time,name,desc}]}); the module re-renders on 'live:change' and 'config:change'.
+     API online: GET /live (spots + spots.claims, viewers, live state) every 10 s, GET /live/chat
      every 3 s, POST /live/viewers heartbeat every 20 s, claims via
      POST /live/spots/claim, releases via POST /live/spots/release. Every timer runs
      only while the Live view is showing AND the tab is visible.
      API offline, or the live endpoints answering 404: simulated chat (aria-live off, a visible
-     pause, and it stops after LV_SIM_MAX lines until the visitor interacts) and viewers, sample
-     seats tagged as such, localStorage spot claims ("liveSpots"), newsletter signups into
-     TL.store "forms". With an API the board shows "Checking spots…" until GET /live answers —
-     taken seats come only from the server. The claim owner id ("sid") lives in localStorage next
-     to the claims. Off air, claiming is labelled a pre-claim for the next break.
+     pause, and it stops after LV_SIM_MAX lines until the visitor interacts) and viewers,
+     localStorage claims ("liveSpots" → {mine, at}), newsletter signups into TL.store "forms".
+     With an API the board shows "Checking the board…" until GET /live answers — taken numbers
+     come only from the server. The claim owner id ("sid") lives in localStorage next to the
+     claims, so a reload keeps ownership of what the board shows as "Yours".
+     CLAIMS FEED (#claimFeed): newest first, one row per held number.
+       online  — rows come from GET /live spots.claims ({spot, name, confirmed, exp}); the claim
+                 time is derived from exp (exp − LV_CLAIM_TTL, the server's 6 h hold) and falls
+                 back to when this browser first saw the row. Own rows read "You".
+       offline — ONLY this browser's own claims, with the feed tagged "preview" and a note saying
+                 so. Other people's claims are never invented.
        TL.live.state()          {on, active, online, embed, spots:{taken, mine, total, price}}
        TL.live.refresh()        re-fetch /live (online) or re-render (offline)
-       TL.live.claim(n, el?)    same path as clicking a spot button
-       TL.live.release(n)       free a spot you hold
-       TL.live.rip(item?)       advance "now ripping" with a pull; emits 'live:rip'
+       TL.live.claim(n, el?)    same path as clicking a number on the board
+       TL.live.release(n)       free a number you hold
+       TL.live.claims()         the rows the feed is showing ([{spot, name, mine, confirmed, at}])
+       TL.live.rip(item?)       put the next card on camera; emits 'live:rip'
        TL.live.pushChat(user, text, sys)
      Events: 'live:rip' {item, pack, total, hit}   'live:spot' {spot, el, item}
      DOM events for motion modules: 'tl:live-state' {on}, 'tl:spot-claimed' {n, el},
      'tl:live-rip' {item, pack, total, hit}.
      Ids other modules rely on: #chatBody #chatForm #chatInput #spotGrid #viewerCount #livePillText */
   var LV_DAYS = ["sun","mon","tue","wed","thu","fri","sat"];
+  var LV_CLAIM_TTL = 6 * 3600 * 1000; /* server hold length (api/src/routes/live.js CLAIM_TTL_MS) */
   var CHAT_FEED = [
-    ["mike_pulls", "LETS GO that alt art was insane"],
-    ["nky_collector", "how many spots left?"],
+    ["mike_pulls", "LETS GO that alt art is clean"],
+    ["nky_collector", "how many numbers left?"],
     ["sarah_tcg", "shipping was crazy fast last week btw"],
-    ["breakz_bill", "my spot is up next, no whammies"],
-    ["gundam_greg", "any gundam breaks coming?"],
-    ["toploaded_shop", "Gundam locals Saturday 1 PM — breaks soon after"],
-    ["jess_rips", "chase card is still in there I can feel it"],
+    ["breakz_bill", "claimed 4, that charizard is mine"],
+    ["gundam_greg", "any gundam on camera tonight?"],
+    ["toploaded_shop", "Gundam locals Saturday 1 PM — come play"],
+    ["jess_rips", "hold that one up again please"],
     ["cincy_cards", "W shop"],
     ["packrat_pete", "see everyone at the Turfway show, first weekend of the month"]
   ];
-  var LV_HYPE = ["LETS GOOOO", "no way", "W pull", "that's the chase!!", "sheesh", "pack luck is unreal tonight", "who had that spot??"];
+  var LV_HYPE = ["LETS GOOOO", "no way", "that one is clean", "that's the chase!!", "sheesh", "case is stacked tonight", "who claimed that??"];
   var LV_SIM_MAX = 8; /* simulated chat lines per sitting — the replay stops after this many until the visitor interacts */
   var lv = {
     booted: false, active: false, api: null, apiReady: false, mounted: "", timers: {}, sid: null, name: "",
-    taken: {}, mine: {}, claimAt: {}, demoTaken: [2, 5, 9], total: 12, price: 24.99, spotsLoaded: false, spotsErr: false,
+    taken: {}, mine: {}, claimAt: {}, demoTaken: [], total: 12, price: 24.99, spotsLoaded: false, spotsErr: false,
     viewers: 214, chatIdx: 0, chatMode: "", chatSeen: {}, chatSeenN: 0, chatSince: 0, chatBusy: false, lastReact: 0,
     simN: 0, simIdle: false, chatPaused: false,
-    pack: 7, packs: 36, ripped: 0, hitPool: [], hits: [], hitMap: {}, lastRip: ""
+    /* claims feed: claimTimes = when this browser claimed a number (persisted), claimKeys = identity
+       of each server row so a release + re-claim of the same number counts as a new claim */
+    serverClaims: null, claimTimes: {}, claimKeys: {}, feedShown: {}, feedSeeded: false, feedSig: null, feedRows: [],
+    pack: 7, packs: 36, ripped: 0, hitPool: [], hits: [], hitMap: {}, lastRip: "", onCamera: ""
   };
   function liveCfg(){ return (TL.config && TL.config.live) || {}; }
   function liveIsOn(){ return !!liveCfg().on; }
@@ -153,16 +165,17 @@
     if(Number(cfg.pack) > 0) lv.pack = Math.min(lv.packs, Number(cfg.pack));
   }
   function lvRenderAll(){ lvRenderState(); lvRenderSpots(); lvRenderSchedule(); lvRenderRip(); lvRenderOffair(); lvRenderNotify(); lvRenderNameRow(); }
+  function lvTitle(){ return liveCfg().title || "Live stream"; }
   function lvRenderState(){
     var on = liveIsOn(), cfg = liveCfg(), emb = lvParseEmbed(cfg), root = document.documentElement;
     var was = lv.on; /* tracked here — other modules toggle html.is-live too, so the class is not a reliable "before" */
     lv.on = on;
     root.classList.toggle("is-live", on);
     var pt = lvEl("livePillText"); if(pt) pt.textContent = on ? "Live" : "Offline";
-    var title = lvEl("liveTitle"); if(title) title.textContent = cfg.title || "Live break";
+    var title = lvEl("liveTitle"); if(title) title.textContent = lvTitle();
     var sub = lvEl("liveSub"), tag = lvEl("liveDemoTag"), screen = lvEl("liveScreen");
     if(on){
-      if(emb && emb.src){ if(sub) sub.textContent = "Streaming live on " + (emb.kind === "youtube" ? "YouTube" : "Twitch") + " · claim a spot below"; if(tag) tag.hidden = true; }
+      if(emb && emb.src){ if(sub) sub.textContent = "Streaming live on " + (emb.kind === "youtube" ? "YouTube" : "Twitch") + " · claim a card with the host"; if(tag) tag.hidden = true; }
       else if(emb){ if(sub) sub.textContent = "Streaming live on Whatnot — open the stream to watch and bid"; if(tag) tag.hidden = true; }
       else { if(sub) sub.textContent = "Simulated stream — the live site embeds Whatnot, YouTube, or Twitch here"; if(tag){ tag.hidden = false; tag.textContent = "simulated stream"; } }
     } else {
@@ -171,10 +184,10 @@
       if(tag) tag.hidden = true;
     }
     if(screen){ screen.classList.toggle("off", !on); screen.classList.toggle("embedded", !!(on && emb && emb.src)); }
-    var head = lvEl("spotHead"); if(head) head.textContent = on ? "Claim a spot in this break" : "Pre-claim for the next break";
+    var head = lvEl("spotHead"); if(head) head.textContent = "Live stream claims";
     var note = lvEl("spotNote"); if(note) note.hidden = on;
-    var hl = lvEl("hitsLabel"); if(hl) hl.textContent = on ? "Recent hits" : "Last break's hits";
-    /* every hit on the strip is drawn from the case by the simulation — there is no real rip history yet */
+    var hl = lvEl("hitsLabel"); if(hl) hl.textContent = on ? "On camera" : "Last stream";
+    /* every card on the strip is drawn from our own inventory by the simulation — there is no real stream log yet */
     var ht = lvEl("hitsDemoTag"); if(ht) ht.hidden = false;
     var vn = lvEl("viewerNum"); if(vn && on && !vn.dataset.set){ vn.dataset.set = "1"; vn.textContent = lv.viewers; }
     var ct = lvEl("chatTag"); if(ct){ ct.hidden = liveOnline() && lv.api === true; ct.textContent = on ? "simulated" : "replay · simulated"; }
@@ -200,9 +213,9 @@
       host.appendChild(f);
     } else {
       var wn = emb.kind === "whatnot";
-      host.innerHTML = '<div class="embed-card"><span class="embed-k">' + (wn ? "Live on Whatnot" : "Live stream") + '</span><b>' + esc(cfg.title || "Live break") + '</b>' +
+      host.innerHTML = '<div class="embed-card"><span class="embed-k">' + (wn ? "Live on Whatnot" : "Live stream") + '</span><b>' + esc(lvTitle()) + '</b>' +
         '<a class="btn" href="' + esc(emb.href) + '" target="_blank" rel="noopener noreferrer">Watch on ' + (wn ? "Whatnot" : "the stream") + ' ↗<span class="sr-only"> (opens in a new tab)</span></a>' +
-        '<span class="embed-sub">Whatnot has no embed — the break runs in their app, spots and chat stay here.</span></div>';
+        '<span class="embed-sub">Whatnot has no embed — the stream runs in their app, claims and chat stay here.</span></div>';
     }
   }
   function lvRenderOffair(){
@@ -228,9 +241,9 @@
   }
   function lvRenderRip(){
     var el = lvEl("ripLabel"); if(!el) return;
-    var cfg = liveCfg(), text = liveIsOn()
-      ? "Now ripping · pack " + lv.pack + " of " + lv.packs
-      : "Next break · " + lv.packs + " packs · " + (Number(cfg.spots) > 0 ? Number(cfg.spots) : lv.total) + " spots";
+    var text = liveIsOn()
+      ? "On camera now" + (lv.onCamera ? " · " + lv.onCamera : "")
+      : "Join us for the next live stream";
     if(text === lv.lastRip) return;
     lv.lastRip = text;
     el.textContent = text;
@@ -253,17 +266,17 @@
     if(as){ as.hidden = !lv.name; as.textContent = "as " + lv.name; as.setAttribute("aria-label", "Chatting as " + lv.name + " — change display name"); }
   }
   /* ---- spots ---- */
-  function lvSaveSpots(){ TL.store.set("liveSpots", {mine: lv.mine}); }
+  function lvSaveSpots(){ TL.store.set("liveSpots", {mine: lv.mine, at: lv.claimTimes}); }
   function lvSpotsLeft(){ var left = 0; for(var i = 1; i <= lv.total; i++){ if(!lv.taken[i]) left++; } return left; }
   function lvRenderSpots(){
     var grid = lvEl("spotGrid"); if(!grid) return;
-    var cfg = liveCfg(), html = "", left = lvSpotsLeft(), on = liveIsOn(), loading = !lv.spotsLoaded, demo = lvDemoMode();
-    var verb = on ? "Claim" : "Pre-claim", tailWord = on ? "" : " for the next break";
+    var cfg=liveCfg(), html = "", left = lvSpotsLeft(), on = liveIsOn(), loading = !lv.spotsLoaded, demo = lvDemoMode();
+    var tailWord = on ? "" : " for the next stream";
     for(var i = 1; i <= lv.total; i++){
       var t = !!lv.taken[i], m = !!lv.mine[i];
-      if(loading){ html += '<button type="button" class="spot loading" data-spot="' + i + '" disabled aria-label="Spot ' + i + ' — checking availability">#' + i + '</button>'; continue; }
+      if(loading){ html += '<button type="button" class="spot loading" data-spot="' + i + '" disabled aria-label="Number ' + i + ' — checking the board">#' + i + '</button>'; continue; }
       html += '<button type="button" class="spot' + (m ? " mine" : t ? " taken" : "") + '" data-spot="' + i + '"' +
-        (m ? ' aria-label="Spot ' + i + ' is yours' + tailWord + ' — open cart"' : t ? ' disabled aria-label="Spot ' + i + ' taken"' : ' aria-label="' + verb + ' spot ' + i + ' for ' + esc(money(lv.price)) + tailWord + '"') + '>' +
+        (m ? ' aria-label="Number ' + i + ' is yours' + tailWord + ' — open cart"' : t ? ' disabled aria-label="Number ' + i + ' is claimed"' : ' aria-label="Claim number ' + i + ' for ' + esc(money(lv.price)) + tailWord + '"') + '>' +
         (m ? "Yours" : t ? "Taken" : "#" + i) + "</button>";
     }
     grid.innerHTML = html;
@@ -465,7 +478,7 @@
     body.innerHTML = "";
     lv.chatSeen = {}; lv.chatSeenN = 0; lv.chatSince = 0;
     if(mode === "sim"){
-      pushChat(null, liveIsOn() ? "Welcome to the break — chat is simulated for this demo" : "Off air — replaying chat from the last break (simulated)", true, {seed: true});
+      pushChat(null, liveIsOn() ? "Welcome to the stream — chat is simulated for this demo" : "Off air — sample chat, not a real stream replay", true, {seed: true});
       CHAT_FEED.slice(0, 4).forEach(function(c){ pushChat(c[0], c[1], false, {seed: true}); });
       lv.chatIdx = 4;
     } else {

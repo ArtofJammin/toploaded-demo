@@ -28,6 +28,19 @@ function simulator() {
   return {context, nodes, saved, shares, cart, items};
 }
 
+test('catalog outage does not quietly substitute cards from inventory',async()=>{
+  const {context:c}=simulator();
+  c.TL.cards={catalogued:()=>true,fromSet:async()=>{throw new Error('catalog offline');}};
+  await assert.rejects(c.ripBuildPool('pk','external-set'),/catalog offline/);
+});
+
+test('TCGplayer rarity abbreviations map to the intended simulation tiers',()=>{
+  const {context:c}=simulator();
+  assert.equal(c.ripTier('pk','C'),'C');assert.equal(c.ripTier('pk','U'),'U');
+  assert.equal(c.ripTier('op','UC'),'UC');assert.equal(c.ripTier('op','SR'),'SR');assert.equal(c.ripTier('op','SEC'),'SEC');
+  assert.equal(c.ripTier('mtg','M'),'M');
+});
+
 test('simulation is explicit on entry, setup, pack and card reveal', () => {
   const markup = readFileSync(new URL('../../src/html/19-packrip.html', import.meta.url), 'utf8');
   const home = readFileSync(new URL('../../src/html/10-home.html', import.meta.url), 'utf8');

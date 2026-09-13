@@ -18,6 +18,8 @@ import { build } from './build.mjs';
 import workerModule from '../api/src/index.js';
 let worker = workerModule;
 import { MemoryKV } from '../api/src/lib/memory-kv.js';
+import { StreamClaims } from '../api/src/lib/stream-claims.js';
+import { memoryObject } from '../api/src/lib/memory-object.js';
 
 const tools = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(tools, '..');
@@ -43,6 +45,7 @@ const vars = loadDevVars();
 const staffPin = vars.DEV_STAFF_PIN || 'staff';
 const adminPin = vars.DEV_ADMIN_PIN || 'admin';
 const env = {
+  LIVE_CLAIMS: memoryObject(StreamClaims),
   SITE_ORIGIN: '*',
   SQUARE_ENV: 'sandbox',
   GITHUB_REPO: 'ArtofJammin/toploaded-demo',
@@ -61,7 +64,7 @@ let initial = {};
 if (!flag('--fresh') && existsSync(KV_FILE)) { try { initial = JSON.parse(readFileSync(KV_FILE, 'utf8')); } catch {} }
 env.KV = new MemoryKV(initial);
 let saveTimer = null;
-env.KV.onChange = () => { clearTimeout(saveTimer); saveTimer = setTimeout(() => writeFileSync(KV_FILE, JSON.stringify(env.KV.toJSON(), null, 1)), 150); };
+if(!flag('--ephemeral')) env.KV.onChange = () => { clearTimeout(saveTimer); saveTimer = setTimeout(() => writeFileSync(KV_FILE, JSON.stringify(env.KV.toJSON(), null, 1)), 150); };
 const exec = { waitUntil: (p) => Promise.resolve(p).catch(e => console.error('[waitUntil]', e)), passThroughOnException() {} };
 
 // ---- static ----
@@ -136,6 +139,6 @@ createServer(async (req, res) => {
     res.end('server error: ' + (e && e.message));
   }
 }).listen(PORT, () => {
-  console.log(`Top Loaded dev server → http://localhost:${PORT}   (API at /api, KV in ${KV_FILE})`);
+console.log(`Top Loaded dev server → http://localhost:${PORT}   (API at /api, ${flag('--ephemeral') ? 'disposable in-memory data' : 'KV in '+KV_FILE})`);
   console.log(`Dev passcodes: staff="${staffPin}"  admin="${adminPin}"  (override in api/.dev.vars)`);
 });

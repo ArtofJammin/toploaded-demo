@@ -199,3 +199,69 @@ a:hover .round-arrow{transform:rotate(45deg)}
   .discovery-pick{animation:none}.deck-face{transform:none}
 }
 @media (pointer:coarse){.deck-controls button{min-width:44px;min-height:44px}.discovery-pick .linklike{min-height:44px}}
+
+/* ============ PLAY NIGHTS + TRADE BAND (home) ============
+   The owner moved the trade call-out above the play nights, asked for a live
+   countdown per game, and moved the card-show countdown to the Card Show page. */
+.trade-band{padding-top:34px; padding-bottom:0}
+.trade-band .trade-tile{display:block}
+.trade-band .trade-tile > div{margin-top:14px}
+.trade-band .trade-tile p{margin-top:14px}
+@media (min-width:861px){
+  .trade-band .trade-tile{display:grid; grid-template-columns:minmax(0,1.15fr) auto; align-items:center; gap:28px; padding:26px 32px}
+  .trade-band .trade-tile .tile-number{grid-column:1/-1}
+  .trade-band .trade-tile > div{margin-top:10px}
+  .trade-band .trade-tile p{margin-top:10px; align-self:end}
+}
+
+.playnow{padding-top:34px}
+.playnow-grid{list-style:none; margin:0; padding:0; display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.playnow-card{min-width:0}
+.playnow-btn{
+  display:grid; grid-template-columns:auto minmax(0,1fr); grid-auto-rows:min-content; gap:2px 12px;
+  height:100%; padding:18px 20px 16px; border:1px solid var(--line); border-radius:12px;
+  background:linear-gradient(180deg,var(--surface2),var(--surface) 60%); color:var(--ink); text-decoration:none;
+  transition:border-color .18s ease, transform .18s ease;
+}
+.playnow-btn:hover,.playnow-btn:focus-visible{border-color:var(--accent); transform:translateY(-2px)}
+.playnow-mark{grid-row:1/3; width:42px; height:42px; border-radius:10px; display:grid; place-items:center; background:var(--bg2); border:1px solid var(--line); color:var(--accent)}
+.playnow-mark .game-icon{display:block}
+.playnow-game{font-family:var(--mono); font-size:.64rem; letter-spacing:.16em; text-transform:uppercase; color:var(--ink3); align-self:end}
+.playnow-ev{font-weight:600; font-size:1rem; line-height:1.25; align-self:start}
+.playnow-when,.playnow-cd,.playnow-fee{grid-column:1/-1}
+.playnow-when{font-family:var(--mono); font-size:.72rem; color:var(--ink2); margin-top:12px}
+.playnow-cd{display:flex; align-items:baseline; gap:2px; margin-top:8px; font-family:var(--mono); color:var(--accent); font-variant-numeric:tabular-nums}
+.playnow-cd b{font-family:var(--disp); font-weight:800; font-size:1.5rem; line-height:1}
+.playnow-cd small{font-size:.62rem; color:var(--ink3); margin-right:7px}
+.playnow-cd .now{font-family:var(--mono); font-size:.74rem; letter-spacing:.1em; text-transform:uppercase; color:var(--good)}
+.playnow-fee{margin-top:10px; font-family:var(--mono); font-size:.64rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3)}
+.playnow-empty{grid-column:1/-1; padding:22px; border:1px dashed var(--line2); border-radius:12px; color:var(--ink2); font-size:.94rem}
+.playnow-empty a{color:var(--accent)}
+@media (max-width:520px){
+  .playnow-grid{grid-template-columns:1fr}
+  .playnow-cd b{font-size:1.3rem}
+}
+@media (prefers-reduced-motion: reduce){
+  .playnow-btn{transition:none}
+  .playnow-btn:hover,.playnow-btn:focus-visible{transform:none}
+}
+
+/* discovery pick: any card from the set, badged when it is in the case */
+.discovery-pick .pick-price{font-family:var(--mono); font-size:.95rem; color:var(--ink)}
+.discovery-pick .pick-price small{font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); margin-left:6px}
+.stock-badge{
+  display:inline-flex; align-items:center; gap:6px; margin:10px 0 4px; padding:4px 10px; border-radius:99px;
+  font-family:var(--mono); font-size:.62rem; letter-spacing:.12em; text-transform:uppercase;
+  background:var(--good-bg); color:var(--good); border:1px solid color-mix(in srgb, var(--good) 40%, transparent);
+}
+.stock-badge::before{content:""; width:6px; height:6px; border-radius:50%; background:currentColor}
+.stock-badge.out{background:transparent; color:var(--ink3); border-color:var(--line2)}
+.discovery-pick [role="button"]{cursor:pointer}
+
+/* reviews: only what the shop actually supplied */
+.review-card .review-stars{display:block; color:var(--accent); letter-spacing:.14em; font-size:.86rem; margin-bottom:8px}
+.review-card .quote-who a{color:var(--ink3); text-decoration:none}
+.review-card .quote-who a:hover{color:var(--accent); text-decoration:underline}
+.review-empty{grid-column:1/-1}
+.review-empty .review-links{display:flex; flex-wrap:wrap; gap:10px; margin-top:16px}
+.review-empty .btn-ghost{text-decoration:none}
