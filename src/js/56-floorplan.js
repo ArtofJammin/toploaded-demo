@@ -12,19 +12,31 @@
     function fits(b,size){return b.r>=1 && b.c>=1 && b.w>=1 && b.h>=1 && b.r+b.h-1<=size.rows && b.c+b.w-1<=size.cols;}
     function overlaps(a,b){return a.c<b.c+b.w && b.c<a.c+a.w && a.r<b.r+b.h && b.r<a.r+a.h;}
     function canPlace(booths,b,size,skip){return fits(b,size) && !booths.some(function(other,i){return i!==skip && overlaps(b,other);});}
+    function roomMetrics(room,rows,cols){
+      var hilton=room==='hilton-ballroom';
+      return {hilton:hilton,row:hilton?64*cols/rows*41/96:64,gap:hilton?0:6,widthFt:hilton?96:null,heightFt:hilton?41:null};
+    }
+    function layout(map,room,size){
+      var m=roomMetrics(room,size.rows,size.cols);
+      map.dataset.rows=size.rows;map.dataset.cols=size.cols;map.dataset.rowBase=m.row;map.dataset.baseGap=m.gap;
+      map.classList.toggle('is-hilton',m.hilton);
+      map.style.gridTemplateColumns='repeat('+size.cols+', var(--fp-cell))';map.style.gridTemplateRows='repeat('+size.rows+', var(--fp-row, var(--fp-cell)))';
+      return m.hilton?'Triple Crown Ballroom · 96 × 41 ft. Each grid allocation is '+(96/size.cols).toFixed(1)+' × '+(41/size.rows).toFixed(1)+' ft. Booth placements are organizer-entered, not surveyed.':'Custom schematic · grid positions have no physical scale.';
+    }
     function viewport(root,map,scroll){
       var zoom=1,drag=null,fitMode=true;
       function setZoom(z){
         var old=zoom; zoom=Math.max(.18,Math.min(2.5,z));
         var x=(scroll.scrollLeft+scroll.clientWidth/2)/old,y=(scroll.scrollTop+scroll.clientHeight/2)/old;
-        map.style.setProperty('--fp-cell',(64*zoom)+'px');map.style.setProperty('--fp-gap',(6*zoom)+'px');
+        map.style.setProperty('--fp-cell',(64*zoom)+'px');map.style.setProperty('--fp-row',((Number(map.dataset.rowBase)||64)*zoom)+'px');map.style.setProperty('--fp-gap',((Number(map.dataset.baseGap)||0)*zoom)+'px');
         map.classList.toggle('is-dense',zoom<.6);
         scroll.scrollLeft=x*zoom-scroll.clientWidth/2;scroll.scrollTop=y*zoom-scroll.clientHeight/2;
       }
       function fit(){
         if(!scroll.clientWidth) return;
         var cols=Number(map.dataset.cols)||10,rows=Number(map.dataset.rows)||6;
-        setZoom(Math.min(1,(scroll.clientWidth-32)/(cols*70),(scroll.clientHeight-32)/(rows*70)));
+        var gap=Number(map.dataset.baseGap)||0,row=Number(map.dataset.rowBase)||64;
+        setZoom(Math.min(1,(scroll.clientWidth-32)/(cols*64+(cols-1)*gap),(scroll.clientHeight-32)/(rows*row+(rows-1)*gap)));
         scroll.scrollLeft=scroll.scrollTop=0;fitMode=true;
       }
       function focus(el){
@@ -48,7 +60,7 @@
       scroll.addEventListener('pointerup',stop);scroll.addEventListener('pointercancel',stop);scroll.addEventListener('lostpointercapture',stop);
       map.addEventListener('focusin',function(e){var b=e.target.closest('.fp-cell');if(b)focus(b);});
       if(typeof ResizeObserver!=='undefined')new ResizeObserver(function(){if(fitMode)fit();}).observe(scroll);
-      return {fit:fit,focus:focus,refresh:function(){if(fitMode)fit();}};
+      return {fit:fit,focus:focus,refresh:function(){if(fitMode)fit();else setZoom(zoom);}};
     }
     var publicBooths=[],selected=-1,publicView=null;
     function match(b){var q=($('#floorSearch').value||'').trim().toLowerCase(),type=$('#floorType').value;return (!type||b.type===type)&&(!q||(b.label+' '+b.id+' '+labels[b.type]).toLowerCase().includes(q));}
@@ -69,13 +81,13 @@
       var booths = (Array.isArray(f.booths) ? f.booths : []).filter(function(b){return b && labels[b.type] && b.r>=1 && b.c>=1 && b.w>=1 && b.h>=1 && b.r+b.h-1<=rows && b.c+b.w-1<=cols;});
       var map=$("#showFloorMap"), note=$("#showFloorNote"), mix=$("#showFloorMix"), legend=$("#showFloorLegend"), list=$("#showFloorList"), scroll=$("#showFloorScroll");
       if(!map) return;
+      $('#showVenueReference').hidden=!/hilton/i.test(String((TL.config.show||{}).venue));
       var guide=$('#showFloorGuide');guide.hidden=!booths.length;
       scroll.hidden = !booths.length; mix.hidden = !booths.length;
       if(!booths.length){ note.textContent="The vendor layout is not published yet. Check back for the confirmed TCG and Sports booth locations and percentages."; map.innerHTML=legend.innerHTML=list.innerHTML=mix.innerHTML="";publicBooths=[];selected=-1;return; }
       var s=stats(booths);
       note.textContent=s.total+" vendor booths · percentages are by booth, not floor area. Mixed vendors are counted separately; food and entry areas are excluded.";
-      map.style.gridTemplateColumns="repeat("+cols+", var(--fp-cell))"; map.style.gridTemplateRows="repeat("+rows+", var(--fp-cell))";
-      map.dataset.rows=rows;map.dataset.cols=cols;
+      $('#floorScaleNote').textContent=layout(map,f.room,{rows:rows,cols:cols});
       map.innerHTML=booths.map(function(b,i){return '<button type="button" class="fp-cell t-'+b.type+'" data-floor-booth="'+i+'" aria-pressed="false" aria-label="'+esc(b.label+' · '+labels[b.type]+', row '+b.r+', column '+b.c)+'" title="'+esc(b.label+' · '+labels[b.type])+'" style="grid-row:'+b.r+' / span '+b.h+';grid-column:'+b.c+' / span '+b.w+'"><b>'+esc(b.label)+'</b><i>'+labels[b.type]+'</i></button>';}).join("");
       mix.innerHTML=Object.keys(s.pct).map(function(k){return '<span class="t-'+k+'" style="width:'+s.pct[k]+'%"></span>';}).join("");
       legend.innerHTML=Object.keys(labels).filter(function(k){return booths.some(function(b){return b.type===k;});}).map(function(k){return '<li><i class="t-'+k+'" aria-hidden="true"></i>'+labels[k]+(s.pct[k]!==undefined?' '+s.pct[k]+'% ('+s.counts[k]+')':'')+'</li>';}).join("");
@@ -88,5 +100,5 @@
       publicView.refresh();
     }
     TL.on("init",render); TL.on("config:change",render);
-    return {stats:stats,render:render,viewport:viewport,fits:fits,overlaps:overlaps,canPlace:canPlace};
+    return {stats:stats,render:render,viewport:viewport,fits:fits,overlaps:overlaps,canPlace:canPlace,layout:layout,roomMetrics:roomMetrics};
   })();

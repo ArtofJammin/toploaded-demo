@@ -3,6 +3,13 @@ import assert from 'node:assert/strict';
 import {makeEnv,client} from './helpers.mjs';
 import {StreamClaims} from '../src/lib/stream-claims.js';
 import {memoryObject} from '../src/lib/memory-object.js';
+import {validateOwnerSettings} from '../src/routes/config.js';
+
+test('null owner settings fail validation without a server crash',()=>{
+  for(const cfg of [{show:{floorplan:null}},{reviews:null}]){
+    assert.throws(()=>validateOwnerSettings(cfg),err=>err.status===400);
+  }
+});
 
 test('floor plan persists and rejects overlap, invalid types and partial-grid shrink',async()=>{
   const c=client(makeEnv()),token=await c.login('admin'),opts={token};
@@ -13,6 +20,8 @@ test('floor plan persists and rejects overlap, invalid types and partial-grid sh
   assert.equal((await c.put('/config',{show:{floorplan:{booths:[booth,{...booth,id:'b'}]}}},opts)).status,400);
   assert.equal((await c.put('/config',{show:{floorplan:{booths:[{...booth,type:'fake'}]}}},opts)).status,400);
   assert.equal((await c.get('/config')).data.show.floorplan.rows,3);
+  assert.equal((await c.put('/config',{show:{floorplan:{room:'hilton-ballroom'}}},opts)).status,200);
+  assert.equal((await c.put('/config',{show:{floorplan:{room:'made-up'}}},opts)).status,400);
 });
 test('attributed review settings persist, filters positive highlights, rejects malformed input',async()=>{
   const c=client(makeEnv()),token=await c.login('admin'),opts={token};
@@ -23,6 +32,8 @@ test('attributed review settings persist, filters positive highlights, rejects m
   assert.equal((await c.put('/config',{reviews:{items:[{...review,url:'javascript:alert(1)'}]}},opts)).status,400);
   assert.equal((await c.put('/config',{reviews:{source:'google'}},opts)).status,200);
   assert.equal((await c.get('/reviews')).data.mode,'setup-required');
+  assert.equal((await c.put('/config',{reviews:{tcgplayerAuto:false}},opts)).status,200);
+  assert.equal((await c.put('/config',{reviews:{tcgplayerAuto:'false'}},opts)).status,400);
 });
 test('shared claims require staff, retain simultaneous posts, and publish status updates',async()=>{
   const c=client(makeEnv({LIVE_CLAIMS:memoryObject(StreamClaims)}));

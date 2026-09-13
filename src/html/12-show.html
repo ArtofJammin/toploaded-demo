@@ -18,9 +18,9 @@
             <span><b id="showHours">10 AM &ndash; 4 PM</b> &middot; vendor setup from <span id="showSetup">8 AM</span></span>
             <span><b id="showVenue">Hilton Cincinnati Airport</b> &middot; <span id="showAddress">7373 Turfway Rd, Florence, KY 41042</span></span>
             <span><b id="showCadence">First Saturday or Sunday</b> of every month &middot; free admission</span>
-            <span class="show-tables">Vendor tables booked &middot; <b id="tablesLabel"><span class="tables-n">11</span> of <span class="tables-t">24</span></b> <small class="show-tables-note">as of the last update</small></span>
+            <span class="show-tables" hidden>Vendor tables booked &middot; <b id="tablesLabel"><span class="tables-n">&mdash;</span> of <span class="tables-t">24</span></b> <small class="show-tables-note">as of the last update</small></span>
           </div>
-          <div class="meter" id="tablesMeter" role="img" aria-label="11 of 24 vendor tables booked"><i></i></div>
+          <div class="meter" id="tablesMeter" role="img" aria-label="Booking count not confirmed" hidden><i></i></div>
           <div class="show-actions">
             <a class="btn btn-ghost" id="showMapLink" href="https://www.google.com/maps/search/?api=1&amp;query=Hilton+Cincinnati+Airport+7373+Turfway+Rd+Florence+KY+41042" target="_blank" rel="noopener noreferrer">Directions to the Hilton &rarr;</a>
             <span id="showCal"></span>
@@ -47,12 +47,17 @@
       </div>
       <section class="section" aria-labelledby="floorTitle">
         <div class="section-head"><h2 id="floorTitle">Floor plan</h2><span class="collector-note">TCG &amp; Sports vendor map</span></div>
+        <section class="venue-reference" id="showVenueReference" aria-labelledby="hiltonPlanTitle">
+          <div class="venue-reference-copy"><p class="eyebrow">Know the venue</p><h3 id="hiltonPlanTitle">Hilton Cincinnati Airport</h3><p>The Triple Crown Ballroom is highlighted on the hotel's first-floor reference plan. Published ballroom dimensions: <b>96 &times; 41 ft</b>.</p><p class="card-note">The hotel diagram is a reference, not a confirmed vendor arrangement. Lobby use, doors, exits and table positions must be confirmed with the organizer and venue.</p><a class="linklike" href="https://marketfloor.app/venues/8a57c194-916e-410c-a085-efbac3b39ad7/guide?locationId=8fdb51c9-6da6-4d06-bfaa-0e90b26b8fc4" target="_blank" rel="noopener noreferrer">Explore the Hilton in Marketfloor ↗</a></div>
+          <figure><div class="venue-plan-paper"><img src="venue-plans/hilton-first-floor.svg" alt="Hilton first-floor diagram: Triple Crown Ballroom beside the lobby and pre-function area" width="610" height="551" loading="lazy" decoding="async"><span class="venue-ballroom-outline" aria-hidden="true"></span></div><figcaption>Hotel-provided diagram, via the Marketfloor venue reference. <a href="https://custom.cvent.com/95cbca96509142b49afebbf7b0599659/files/rfp/85804e05e44a47d195543aedf6aaa8f0/646e697186df40a3b16f75ebac28a570.pdf" target="_blank" rel="noopener noreferrer">Source plan, page 2 ↗</a></figcaption></figure>
+        </section>
         <p id="showFloorNote" class="card-note"></p>
         <div id="showFloorMix" class="floor-mix" aria-hidden="true"></div>
         <ul id="showFloorLegend" class="floor-legend"></ul>
         <div id="showFloorGuide" class="floor-guide" hidden>
           <div class="floor-tools"><div class="field"><label for="floorSearch">Find a vendor</label><input id="floorSearch" type="search" placeholder="Vendor or booth name" maxlength="100"></div><div class="field"><label for="floorType">Show on map</label><select id="floorType"><option value="">All categories</option><option value="tcg">TCG</option><option value="sports">Sports</option><option value="mixed">Mixed</option><option value="food">Food</option><option value="entry">Entry</option></select></div><div class="floor-zoom" aria-label="Map zoom"><button type="button" data-floor-zoom="out" aria-label="Zoom out">&minus;</button><button type="button" data-floor-zoom="fit">Fit floor</button><button type="button" data-floor-zoom="in" aria-label="Zoom in">+</button></div></div>
-          <p class="card-note">Select a booth for details. Drag empty floor to pan, use Ctrl + wheel to zoom, or scroll the map on touch. Schematic layout &mdash; not a scale drawing of the venue.</p>
+          <p class="card-note" id="floorScaleNote"></p>
+          <p class="card-note">Select a booth for details. Drag empty floor to pan, use Ctrl + wheel to zoom, or scroll the map on touch.</p>
           <div class="floor-guide-body"><div class="floor-scroll" id="showFloorScroll" tabindex="0" role="region" aria-label="Interactive vendor floor plan"><div class="floor-map" id="showFloorMap"></div></div><aside class="floor-detail" id="showFloorDetail" aria-live="polite"><h3>Explore the floor</h3><p>Choose a vendor on the map or in the directory.</p></aside></div>
           <p id="floorResults" role="status" class="card-note"></p>
           <ul id="showFloorList" class="floor-vendors" aria-label="Vendor directory"></ul>

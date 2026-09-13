@@ -191,7 +191,7 @@
   }
   function renderShowStat(){
     var s = TL.config.show || {};
-    statNum($("#statTables"), s.booked || 0);
+    if(s.booked===null||s.booked===undefined)$('#statTables').textContent='—';else statNum($("#statTables"), s.booked || 0);
     var of = $("#statTablesOf"); if(of) of.textContent = fmtInt(s.tables || 0);
     var d = $("#statShowDate");
     if(d){

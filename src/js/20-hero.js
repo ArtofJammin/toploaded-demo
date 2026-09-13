@@ -297,7 +297,12 @@
     if(!n) return "";
     return '<span class="review-stars" aria-label="' + n + ' out of 5">' + new Array(n + 1).join("★") + '</span>';
   }
-  var reviewRemote=null,reviewFetchKey="";
+  var reviewRemote=null,reviewFetchKey="",reviewSnapshot=null;
+  TL.on('init',function(){
+    fetch('reviews-tcgplayer.json',{cache:'no-cache'}).then(function(r){if(!r.ok)throw new Error('Review feed unavailable');return r.json();}).then(function(d){
+      if(d.sellerKey==='5c356cdf'&&Array.isArray(d.items)&&d.items.length<=3){reviewSnapshot=d;renderTestimonials();}
+    }).catch(function(){/* Curated reviews/source links remain available. */});
+  });
   function reviewUrl(u){try{var p=new URL(u);return p.protocol==="https:"||p.protocol==="http:"?p.href:"";}catch(e){return "";}}
   function fetchReviews(){
     var cfg=TL.config.reviews||{},key=JSON.stringify(cfg);
@@ -310,9 +315,12 @@
     if(!box) return;
     var cfg = (TL.config && TL.config.reviews) || {};
     var min = Number(cfg.minRating || 0);
-    var list = (reviewRemote ? reviewRemote.items : Array.isArray(cfg.items) ? cfg.items : []).map(function(t){
+    var supplied = reviewRemote ? reviewRemote.items : Array.isArray(cfg.items) ? cfg.items : [];
+    var automatic = cfg.tcgplayerAuto!==false && reviewSnapshot && Date.now()-Date.parse(reviewSnapshot.generated)<30*86400000 ? reviewSnapshot.items : [];
+    var reviewSeen={};
+    var list = supplied.concat(automatic).filter(function(t){var k=t.source+'|'+t.quote+'|'+t.who;if(reviewSeen[k])return false;reviewSeen[k]=true;return true;}).map(function(t){
       return {q: t.quote || t.text || "", who: t.who || t.name || "", rating: Number(t.rating || 0),
-        source: REVIEW_SOURCES[t.source] ? t.source : "shop", url: reviewUrl(t.url),authorUrl:reviewUrl(t.authorUrl),photo:reviewUrl(t.photo)};
+        source: REVIEW_SOURCES[t.source] ? t.source : "shop", url: reviewUrl(t.url),authorUrl:reviewUrl(t.authorUrl),photo:reviewUrl(t.photo),at:t.at};
     }).filter(function(t){ return t.q && t.rating >= min; }).slice(0, 6);
 
     if(!list.length){
@@ -336,10 +344,11 @@
         (t.authorUrl ? '<a class="review-author" href="'+esc(t.authorUrl)+'" target="_blank" rel="noopener noreferrer">'+(t.photo?'<img src="'+esc(t.photo)+'" alt="" width="32" height="32" loading="lazy">':'')+esc(t.who)+'</a>' : '')+
         '<p class="p-set quote-who">' + (href
           ? '<a href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">' + esc(who) + ' ↗</a>'
-          : esc(who)) + '</p></div>';
+          : esc(who)) + (t.at&&Number.isFinite(Date.parse(t.at))?' · '+esc(new Date(t.at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:TL.config.timezone||'America/New_York'})):'')+'</p></div>';
     }).join("");
     if(reviewRemote && reviewRemote.mode==="google")box.insertAdjacentHTML("beforeend",'<p class="review-attribution">Google-selected reviews ordered by relevance, filtered to '+esc(min)+'+ stars. <a href="'+esc(reviewUrl(reviewRemote.allReviews))+'" target="_blank" rel="noopener">View all reviews</a> · <a href="'+esc(reviewUrl(reviewRemote.terms))+'">Terms</a> · <a href="'+esc(reviewUrl(reviewRemote.privacy))+'">Privacy</a></p>');
     if(tag){ tag.hidden = false;tag.textContent="Selected positive reviews · "+min+"+ stars, not an overall rating"; }
+    if(automatic.length)box.insertAdjacentHTML('beforeend','<p class="review-attribution">TCGplayer highlights: recent five-star feedback with short comments. Last refreshed '+esc(new Date(reviewSnapshot.generated).toLocaleDateString())+'. <a href="https://www.tcgplayer.com/sellers/Top-Loaded-TCG/5c356cdf/feedback" target="_blank" rel="noopener noreferrer">Read all feedback ↗</a></p>');
   }
   TL.on("config:change", function(){reviewRemote=null;renderTestimonials();fetchReviews();});
   TL.on("api:ready",fetchReviews);

@@ -1,0 +1,53 @@
+{
+  "id": "hilton-cincinnati-airport-first-floor",
+  "imageUrl": "venue-plans/hilton-first-floor.svg",
+  "source": {
+    "title": "Hilton Cincinnati Airport conference fact sheet",
+    "url": "https://custom.cvent.com/95cbca96509142b49afebbf7b0599659/files/rfp/85804e05e44a47d195543aedf6aaa8f0/646e697186df40a3b16f75ebac28a570.pdf",
+    "page": 2,
+    "embeddedImage": "X8",
+    "pdfSha256": "9183ee494195cce70d7de19e29e3c887b4f4e493593626646c65d22ae055ce7b",
+    "imageWidth": 1001,
+    "imageHeight": 672
+  },
+  "cropSourcePx": {
+    "x": 354,
+    "y": 114,
+    "width": 610,
+    "height": 551
+  },
+  "ballroomSourcePx": {
+    "x": 667,
+    "y": 433,
+    "width": 143,
+    "height": 64
+  },
+  "ballroomImagePx": {
+    "x": 313,
+    "y": 319,
+    "width": 143,
+    "height": 64
+  },
+  "ballroomFt": {
+    "width": 96,
+    "height": 41
+  },
+  "placementFt": {
+    "x": -210.125874,
+    "y": -204.359375,
+    "width": 409.51049,
+    "height": 352.984375
+  },
+  "provisionalGeoreference": {
+    "originLat": 39.013458,
+    "originLng": -84.632947,
+    "rotationDeg": 277.03
+  },
+  "confidence": "approximate",
+  "notes": [
+    "The ballroom rectangle is calibrated to the published 96 by 41 foot dimensions.",
+    "The source is schematic; outside-room dimensions are estimates and are not surveyed usable-space boundaries.",
+    "The blueprint includes public, private, and other meeting spaces as context. Only the ballroom is definite for this show.",
+    "A venue administrator must define approved optional space, entrances, exits, and obstacles."
+  ]
+}

@@ -209,7 +209,7 @@
             <dt>Tables</dt>
             <dd class="time-row">
               <label>Total <input id="setShowTables" type="number" min="0" step="1" inputmode="numeric" style="width:80px"></label>
-              <label>Booked <input id="setShowBooked" type="number" min="0" step="1" inputmode="numeric" style="width:80px"></label>
+              <label>Booked <input id="setShowBooked" type="number" min="0" step="1" inputmode="numeric" placeholder="Unknown" style="width:100px"><small>Leave blank until confirmed.</small></label>
             </dd>
             <dt>Table prices</dt><dd><div id="tablePriceEditor" class="rows-editor"></div></dd>
           </dl>
@@ -252,6 +252,7 @@
             <div class="field full"><label for="setRevPlace">Google Place ID</label><input id="setRevPlace" placeholder="The shop's verified Google Place ID"></div>
           </div>
           <p class="card-note" id="revSourceNote"></p>
+          <label class="floor-auto-reviews"><input id="setRevTcgAuto" type="checkbox" checked> Include automatically refreshed TCGplayer highlights</label><p class="card-note">Up to three short, genuine five-star comments, refreshed each morning from the shop's public feedback. No order or account IDs are stored. <a href="https://github.com/ArtofJammin/toploaded-demo/actions/workflows/reviews.yml" target="_blank" rel="noopener noreferrer">Refresh job ↗</a></p>
           <div id="revEditor"></div>
           <p class="card-note" id="revPreview" role="status"></p>
           <div class="card-actions"><button class="btn" id="revApply" type="button">Publish reviews</button><button class="btn btn-ghost" id="revAdd" type="button">Add review</button><span class="save-state" role="status" data-state-for="cardReviews"></span></div>
@@ -260,13 +261,15 @@
 
       <div class="admin-card" id="cardFloorplan">
         <h3>Card show floor plan</h3>
-        <p class="card-note">Build the actual show layout: select a booth to edit, drag it to move, or use its arrow keys. TCG, Sports and Mixed percentages count vendor booths, not floor area. Empty space is aisle space; this is a schematic, not a measured venue plan. An empty plan stays unpublished.</p>
+        <p class="card-note">Build the actual show layout: select a booth to edit, drag it to move, or use its arrow keys. TCG, Sports and Mixed percentages count vendor booths, not floor area. Keep aisles, exits and other required clearances open; this editor does not certify a safe or venue-approved layout.</p>
+        <div class="field"><label for="setFpRoom">Room reference</label><select id="setFpRoom"><option value="hilton-ballroom">Hilton · Triple Crown Ballroom · 96 × 41 ft</option><option value="schematic">Custom schematic · no physical scale</option></select><p class="card-note" id="fpScaleNote"></p></div>
         <div class="form-grid"><div class="field"><label for="setFpRows">Grid rows</label><input id="setFpRows" type="number" min="1" max="20" value="6"></div><div class="field"><label for="setFpCols">Grid columns</label><input id="setFpCols" type="number" min="1" max="26" value="10"></div></div>
         <div class="floor-tools"><div class="field"><label for="fpBrush">New booth category</label><select id="fpBrush"><option value="tcg">TCG</option><option value="sports">Sports</option><option value="mixed">Mixed</option><option value="food">Food</option><option value="entry">Entry</option></select></div><button class="btn btn-ghost" id="fpPlace" type="button" aria-pressed="false">Place on floor</button><button class="btn btn-ghost" id="fpRotate" type="button" disabled>Rotate selected</button><div class="floor-zoom" aria-label="Editor zoom"><button type="button" data-floor-zoom="out" aria-label="Zoom editor out">&minus;</button><button type="button" data-floor-zoom="fit">Fit floor</button><button type="button" data-floor-zoom="in" aria-label="Zoom editor in">+</button></div></div>
         <p id="fpSelection" class="card-note" role="status">Add a booth, or choose Place on floor and tap an empty square.</p>
         <div class="floor-guide-body"><div class="floor-scroll" id="fpScroll" tabindex="0" role="region" aria-label="Floor plan editor"><div class="floor-map" id="fpMap"></div></div><div id="fpEditor" class="floor-inspector"></div></div>
         <div class="floor-mix" id="fpMix" aria-hidden="true"></div><p id="fpMixText" class="card-note"></p><span id="fpRatio" class="save-state"></span>
-        <div class="card-actions"><button class="btn" id="fpApply" type="button">Save floor plan</button><button class="btn btn-ghost" id="fpAdd" type="button">Add booth</button><span class="save-state" role="status" data-state-for="cardFloorplan"></span></div>
+        <p class="card-note" id="fpPublishNote" role="status"></p>
+        <div class="card-actions"><button class="btn" id="fpApply" type="button">Save floor plan</button><button class="btn btn-ghost" id="fpAdd" type="button">Add booth</button><button class="btn btn-ghost" id="fpExport" type="button">Download draft</button><span class="save-state" role="status" data-state-for="cardFloorplan"></span></div>
       </div>
 
       <div class="reset-row">

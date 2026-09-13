@@ -39,7 +39,7 @@
       savingConfig = false;
       var server = canServer && !!(res && typeof res === "object");
       var where = !TL.api.online ? "Saved on this device" : (server ? "Saved to server" : "Saved on this device only — server refused");
-      setState(st, server || !TL.api.online ? "ok" : "warn", where + " · " + nowTime());
+      setState(st, server ? "ok" : "warn", where + " · " + nowTime());
       renderCfgUpdated();
       toast((okMsg ? okMsg + " — " : "") + where.toLowerCase());
       return server;
@@ -266,7 +266,7 @@
     rowsRender($("#tablePriceEditor"), (s.tablePrices || []).map(function(t){ return {n: t.n, price: t.price}; }), TABLE_F, "No table prices.");
   }
   $("#setShowApply").addEventListener("click", function(){
-    var tables = Math.max(0, Math.round(num(val("setShowTables"), 0))), booked = Math.max(0, Math.round(num(val("setShowBooked"), 0)));
+    var tables = Math.max(0, Math.round(num(val("setShowTables"), 0))), booked = val('setShowBooked')===''?null:Math.max(0, Math.round(num(val("setShowBooked"), 0)));
     if(booked > tables){ toast("Booked can't be more than the total tables"); $("#setShowBooked").focus(); return; }
     var start = val("setShowStart") || "10:00", end = val("setShowEnd") || "16:00";
     var hoursTxt = val("setShowHours") || (fmt12(start) + " – " + fmt12(end));
@@ -444,14 +444,14 @@
   function renderRevSourceNote(){
     var el = $("#revSourceNote"); if(!el) return;
     el.textContent = val("setRevSource") === "google"
-      ? "Automatic Google reviews need the shared API, a Places key, the shop's Place ID, and published terms/privacy links. Until connected, only the genuine reviews entered below can appear."
-      : "Pasted in by hand: the site shows exactly what's in the list below, nothing else.";
+      ? "Automatic Google reviews need the shared API, a Places key, the shop's Place ID, and published terms/privacy links. TCGplayer highlights refresh independently when enabled below."
+      : "The reviews below are owner-curated. Automatically refreshed TCGplayer highlights can appear alongside them when enabled below.";
   }
   function renderRevPreview(){
     var el = $("#revPreview"); if(!el) return;
     var min = revMin(), live = 0, held = 0;
     revWork.forEach(function(r){ if(String(r.quote || "").trim()){ if(r.rating >= min) live++; else held++; } });
-    if(!revWork.length){ el.textContent = "Nothing published — the home page section stays empty until you add a review."; return; }
+    if(!revWork.length){ el.textContent = "No owner-curated reviews. The automatic TCGplayer highlights can still appear when enabled."; return; }
     el.textContent = live + " review" + (live === 1 ? "" : "s") + " will show on the home page" +
       (held ? " · " + held + " held back under the " + min + "-star minimum" : "") +
       " · publish to put the change live.";
@@ -491,6 +491,7 @@
     setVal("setRevSource", r.source === "google" ? "google" : "manual");
     setVal("setRevPlace", r.googlePlaceId);
     setVal("setRevMin", TL.clamp(Math.round(num(r.minRating, 4)), 1, 5));
+    $('#setRevTcgAuto').checked=r.tcgplayerAuto!==false;
     revWork = revFromConfig(); revReady = true;
     renderRevSourceNote(); renderRevEditor();
   }
@@ -541,7 +542,7 @@
       toast("Nothing published — the list is back as it was");
       return;
     }
-    var patch = {reviews: {source: val("setRevSource") === "google" ? "google" : "manual", googlePlaceId: val("setRevPlace"), minRating: min, items: items}};
+    var patch = {reviews: {source: val("setRevSource") === "google" ? "google" : "manual", googlePlaceId: val("setRevPlace"), minRating: min, items: items,tcgplayerAuto:$('#setRevTcgAuto').checked}};
     /* the older home-page quote list reads {quote, who}; keep it in step so real reviews
        replace the sample quotes wherever that list is still what gets rendered */
     if(window.TL_DEFAULT_CONFIG && ("testimonials" in window.TL_DEFAULT_CONFIG)){
@@ -599,10 +600,8 @@
   function renderFpMap(){
     var map = $("#fpMap"), size = fpSize();
     if(map){
-      map.dataset.rows=size.rows;map.dataset.cols=size.cols;
       map.classList.toggle('is-placing',fpPlacing);
-      map.style.gridTemplateColumns = "repeat(" + size.cols + ", var(--fp-cell))";
-      map.style.gridTemplateRows = "repeat(" + size.rows + ", var(--fp-cell))";
+      $('#fpScaleNote').textContent=TL.floorplan.layout(map,val('setFpRoom'),size);
       map.innerHTML = fpWork.map(function(b, i){
         var fits = TL.floorplan.canPlace(fpWork,b,size,i);
         var r = TL.clamp(b.r, 1, size.rows), c = TL.clamp(b.c, 1, size.cols);
@@ -614,6 +613,7 @@
       fpViewport.refresh();
     }
     $('#fpRotate').disabled=!fpWork[fpSelected];$('#fpPlace').setAttribute('aria-pressed',String(fpPlacing));
+    $('#fpPublishNote').textContent=TL.api.online&&TL.api.role==='admin'?'Connected: Save floor plan publishes this layout to the shared site configuration.':'Not connected to a shared backend: Save keeps this layout on this device only. Download a draft to preserve your work; public visitors will not see these changes yet.';
     $('#fpSelection').textContent=fpPlacing?'Tap an empty square to place a new '+BOOTH_LAB[val('fpBrush')]+' booth.':fpWork[fpSelected]?'Selected: '+(fpWork[fpSelected].label||'Unnamed booth')+' — drag to move, use arrow keys, or edit the details. Changes are not published until saved.':'Add a booth, or choose Place on floor and tap an empty square.';
     renderFpMix(size);
   }
@@ -652,6 +652,7 @@
   }
   function renderFloorplanCard(){
     var f = (TL.config.show || {}).floorplan || {};
+    setVal('setFpRoom',f.room==='hilton-ballroom'?'hilton-ballroom':'schematic');
     setVal("setFpRows", TL.clamp(Math.round(num(f.rows, 6)), 1, FP_MAX_ROWS));
     setVal("setFpCols", TL.clamp(Math.round(num(f.cols, 10)), 1, FP_MAX_COLS));
     fpWork = fpFromConfig(); fpReady = true;fpSelected=fpWork.length?0:-1;fpPlacing=false;
@@ -689,8 +690,9 @@
     fpViewport.focus($('#fpMap [data-fpselect="'+fpSelected+'"]'));
   }
   function fpPoint(e){
-    var map=$('#fpMap'),rect=map.getBoundingClientRect(),step=parseFloat(getComputedStyle(map).getPropertyValue('--fp-cell'))+parseFloat(getComputedStyle(map).gap);
-    return {r:Math.floor((e.clientY-rect.top-2)/step)+1,c:Math.floor((e.clientX-rect.left-2)/step)+1};
+    var map=$('#fpMap'),rect=map.getBoundingClientRect(),css=getComputedStyle(map);
+    var stepX=parseFloat(css.getPropertyValue('--fp-cell'))+parseFloat(css.columnGap),stepY=parseFloat(css.getPropertyValue('--fp-row'))+parseFloat(css.rowGap);
+    return {r:Math.floor((e.clientY-rect.top-2)/stepY)+1,c:Math.floor((e.clientX-rect.left-2)/stepX)+1};
   }
   function fpFocus(){var b=$('#fpMap [data-fpselect="'+fpSelected+'"]');if(b)b.focus({preventScroll:true});}
   function fpMove(i,r,c,rotate){
@@ -735,6 +737,12 @@
   $('#fpMap').addEventListener('pointercancel',function(){fpDrag=null;fpSuppressClick=false;renderFpMap();});
   $("#setFpRows").addEventListener("input", renderFpMap);
   $("#setFpCols").addEventListener("input", renderFpMap);
+  $('#setFpRoom').addEventListener('change',renderFpMap);
+  $('#fpExport').addEventListener('click',function(){
+    if(!fpReady){toast('Wait for the floor editor to load');return;}
+    var size=fpSize(),draft={kind:'top-loaded-floorplan-draft',exported:new Date().toISOString(),venue:(TL.config.show||{}).venue,showDate:(TL.config.show||{}).date,confirmed:false,floorplan:{room:val('setFpRoom'),rows:size.rows,cols:size.cols,booths:fpWork.map(function(b,i){return {id:b.id||'draft-'+(i+1),label:b.label,type:b.type,r:b.r,c:b.c,w:b.w,h:b.h};})}};
+    var url=URL.createObjectURL(new Blob([JSON.stringify(draft,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='top-loaded-floorplan-draft.json';a.click();setTimeout(function(){URL.revokeObjectURL(url);},1000);toast('Draft downloaded — this does not publish it');
+  });
   $("#fpApply").addEventListener("click", function(){
     if(!fpReady){ renderFloorplanCard(); toast("Floor plan reloaded — check it, then save"); return; }
     var size = fpSize();
@@ -769,7 +777,7 @@
       toast("Nothing saved — the plan is back as it was");
       return;
     }
-    saveCard("cardFloorplan", {show: {floorplan: {rows: size.rows, cols: size.cols, booths: booths}}}, "Floor plan saved")
+    saveCard("cardFloorplan", {show: {floorplan: {room:val('setFpRoom'),rows: size.rows, cols: size.cols, booths: booths}}}, "Floor plan saved")
       .then(function(){ renderFloorplanCard(); });
   });
 

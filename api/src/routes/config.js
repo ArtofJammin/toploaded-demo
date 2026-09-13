@@ -78,6 +78,7 @@ export function validateOwnerSettings(cfg) {
   const fp=cfg.show?.floorplan;
   if(fp !== undefined){
     if(!fp || !Number.isInteger(fp.rows)||fp.rows<1||fp.rows>20||!Number.isInteger(fp.cols)||fp.cols<1||fp.cols>26||!Array.isArray(fp.booths)||fp.booths.length>100)fail('Floor plan needs a 1–20 by 1–26 grid and at most 100 booths');
+    if(fp.room!==undefined&&!['schematic','hilton-ballroom'].includes(fp.room))fail('Choose the Hilton ballroom or a schematic room');
     const occupied=new Set(),ids=new Set();
     for(const b of fp.booths){
       if(!b || typeof b.id!=='string'||!b.id.trim()||ids.has(b.id)||typeof b.label!=='string'||!b.label.trim()||b.label.length>120||!['tcg','sports','mixed','food','entry'].includes(b.type))fail('Each booth needs a unique ID, name and valid type');
@@ -89,6 +90,7 @@ export function validateOwnerSettings(cfg) {
   const rv=cfg.reviews;
   if(rv !== undefined){
     if(!rv||!['manual','google'].includes(rv.source)||!Number.isInteger(rv.minRating)||rv.minRating<1||rv.minRating>5||typeof rv.googlePlaceId!=='string'||rv.googlePlaceId.length>200||!Array.isArray(rv.items)||rv.items.length>50)fail('Invalid review settings');
+    if(rv.tcgplayerAuto!==undefined&&typeof rv.tcgplayerAuto!=='boolean')fail('Automatic TCGplayer reviews must be on or off');
     for(const t of rv.items){
       if(!t||typeof t.quote!=='string'||!t.quote.trim()||typeof t.who!=='string'||!t.who.trim()||!Number.isInteger(t.rating)||t.rating<1||t.rating>5||!['google','tcgplayer','shop'].includes(t.source)||t.url && !isHttpUrl(t.url))fail('Reviews need genuine wording, author, rating, source and an http(s) source link');
     }

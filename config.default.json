@@ -56,7 +56,7 @@
     "venue": "Hilton Cincinnati Airport",
     "address": "7373 Turfway Rd, Florence, KY 41042",
     "tables": 24,
-    "booked": 11,
+    "booked": null,
     "cadence": "First Saturday or Sunday of every month",
     "tablePrices": [
       {
@@ -73,6 +73,7 @@
       }
     ],
     "floorplan": {
+      "room": "hilton-ballroom",
       "rows": 6,
       "cols": 10,
       "booths": []
@@ -203,6 +204,7 @@
     }
   },
   "reviews": {
+    "tcgplayerAuto": true,
     "source": "manual",
     "googlePlaceId": "",
     "minRating": 4,

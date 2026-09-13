@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   # GITHUB_TOKEN inventory commits do NOT trigger push workflows or legacy Pages.
   workflow_run:
-    workflows: [Refresh inventory, Refresh catalog]
+    workflows: [Refresh inventory, Refresh catalog, Refresh reviews]
     types: [completed]
     branches: [main]
 
@@ -44,6 +44,9 @@ jobs:
           mkdir _site
           cp index.html inventory.json inventory-summary.json favicon.png logo-dark.png logo-light.png og-image.png _site/
           cp catalog-*.json _site/
+          cp reviews-tcgplayer.json _site/
+          mkdir _site/venue-plans
+          cp venue-plans/hilton-first-floor.svg venue-plans/hilton-first-floor.json _site/venue-plans/
           touch _site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:

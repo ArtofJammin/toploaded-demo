@@ -26,6 +26,16 @@ test('vendor mix uses vendor booths, excludes amenities and totals 100 percent',
   assert.equal(s.total,3);assert.equal(Object.values(s.pct).reduce((a,b)=>a+b,0),100);assert.equal(s.pct.tcg,33);
   assert.equal(c.TL.floorplan.stats([]).total,0);
 });
+
+test('Hilton grid retains the published 96 by 41 foot room proportions at every grid size',()=>{
+  const c={TL:{on(){}}};vm.createContext(c);vm.runInContext(read('src/js/56-floorplan.js'),c);
+  for(const [rows,cols] of [[6,10],[10,24],[20,26]]){
+    const m=c.TL.floorplan.roomMetrics('hilton-ballroom',rows,cols);
+    assert.equal(m.widthFt,96);assert.equal(m.heightFt,41);assert.ok(Math.abs(cols*64/(rows*m.row)-96/41)<1e-10);
+  }
+  assert.equal(c.TL.floorplan.roomMetrics('schematic',6,10).widthFt,null);
+  assert.ok(read('venue-plans/hilton-first-floor.svg').includes('Hilton Cincinnati Airport first-floor reference plan'));
+});
 test('shop-time clocks are stable and DST-aware instead of drifting on every tick',()=>{
   const c={TL:{config:{timezone:'America/New_York'}}};vm.createContext(c);
   const block=read('src/js/03-config.js').match(/  TL\.wallTime = function[\s\S]*?\n  };/)[0];vm.runInContext(block,c);

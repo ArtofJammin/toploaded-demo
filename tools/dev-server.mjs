@@ -78,7 +78,8 @@ function serveStatic(pathname, res) {
   if (p === '/' || p === '') p = '/index.html';
   const rel = p.replace(/^\/+/, '');
   const file = normalize(join(repo, rel));
-  const ok = /^[A-Za-z0-9._-]+$/.test(rel) && !rel.startsWith('.') && STATIC_EXT.has(extname(rel).toLowerCase()) &&
+  const publicPath = /^[A-Za-z0-9._-]+$/.test(rel) || /^venue-plans\/hilton-first-floor\.(svg|json)$/.test(rel);
+  const ok = publicPath && !rel.startsWith('.') && STATIC_EXT.has(extname(rel).toLowerCase()) &&
     file.startsWith(repo) && existsSync(file) && !statSync(file).isDirectory();
   if (!ok) {
     res.writeHead(404, { 'content-type': 'text/plain' }); res.end('not found'); return;

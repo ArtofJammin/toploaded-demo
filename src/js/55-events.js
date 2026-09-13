@@ -372,6 +372,9 @@
     if(n){ if(lastTablesShown !== booked){ n.textContent = lastTablesShown === null ? "0" : String(lastTablesShown); evCountTo(n, booked, {duration: 900}); lastTablesShown = booked; } }
     else if((el = $("#tablesLabel"))) el.textContent = booked + " of " + total;
     if(meter){ meter.setAttribute("aria-label", booked + " of " + total + " vendor tables booked as of the last update"); var bar = meter.querySelector("i"); if(bar) bar.style.width = Math.round(booked / total * 100) + "%"; meter.classList.toggle("full", booked >= total); }
+    var knownBooking=Number.isFinite(s.booked)&&s.booked>=0;
+    if(meter)meter.hidden=!knownBooking;
+    var bookingLine=$('.show-tables');if(bookingLine)bookingLine.hidden=!knownBooking;
     var cal = $("#showCal"), evt = calForShow(); if(cal) cal.innerHTML = evt ? calMenu(evt) : "";
     var sel = $("#vTables");
     if(sel && Array.isArray(s.tablePrices) && s.tablePrices.length){

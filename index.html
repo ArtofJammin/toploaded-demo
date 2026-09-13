@@ -1521,7 +1521,13 @@ html.page-hidden .drawer .cart-empty::before{animation-play-state:paused}
 .floor-guide-body{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:18px;margin:16px 0;align-items:start}
 .floor-guide-body .floor-scroll{margin:0;height:410px;cursor:grab;overscroll-behavior-x:contain;position:relative}
 .floor-scroll.is-panning{cursor:grabbing;user-select:none}
-.floor-map{--fp-gap:6px;min-width:0;gap:var(--fp-gap);background-size:calc(var(--fp-cell) + var(--fp-gap)) calc(var(--fp-cell) + var(--fp-gap));border:2px solid var(--line);box-sizing:content-box;isolation:isolate}
+.floor-map{--fp-gap:6px;min-width:0;gap:var(--fp-gap);background-size:calc(var(--fp-cell) + var(--fp-gap)) calc(var(--fp-row,var(--fp-cell)) + var(--fp-gap));border:2px solid var(--line);box-sizing:content-box;isolation:isolate}
+.floor-map.is-hilton .fp-cell{margin:2px}
+.venue-reference{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:28px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:26px;margin:20px 0 28px}
+.venue-reference h3{font-size:clamp(1.7rem,3vw,2.6rem);line-height:1.1;margin:12px 0 20px}.venue-reference p{margin-bottom:18px}.venue-reference figure{margin:0;min-width:0}.venue-reference figcaption{font-size:.75rem;color:var(--ink2);margin-top:10px;line-height:1.5}
+.venue-plan-paper{position:relative;background:#fff;border-radius:6px;overflow:hidden}.venue-plan-paper img{display:block;width:100%;height:auto}
+.venue-ballroom-outline{position:absolute;left:51.3115%;top:57.8947%;width:23.4426%;height:11.6152%;border:3px solid #bd7100;background:#ffdd4933;pointer-events:none}
+.floor-auto-reviews{display:flex;align-items:center;gap:10px;margin:20px 0 10px;font-size:.9rem}.floor-auto-reviews input{width:20px;height:20px;flex-shrink:0}
 .fp-cell{font-family:var(--body);cursor:pointer;position:relative;min-height:0;box-shadow:0 3px 0 color-mix(in srgb,currentColor 25%,transparent);transition:opacity .15s,border-color .15s}
 .fp-cell b{max-width:100%;font-size:clamp(9px,calc(var(--fp-cell)*.19),15px);line-height:1.1}.fp-cell i{font-size:clamp(8px,calc(var(--fp-cell)*.16),12px)}
 .fp-cell[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:2px;z-index:2}
@@ -1538,7 +1544,7 @@ html.page-hidden .drawer .cart-empty::before{animation-play-state:paused}
 #fpEditor{margin-top:0;display:block}#fpEditor .fp-row{padding:0 28px 0 0;border:0;background:none;gap:12px}#fpEditor .row-del{right:-18px;top:-14px}
 #fpMap .fp-cell{touch-action:none;user-select:none}#fpMap.is-placing{cursor:crosshair}#fpMap.is-placing .fp-cell{cursor:not-allowed}
 #fpPlace[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
-@media(max-width:760px){.floor-guide-body{grid-template-columns:1fr}.floor-guide-body .floor-scroll{height:340px}.floor-detail{padding:16px}.floor-tools>.btn{flex:1 1 auto}}
+@media(max-width:760px){.floor-guide-body,.venue-reference{grid-template-columns:1fr}.venue-reference{padding:18px;gap:12px}.floor-guide-body .floor-scroll{height:340px}.floor-detail{padding:16px}.floor-tools>.btn{flex:1 1 auto}}
 @media(prefers-reduced-motion:reduce){.fp-cell{transition:none}}
 
 /* ============ EVENTS ============ */
@@ -3418,9 +3424,9 @@ a:hover .round-arrow{transform:rotate(45deg)}
             <span><b id="showHours">10 AM &ndash; 4 PM</b> &middot; vendor setup from <span id="showSetup">8 AM</span></span>
             <span><b id="showVenue">Hilton Cincinnati Airport</b> &middot; <span id="showAddress">7373 Turfway Rd, Florence, KY 41042</span></span>
             <span><b id="showCadence">First Saturday or Sunday</b> of every month &middot; free admission</span>
-            <span class="show-tables">Vendor tables booked &middot; <b id="tablesLabel"><span class="tables-n">11</span> of <span class="tables-t">24</span></b> <small class="show-tables-note">as of the last update</small></span>
+            <span class="show-tables" hidden>Vendor tables booked &middot; <b id="tablesLabel"><span class="tables-n">&mdash;</span> of <span class="tables-t">24</span></b> <small class="show-tables-note">as of the last update</small></span>
           </div>
-          <div class="meter" id="tablesMeter" role="img" aria-label="11 of 24 vendor tables booked"><i></i></div>
+          <div class="meter" id="tablesMeter" role="img" aria-label="Booking count not confirmed" hidden><i></i></div>
           <div class="show-actions">
             <a class="btn btn-ghost" id="showMapLink" href="https://www.google.com/maps/search/?api=1&amp;query=Hilton+Cincinnati+Airport+7373+Turfway+Rd+Florence+KY+41042" target="_blank" rel="noopener noreferrer">Directions to the Hilton &rarr;</a>
             <span id="showCal"></span>
@@ -3447,12 +3453,17 @@ a:hover .round-arrow{transform:rotate(45deg)}
       </div>
       <section class="section" aria-labelledby="floorTitle">
         <div class="section-head"><h2 id="floorTitle">Floor plan</h2><span class="collector-note">TCG &amp; Sports vendor map</span></div>
+        <section class="venue-reference" id="showVenueReference" aria-labelledby="hiltonPlanTitle">
+          <div class="venue-reference-copy"><p class="eyebrow">Know the venue</p><h3 id="hiltonPlanTitle">Hilton Cincinnati Airport</h3><p>The Triple Crown Ballroom is highlighted on the hotel's first-floor reference plan. Published ballroom dimensions: <b>96 &times; 41 ft</b>.</p><p class="card-note">The hotel diagram is a reference, not a confirmed vendor arrangement. Lobby use, doors, exits and table positions must be confirmed with the organizer and venue.</p><a class="linklike" href="https://marketfloor.app/venues/8a57c194-916e-410c-a085-efbac3b39ad7/guide?locationId=8fdb51c9-6da6-4d06-bfaa-0e90b26b8fc4" target="_blank" rel="noopener noreferrer">Explore the Hilton in Marketfloor ↗</a></div>
+          <figure><div class="venue-plan-paper"><img src="venue-plans/hilton-first-floor.svg" alt="Hilton first-floor diagram: Triple Crown Ballroom beside the lobby and pre-function area" width="610" height="551" loading="lazy" decoding="async"><span class="venue-ballroom-outline" aria-hidden="true"></span></div><figcaption>Hotel-provided diagram, via the Marketfloor venue reference. <a href="https://custom.cvent.com/95cbca96509142b49afebbf7b0599659/files/rfp/85804e05e44a47d195543aedf6aaa8f0/646e697186df40a3b16f75ebac28a570.pdf" target="_blank" rel="noopener noreferrer">Source plan, page 2 ↗</a></figcaption></figure>
+        </section>
         <p id="showFloorNote" class="card-note"></p>
         <div id="showFloorMix" class="floor-mix" aria-hidden="true"></div>
         <ul id="showFloorLegend" class="floor-legend"></ul>
         <div id="showFloorGuide" class="floor-guide" hidden>
           <div class="floor-tools"><div class="field"><label for="floorSearch">Find a vendor</label><input id="floorSearch" type="search" placeholder="Vendor or booth name" maxlength="100"></div><div class="field"><label for="floorType">Show on map</label><select id="floorType"><option value="">All categories</option><option value="tcg">TCG</option><option value="sports">Sports</option><option value="mixed">Mixed</option><option value="food">Food</option><option value="entry">Entry</option></select></div><div class="floor-zoom" aria-label="Map zoom"><button type="button" data-floor-zoom="out" aria-label="Zoom out">&minus;</button><button type="button" data-floor-zoom="fit">Fit floor</button><button type="button" data-floor-zoom="in" aria-label="Zoom in">+</button></div></div>
-          <p class="card-note">Select a booth for details. Drag empty floor to pan, use Ctrl + wheel to zoom, or scroll the map on touch. Schematic layout &mdash; not a scale drawing of the venue.</p>
+          <p class="card-note" id="floorScaleNote"></p>
+          <p class="card-note">Select a booth for details. Drag empty floor to pan, use Ctrl + wheel to zoom, or scroll the map on touch.</p>
           <div class="floor-guide-body"><div class="floor-scroll" id="showFloorScroll" tabindex="0" role="region" aria-label="Interactive vendor floor plan"><div class="floor-map" id="showFloorMap"></div></div><aside class="floor-detail" id="showFloorDetail" aria-live="polite"><h3>Explore the floor</h3><p>Choose a vendor on the map or in the directory.</p></aside></div>
           <p id="floorResults" role="status" class="card-note"></p>
           <ul id="showFloorList" class="floor-vendors" aria-label="Vendor directory"></ul>
@@ -3993,7 +4004,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
             <dt>Tables</dt>
             <dd class="time-row">
               <label>Total <input id="setShowTables" type="number" min="0" step="1" inputmode="numeric" style="width:80px"></label>
-              <label>Booked <input id="setShowBooked" type="number" min="0" step="1" inputmode="numeric" style="width:80px"></label>
+              <label>Booked <input id="setShowBooked" type="number" min="0" step="1" inputmode="numeric" placeholder="Unknown" style="width:100px"><small>Leave blank until confirmed.</small></label>
             </dd>
             <dt>Table prices</dt><dd><div id="tablePriceEditor" class="rows-editor"></div></dd>
           </dl>
@@ -4036,6 +4047,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
             <div class="field full"><label for="setRevPlace">Google Place ID</label><input id="setRevPlace" placeholder="The shop's verified Google Place ID"></div>
           </div>
           <p class="card-note" id="revSourceNote"></p>
+          <label class="floor-auto-reviews"><input id="setRevTcgAuto" type="checkbox" checked> Include automatically refreshed TCGplayer highlights</label><p class="card-note">Up to three short, genuine five-star comments, refreshed each morning from the shop's public feedback. No order or account IDs are stored. <a href="https://github.com/ArtofJammin/toploaded-demo/actions/workflows/reviews.yml" target="_blank" rel="noopener noreferrer">Refresh job ↗</a></p>
           <div id="revEditor"></div>
           <p class="card-note" id="revPreview" role="status"></p>
           <div class="card-actions"><button class="btn" id="revApply" type="button">Publish reviews</button><button class="btn btn-ghost" id="revAdd" type="button">Add review</button><span class="save-state" role="status" data-state-for="cardReviews"></span></div>
@@ -4044,13 +4056,15 @@ a:hover .round-arrow{transform:rotate(45deg)}
 
       <div class="admin-card" id="cardFloorplan">
         <h3>Card show floor plan</h3>
-        <p class="card-note">Build the actual show layout: select a booth to edit, drag it to move, or use its arrow keys. TCG, Sports and Mixed percentages count vendor booths, not floor area. Empty space is aisle space; this is a schematic, not a measured venue plan. An empty plan stays unpublished.</p>
+        <p class="card-note">Build the actual show layout: select a booth to edit, drag it to move, or use its arrow keys. TCG, Sports and Mixed percentages count vendor booths, not floor area. Keep aisles, exits and other required clearances open; this editor does not certify a safe or venue-approved layout.</p>
+        <div class="field"><label for="setFpRoom">Room reference</label><select id="setFpRoom"><option value="hilton-ballroom">Hilton · Triple Crown Ballroom · 96 × 41 ft</option><option value="schematic">Custom schematic · no physical scale</option></select><p class="card-note" id="fpScaleNote"></p></div>
         <div class="form-grid"><div class="field"><label for="setFpRows">Grid rows</label><input id="setFpRows" type="number" min="1" max="20" value="6"></div><div class="field"><label for="setFpCols">Grid columns</label><input id="setFpCols" type="number" min="1" max="26" value="10"></div></div>
         <div class="floor-tools"><div class="field"><label for="fpBrush">New booth category</label><select id="fpBrush"><option value="tcg">TCG</option><option value="sports">Sports</option><option value="mixed">Mixed</option><option value="food">Food</option><option value="entry">Entry</option></select></div><button class="btn btn-ghost" id="fpPlace" type="button" aria-pressed="false">Place on floor</button><button class="btn btn-ghost" id="fpRotate" type="button" disabled>Rotate selected</button><div class="floor-zoom" aria-label="Editor zoom"><button type="button" data-floor-zoom="out" aria-label="Zoom editor out">&minus;</button><button type="button" data-floor-zoom="fit">Fit floor</button><button type="button" data-floor-zoom="in" aria-label="Zoom editor in">+</button></div></div>
         <p id="fpSelection" class="card-note" role="status">Add a booth, or choose Place on floor and tap an empty square.</p>
         <div class="floor-guide-body"><div class="floor-scroll" id="fpScroll" tabindex="0" role="region" aria-label="Floor plan editor"><div class="floor-map" id="fpMap"></div></div><div id="fpEditor" class="floor-inspector"></div></div>
         <div class="floor-mix" id="fpMix" aria-hidden="true"></div><p id="fpMixText" class="card-note"></p><span id="fpRatio" class="save-state"></span>
-        <div class="card-actions"><button class="btn" id="fpApply" type="button">Save floor plan</button><button class="btn btn-ghost" id="fpAdd" type="button">Add booth</button><span class="save-state" role="status" data-state-for="cardFloorplan"></span></div>
+        <p class="card-note" id="fpPublishNote" role="status"></p>
+        <div class="card-actions"><button class="btn" id="fpApply" type="button">Save floor plan</button><button class="btn btn-ghost" id="fpAdd" type="button">Add booth</button><button class="btn btn-ghost" id="fpExport" type="button">Download draft</button><span class="save-state" role="status" data-state-for="cardFloorplan"></span></div>
       </div>
 
       <div class="reset-row">
@@ -4379,7 +4393,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
   </div>
 </div>
 
-<script id="siteConfig">window.TL_DEFAULT_CONFIG={"title":"Top Loaded","tagline":"Trading Cards · NKY","phone":"(513) 222-2573","phoneRaw":"+15132222573","email":"toploadedtcg@gmail.com","address":{"line1":"2514 Hazelwood Dr","city":"Crescent Springs","state":"KY","zip":"41017"},"timezone":"America/New_York","hours":{"mon":null,"tue":["11:00","18:00"],"wed":["11:00","18:00"],"thu":["11:00","18:00"],"fri":["11:00","18:00"],"sat":["10:00","16:00"],"sun":["10:00","16:00"]},"hoursText":{"wk":"Tue–Fri · 11 AM – 6 PM","we":"Sat–Sun · 10 AM – 4 PM"},"banner":{"on":false,"text":""},"logo":null,"show":{"date":"2026-09-05","start":"10:00","end":"16:00","setup":"08:00","hours":"10 AM – 4 PM","venue":"Hilton Cincinnati Airport","address":"7373 Turfway Rd, Florence, KY 41042","tables":24,"booked":11,"cadence":"First Saturday or Sunday of every month","tablePrices":[{"n":1,"price":60},{"n":2,"price":110},{"n":3,"price":150}],"floorplan":{"rows":6,"cols":10,"booths":[]}},"events":[{"id":"op-wed","day":"Wed","dow":3,"name":"One Piece Locals","small":"Bandai official · winner & participation packs","time":"5:00 PM","start":"17:00","fee":"TBD","game":"op","signup":"tcgplus"},{"id":"op-sat","day":"Sat","dow":6,"name":"One Piece Locals","small":"Bandai official · winner & participation packs","time":"11:00 AM","start":"11:00","fee":"TBD","game":"op","signup":"tcgplus"},{"id":"gd-sat","day":"Sat","dow":6,"name":"Gundam Card Game","small":"Bandai official · winner & participation packs","time":"1:00 PM","start":"13:00","fee":"TBD","game":"gundam","signup":"tcgplus"},{"id":"pk-sun","day":"Sun","dow":0,"name":"Pokemon League","small":"All ages · league promo prizing","time":"11:00 AM","start":"11:00","fee":"TBD","game":"pk","signup":"form"}],"live":{"on":false,"title":"Streaming from the shop floor","platform":"","embed":"","spotPrice":24.99,"spots":12,"packsPerSpot":3,"schedule":[]},"links":{"tcgplus":"https://www.bandai-tcg-plus.com/","facebook":"https://www.facebook.com/toploadedtradingcards","instagram":"https://www.instagram.com/toploadedtcg","tcgplayer":"https://www.tcgplayer.com/sellers/Top-Loaded-TCG/5c356cdf","whatnot":"","googleMaps":"https://www.google.com/maps/search/?api=1&query=Top+Loaded+Trading+Cards+2514+Hazelwood+Dr+Crescent+Springs+KY+41017","appleMaps":"https://maps.apple.com/place?place-id=I96E3F1088FE2244C"},"buy":{"rates":{"bulk":0.55,"standard":0.6,"hot":0.7,"graded":0.8},"creditBonus":0.1},"ticker":[["Charizard ex · 151","$85"],["Umbreon VMAX Alt","$450"],["Shanks OP-09 Leader","$42"],["The One Ring","$40"],["Prismatic ETBs","$70"],["Luffy OP-05 Alt","$88"],["Ragavan MH2","$41"],["Base Set holos","ask"],["Sealed booster boxes","top rates"]],"testimonials":[],"rip":{"prices":{"pk":4.49,"op":4.49,"mtg":5.49}},"reviews":{"source":"manual","googlePlaceId":"","minRating":4,"items":[]},"updatedAt":null};</script>
+<script id="siteConfig">window.TL_DEFAULT_CONFIG={"title":"Top Loaded","tagline":"Trading Cards · NKY","phone":"(513) 222-2573","phoneRaw":"+15132222573","email":"toploadedtcg@gmail.com","address":{"line1":"2514 Hazelwood Dr","city":"Crescent Springs","state":"KY","zip":"41017"},"timezone":"America/New_York","hours":{"mon":null,"tue":["11:00","18:00"],"wed":["11:00","18:00"],"thu":["11:00","18:00"],"fri":["11:00","18:00"],"sat":["10:00","16:00"],"sun":["10:00","16:00"]},"hoursText":{"wk":"Tue–Fri · 11 AM – 6 PM","we":"Sat–Sun · 10 AM – 4 PM"},"banner":{"on":false,"text":""},"logo":null,"show":{"date":"2026-09-05","start":"10:00","end":"16:00","setup":"08:00","hours":"10 AM – 4 PM","venue":"Hilton Cincinnati Airport","address":"7373 Turfway Rd, Florence, KY 41042","tables":24,"booked":null,"cadence":"First Saturday or Sunday of every month","tablePrices":[{"n":1,"price":60},{"n":2,"price":110},{"n":3,"price":150}],"floorplan":{"room":"hilton-ballroom","rows":6,"cols":10,"booths":[]}},"events":[{"id":"op-wed","day":"Wed","dow":3,"name":"One Piece Locals","small":"Bandai official · winner & participation packs","time":"5:00 PM","start":"17:00","fee":"TBD","game":"op","signup":"tcgplus"},{"id":"op-sat","day":"Sat","dow":6,"name":"One Piece Locals","small":"Bandai official · winner & participation packs","time":"11:00 AM","start":"11:00","fee":"TBD","game":"op","signup":"tcgplus"},{"id":"gd-sat","day":"Sat","dow":6,"name":"Gundam Card Game","small":"Bandai official · winner & participation packs","time":"1:00 PM","start":"13:00","fee":"TBD","game":"gundam","signup":"tcgplus"},{"id":"pk-sun","day":"Sun","dow":0,"name":"Pokemon League","small":"All ages · league promo prizing","time":"11:00 AM","start":"11:00","fee":"TBD","game":"pk","signup":"form"}],"live":{"on":false,"title":"Streaming from the shop floor","platform":"","embed":"","spotPrice":24.99,"spots":12,"packsPerSpot":3,"schedule":[]},"links":{"tcgplus":"https://www.bandai-tcg-plus.com/","facebook":"https://www.facebook.com/toploadedtradingcards","instagram":"https://www.instagram.com/toploadedtcg","tcgplayer":"https://www.tcgplayer.com/sellers/Top-Loaded-TCG/5c356cdf","whatnot":"","googleMaps":"https://www.google.com/maps/search/?api=1&query=Top+Loaded+Trading+Cards+2514+Hazelwood+Dr+Crescent+Springs+KY+41017","appleMaps":"https://maps.apple.com/place?place-id=I96E3F1088FE2244C"},"buy":{"rates":{"bulk":0.55,"standard":0.6,"hot":0.7,"graded":0.8},"creditBonus":0.1},"ticker":[["Charizard ex · 151","$85"],["Umbreon VMAX Alt","$450"],["Shanks OP-09 Leader","$42"],["The One Ring","$40"],["Prismatic ETBs","$70"],["Luffy OP-05 Alt","$88"],["Ragavan MH2","$41"],["Base Set holos","ask"],["Sealed booster boxes","top rates"]],"testimonials":[],"rip":{"prices":{"pk":4.49,"op":4.49,"mtg":5.49}},"reviews":{"tcgplayerAuto":true,"source":"manual","googlePlaceId":"","minRating":4,"items":[]},"updatedAt":null};</script>
 <script id="cardArtData"></script>
 <script>
 (function(){
@@ -5437,7 +5451,12 @@ a:hover .round-arrow{transform:rotate(45deg)}
     if(!n) return "";
     return '<span class="review-stars" aria-label="' + n + ' out of 5">' + new Array(n + 1).join("★") + '</span>';
   }
-  var reviewRemote=null,reviewFetchKey="";
+  var reviewRemote=null,reviewFetchKey="",reviewSnapshot=null;
+  TL.on('init',function(){
+    fetch('reviews-tcgplayer.json',{cache:'no-cache'}).then(function(r){if(!r.ok)throw new Error('Review feed unavailable');return r.json();}).then(function(d){
+      if(d.sellerKey==='5c356cdf'&&Array.isArray(d.items)&&d.items.length<=3){reviewSnapshot=d;renderTestimonials();}
+    }).catch(function(){/* Curated reviews/source links remain available. */});
+  });
   function reviewUrl(u){try{var p=new URL(u);return p.protocol==="https:"||p.protocol==="http:"?p.href:"";}catch(e){return "";}}
   function fetchReviews(){
     var cfg=TL.config.reviews||{},key=JSON.stringify(cfg);
@@ -5450,9 +5469,12 @@ a:hover .round-arrow{transform:rotate(45deg)}
     if(!box) return;
     var cfg = (TL.config && TL.config.reviews) || {};
     var min = Number(cfg.minRating || 0);
-    var list = (reviewRemote ? reviewRemote.items : Array.isArray(cfg.items) ? cfg.items : []).map(function(t){
+    var supplied = reviewRemote ? reviewRemote.items : Array.isArray(cfg.items) ? cfg.items : [];
+    var automatic = cfg.tcgplayerAuto!==false && reviewSnapshot && Date.now()-Date.parse(reviewSnapshot.generated)<30*86400000 ? reviewSnapshot.items : [];
+    var reviewSeen={};
+    var list = supplied.concat(automatic).filter(function(t){var k=t.source+'|'+t.quote+'|'+t.who;if(reviewSeen[k])return false;reviewSeen[k]=true;return true;}).map(function(t){
       return {q: t.quote || t.text || "", who: t.who || t.name || "", rating: Number(t.rating || 0),
-        source: REVIEW_SOURCES[t.source] ? t.source : "shop", url: reviewUrl(t.url),authorUrl:reviewUrl(t.authorUrl),photo:reviewUrl(t.photo)};
+        source: REVIEW_SOURCES[t.source] ? t.source : "shop", url: reviewUrl(t.url),authorUrl:reviewUrl(t.authorUrl),photo:reviewUrl(t.photo),at:t.at};
     }).filter(function(t){ return t.q && t.rating >= min; }).slice(0, 6);
 
     if(!list.length){
@@ -5476,10 +5498,11 @@ a:hover .round-arrow{transform:rotate(45deg)}
         (t.authorUrl ? '<a class="review-author" href="'+esc(t.authorUrl)+'" target="_blank" rel="noopener noreferrer">'+(t.photo?'<img src="'+esc(t.photo)+'" alt="" width="32" height="32" loading="lazy">':'')+esc(t.who)+'</a>' : '')+
         '<p class="p-set quote-who">' + (href
           ? '<a href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">' + esc(who) + ' ↗</a>'
-          : esc(who)) + '</p></div>';
+          : esc(who)) + (t.at&&Number.isFinite(Date.parse(t.at))?' · '+esc(new Date(t.at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:TL.config.timezone||'America/New_York'})):'')+'</p></div>';
     }).join("");
     if(reviewRemote && reviewRemote.mode==="google")box.insertAdjacentHTML("beforeend",'<p class="review-attribution">Google-selected reviews ordered by relevance, filtered to '+esc(min)+'+ stars. <a href="'+esc(reviewUrl(reviewRemote.allReviews))+'" target="_blank" rel="noopener">View all reviews</a> · <a href="'+esc(reviewUrl(reviewRemote.terms))+'">Terms</a> · <a href="'+esc(reviewUrl(reviewRemote.privacy))+'">Privacy</a></p>');
     if(tag){ tag.hidden = false;tag.textContent="Selected positive reviews · "+min+"+ stars, not an overall rating"; }
+    if(automatic.length)box.insertAdjacentHTML('beforeend','<p class="review-attribution">TCGplayer highlights: recent five-star feedback with short comments. Last refreshed '+esc(new Date(reviewSnapshot.generated).toLocaleDateString())+'. <a href="https://www.tcgplayer.com/sellers/Top-Loaded-TCG/5c356cdf/feedback" target="_blank" rel="noopener noreferrer">Read all feedback ↗</a></p>');
   }
   TL.on("config:change", function(){reviewRemote=null;renderTestimonials();fetchReviews();});
   TL.on("api:ready",fetchReviews);
@@ -7949,7 +7972,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
   }
   function renderShowStat(){
     var s = TL.config.show || {};
-    statNum($("#statTables"), s.booked || 0);
+    if(s.booked===null||s.booked===undefined)$('#statTables').textContent='—';else statNum($("#statTables"), s.booked || 0);
     var of = $("#statTablesOf"); if(of) of.textContent = fmtInt(s.tables || 0);
     var d = $("#statShowDate");
     if(d){
@@ -9339,6 +9362,9 @@ a:hover .round-arrow{transform:rotate(45deg)}
     if(n){ if(lastTablesShown !== booked){ n.textContent = lastTablesShown === null ? "0" : String(lastTablesShown); evCountTo(n, booked, {duration: 900}); lastTablesShown = booked; } }
     else if((el = $("#tablesLabel"))) el.textContent = booked + " of " + total;
     if(meter){ meter.setAttribute("aria-label", booked + " of " + total + " vendor tables booked as of the last update"); var bar = meter.querySelector("i"); if(bar) bar.style.width = Math.round(booked / total * 100) + "%"; meter.classList.toggle("full", booked >= total); }
+    var knownBooking=Number.isFinite(s.booked)&&s.booked>=0;
+    if(meter)meter.hidden=!knownBooking;
+    var bookingLine=$('.show-tables');if(bookingLine)bookingLine.hidden=!knownBooking;
     var cal = $("#showCal"), evt = calForShow(); if(cal) cal.innerHTML = evt ? calMenu(evt) : "";
     var sel = $("#vTables");
     if(sel && Array.isArray(s.tablePrices) && s.tablePrices.length){
@@ -9563,19 +9589,31 @@ a:hover .round-arrow{transform:rotate(45deg)}
     function fits(b,size){return b.r>=1 && b.c>=1 && b.w>=1 && b.h>=1 && b.r+b.h-1<=size.rows && b.c+b.w-1<=size.cols;}
     function overlaps(a,b){return a.c<b.c+b.w && b.c<a.c+a.w && a.r<b.r+b.h && b.r<a.r+a.h;}
     function canPlace(booths,b,size,skip){return fits(b,size) && !booths.some(function(other,i){return i!==skip && overlaps(b,other);});}
+    function roomMetrics(room,rows,cols){
+      var hilton=room==='hilton-ballroom';
+      return {hilton:hilton,row:hilton?64*cols/rows*41/96:64,gap:hilton?0:6,widthFt:hilton?96:null,heightFt:hilton?41:null};
+    }
+    function layout(map,room,size){
+      var m=roomMetrics(room,size.rows,size.cols);
+      map.dataset.rows=size.rows;map.dataset.cols=size.cols;map.dataset.rowBase=m.row;map.dataset.baseGap=m.gap;
+      map.classList.toggle('is-hilton',m.hilton);
+      map.style.gridTemplateColumns='repeat('+size.cols+', var(--fp-cell))';map.style.gridTemplateRows='repeat('+size.rows+', var(--fp-row, var(--fp-cell)))';
+      return m.hilton?'Triple Crown Ballroom · 96 × 41 ft. Each grid allocation is '+(96/size.cols).toFixed(1)+' × '+(41/size.rows).toFixed(1)+' ft. Booth placements are organizer-entered, not surveyed.':'Custom schematic · grid positions have no physical scale.';
+    }
     function viewport(root,map,scroll){
       var zoom=1,drag=null,fitMode=true;
       function setZoom(z){
         var old=zoom; zoom=Math.max(.18,Math.min(2.5,z));
         var x=(scroll.scrollLeft+scroll.clientWidth/2)/old,y=(scroll.scrollTop+scroll.clientHeight/2)/old;
-        map.style.setProperty('--fp-cell',(64*zoom)+'px');map.style.setProperty('--fp-gap',(6*zoom)+'px');
+        map.style.setProperty('--fp-cell',(64*zoom)+'px');map.style.setProperty('--fp-row',((Number(map.dataset.rowBase)||64)*zoom)+'px');map.style.setProperty('--fp-gap',((Number(map.dataset.baseGap)||0)*zoom)+'px');
         map.classList.toggle('is-dense',zoom<.6);
         scroll.scrollLeft=x*zoom-scroll.clientWidth/2;scroll.scrollTop=y*zoom-scroll.clientHeight/2;
       }
       function fit(){
         if(!scroll.clientWidth) return;
         var cols=Number(map.dataset.cols)||10,rows=Number(map.dataset.rows)||6;
-        setZoom(Math.min(1,(scroll.clientWidth-32)/(cols*70),(scroll.clientHeight-32)/(rows*70)));
+        var gap=Number(map.dataset.baseGap)||0,row=Number(map.dataset.rowBase)||64;
+        setZoom(Math.min(1,(scroll.clientWidth-32)/(cols*64+(cols-1)*gap),(scroll.clientHeight-32)/(rows*row+(rows-1)*gap)));
         scroll.scrollLeft=scroll.scrollTop=0;fitMode=true;
       }
       function focus(el){
@@ -9599,7 +9637,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
       scroll.addEventListener('pointerup',stop);scroll.addEventListener('pointercancel',stop);scroll.addEventListener('lostpointercapture',stop);
       map.addEventListener('focusin',function(e){var b=e.target.closest('.fp-cell');if(b)focus(b);});
       if(typeof ResizeObserver!=='undefined')new ResizeObserver(function(){if(fitMode)fit();}).observe(scroll);
-      return {fit:fit,focus:focus,refresh:function(){if(fitMode)fit();}};
+      return {fit:fit,focus:focus,refresh:function(){if(fitMode)fit();else setZoom(zoom);}};
     }
     var publicBooths=[],selected=-1,publicView=null;
     function match(b){var q=($('#floorSearch').value||'').trim().toLowerCase(),type=$('#floorType').value;return (!type||b.type===type)&&(!q||(b.label+' '+b.id+' '+labels[b.type]).toLowerCase().includes(q));}
@@ -9620,13 +9658,13 @@ a:hover .round-arrow{transform:rotate(45deg)}
       var booths = (Array.isArray(f.booths) ? f.booths : []).filter(function(b){return b && labels[b.type] && b.r>=1 && b.c>=1 && b.w>=1 && b.h>=1 && b.r+b.h-1<=rows && b.c+b.w-1<=cols;});
       var map=$("#showFloorMap"), note=$("#showFloorNote"), mix=$("#showFloorMix"), legend=$("#showFloorLegend"), list=$("#showFloorList"), scroll=$("#showFloorScroll");
       if(!map) return;
+      $('#showVenueReference').hidden=!/hilton/i.test(String((TL.config.show||{}).venue));
       var guide=$('#showFloorGuide');guide.hidden=!booths.length;
       scroll.hidden = !booths.length; mix.hidden = !booths.length;
       if(!booths.length){ note.textContent="The vendor layout is not published yet. Check back for the confirmed TCG and Sports booth locations and percentages."; map.innerHTML=legend.innerHTML=list.innerHTML=mix.innerHTML="";publicBooths=[];selected=-1;return; }
       var s=stats(booths);
       note.textContent=s.total+" vendor booths · percentages are by booth, not floor area. Mixed vendors are counted separately; food and entry areas are excluded.";
-      map.style.gridTemplateColumns="repeat("+cols+", var(--fp-cell))"; map.style.gridTemplateRows="repeat("+rows+", var(--fp-cell))";
-      map.dataset.rows=rows;map.dataset.cols=cols;
+      $('#floorScaleNote').textContent=layout(map,f.room,{rows:rows,cols:cols});
       map.innerHTML=booths.map(function(b,i){return '<button type="button" class="fp-cell t-'+b.type+'" data-floor-booth="'+i+'" aria-pressed="false" aria-label="'+esc(b.label+' · '+labels[b.type]+', row '+b.r+', column '+b.c)+'" title="'+esc(b.label+' · '+labels[b.type])+'" style="grid-row:'+b.r+' / span '+b.h+';grid-column:'+b.c+' / span '+b.w+'"><b>'+esc(b.label)+'</b><i>'+labels[b.type]+'</i></button>';}).join("");
       mix.innerHTML=Object.keys(s.pct).map(function(k){return '<span class="t-'+k+'" style="width:'+s.pct[k]+'%"></span>';}).join("");
       legend.innerHTML=Object.keys(labels).filter(function(k){return booths.some(function(b){return b.type===k;});}).map(function(k){return '<li><i class="t-'+k+'" aria-hidden="true"></i>'+labels[k]+(s.pct[k]!==undefined?' '+s.pct[k]+'% ('+s.counts[k]+')':'')+'</li>';}).join("");
@@ -9639,7 +9677,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
       publicView.refresh();
     }
     TL.on("init",render); TL.on("config:change",render);
-    return {stats:stats,render:render,viewport:viewport,fits:fits,overlaps:overlaps,canPlace:canPlace};
+    return {stats:stats,render:render,viewport:viewport,fits:fits,overlaps:overlaps,canPlace:canPlace,layout:layout,roomMetrics:roomMetrics};
   })();
 
   /* ---------- pack rip: virtual booster mini-game ----------
@@ -10509,7 +10547,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
       savingConfig = false;
       var server = canServer && !!(res && typeof res === "object");
       var where = !TL.api.online ? "Saved on this device" : (server ? "Saved to server" : "Saved on this device only — server refused");
-      setState(st, server || !TL.api.online ? "ok" : "warn", where + " · " + nowTime());
+      setState(st, server ? "ok" : "warn", where + " · " + nowTime());
       renderCfgUpdated();
       toast((okMsg ? okMsg + " — " : "") + where.toLowerCase());
       return server;
@@ -10736,7 +10774,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
     rowsRender($("#tablePriceEditor"), (s.tablePrices || []).map(function(t){ return {n: t.n, price: t.price}; }), TABLE_F, "No table prices.");
   }
   $("#setShowApply").addEventListener("click", function(){
-    var tables = Math.max(0, Math.round(num(val("setShowTables"), 0))), booked = Math.max(0, Math.round(num(val("setShowBooked"), 0)));
+    var tables = Math.max(0, Math.round(num(val("setShowTables"), 0))), booked = val('setShowBooked')===''?null:Math.max(0, Math.round(num(val("setShowBooked"), 0)));
     if(booked > tables){ toast("Booked can't be more than the total tables"); $("#setShowBooked").focus(); return; }
     var start = val("setShowStart") || "10:00", end = val("setShowEnd") || "16:00";
     var hoursTxt = val("setShowHours") || (fmt12(start) + " – " + fmt12(end));
@@ -10914,14 +10952,14 @@ a:hover .round-arrow{transform:rotate(45deg)}
   function renderRevSourceNote(){
     var el = $("#revSourceNote"); if(!el) return;
     el.textContent = val("setRevSource") === "google"
-      ? "Automatic Google reviews need the shared API, a Places key, the shop's Place ID, and published terms/privacy links. Until connected, only the genuine reviews entered below can appear."
-      : "Pasted in by hand: the site shows exactly what's in the list below, nothing else.";
+      ? "Automatic Google reviews need the shared API, a Places key, the shop's Place ID, and published terms/privacy links. TCGplayer highlights refresh independently when enabled below."
+      : "The reviews below are owner-curated. Automatically refreshed TCGplayer highlights can appear alongside them when enabled below.";
   }
   function renderRevPreview(){
     var el = $("#revPreview"); if(!el) return;
     var min = revMin(), live = 0, held = 0;
     revWork.forEach(function(r){ if(String(r.quote || "").trim()){ if(r.rating >= min) live++; else held++; } });
-    if(!revWork.length){ el.textContent = "Nothing published — the home page section stays empty until you add a review."; return; }
+    if(!revWork.length){ el.textContent = "No owner-curated reviews. The automatic TCGplayer highlights can still appear when enabled."; return; }
     el.textContent = live + " review" + (live === 1 ? "" : "s") + " will show on the home page" +
       (held ? " · " + held + " held back under the " + min + "-star minimum" : "") +
       " · publish to put the change live.";
@@ -10961,6 +10999,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
     setVal("setRevSource", r.source === "google" ? "google" : "manual");
     setVal("setRevPlace", r.googlePlaceId);
     setVal("setRevMin", TL.clamp(Math.round(num(r.minRating, 4)), 1, 5));
+    $('#setRevTcgAuto').checked=r.tcgplayerAuto!==false;
     revWork = revFromConfig(); revReady = true;
     renderRevSourceNote(); renderRevEditor();
   }
@@ -11011,7 +11050,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
       toast("Nothing published — the list is back as it was");
       return;
     }
-    var patch = {reviews: {source: val("setRevSource") === "google" ? "google" : "manual", googlePlaceId: val("setRevPlace"), minRating: min, items: items}};
+    var patch = {reviews: {source: val("setRevSource") === "google" ? "google" : "manual", googlePlaceId: val("setRevPlace"), minRating: min, items: items,tcgplayerAuto:$('#setRevTcgAuto').checked}};
     /* the older home-page quote list reads {quote, who}; keep it in step so real reviews
        replace the sample quotes wherever that list is still what gets rendered */
     if(window.TL_DEFAULT_CONFIG && ("testimonials" in window.TL_DEFAULT_CONFIG)){
@@ -11069,10 +11108,8 @@ a:hover .round-arrow{transform:rotate(45deg)}
   function renderFpMap(){
     var map = $("#fpMap"), size = fpSize();
     if(map){
-      map.dataset.rows=size.rows;map.dataset.cols=size.cols;
       map.classList.toggle('is-placing',fpPlacing);
-      map.style.gridTemplateColumns = "repeat(" + size.cols + ", var(--fp-cell))";
-      map.style.gridTemplateRows = "repeat(" + size.rows + ", var(--fp-cell))";
+      $('#fpScaleNote').textContent=TL.floorplan.layout(map,val('setFpRoom'),size);
       map.innerHTML = fpWork.map(function(b, i){
         var fits = TL.floorplan.canPlace(fpWork,b,size,i);
         var r = TL.clamp(b.r, 1, size.rows), c = TL.clamp(b.c, 1, size.cols);
@@ -11084,6 +11121,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
       fpViewport.refresh();
     }
     $('#fpRotate').disabled=!fpWork[fpSelected];$('#fpPlace').setAttribute('aria-pressed',String(fpPlacing));
+    $('#fpPublishNote').textContent=TL.api.online&&TL.api.role==='admin'?'Connected: Save floor plan publishes this layout to the shared site configuration.':'Not connected to a shared backend: Save keeps this layout on this device only. Download a draft to preserve your work; public visitors will not see these changes yet.';
     $('#fpSelection').textContent=fpPlacing?'Tap an empty square to place a new '+BOOTH_LAB[val('fpBrush')]+' booth.':fpWork[fpSelected]?'Selected: '+(fpWork[fpSelected].label||'Unnamed booth')+' — drag to move, use arrow keys, or edit the details. Changes are not published until saved.':'Add a booth, or choose Place on floor and tap an empty square.';
     renderFpMix(size);
   }
@@ -11122,6 +11160,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
   }
   function renderFloorplanCard(){
     var f = (TL.config.show || {}).floorplan || {};
+    setVal('setFpRoom',f.room==='hilton-ballroom'?'hilton-ballroom':'schematic');
     setVal("setFpRows", TL.clamp(Math.round(num(f.rows, 6)), 1, FP_MAX_ROWS));
     setVal("setFpCols", TL.clamp(Math.round(num(f.cols, 10)), 1, FP_MAX_COLS));
     fpWork = fpFromConfig(); fpReady = true;fpSelected=fpWork.length?0:-1;fpPlacing=false;
@@ -11159,8 +11198,9 @@ a:hover .round-arrow{transform:rotate(45deg)}
     fpViewport.focus($('#fpMap [data-fpselect="'+fpSelected+'"]'));
   }
   function fpPoint(e){
-    var map=$('#fpMap'),rect=map.getBoundingClientRect(),step=parseFloat(getComputedStyle(map).getPropertyValue('--fp-cell'))+parseFloat(getComputedStyle(map).gap);
-    return {r:Math.floor((e.clientY-rect.top-2)/step)+1,c:Math.floor((e.clientX-rect.left-2)/step)+1};
+    var map=$('#fpMap'),rect=map.getBoundingClientRect(),css=getComputedStyle(map);
+    var stepX=parseFloat(css.getPropertyValue('--fp-cell'))+parseFloat(css.columnGap),stepY=parseFloat(css.getPropertyValue('--fp-row'))+parseFloat(css.rowGap);
+    return {r:Math.floor((e.clientY-rect.top-2)/stepY)+1,c:Math.floor((e.clientX-rect.left-2)/stepX)+1};
   }
   function fpFocus(){var b=$('#fpMap [data-fpselect="'+fpSelected+'"]');if(b)b.focus({preventScroll:true});}
   function fpMove(i,r,c,rotate){
@@ -11205,6 +11245,12 @@ a:hover .round-arrow{transform:rotate(45deg)}
   $('#fpMap').addEventListener('pointercancel',function(){fpDrag=null;fpSuppressClick=false;renderFpMap();});
   $("#setFpRows").addEventListener("input", renderFpMap);
   $("#setFpCols").addEventListener("input", renderFpMap);
+  $('#setFpRoom').addEventListener('change',renderFpMap);
+  $('#fpExport').addEventListener('click',function(){
+    if(!fpReady){toast('Wait for the floor editor to load');return;}
+    var size=fpSize(),draft={kind:'top-loaded-floorplan-draft',exported:new Date().toISOString(),venue:(TL.config.show||{}).venue,showDate:(TL.config.show||{}).date,confirmed:false,floorplan:{room:val('setFpRoom'),rows:size.rows,cols:size.cols,booths:fpWork.map(function(b,i){return {id:b.id||'draft-'+(i+1),label:b.label,type:b.type,r:b.r,c:b.c,w:b.w,h:b.h};})}};
+    var url=URL.createObjectURL(new Blob([JSON.stringify(draft,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='top-loaded-floorplan-draft.json';a.click();setTimeout(function(){URL.revokeObjectURL(url);},1000);toast('Draft downloaded — this does not publish it');
+  });
   $("#fpApply").addEventListener("click", function(){
     if(!fpReady){ renderFloorplanCard(); toast("Floor plan reloaded — check it, then save"); return; }
     var size = fpSize();
@@ -11239,7 +11285,7 @@ a:hover .round-arrow{transform:rotate(45deg)}
       toast("Nothing saved — the plan is back as it was");
       return;
     }
-    saveCard("cardFloorplan", {show: {floorplan: {rows: size.rows, cols: size.cols, booths: booths}}}, "Floor plan saved")
+    saveCard("cardFloorplan", {show: {floorplan: {room:val('setFpRoom'),rows: size.rows, cols: size.cols, booths: booths}}}, "Floor plan saved")
       .then(function(){ renderFloorplanCard(); });
   });
 
